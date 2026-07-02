@@ -23,13 +23,15 @@
     just
   ];
 
+  # Headless tailscaled (no GUI app). One-time join after first switch:
+  #   sudo tailscale up --auth-key=<oauth-minted key, tag:oauth-generated> --hostname=mac-mini
+  services.tailscale.enable = true;
+
   # GUI apps that aren't packaged well in nixpkgs on macOS.
   # Homebrew itself is installed by nix-homebrew (see flake.nix).
   homebrew = {
     enable = true;
-    casks = [
-      "tailscale-app"
-    ];
+    casks = [ ];
     onActivation.cleanup = "zap"; # remove anything not declared here
   };
 }
