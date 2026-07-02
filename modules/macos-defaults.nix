@@ -13,7 +13,6 @@
   system.defaults = {
     NSGlobalDomain = {
       "com.apple.trackpad.scaling" = 5.0;
-      "com.apple.mouse.scaling" = 5.0;
       InitialKeyRepeat = 10;
       KeyRepeat = 2;
       ApplePressAndHoldEnabled = false;
@@ -52,6 +51,8 @@
     };
 
     CustomUserPreferences = {
+      # no typed option for mouse speed (only trackpad)
+      NSGlobalDomain."com.apple.mouse.scaling" = 5.0;
       "com.apple.finder" = {
         StandardViewSettings = {
           ExtendedListViewSettings_calculateAllSizes = true;
