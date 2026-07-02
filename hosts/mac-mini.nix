@@ -24,7 +24,7 @@
   ];
 
   # GUI apps that aren't packaged well in nixpkgs on macOS.
-  # Requires Homebrew itself to be installed (see README manual steps).
+  # Homebrew itself is installed by nix-homebrew (see flake.nix).
   homebrew = {
     enable = true;
     casks = [
