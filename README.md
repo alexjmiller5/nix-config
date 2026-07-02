@@ -41,21 +41,16 @@ No `ssh-copy-id` needed: the bootstrap (step 5) authenticates with the account p
 2. System Settings → Users & Groups → enable **automatic login** (so GUI apps come up after an unattended reboot).
 3. Grant any TCC prompts (Full Disk Access etc.) as they appear — macOS permission grants are GUI-only by design.
 
-### 5. Bootstrap nix — one SSH command
+### 5. Bootstrap — one SSH command
 
-One idempotent script installs Determinate Nix and applies the flake; nix does everything else (Homebrew itself via nix-homebrew, casks, packages, dotfiles, system settings). It prompts for the mini's sudo password, so it needs a tty (`-t`):
+One idempotent script installs Determinate Nix, applies the flake (Homebrew
+itself via nix-homebrew, packages, dotfiles, `authorized_keys`, tailscaled,
+system settings), and joins the tailnet.
 
-```sh
-ssh -t mac-mini-local 'bash <(curl -fsSL https://raw.githubusercontent.com/alexjmiller5/nix-config/main/scripts/bootstrap.sh)'
-```
-
-### 6. Join the tailnet (headless, no GUI login)
-
-The flake runs `tailscaled` (`services.tailscale`), but *joining* is a one-time
-imperative act — auth keys can't be permanent (90-day max) so nothing here is
-declarable. Mint a key from the laptop using the Tailscale OAuth client in
+Joining needs an auth key — the one irreducibly imperative bit, since Tailscale
+keys cap at 90 days. Mint it from the laptop using the OAuth client in
 1Password (items "Tailscale OAuth Client ID" / "Tailscale OAuth Client Secret",
-Personal vault). Keys minted this way **must** carry `tag:oauth-generated`:
+Personal vault); keys minted this way **must** carry `tag:oauth-generated`:
 
 ```sh
 TOKEN=$(curl -s https://api.tailscale.com/api/v2/oauth/token \
@@ -67,14 +62,19 @@ AUTHKEY=$(curl -s -X POST https://api.tailscale.com/api/v2/tailnet/-/keys \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"capabilities":{"devices":{"create":{"reusable":false,"ephemeral":false,"preauthorized":true,"tags":["tag:oauth-generated"]}}},"expirySeconds":604800,"description":"mac-mini bootstrap"}' \
   | jq -r .key)
-
-ssh -t mac-mini-local "sudo /run/current-system/sw/bin/tailscale up --auth-key=$AUTHKEY --hostname=mac-mini"
 ```
 
-`--hostname=mac-mini` must match the `mac-mini-tailscale` entry in the laptop's
-`~/.ssh/config`. Joining survives reboots and rebuilds; this only recurs on a
-full machine rebuild.
+Then the one command (first time it authenticates with the account password;
+afterwards the flake-installed key takes over). `-t` because the script sudo-prompts:
 
-### 7. Exit exam
+```sh
+ssh -t mac-mini-local "bash <(curl -fsSL https://raw.githubusercontent.com/alexjmiller5/nix-config/main/scripts/bootstrap.sh) $AUTHKEY"
+```
+
+The tailnet hostname is pinned to `mac-mini` in the script, matching the
+`mac-mini-tailscale` entry in the laptop's `~/.ssh/config`. Joining survives
+reboots and rebuilds; it only recurs on a full machine rebuild.
+
+### 6. Exit exam
 
 Reboot the mini without touching it. Confirm `ssh mac-mini-tailscale` (from the laptop's `~/.ssh/config`) comes back on its own. If yes, unplug the display forever.
