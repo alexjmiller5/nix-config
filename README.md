@@ -38,9 +38,8 @@ No `ssh-copy-id` needed: the bootstrap (step 5) authenticates with the account p
 ### 4. GUI-only configuration (via Screen Sharing)
 
 1. System Settings → Apple ID → **iCloud → iCloud Drive → enable "Desktop & Documents Folders"**, and turn **off "Optimize Mac Storage"** (scripts need real files on disk, not cloud stubs).
-2. System Settings → Users & Groups → enable **automatic login** (so GUI apps like Tailscale come up after an unattended reboot).
-3. Install Tailscale (the bootstrap below installs the cask) and **sign in via its menu-bar GUI**. Tailscale login is interactive and cannot be declared.
-4. Grant any TCC prompts (Full Disk Access etc.) as they appear — macOS permission grants are GUI-only by design.
+2. System Settings → Users & Groups → enable **automatic login** (so GUI apps come up after an unattended reboot).
+3. Grant any TCC prompts (Full Disk Access etc.) as they appear — macOS permission grants are GUI-only by design.
 
 ### 5. Bootstrap nix — one SSH command
 
@@ -50,6 +49,32 @@ One idempotent script installs Determinate Nix and applies the flake; nix does e
 ssh -t mac-mini-local 'bash <(curl -fsSL https://raw.githubusercontent.com/alexjmiller5/nix-config/main/scripts/bootstrap.sh)'
 ```
 
-### 6. Exit exam
+### 6. Join the tailnet (headless, no GUI login)
+
+The flake runs `tailscaled` (`services.tailscale`), but *joining* is a one-time
+imperative act — auth keys can't be permanent (90-day max) so nothing here is
+declarable. Mint a key from the laptop using the Tailscale OAuth client in
+1Password (items "Tailscale OAuth Client ID" / "Tailscale OAuth Client Secret",
+Personal vault). Keys minted this way **must** carry `tag:oauth-generated`:
+
+```sh
+TOKEN=$(curl -s https://api.tailscale.com/api/v2/oauth/token \
+  -d "client_id=$(op item get 'Tailscale OAuth Client ID' --fields credential --reveal)" \
+  -d "client_secret=$(op item get 'Tailscale OAuth Client Secret' --fields credential --reveal)" \
+  | jq -r .access_token)
+
+AUTHKEY=$(curl -s -X POST https://api.tailscale.com/api/v2/tailnet/-/keys \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"capabilities":{"devices":{"create":{"reusable":false,"ephemeral":false,"preauthorized":true,"tags":["tag:oauth-generated"]}}},"expirySeconds":604800,"description":"mac-mini bootstrap"}' \
+  | jq -r .key)
+
+ssh -t mac-mini-local "sudo /run/current-system/sw/bin/tailscale up --auth-key=$AUTHKEY --hostname=mac-mini"
+```
+
+`--hostname=mac-mini` must match the `mac-mini-tailscale` entry in the laptop's
+`~/.ssh/config`. Joining survives reboots and rebuilds; this only recurs on a
+full machine rebuild.
+
+### 7. Exit exam
 
 Reboot the mini without touching it. Confirm `ssh mac-mini-tailscale` (from the laptop's `~/.ssh/config`) comes back on its own. If yes, unplug the display forever.
