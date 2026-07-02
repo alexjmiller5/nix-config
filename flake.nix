@@ -24,6 +24,7 @@
         specialArgs = { inherit username; };
         modules = [
           ./hosts/mac-mini.nix
+          ./modules/macos-defaults.nix
           nix-homebrew.darwinModules.nix-homebrew
           {
             nix-homebrew = {
