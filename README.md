@@ -31,12 +31,9 @@ The display, mouse, and accessibility keyboard are no longer needed — everythi
 
 ### 3. Take over from the laptop
 
-1. Finder → Go → **Connect to Server** (⌘K) → `vnc://Alexanders-Mac-mini.local` → log in. Full GUI control with the laptop's keyboard.
-2. Push the SSH key (generated in 1Password, item "Mac Mini SSH Key", Personal vault):
-   ```sh
-   ssh-copy-id -i ~/.ssh/mac_mini.pub alexmiller@Alexanders-Mac-mini.local
-   ```
-   (One-time password entry; afterwards home-manager owns `authorized_keys`.)
+Finder → Go → **Connect to Server** (⌘K) → `vnc://Alexanders-Mac-mini.local` → log in. Full GUI control with the laptop's keyboard.
+
+No `ssh-copy-id` needed: the bootstrap (step 5) authenticates with the account password once, and the flake itself installs the SSH key — `home.nix` owns `authorized_keys`, key lives in 1Password ("Mac Mini SSH Key", Personal vault).
 
 ### 4. GUI-only configuration (via Screen Sharing)
 
