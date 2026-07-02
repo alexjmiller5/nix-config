@@ -11,9 +11,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Installs and pins Homebrew itself declaratively (no curl|bash installer).
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew }:
     let
       username = "alexmiller";
     in
@@ -22,6 +24,13 @@
         specialArgs = { inherit username; };
         modules = [
           ./hosts/mac-mini.nix
+          nix-homebrew.darwinModules.nix-homebrew
+          {
+            nix-homebrew = {
+              enable = true;
+              user = username;
+            };
+          }
           home-manager.darwinModules.home-manager
           {
             home-manager.useGlobalPkgs = true;

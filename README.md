@@ -45,20 +45,12 @@ The display, mouse, and accessibility keyboard are no longer needed — everythi
 3. Install Tailscale (the bootstrap below installs the cask) and **sign in via its menu-bar GUI**. Tailscale login is interactive and cannot be declared.
 4. Grant any TCC prompts (Full Disk Access etc.) as they appear — macOS permission grants are GUI-only by design.
 
-### 5. Bootstrap nix (over SSH)
+### 5. Bootstrap nix — one SSH command
+
+One idempotent script installs Determinate Nix and applies the flake; nix does everything else (Homebrew itself via nix-homebrew, casks, packages, dotfiles, system settings). It prompts for the mini's sudo password, so it needs a tty (`-t`):
 
 ```sh
-# Xcode command line tools (accept the GUI dialog via Screen Sharing if prompted)
-xcode-select --install
-
-# Homebrew (nix-darwin's homebrew module manages casks, but not brew itself)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Determinate Nix
-curl -fsSL https://install.determinate.systems/nix | sh -s -- install
-
-# First activation (subsequent ones are `just switch`)
-sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake github:alexjmiller5/nix-config#mac-mini
+ssh -t mac-mini-local 'bash <(curl -fsSL https://raw.githubusercontent.com/alexjmiller5/nix-config/main/scripts/bootstrap.sh)'
 ```
 
 ### 6. Exit exam
