@@ -92,12 +92,33 @@
         "type": "github"
       }
     },
+    "notion-finance-sync": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1783288352,
+        "narHash": "sha256-lOSTyBWmD+99LhC5Bp4rRg/EgPwM1wu+y2tb75wDmlE=",
+        "owner": "alexjmiller5",
+        "repo": "notion-finance-sync",
+        "rev": "45c3f884ea98d22bb87814e5a864dc5eca62e7f8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "notion-finance-sync",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "notion-finance-sync": "notion-finance-sync"
       }
     }
   },

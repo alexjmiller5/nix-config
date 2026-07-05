@@ -13,9 +13,14 @@
     };
     # Installs and pins Homebrew itself declaratively (no curl|bash installer).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    # Daily bank -> Notion sync (provides a nix-darwin module).
+    notion-finance-sync = {
+      url = "github:alexjmiller5/notion-finance-sync";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync }:
     let
       username = "alexmiller";
     in
@@ -25,6 +30,7 @@
         modules = [
           ./hosts/mac-mini.nix
           ./modules/macos-defaults.nix
+          notion-finance-sync.darwinModules.default
           nix-homebrew.darwinModules.nix-homebrew
           {
             nix-homebrew = {
