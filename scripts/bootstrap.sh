@@ -27,7 +27,7 @@ TS=/run/current-system/sw/bin/tailscale
 if [ -n "$TS_AUTHKEY" ] && ! $TS status >/dev/null 2>&1; then
   echo "==> Joining tailnet as $TS_HOSTNAME"
   sleep 5 # let launchd bring tailscaled up
-  sudo $TS up --auth-key="$TS_AUTHKEY" --hostname="$TS_HOSTNAME"
+  sudo $TS up --auth-key="$TS_AUTHKEY" --hostname="$TS_HOSTNAME" --advertise-exit-node
 fi
 
 echo "==> Done. Day-to-day: 'just switch' from a clone, or 'just switch-remote'."
