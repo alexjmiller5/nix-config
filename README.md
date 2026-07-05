@@ -18,9 +18,9 @@ Everything nix *cannot* do on macOS, in order. After the last step, nix does the
 2. On the first Setup Assistant screen, click the **Accessibility** button → **Motor** → enable the **Accessibility Keyboard**. This on-screen keyboard replaces a physical one for all of setup.
 3. Prefer **ethernet** (skips typing a Wi-Fi password).
 4. **Skip** Migration Assistant, Siri, Screen Time, Apple Intelligence.
-5. Sign into the **Apple account** (iCloud) when prompted — doing it here beats doing it headless later. 2FA codes arrive on other trusted devices.
+5. **Skip Apple account sign-in during Setup Assistant.** Signing in here silently enables FileVault (no prompt, key escrowed to iCloud) — see below for why that's fatal. Sign into iCloud later via System Settings, which does NOT auto-enable FileVault.
 6. Create the local user account (username must match `username` in `flake.nix`).
-7. **Decline FileVault.** A FileVaulted headless mac blocks at the pre-boot unlock screen on every reboot — no SSH until someone types the disk password locally. (Enable later only if physical access is routine.)
+7. **Decline FileVault**, and after first login verify with `fdesetup status` (disable with `sudo fdesetup disable`; don't reboot until decryption completes). A FileVaulted headless mac blocks at the **pre-boot unlock screen** on every reboot — no SSH, no network, and the pre-boot screen has NO accessibility keyboard, so a mouse-only setup is bricked until a physical keyboard is found. Learned the hard way.
 
 ### 2. Enable remote access (still at the display, clicks only)
 
