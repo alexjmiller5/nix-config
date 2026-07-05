@@ -75,6 +75,15 @@ The tailnet hostname is pinned to `mac-mini` in the script, matching the
 `mac-mini-tailscale` entry in the laptop's `~/.ssh/config`. Joining survives
 reboots and rebuilds; it only recurs on a full machine rebuild.
 
+The script also advertises the machine as an **exit node** (a runtime
+tailscaled preference, persisted across reboots — nix-darwin has no module
+option for it). Exit nodes need approval; keep this `autoApprovers` rule in
+the tailnet ACL so tagged devices are approved automatically:
+
+```jsonc
+"autoApprovers": { "exitNode": ["tag:oauth-generated"] }
+```
+
 ### 6. Exit exam
 
 Reboot the mini without touching it. Confirm `ssh mac-mini-tailscale` (from the laptop's `~/.ssh/config`) comes back on its own. If yes, unplug the display forever.
