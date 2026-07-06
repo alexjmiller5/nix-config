@@ -11,6 +11,14 @@
   # Determinate Nix manages the nix daemon itself; nix-darwin must not.
   nix.enable = false;
 
+  # Determinate owns /etc/nix/nix.conf and !includes nix.custom.conf, so since
+  # nix.enable = false (no nix.settings) we codify custom nix settings there.
+  # lazy-trees breaks fetching some nixpkgs subpaths (e.g. bootstrap_cmds) during
+  # darwin-rebuild eval, so disable it.
+  environment.etc."nix/nix.custom.conf".text = ''
+    lazy-trees = false
+  '';
+
   # Xcode Command Line Tools — Homebrew (used for the google-chrome cask, since no
   # browser is packaged for darwin in nixpkgs) needs them, but they're Apple's
   # proprietary component installable ONLY via softwareupdate — not a nix package.
