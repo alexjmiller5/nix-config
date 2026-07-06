@@ -1,9 +1,12 @@
-{ pkgs, username, ... }:
+{ pkgs, lib, username, ... }:
 
 {
   system.stateVersion = 6;
   system.primaryUser = username;
   nixpkgs.hostPlatform = "aarch64-darwin";
+
+  # The 1Password CLI (op) — used by the notion-finance-sync sync — is unfree.
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" ];
 
   # Determinate Nix manages the nix daemon itself; nix-darwin must not.
   nix.enable = false;
@@ -37,15 +40,45 @@
     onActivation.cleanup = "zap"; # remove anything not declared here
   };
 
-  # Daily bank -> Notion sync (module from the notion-finance-sync flake input).
-  # Installs Chrome + the `op` CLI and a launchd user agent. One-time manual setup
-  # (clone + uv sync, OP token in Keychain, Full Disk Access, first per-bank login)
-  # is in that repo's README "Deploy to a Mac Mini with Nix".
+  # Daily bank -> Notion sync. The module builds the app (uv2nix) and installs
+  # Chrome + the `op` CLI + a launchd agent — no checkout, no uv sync. `settings`
+  # is the (non-secret) config.toml, rendered into the store. Secrets stay in
+  # 1Password; remaining manual setup (OP token in Keychain, Full Disk Access,
+  # first per-bank login) is in the notion-finance-sync repo's docs/DEPLOY.md.
   services.notion-finance-sync = {
     enable = true;
     user = username;
-    checkoutDir = "/Users/${username}/Desktop/coding/active-projects/notion-finance-sync";
     hour = 3;
     minute = 30;
+    settings = {
+      email = { gmail_address = "redacted-usr@gmail.com"; };
+      bilt = { phone = "0000000000"; };
+      notion = {
+        transactions_database_id = "34603953a8af801fac1cf9720fa11d64";
+        transactions_data_source_id = "34603953-a8af-806e-bd83-000b5b921780";
+        tasks_data_source_id = "77ef5074-aa23-468a-b5fb-2692e78184db";
+        property_ids = {
+          NAME = "title"; AMOUNT = "%40%3DeX"; DATE = "apGe"; STATUS = "bNqL";
+          SOURCE_ID = "c%5BvI"; SOURCE_ACCOUNT_ID = "TatA"; PAYEE = "G%5DBY";
+          MEMO = "qpd%5B"; BANK_CATEGORY = "Loz%7B"; CATEGORY = "Hj%7CJ";
+          BANK = "INs%3B"; CREDIT_CARD_ACCOUNT = "%3E%7D%7Bt"; CARD_NETWORK = "Xx%7Cq";
+          ACCOUNT_TYPE = "dJ%7C%7C"; ACCOUNT_NAME = "KND%3D"; CALCULATED_REWARDS = "GVVr";
+          TRUE_REWARDS = "_U~%40"; REWARDS_TYPE = "Pz%5Eo"; BILT_POINTS = "t%5DBn";
+          BILT_PARTNER = "%3Aycu"; EXCLUDED = "%5EepD"; QUANTITY = "JXmA";
+          TICKER = "%3BmS%3E"; PRICE_PER_SHARE = "efsI"; REVIEW_STATUS = "%3E%7BtH";
+          RELEASE_DATE = "yUd%7D"; NET_AMOUNT = "MGRT"; RELATED_TRANSACTIONS = "J%5C%7B%3A";
+          RELATED_TRANSACTIONS_AMOUNT = "m%3Evy";
+        };
+      };
+      onepassword = {
+        vault = "uq67q3orxxydw6yvrel3wvzpzy";
+        service_account_token_ref = "op://Personal/Notion Finance Sync Service Account Token/password";
+        bank_items = {
+          bofa = "BofA"; bofa_investments = "BofA"; wells_fargo = "Wells Fargo";
+          us_bank = "U.S. Bank"; everbank = "Everbank"; venmo = "Venmo";
+          etrade = "4w52rrhmv7cc32hivgk3v5tecy"; fidelity = "Fidelity";
+        };
+      };
+    };
   };
 }

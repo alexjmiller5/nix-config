@@ -96,19 +96,72 @@
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "pyproject-build-systems": "pyproject-build-systems",
+        "pyproject-nix": "pyproject-nix",
+        "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1783298002,
-        "narHash": "sha256-1VVqKkqbliNjRqfyctRngRy3xVq9HZ/P8yeJD6bkNz8=",
+        "lastModified": 1783300657,
+        "narHash": "sha256-gsk+L6Rh6BhP7ZiwaX8d0T+gsHmXw0yEBhkdyBOUmSg=",
         "owner": "alexjmiller5",
         "repo": "notion-finance-sync",
-        "rev": "d9fcdb288802665b77539f040f77bf7a10da351d",
+        "rev": "88766eec1894755bebd9d86225302af893edd1ee",
         "type": "github"
       },
       "original": {
         "owner": "alexjmiller5",
         "repo": "notion-finance-sync",
+        "type": "github"
+      }
+    },
+    "pyproject-build-systems": {
+      "inputs": {
+        "nixpkgs": [
+          "notion-finance-sync",
+          "nixpkgs"
+        ],
+        "pyproject-nix": [
+          "notion-finance-sync",
+          "pyproject-nix"
+        ],
+        "uv2nix": [
+          "notion-finance-sync",
+          "uv2nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782093830,
+        "narHash": "sha256-6gmEVe69+KlRkZD4PEEV5xAlB9CB0Y9TiuEgQjDrKTQ=",
+        "owner": "pyproject-nix",
+        "repo": "build-system-pkgs",
+        "rev": "430680a19bc85a3bda55f12e4cc1a1aadcf2e478",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pyproject-nix",
+        "repo": "build-system-pkgs",
+        "type": "github"
+      }
+    },
+    "pyproject-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "notion-finance-sync",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782905613,
+        "narHash": "sha256-SvXJcAemihifkTn4BGvyE5K1FJX9bl4U8DQ5pqKvD0s=",
+        "owner": "pyproject-nix",
+        "repo": "pyproject.nix",
+        "rev": "7af23cfe91064865ecf2e835da28b45b3c6f49fd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pyproject-nix",
+        "repo": "pyproject.nix",
         "type": "github"
       }
     },
@@ -119,6 +172,31 @@
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",
         "notion-finance-sync": "notion-finance-sync"
+      }
+    },
+    "uv2nix": {
+      "inputs": {
+        "nixpkgs": [
+          "notion-finance-sync",
+          "nixpkgs"
+        ],
+        "pyproject-nix": [
+          "notion-finance-sync",
+          "pyproject-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782810559,
+        "narHash": "sha256-loy132LKn8QfiPbFJhdTjm+yZG3zklyOQhVabLyx2l4=",
+        "owner": "pyproject-nix",
+        "repo": "uv2nix",
+        "rev": "2f698e4b5a3c6004edaf051543542f18a36afe77",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pyproject-nix",
+        "repo": "uv2nix",
+        "type": "github"
       }
     }
   },
