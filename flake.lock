@@ -99,11 +99,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783288352,
-        "narHash": "sha256-lOSTyBWmD+99LhC5Bp4rRg/EgPwM1wu+y2tb75wDmlE=",
+        "lastModified": 1783298002,
+        "narHash": "sha256-1VVqKkqbliNjRqfyctRngRy3xVq9HZ/P8yeJD6bkNz8=",
         "owner": "alexjmiller5",
         "repo": "notion-finance-sync",
-        "rev": "45c3f884ea98d22bb87814e5a864dc5eca62e7f8",
+        "rev": "d9fcdb288802665b77539f040f77bf7a10da351d",
         "type": "github"
       },
       "original": {
