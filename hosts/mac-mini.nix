@@ -1,4 +1,4 @@
-{ pkgs, lib, username, ... }:
+{ config, pkgs, lib, username, ... }:
 
 {
   system.stateVersion = 6;
@@ -70,11 +70,19 @@
   # is the (non-secret) config.toml, rendered into the store. Secrets stay in
   # 1Password; remaining manual setup (OP token in Keychain, Full Disk Access,
   # first per-bank login) is in the notion-finance-sync repo's docs/DEPLOY.md.
+  # OP service-account token: age-encrypted in the repo, decrypted at activation to
+  # a file the sync reads (owner = the user the launchd agent runs as).
+  age.secrets.op-token = {
+    file = ../secrets/op-token.age;
+    owner = username;
+  };
+
   services.notion-finance-sync = {
     enable = true;
     user = username;
     hour = 3;
     minute = 30;
+    tokenFile = config.age.secrets.op-token.path;
     settings = {
       email = { gmail_address = "redacted-usr@gmail.com"; };
       bilt = { phone = "0000000000"; };

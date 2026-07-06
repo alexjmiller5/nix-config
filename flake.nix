@@ -18,9 +18,14 @@
       url = "github:alexjmiller5/notion-finance-sync";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # age-encrypted secrets, decrypted at activation via the host SSH key.
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, agenix }:
     let
       username = "alexmiller";
     in
@@ -30,6 +35,7 @@
         modules = [
           ./hosts/mac-mini.nix
           ./modules/macos-defaults.nix
+          agenix.darwinModules.default
           notion-finance-sync.darwinModules.default
           nix-homebrew.darwinModules.nix-homebrew
           {
