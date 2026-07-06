@@ -11,6 +11,23 @@
   # Determinate Nix manages the nix daemon itself; nix-darwin must not.
   nix.enable = false;
 
+  # Xcode Command Line Tools — Homebrew (used for the google-chrome cask, since no
+  # browser is packaged for darwin in nixpkgs) needs them, but they're Apple's
+  # proprietary component installable ONLY via softwareupdate — not a nix package.
+  # So `darwin-rebuild` installs them here (idempotent; skips if already present),
+  # BEFORE the Homebrew step runs. You don't run the command — Nix does.
+  system.activationScripts.preActivation.text = lib.mkBefore ''
+    if ! /usr/bin/xcode-select -p >/dev/null 2>&1; then
+      echo "installing Xcode Command Line Tools (Homebrew prerequisite)..."
+      touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in_progress
+      prod="$(/usr/sbin/softwareupdate -l 2>/dev/null | grep -i 'label:.*command line tools' | tail -1 | sed 's/^.*[Ll]abel: //')"
+      if [ -n "$prod" ]; then
+        /usr/sbin/softwareupdate -i "$prod" --verbose || true
+      fi
+      rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in_progress
+    fi
+  '';
+
   users.users.${username} = {
     name = username;
     home = "/Users/${username}";
