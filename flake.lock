@@ -168,11 +168,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1783553602,
-        "narHash": "sha256-FvefLGhubMc9HKT1SdYXWFtnLC0FO686F75Fau4BnX0=",
+        "lastModified": 1783556473,
+        "narHash": "sha256-BVNKa3stiGAL00M5AKeR8IAbkYc7YNxIKnpqEfYuJhY=",
         "owner": "alexjmiller5",
         "repo": "notion-finance-sync",
-        "rev": "e5d5b1e2cfc5829821755b3570e3fd0a6f30719d",
+        "rev": "94652f5963e65df1c20bc00aeb836ba6e3120dd7",
         "type": "github"
       },
       "original": {
