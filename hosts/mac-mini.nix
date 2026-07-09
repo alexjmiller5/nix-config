@@ -59,8 +59,8 @@
     minute = 30;
     tokenFile = config.age.secrets.op-token.path;
     settings = {
-      email = { gmail_address = "redacted-usr@gmail.com"; };
-      bilt = { phone = "0000000000"; };
+      # gmail address + Bilt phone come from 1Password ("Personal Identifiers"
+      # in the project vault) — personal identifiers stay out of this public repo.
       notion = {
         transactions_database_id = "34603953a8af801fac1cf9720fa11d64";
         transactions_data_source_id = "34603953-a8af-806e-bd83-000b5b921780";
