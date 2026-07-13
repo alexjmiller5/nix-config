@@ -40,6 +40,18 @@
     onActivation.cleanup = "zap"; # remove anything not declared here
   };
 
+  # Weekly Apple-data snapshots (Sun 05:00 / 05:05). Each module installs a
+  # signed .app + launchd agent; the one manual step per app is a Full Disk
+  # Access grant (README §6). Output lands in iCloud-synced ~/Documents.
+  services.screentime-backup = {
+    enable = true;
+    user = username;
+  };
+  services.callhistory-backup = {
+    enable = true;
+    user = username;
+  };
+
   # Daily bank -> Notion sync. The module builds the app (uv2nix) and installs
   # Chrome + the `op` CLI + a launchd agent — no checkout, no uv sync. `settings`
   # is the (non-secret) config.toml, rendered into the store. Secrets stay in
