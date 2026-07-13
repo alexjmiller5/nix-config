@@ -31,12 +31,10 @@
   outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix }:
     let
       username = "alexmiller";
-    in
-    {
-      darwinConfigurations."mac-mini" = nix-darwin.lib.darwinSystem {
+      mkHost = hostFile: nix-darwin.lib.darwinSystem {
         specialArgs = { inherit username; };
         modules = [
-          ./hosts/mac-mini.nix
+          hostFile
           ./modules/macos-defaults.nix
           agenix.darwinModules.default
           notion-finance-sync.darwinModules.default
@@ -59,5 +57,11 @@
           }
         ];
       };
+    in
+    {
+      darwinConfigurations."mac-mini" = mkHost ./hosts/mac-mini.nix;
+      # Config-only for now — see hosts/macbook-air.nix for what must change
+      # before the first darwin-rebuild on the laptop.
+      darwinConfigurations."macbook-air" = mkHost ./hosts/macbook-air.nix;
     };
 }
