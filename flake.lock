@@ -40,6 +40,21 @@
         "type": "github"
       }
     },
+    "callhistory-backup": {
+      "locked": {
+        "lastModified": 1783915524,
+        "narHash": "sha256-0C4OmIwCovLUVQEnanyiB10SsHi+D2M5ksG+PcfSraY=",
+        "owner": "alexjmiller5",
+        "repo": "callhistory-backup",
+        "rev": "ecee75d2c3a65ede0faf3509a63b2744d48d0adc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "callhistory-backup",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -234,11 +249,28 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
+        "callhistory-backup": "callhistory-backup",
         "home-manager": "home-manager_2",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",
-        "notion-finance-sync": "notion-finance-sync"
+        "notion-finance-sync": "notion-finance-sync",
+        "screentime-backup": "screentime-backup"
+      }
+    },
+    "screentime-backup": {
+      "locked": {
+        "lastModified": 1783915345,
+        "narHash": "sha256-90+02elXtSsQL+0AZZXLvNGWE+Ab0DCvJw+L+Q9qzLE=",
+        "owner": "alexjmiller5",
+        "repo": "screentime-backup",
+        "rev": "6a495d0840b3e776e1c8e956419f148aac8ccfc9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "screentime-backup",
+        "type": "github"
       }
     },
     "systems": {

@@ -37,7 +37,7 @@ No `ssh-copy-id` needed: the bootstrap (step 5) authenticates with the account p
 
 ### 4. GUI-only configuration (via Screen Sharing)
 
-1. System Settings → Apple ID → **iCloud → iCloud Drive → enable "Desktop & Documents Folders"**, and turn **off "Optimize Mac Storage"** (scripts need real files on disk, not cloud stubs).
+1. System Settings → Apple ID → **iCloud → iCloud Drive → enable "Desktop & Documents Folders"**, and turn **on "Optimize Mac Storage"** (the full Desktop+Documents mirror outgrew the mini's 228GB disk — it hit 0 bytes free with Optimize off). Then in Finder, right-click the **Desktop** folder → **Keep Downloaded**, so scripts reading from Desktop always see real files while Documents stays evictable. Any job needing a real file elsewhere should run `brctl download "<path>"` first.
 2. System Settings → Users & Groups → enable **automatic login** (so GUI apps come up after an unattended reboot).
 3. Grant any TCC prompts (Full Disk Access etc.) as they appear — macOS permission grants are GUI-only by design.
 
@@ -84,6 +84,19 @@ the tailnet ACL so tagged devices are approved automatically:
 "autoApprovers": { "exitNode": ["tag:oauth-generated"] }
 ```
 
-### 6. Exit exam
+### 6. Per-module manual steps (TCC — GUI-only by design)
+
+- **screentime-backup** + **callhistory-backup** (weekly Apple-data snapshots):
+  grant Full Disk Access once per app — System Settings → Privacy & Security →
+  **Full Disk Access** → **[+]** → `/Applications/ScreenTimeBackup.app` and
+  `/Applications/CallHistoryBackup.app`, toggle on. Each app is re-signed with
+  its same stable cert every rebuild, so the grants persist. Verify:
+  `launchctl kickstart -k gui/$(id -u)/com.alexmiller.screentime-backup` (and
+  `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
+  `backup OK` lines (a `cannot read` line means the grant is missing).
+- **notion-finance-sync**: FDA for `/Applications/NotionFinanceSync.app` + the
+  rest of its runbook — see that repo's `docs/DEPLOY.md`.
+
+### 7. Exit exam
 
 Reboot the mini without touching it. Confirm `ssh mac-mini-tailscale` (from the laptop's `~/.ssh/config`) comes back on its own. If yes, unplug the display forever.

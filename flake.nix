@@ -18,6 +18,9 @@
       url = "github:alexjmiller5/notion-finance-sync";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Weekly Screen Time + call history snapshots (each provides a nix-darwin module).
+    screentime-backup.url = "github:alexjmiller5/screentime-backup";
+    callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
     # age-encrypted secrets, decrypted at activation via the host SSH key.
     agenix = {
       url = "github:ryantm/agenix";
@@ -25,7 +28,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, agenix }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix }:
     let
       username = "alexmiller";
     in
@@ -37,6 +40,8 @@
           ./modules/macos-defaults.nix
           agenix.darwinModules.default
           notion-finance-sync.darwinModules.default
+          screentime-backup.darwinModules.default
+          callhistory-backup.darwinModules.default
           nix-homebrew.darwinModules.nix-homebrew
           {
             nix-homebrew = {
