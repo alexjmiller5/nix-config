@@ -42,11 +42,11 @@
     },
     "callhistory-backup": {
       "locked": {
-        "lastModified": 1783915524,
-        "narHash": "sha256-0C4OmIwCovLUVQEnanyiB10SsHi+D2M5ksG+PcfSraY=",
+        "lastModified": 1783916397,
+        "narHash": "sha256-J+SGyK7HMVawSBG4kCkoV6RrJ4ofDsvQLCvlXl3zB78=",
         "owner": "alexjmiller5",
         "repo": "callhistory-backup",
-        "rev": "ecee75d2c3a65ede0faf3509a63b2744d48d0adc",
+        "rev": "a241505c40d60c8d4f99e4d52a50a5c546801d4b",
         "type": "github"
       },
       "original": {
@@ -260,11 +260,11 @@
     },
     "screentime-backup": {
       "locked": {
-        "lastModified": 1783915345,
-        "narHash": "sha256-90+02elXtSsQL+0AZZXLvNGWE+Ab0DCvJw+L+Q9qzLE=",
+        "lastModified": 1783916395,
+        "narHash": "sha256-3Fl73ek3MSkfxsLcka2DLHO098B++oJEQBR70q3Ihdg=",
         "owner": "alexjmiller5",
         "repo": "screentime-backup",
-        "rev": "6a495d0840b3e776e1c8e956419f148aac8ccfc9",
+        "rev": "1551577565698a00a688f1d3e75a41581a9431ed",
         "type": "github"
       },
       "original": {
