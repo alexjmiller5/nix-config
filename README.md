@@ -2,15 +2,16 @@
 
 Declarative macOS machine configs via [nix-darwin](https://github.com/nix-darwin/nix-darwin) + [home-manager](https://github.com/nix-community/home-manager).
 
-| Host | Config |
-|------|--------|
-| `mac-mini` | `hosts/mac-mini.nix` (system) + `home.nix` (user) |
+| Host | Config | Status |
+|------|--------|--------|
+| `mac-mini` | `hosts/mac-mini.nix` (system) + `home.nix` (user) | active |
+| `macbook-air` | `hosts/macbook-air.nix` (imports the mini's config + noTunes) | **config-only — never activated**; pre-switch checklist in the host file |
 
 Day-to-day: edit config, `just switch` (on the machine) or `just switch-remote` to pull straight from GitHub. `just check` validates the flake.
 
-## Laptop tweaks (MacBook isn't a flake host yet)
+## Laptop tweaks (until `macbook-air` is activated)
 
-- `scripts/setup-notunes.sh` — play/pause media key opens Spotify instead of Apple Music (noTunes cask + replacement pref + login LaunchAgent). Idempotent; fold into a laptop host module if the MacBook gets onboarded.
+- `scripts/setup-notunes.sh` — play/pause media key opens Spotify instead of Apple Music (noTunes cask + replacement pref + login LaunchAgent). Idempotent. `modules/notunes.nix` is the declarative version; once nix owns the laptop, remove the script's `~/Library/LaunchAgents/digital.twisted.noTunes.plist`.
 
 ## Manual setup steps (Mac Mini, from scratch)
 
