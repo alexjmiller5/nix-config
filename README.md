@@ -8,6 +8,10 @@ Declarative macOS machine configs via [nix-darwin](https://github.com/nix-darwin
 
 Day-to-day: edit config, `just switch` (on the machine) or `just switch-remote` to pull straight from GitHub. `just check` validates the flake.
 
+## Laptop tweaks (MacBook isn't a flake host yet)
+
+- `scripts/setup-notunes.sh` — play/pause media key opens Spotify instead of Apple Music (noTunes cask + replacement pref + login LaunchAgent). Idempotent; fold into a laptop host module if the MacBook gets onboarded.
+
 ## Manual setup steps (Mac Mini, from scratch)
 
 Everything nix *cannot* do on macOS, in order. After the last step, nix does the rest.
