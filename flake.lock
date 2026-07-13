@@ -42,11 +42,11 @@
     },
     "callhistory-backup": {
       "locked": {
-        "lastModified": 1783916397,
-        "narHash": "sha256-J+SGyK7HMVawSBG4kCkoV6RrJ4ofDsvQLCvlXl3zB78=",
+        "lastModified": 1783917243,
+        "narHash": "sha256-ZAyWsBkbrUUv7FNfdwy5qKv+wiJy53tfRiRXD1JNJAc=",
         "owner": "alexjmiller5",
         "repo": "callhistory-backup",
-        "rev": "a241505c40d60c8d4f99e4d52a50a5c546801d4b",
+        "rev": "c28c29e468dd68487de1e57e40a1fa45464c8c27",
         "type": "github"
       },
       "original": {
