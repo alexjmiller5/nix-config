@@ -8,7 +8,7 @@
 { ... }:
 
 {
-  homebrew.casks = [ "notunes" "spotify" ];
+  homebrew.casks = [ "notunes" ];
 
   system.defaults.CustomUserPreferences."digital.twisted.noTunes" = {
     replacement = "/Applications/Spotify.app";
