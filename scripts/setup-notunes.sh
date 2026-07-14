@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
-# Make the play/pause media key open Spotify instead of Apple Music.
+# Stop the play/pause media key from opening Apple Music.
 #
 # macOS's rcd daemon hardwires the play key to launch Music.app when no media
 # app is running. noTunes (https://github.com/tombonez/noTunes) watches for
-# Music launching, kills it immediately, and opens the replacement app instead;
-# once Spotify is running the media keys control it natively.
+# Music launching and kills it immediately — nothing opens in its place
+# (deliberately no `replacement` pref); with Spotify already running, the
+# media keys control it natively.
 #
-# Idempotent — rerun anytime.
-# ponytail: plain script because this laptop isn't a flake host yet; fold into
-# a nix-darwin host module (homebrew cask + CustomUserPreferences + launchd
-# agent) when the MacBook gets onboarded.
+# Idempotent — rerun anytime. Declarative version: modules/notunes.nix
+# (applies once the macbook-air host is activated; then delete this script's
+# LaunchAgent — the module's agent is org.nixos.notunes).
 set -euo pipefail
 
 brew list --cask notunes &>/dev/null || brew install --cask notunes
 
-defaults write digital.twisted.noTunes replacement /Applications/Spotify.app
+# No replacement app — just block Music (remove the pref if a past run set it)
+defaults delete digital.twisted.noTunes replacement 2>/dev/null || true
 
 # Run at login via LaunchAgent (scriptable, unlike Login Items which need a TCC prompt)
 plist="$HOME/Library/LaunchAgents/digital.twisted.noTunes.plist"
@@ -39,4 +40,4 @@ EOF
 launchctl bootout "gui/$(id -u)/digital.twisted.noTunes" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$plist"
 
-pgrep -x noTunes >/dev/null && echo "✓ noTunes running — play key now routes to Spotify"
+pgrep -x noTunes >/dev/null && echo "✓ noTunes running — Apple Music blocked"

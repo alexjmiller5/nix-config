@@ -11,7 +11,7 @@ Day-to-day: edit config, `just switch` (on the machine) or `just switch-remote` 
 
 ## Laptop tweaks (until `macbook-air` is activated)
 
-- `scripts/setup-notunes.sh` — play/pause media key opens Spotify instead of Apple Music (noTunes cask + replacement pref + login LaunchAgent). Idempotent. `modules/notunes.nix` is the declarative version; once nix owns the laptop, remove the script's `~/Library/LaunchAgents/digital.twisted.noTunes.plist`.
+- `scripts/setup-notunes.sh` — play/pause media key no longer opens Apple Music (noTunes cask + login LaunchAgent; no replacement app, Music is just blocked). Idempotent. `modules/notunes.nix` is the declarative version; once nix owns the laptop, remove the script's `~/Library/LaunchAgents/digital.twisted.noTunes.plist`.
 
 ## Manual setup steps (Mac Mini, from scratch)
 
