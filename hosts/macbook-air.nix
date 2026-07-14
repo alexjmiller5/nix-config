@@ -116,7 +116,7 @@
       "notion"
       "notion-calendar"
       "notion-cli"
-      # notunes + spotify come from modules/notunes.nix
+      # notunes comes from modules/notunes.nix
       "obsidian"
       "openclaw"
       "postman"
@@ -124,6 +124,7 @@
       "repobar"
       "sf-symbols"
       "slack"
+      "spotify"
       "tailscale-app"
       "temurin"
       "tor-browser"
