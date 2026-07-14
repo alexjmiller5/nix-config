@@ -5,7 +5,7 @@ Declarative macOS machine configs via [nix-darwin](https://github.com/nix-darwin
 | Host | Config | Status |
 |------|--------|--------|
 | `mac-mini` | `hosts/mac-mini.nix` (system) + `home.nix` (user) | active |
-| `macbook-air` | `hosts/macbook-air.nix` (imports the mini's config + noTunes) | **config-only — never activated**; pre-switch checklist in the host file |
+| `macbook-air` | `hosts/macbook-air.nix` (mini's config minus its headless-server bits and data-collection jobs, + noTunes + a snapshot of the laptop's brew state) | **config-only — never activated** |
 
 Day-to-day: edit config, `just switch` (on the machine) or `just switch-remote` to pull straight from GitHub. `just check` validates the flake.
 
