@@ -36,8 +36,25 @@
   # cleanup = "zap" that's fine — declared casks merge across modules.
   homebrew = {
     enable = true;
-    casks = [ ];
+    # whatsapp: linked as a companion device so its CallHistory.sqlite (the
+    # only store with third-party call durations) stays synced for
+    # callhistory-backup. One-time manual link via QR — README §6.
+    casks = [ "whatsapp" ];
     onActivation.cleanup = "zap"; # remove anything not declared here
+  };
+
+  # Keep WhatsApp running in the auto-login session so it continuously syncs
+  # call history from the iPhone; callhistory-backup snapshots its DB weekly.
+  launchd.user.agents.whatsapp-keepalive = {
+    serviceConfig = {
+      Label = "com.alexmiller.whatsapp-keepalive";
+      ProgramArguments = [
+        "/bin/sh" "-c"
+        "/usr/bin/pgrep -x WhatsApp >/dev/null || /usr/bin/open -ga WhatsApp"
+      ];
+      RunAtLoad = true;
+      StartInterval = 3600;
+    };
   };
 
   # Weekly Apple-data snapshots (Sun 05:00 / 05:05). Each module installs a

@@ -99,6 +99,11 @@ the tailnet ACL so tagged devices are approved automatically:
   `launchctl kickstart -k gui/$(id -u)/com.alexmiller.screentime-backup` (and
   `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
   `backup OK` lines (a `cannot read` line means the grant is missing).
+- **whatsapp (companion device for callhistory-backup)**: via Screen Sharing,
+  open WhatsApp once → Settings on the iPhone → Linked Devices → Link a Device
+  → scan the QR on the mini's screen. The keep-alive agent keeps it running
+  afterward; no re-linking needed as long as the phone comes online every
+  14 days and the app keeps running.
 - **notion-finance-sync**: FDA for `/Applications/NotionFinanceSync.app` + the
   rest of its runbook — see that repo's `docs/DEPLOY.md`.
 
