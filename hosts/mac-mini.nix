@@ -36,7 +36,7 @@
   # cleanup = "zap" that's fine — declared casks merge across modules.
   homebrew = {
     enable = true;
-    casks = [ ];
+    casks = [ "claude-code" ];
     onActivation.cleanup = "zap"; # remove anything not declared here
   };
 
