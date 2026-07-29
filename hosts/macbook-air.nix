@@ -138,8 +138,7 @@
       "google-chrome"
       "hammerspoon"
       "ipfs-desktop"
-      # TODO(phase-0): add "karabiner-elements" + "zoom" once their one-time
-      # `brew install --cask --adopt` runs (pkg installers need interactive sudo).
+      "karabiner-elements"
       "keyclu"
       "legcord"
       "libreoffice"
@@ -170,6 +169,7 @@
       "wireshark-app"
       "xquartz"
       "yaak"
+      "zoom"
     ];
     # App Store apps (enumerated via `mas list`, 2026-07-28). Requires being
     # signed in to the App Store; mas can't install un-purchased apps.
