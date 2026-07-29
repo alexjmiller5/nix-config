@@ -33,8 +33,8 @@
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 
-  # Snapshot of the laptop's imperatively-installed brew state (2026-07-13),
-  # so the first switch changes nothing.
+  # Snapshot of the laptop's imperatively-installed brew state (refreshed
+  # 2026-07-28 during Phase 0 reconcile), so the first switch changes nothing.
   homebrew = {
     enable = true;
     taps = [
@@ -42,6 +42,9 @@
       "ddev/ddev"
       "electrikmilk/cherri"
       "jellycuts/formulae"
+      # yabai's formula tap — was untapped at some point but the formula is
+      # still installed from it; nix-darwin re-taps it.
+      "koekeishiya/formulae"
       "smudge/smudge"
       "steipete/tap"
       "supabase/tap"
@@ -60,11 +63,13 @@
       "create-dmg"
       "d2"
       "duti"
+      "electrikmilk/cherri/cherri"
       "exiftool"
       "fastlane"
       "ffmpeg"
       "fswatch"
       "fzf"
+      "gdbm"
       "gemini-cli"
       "gh"
       "git-filter-repo"
@@ -73,13 +78,21 @@
       "gsettings-desktop-schemas"
       "jupyterlab"
       "just"
+      # window manager — runs via the custom com.asmvik.yabai launchd agent
+      "koekeishiya/formulae/yabai"
       "libffi"
       "libimobiledevice"
+      "libomp"
+      "libyaml"
       "lua@5.4"
       "luarocks"
+      "mas"
       "mlton"
+      "neovim"
+      "node"
       "oci-cli"
       "openclaw-cli"
+      "openssl@3"
       "perl"
       "pnpm"
       "python@3.10"
@@ -88,12 +101,16 @@
       "sevenzip"
       "shellcheck"
       "skills"
+      "smudge/smudge/nightlight"
       "sshpass"
+      "supabase/tap/supabase"
       "terraform"
       "tree"
+      "tree-sitter-cli"
       "uv"
       "vips"
       "vsce"
+      "xcodegen"
       "yq"
       "yt-dlp"
       "zsh-autosuggestions"
@@ -102,24 +119,44 @@
       "1password"
       "1password-cli"
       "alt-tab"
+      "bambu-studio"
+      "betterdisplay"
+      "binary-ninja-free"
+      "burp-suite"
+      "chatgpt"
       "claude"
       "claude-code"
       "codexbar"
       "discord"
       "docker-desktop"
+      "dolphin"
+      "duckduckgo"
       "figma"
       "gcloud-cli"
       "ghostty"
       "github"
+      "google-chrome"
+      "hammerspoon"
+      "ipfs-desktop"
+      # TODO(phase-0): add "karabiner-elements" + "zoom" once their one-time
+      # `brew install --cask --adopt` runs (pkg installers need interactive sudo).
       "keyclu"
+      "legcord"
+      "libreoffice"
       "mactex-no-gui"
+      "mysqlworkbench"
       "notion"
       "notion-calendar"
       "notion-cli"
       # notunes comes from modules/notunes.nix
+      "numi"
       "obsidian"
       "openclaw"
       "postman"
+      "processing"
+      "qbittorrent"
+      "qflipper"
+      "raspberry-pi-imager"
       "raycast"
       "repobar"
       "sf-symbols"
@@ -129,9 +166,23 @@
       "temurin"
       "tor-browser"
       "visual-studio-code"
+      "whatsapp"
       "wireshark-app"
       "xquartz"
+      "yaak"
     ];
+    # App Store apps (enumerated via `mas list`, 2026-07-28). Requires being
+    # signed in to the App Store; mas can't install un-purchased apps.
+    masApps = {
+      "Developer" = 640199958;
+      "Flappy Golf 2" = 1154174205;
+      "Flighty" = 1358823008;
+      "hide.me" = 953040671;
+      "Octagon" = 691956219;
+      "ScreenZen" = 1541027222;
+      "Telegram" = 747648890;
+      "Xcode" = 497799835;
+    };
     # The mini uses "zap" (uninstall anything undeclared). Flip this to "zap"
     # only after a first successful switch confirms the lists above are
     # complete — zap on a stale list uninstalls whatever it's missing.
