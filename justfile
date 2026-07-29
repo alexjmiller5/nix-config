@@ -16,6 +16,14 @@ deploy host="mac-mini-tailscale":
 switch:
     sudo darwin-rebuild switch --flake .#mac-mini
 
+# Apply the laptop's config ON the laptop. Works before nix-darwin is installed:
+# builds the system first, then uses the build's own darwin-rebuild to activate.
+switch-laptop:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    nix build .#darwinConfigurations.macbook-air.system
+    sudo ./result/sw/bin/darwin-rebuild switch --flake .#macbook-air
+
 # Validate the flake
 check:
     nix flake check
