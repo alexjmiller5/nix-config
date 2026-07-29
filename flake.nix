@@ -31,10 +31,10 @@
   outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix }:
     let
       username = "alexmiller";
-      mkHost = hostFile: nix-darwin.lib.darwinSystem {
+      mkHost = { host, home }: nix-darwin.lib.darwinSystem {
         specialArgs = { inherit username; };
         modules = [
-          hostFile
+          host
           ./modules/macos-defaults.nix
           agenix.darwinModules.default
           notion-finance-sync.darwinModules.default
@@ -53,15 +53,30 @@
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
             home-manager.extraSpecialArgs = { inherit username; };
-            home-manager.users.${username} = import ./home.nix;
+            home-manager.users.${username} = import home;
           }
         ];
       };
     in
     {
-      darwinConfigurations."mac-mini" = mkHost ./hosts/mac-mini.nix;
-      # Config-only for now — see hosts/macbook-air.nix for what must change
-      # before the first darwin-rebuild on the laptop.
-      darwinConfigurations."macbook-air" = mkHost ./hosts/macbook-air.nix;
+      darwinConfigurations."mac-mini" = mkHost {
+        host = ./hosts/mac-mini.nix;
+        home = ./home/mac-mini.nix;
+      };
+      darwinConfigurations."macbook-air" = mkHost {
+        host = ./hosts/macbook-air.nix;
+        home = ./home/macbook-air.nix;
+      };
+
+      # Reusable home-manager modules, for consumption by other flakes
+      # (e.g. a work-laptop config pinning this repo as an input).
+      # git.nix identity uses mkDefault, so consumers can override the email.
+      homeModules = {
+        git = ./home/git.nix;
+        zsh = ./home/zsh.nix;
+        aliases-dev = ./home/aliases/dev.nix;
+        aliases-ai = ./home/aliases/ai.nix;
+        aliases-infra = ./home/aliases/infra.nix;
+      };
     };
 }

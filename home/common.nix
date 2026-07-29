@@ -1,6 +1,9 @@
 { pkgs, username, lib, ... }:
 
+# Shared home-manager base for every host.
 {
+  imports = [ ./git.nix ];
+
   home.stateVersion = "25.05";
   home.username = username;
   home.homeDirectory = "/Users/${username}";
@@ -22,12 +25,4 @@
     ripgrep
     jq
   ];
-
-  programs.git = {
-    enable = true;
-    settings.user = {
-      name = "Alex Miller";
-      email = "98389659+alexjmiller5@users.noreply.github.com";
-    };
-  };
 }

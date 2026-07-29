@@ -1,0 +1,259 @@
+{
+	// Vscode Theme
+	// Good Choices: "SynthWave '84", "City Lights", "Horizon", "An Old Hope Classic", 
+	// "Default Dark+", "Default Light+", "Default High Contrast"
+	"workbench.colorTheme": "GitHub Dark Default",
+	// SynthWave '84 theme customization
+	"synthwave84.brightness": 0.25,
+	// File icon configuration
+	"workbench.iconTheme": "vscode-great-icons",
+	// Autosave enabled
+	"files.autoSave": "afterDelay",
+	"files.autoSaveDelay": 1000,
+	// Autoformat on save and on type
+	"editor.formatOnSave": true,
+	"editor.formatOnType": true,
+	// Disable minimap
+	"editor.minimap.enabled": false,
+	// Default Formatters
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.black-formatter",
+	},
+	// "[markdown]": {
+	// "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+	// },
+	"[sql]": {
+		"editor.defaultFormatter": "mtxr.sqltools"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "vscode.html-language-features"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	},
+	"[yaml]": {
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	// Open mp4 files in the MP4 previewer extension
+	"workbench.editorAssociations": {
+		"*.md": "milkdown.editor",
+		// Open stl files in 3D Viewer
+		"*.stl": "3dviewer.viewer"
+	},
+	// Python file location
+	"python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+	"code-runner.executorMap": {
+		"javascript": "node",
+		"php": "/usr/local/bin/php",
+		"python": "python3",
+		"perl": "/usr/bin/perl",
+		"ruby": "/usr/local/bin/ruby",
+		"go": "go run",
+		"html": "open -a \"Google Chrome\" $fileName",
+		"java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+		"c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir/$fileNameWithoutExt"
+	},
+	// Github Copilot enabled
+	"editor.inlineSuggest.enabled": true,
+	"github.copilot.enable": {
+		"*": true,
+		"plaintext": true,
+		"markdown": true,
+		"scminput": true,
+		"dart": true,
+		"java": false
+	},
+	// Disable redhat data collection
+	"redhat.telemetry.enabled": false,
+	// LaTeX Settings from https://mathjiajia.github.io/vscode-and-latex/
+	"latex-workshop.latex.tools": [
+		{
+			"name": "latexmk",
+			"command": "latexmk",
+			"args": [
+				"-synctex=1",
+				"-interaction=nonstopmode",
+				"-file-line-error",
+				"-pdf",
+				"-outdir=%OUTDIR%",
+				"%DOC%"
+			],
+			"env": {}
+		},
+		{
+			"name": "xelatex",
+			"command": "xelatex",
+			"args": [
+				"-synctex=1",
+				"-interaction=nonstopmode",
+				"-file-line-error",
+				"%DOC%"
+			],
+			"env": {}
+		},
+		{
+			"name": "pdflatex",
+			"command": "pdflatex",
+			"args": [
+				"-synctex=1",
+				"-interaction=nonstopmode",
+				"-file-line-error",
+				"--shell-escape",
+				"%DOC%"
+			],
+			"env": {}
+		},
+		{
+			"name": "bibtex",
+			"command": "bibtex",
+			"args": [
+				"%DOCFILE%"
+			],
+			"env": {}
+		}
+	],
+	"latex-workshop.latex.recipes": [
+		{
+			"name": "pdfLaTeX",
+			"tools": [
+				"pdflatex"
+			]
+		},
+		{
+			"name": "latexmk 🔃",
+			"tools": [
+				"latexmk"
+			]
+		},
+		{
+			"name": "xelatex",
+			"tools": [
+				"xelatex"
+			]
+		},
+		{
+			"name": "pdflatex ➞ bibtex ➞ pdflatex`×2",
+			"tools": [
+				"pdflatex",
+				"bibtex",
+				"pdflatex",
+				"pdflatex"
+			]
+		},
+		{
+			"name": "xelatex ➞ bibtex ➞ xelatex`×2",
+			"tools": [
+				"xelatex",
+				"bibtex",
+				"xelatex",
+				"xelatex"
+			]
+		}
+	],
+	"latex-workshop.formatting.latex": "latexindent",
+	// Remove the command center to save more vertical space
+	"window.commandCenter": false,
+	// The number of spaces a tab is equal to.
+	"editor.tabSize": 2,
+	// Insert spaces when pressing Tab.
+	"editor.insertSpaces": true,
+	// When opening a file, `editor.tabSize` and `editor.insertSpaces` will be detected based on the file contents.
+	"editor.detectIndentation": true,
+	// Show module versions on startup
+	"versionlens.suggestions.showOnStartup": true,
+	// Enable Font Ligatures to simplify things like >= or <= (https://www.youtube.com/watch?v=5OIC7lwceLE)
+	"editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
+	"editor.fontLigatures": true,
+	"terminal.integrated.fontLigatures.enabled": true,
+	"vsicons.dontShowNewVersionMessage": true,
+	// Open files in VSCode new window
+	"window.openFilesInNewWindow": "on",
+	// Make sure SVG files open as images in preview mode, similar to how markdown previews work
+	"svg.preview.mode": "img",
+	// Rules, 80 as a soft limit, 120 as a hard limit
+	"editor.rulers": [
+		{
+			"column": 80,
+			"color": "#ff0000"
+		},
+		{
+			"column": 120,
+			"color": "#00ff00"
+		}
+	],
+	// Change the default terminal to Ghostty
+	"terminal.external.osxExec": "Ghostty.app",
+	// Add the call history database to SQLTools
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"driver": "SQLite",
+			"database": "/Users/alexmiller/Desktop/CallHistoryDB/CallHistory.storedata",
+			"name": "Call History"
+		}
+	],
+	// true: Enable the SQLTools extension to work with sqlite - switched to false as it was causing startup errors
+	"sqltools.useNodeRuntime": false,
+	// Associate all html files with the html language mode (instead of django-html)
+	"files.associations": {
+		"*.html": "html",
+		"*.plist": "xml"
+	},
+	// Wrap lines that exceed the width of the editor window
+	"editor.wordWrap": "on",
+	// Keep junk out of your search results
+	"search.exclude": {
+		"**/.direnv": true,
+		"**/.git": true,
+		"**/node_modules": true,
+		"dist": true,
+		"pnpm-lock.yaml": true,
+		"*.d.ts": true,
+		"tmp": true,
+	},
+	// Hide copilot chat on launch
+	"workbench.secondarySideBar.defaultVisibility": "hidden",
+	// Prevent automatic virtual environment activation in terminal
+	"python.terminal.activateEnvironment": false,
+	"gitlens.ai.model": "vscode",
+	"gitlens.ai.vscode.model": "copilot:gpt-4.1",
+	"remote.SSH.useLocalServer": true,
+	"security.promptForLocalFileProtocolHandling": false,
+	"security.promptForRemoteFileProtocolHandling": false,
+	"vsicons.presets.yamlOfficial": true,
+	"docker.extension.enableComposeLanguageServer": false,
+	"[ruby]": {
+		"editor.defaultFormatter": "jnbt.vscode-rufo"
+	},
+	"powerClipper.alwaysExclude": [
+		"**/package-lock.json",
+		"**/tsconfig.json",
+		"**/.prettierrc",
+		"**/.gitignore",
+		"**/.eslintrc.json",
+		"**/.eslintignore",
+		"**/node_modules"
+	],
+	"claudeCode.preferredLocation": "panel",
+	"claudeCode.useTerminal": true,
+	"terminal.integrated.persistentSessionScrollback": 1000,
+	"terminal.integrated.scrollback": 10000,
+	"workbench.startupEditor": "none",
+	"python.analysis.typeCheckingMode": "basic",
+	"svelte.enable-ts-plugin": true,
+	"yaml.disableSchemaDetection": [
+		"**/.github/workflows/*.yml",
+		"**/.github/workflows/*.yaml",
+		"**/.gitea/workflows/*.yml",
+		"**/.gitea/workflows/*.yaml",
+		"**/.forgejo/workflows/*.yml",
+		"**/.forgejo/workflows/*.yaml"
+	],
+	// ⬆️ New settings (past the "workbench.secondarySideBar.defaultVisibility" suggestions) autonatically added by VSCode or an extension which need comments or removal
+}

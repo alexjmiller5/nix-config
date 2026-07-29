@@ -1,10 +1,10 @@
 { pkgs, username, ... }:
 
-# MacBook Air. NOT DEPLOYED YET — staged for the eventual full nix-darwin
-# migration of the laptop. Mirrors the mini minus its headless-server bits
-# (never-sleep power settings, headless tailscaled) and its data-collection
-# services (screentime/callhistory/finance-sync — the flake imports those
-# modules for every host, but only mac-mini.nix enables them).
+# MacBook Air — LIVE since 2026-07-28 (generation 1). Mirrors the mini minus
+# its headless-server bits (never-sleep power settings, headless tailscaled)
+# and its data-collection services (screentime/callhistory/finance-sync — the
+# flake imports those modules for every host, but only mac-mini.nix enables
+# them). Home profile: home/macbook-air.nix.
 {
   imports = [ ../modules/notunes.nix ];
 
@@ -113,7 +113,6 @@
       "xcodegen"
       "yq"
       "yt-dlp"
-      "zsh-autosuggestions"
     ];
     casks = [
       "1password"
