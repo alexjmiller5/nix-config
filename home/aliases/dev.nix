@@ -1,7 +1,7 @@
 # General development + media aliases — portable to any machine.
 {
+  # (`..`/`../..` navigation comes from programs.zsh.autocd, not an alias)
   programs.zsh.shellAliases = {
-    ".." = "cd ..";
     la = "ls -a";
     lla = "ls -la";
     vim = "nvim";
