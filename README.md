@@ -4,14 +4,15 @@ Declarative macOS machine configs via [nix-darwin](https://github.com/nix-darwin
 
 | Host | Config | Status |
 |------|--------|--------|
-| `mac-mini` | `hosts/mac-mini.nix` (system) + `home.nix` (user) | active |
-| `macbook-air` | `hosts/macbook-air.nix` (mini's config minus its headless-server bits and data-collection jobs, + noTunes + a snapshot of the laptop's brew state) | **config-only — never activated** |
+| `mac-mini` | `hosts/mac-mini.nix` (system) + `home/mac-mini.nix` (user) | active |
+| `macbook-air` | `hosts/macbook-air.nix` + `home/macbook-air.nix` (full shell/dotfiles/agents profile) | **active since 2026-07-28** |
 
-Day-to-day: edit config, `just switch` (on the machine) or `just switch-remote` to pull straight from GitHub. `just check` validates the flake.
+Day-to-day: edit config, then `just switch-laptop` (on the laptop), `just deploy` (mini, from the laptop), or `just switch` (on the mini). `just check` validates the flake.
 
-## Laptop tweaks (until `macbook-air` is activated)
+The flake also exports `homeModules.*` (zsh, git, alias categories) for
+consumption by other flakes — e.g. a work-machine config pinning this repo.
 
-- `scripts/setup-notunes.sh` — play/pause media key no longer opens Apple Music (noTunes cask + login LaunchAgent; no replacement app, Music is just blocked). Idempotent. `modules/notunes.nix` is the declarative version; once nix owns the laptop, remove the script's `~/Library/LaunchAgents/digital.twisted.noTunes.plist`.
+Laptop manual steps (TCC grants, yabai SIP, one-time app setup): **[MANUAL.md](MANUAL.md)**.
 
 ## Manual setup steps (Mac Mini, from scratch)
 
