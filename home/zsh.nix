@@ -8,6 +8,9 @@
   programs.zsh = {
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";
+    # Typing a directory path as a command cd's into it: `..`, `../../..`,
+    # `../some-folder/deeper`, bare subdir names — all work without `cd`.
+    autocd = true;
 
     enableCompletion = true;
     completionInit = ''
