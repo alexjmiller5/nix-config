@@ -14,6 +14,16 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
    - `gh repo clone alexjmiller5/agent-config ~/Desktop/coding/active-projects/agent-config`
    - `gh repo clone alexjmiller5/hammerspoon ~/.hammerspoon`
 5. Re-run `just switch-laptop` (out-of-store symlinks now resolve).
+6. Trust the third-party taps (brew's tap-trust gate blocks formula loads
+   otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
+
+## SSH
+
+- `~/.ssh/config` is nix-symlinked into agent-config (private). Keys are held
+  by the 1Password SSH agent; the `.pub` files in `~/.ssh` are its selectors.
+- Deliberately imperative: `blueprint_deploy_key` (the agenix "laptop"
+  recipient key — a real on-disk secret, never repo'd), `known_hosts`
+  (organic state), `authorized_keys` (written by home-manager activation).
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
