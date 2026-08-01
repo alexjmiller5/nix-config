@@ -32,10 +32,10 @@
     fzf
     git-filter-repo
     gitleaks
-    sevenzip
+    _7zz       # brew "sevenzip"
     shellcheck
     sshpass
     tree
-    yq
+    yq-go      # brew "yq" is mikefarah's Go yq, matching this
   ];
 }
