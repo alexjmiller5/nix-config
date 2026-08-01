@@ -61,6 +61,10 @@
           calculateAllSizes = true;
         };
       };
+      # iCloud Drive "Optimize Mac Storage" behavior
+      "com.apple.bird" = {
+        optimize-storage = true;
+      };
       "com.apple.desktopservices" = {
         DSDontWriteNetworkStores = true;
         DSDontWriteUSBStores = true;
