@@ -61,16 +61,21 @@ in
   }
   // lib.listToAttrs (map
     (app: lib.nameValuePair "login-${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] app)}" (loginItem app))
+    # Current Open-at-Login list (2026-08-01 screenshot), minus:
+    #  - FigmaAgent: Figma's self-registered helper — Figma owns it, leave it.
+    #  - Gemini: already launched by its own com.alexmiller.geminidesktop plist.
     [
-      "KeyClu"
-      "Google Chrome"
-      "Notion"
-      "Receptor"
-      "Hammerspoon"
-      "Raycast"
-      "BetterDisplay"
-      "Notion Calendar"
-      "Spotify"
       "1Password"
+      "BetterDisplay"
+      "CodexBar"
+      "Google Chrome"
+      "Hammerspoon"
+      "Notion"
+      "Notion Calendar"
+      "Raycast"
+      "Raycast Beta"
+      "Receptor"
+      "RepoBar"
+      "Spotify"
     ]);
 }
