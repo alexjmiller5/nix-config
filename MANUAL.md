@@ -21,9 +21,11 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 - `~/.ssh/config` is nix-symlinked into agent-config (private). Keys are held
   by the 1Password SSH agent; the `.pub` files in `~/.ssh` are its selectors.
-- Deliberately imperative: `blueprint_deploy_key` (the agenix "laptop"
-  recipient key — a real on-disk secret, never repo'd), `known_hosts`
-  (organic state), `authorized_keys` (written by home-manager activation).
+- Deliberately imperative: `~/.ssh/agenix` (the agenix "laptop" recipient key
+  — age can't use the 1P agent, so this is a real on-disk secret, never
+  repo'd; regenerate with `ssh-keygen -t ed25519 -f ~/.ssh/agenix -N ""` and
+  update secrets/secrets.nix + re-encrypt if lost), `known_hosts` (organic
+  state), `authorized_keys` (written by home-manager activation).
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
