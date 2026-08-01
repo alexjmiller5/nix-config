@@ -55,8 +55,11 @@
       bindkey '^[[1;5H' redisplay         # cmd+up: no-op in shell
       bindkey '^[[1;5F' redisplay         # cmd+down: no-op in shell
 
-      # 1Password as the default ssh authenticator
-      export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      # 1Password as the default ssh authenticator (guarded: the desktop app —
+      # and thus the socket — only exists on machines with a GUI 1Password)
+      _op_sock="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      [[ -S "$_op_sock" ]] && export SSH_AUTH_SOCK="$_op_sock"
+      unset _op_sock
 
       # Make sure secrets aren't saved to .zsh_history; zsh hook, not a function
       zshaddhistory() {

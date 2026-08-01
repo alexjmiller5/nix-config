@@ -24,5 +24,18 @@
     deno
     ripgrep
     jq
+    # First brew→nixpkgs tranche (2026-08-01): pure CLI tools with no macOS
+    # quirks; their brew formulae are undeclared so zap removes the dupes.
+    act
+    bat
+    d2
+    fzf
+    git-filter-repo
+    gitleaks
+    sevenzip
+    shellcheck
+    sshpass
+    tree
+    yq
   ];
 }

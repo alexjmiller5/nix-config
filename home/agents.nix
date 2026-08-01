@@ -23,6 +23,24 @@ let
     git push origin main
   '';
 
+  # Weekly update pass (Mon 09:30; launchd catches up after wake if asleep):
+  # bump flake inputs, prove the system still builds (revert the lock if not),
+  # upgrade brew formulae, then notify — switching stays a human decision.
+  weeklyUpdates = pkgs.writeShellScript "weekly-updates" ''
+    set -uo pipefail
+    export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/opt/homebrew/bin:/usr/bin:/bin"
+    cd "$HOME/Desktop/coding/active-projects/nix-config"
+    nix flake update
+    if nix build .#darwinConfigurations.macbook-air.system; then
+      status="flake inputs updated + system builds — review lock diff, then just switch-laptop"
+    else
+      git checkout -- flake.lock
+      status="flake update FAILED to build — lock reverted, investigate"
+    fi
+    brew upgrade --formula || true
+    /usr/bin/osascript -e "display notification \"$status\" with title \"nix weekly updates\""
+  '';
+
   # A login item as a launchd agent: launch the app without stealing focus.
   loginItem = app: {
     enable = true;
@@ -44,6 +62,17 @@ in
         StartCalendarInterval = [ { Hour = 10; Minute = 0; } ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";
+      };
+    };
+
+    weekly-updates = {
+      enable = true;
+      config = {
+        Label = "com.alexmiller.weekly-updates";
+        ProgramArguments = [ "${weeklyUpdates}" ];
+        StartCalendarInterval = [ { Weekday = 1; Hour = 9; Minute = 30; } ];
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/weekly-updates.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/weekly-updates.log";
       };
     };
 

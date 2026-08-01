@@ -58,10 +58,8 @@
       "supabase/tap"
     ];
     brews = [
-      "act"
       "automake"
       "base64"
-      "bat"
       "bison"
       "bun"
       "chrome-cli"
@@ -69,23 +67,18 @@
       "cloudflare-wrangler"
       "cmake"
       "create-dmg"
-      "d2"
       "duti"
       "electrikmilk/cherri/cherri"
       "exiftool"
       "fastlane"
       "ffmpeg"
       "fswatch"
-      "fzf"
       "gdbm"
       "gemini-cli"
       "gh"
-      "git-filter-repo"
-      "gitleaks"
       "gogcli"
       "gsettings-desktop-schemas"
       "jupyterlab"
-      "just"
       # window manager — runs via the custom com.asmvik.yabai launchd agent
       "koekeishiya/formulae/yabai"
       "libffi"
@@ -106,20 +99,14 @@
       "python@3.10"
       "rbenv"
       "ruby-install"
-      "sevenzip"
-      "shellcheck"
       "skills"
       "smudge/smudge/nightlight"
-      "sshpass"
       "supabase/tap/supabase"
       "terraform"
-      "tree"
       "tree-sitter-cli"
-      "uv"
       "vips"
       "vsce"
       "xcodegen"
-      "yq"
       "yt-dlp"
     ];
     casks = [
@@ -190,9 +177,9 @@
       "Telegram" = 747648890;
       "Xcode" = 497799835;
     };
-    # The mini uses "zap" (uninstall anything undeclared). Flip this to "zap"
-    # only after a first successful switch confirms the lists above are
-    # complete — zap on a stale list uninstalls whatever it's missing.
-    onActivation.cleanup = "none";
+    # Fully declarative since 2026-08-01: anything installed but undeclared
+    # gets uninstalled on switch (dry-run reviewed before flipping — only
+    # orphaned libevent + the nixpkgs-replaced zsh-autosuggestions).
+    onActivation.cleanup = "zap";
   };
 }
