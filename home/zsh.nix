@@ -7,7 +7,9 @@
 {
   programs.zsh = {
     enable = true;
-    dotDir = "${config.xdg.configHome}/zsh";
+    # Left at default (zsh files generated in $HOME). Uncomment to restore the
+    # ZDOTDIR ~/.config/zsh layout; history + compdump stay there either way.
+    # dotDir = "${config.xdg.configHome}/zsh";
     # Typing a directory path as a command cd's into it: `..`, `../../..`,
     # `../some-folder/deeper`, bare subdir names — all work without `cd`.
     autocd = true;
