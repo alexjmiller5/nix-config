@@ -19,7 +19,16 @@ in
     ./aliases/dev.nix
     ./aliases/ai.nix
     ./aliases/infra.nix
+    ./macos-tweaks.nix
+    ./agents.nix
   ];
+
+  # yabai config (formula declared in the host; the com.asmvik.yabai launchd
+  # agent and the sudoers scripting-addition entry stay manual — MANUAL.md).
+  home.file.".yabairc" = {
+    source = ../dotfiles/yabai/yabairc;
+    executable = true;
+  };
 
   # Commit signing via 1Password (desktop app + op-ssh-sign, laptop-only).
   # The signer script lives in agent-config, reached via the ~/.claude/skills

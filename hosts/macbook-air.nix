@@ -33,6 +33,14 @@
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 
+  # Disable auto display brightness (laptop-only; written to /Library/Preferences
+  # as root — takes effect after a restart).
+  system.defaults.CustomSystemPreferences = {
+    "/Library/Preferences/com.apple.iokit.AmbientLightSensor" = {
+      "Automatic Display Enabled" = false;
+    };
+  };
+
   # Snapshot of the laptop's imperatively-installed brew state (refreshed
   # 2026-07-28 during Phase 0 reconcile), so the first switch changes nothing.
   homebrew = {
