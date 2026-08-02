@@ -26,5 +26,8 @@
     sshpass
     tree
     yq-go      # brew "yq" is mikefarah's Go yq, matching this
+    # osxphotos (Apple Photos CLI) is not in nixpkgs; uvx runs it ephemerally
+    # from PyPI (cached), so this wrapper is the whole install.
+    (writeShellScriptBin "osxphotos" ''exec ${uv}/bin/uvx osxphotos "$@"'')
   ];
 }
