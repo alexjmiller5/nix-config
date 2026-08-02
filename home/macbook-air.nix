@@ -1,6 +1,6 @@
 { config, pkgs, lib, username, ... }:
 
-# Laptop home profile: full shell + dotfiles + the private-config fan-out.
+# Laptop home profile: full shell + dotfiles + the agent-config fan-out.
 #
 # Two file-management modes in here, chosen per file:
 #  - store symlink (home.file.source = ./path): immutable, edit via repo+rebuild.
@@ -9,7 +9,7 @@
 #    the app can write at runtime (VS Code settings, Claude settings, skills).
 let
   repoRoot = "${config.home.homeDirectory}/Desktop/coding/active-projects";
-  privateConfig = "${repoRoot}/private-config";
+  agentConfig = "${repoRoot}/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
 in
 {
@@ -33,7 +33,7 @@ in
   };
 
   # Commit signing via 1Password (desktop app + op-ssh-sign, laptop-only).
-  # The signer script lives in private-config, reached via the ~/.claude/skills
+  # The signer script lives in agent-config, reached via the ~/.claude/skills
   # symlink so the path stays stable if the repo moves.
   programs.git.settings = {
     user.signingkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKWqJ5X61r/CFl99qjU/rZyIB4DCQpVI+cF0y33WSSMC";
@@ -58,16 +58,16 @@ in
   home.file."Library/Application Support/Code/User/keybindings.json".source =
     mkLink "${repoRoot}/nix-config/dotfiles/vscode/keybindings.json";
 
-  # --- private-config fan-out (private repo; app-writable working copy) ---
+  # --- agent-config fan-out (private repo; app-writable working copy) ---
   # skills served to BOTH the cross-agent standard location and Claude Code's.
-  home.file.".agents/skills".source = mkLink "${privateConfig}/skills";
-  home.file.".claude/skills".source = mkLink "${privateConfig}/skills";
-  home.file.".claude/settings.json".source = mkLink "${privateConfig}/claude/settings.json";
-  home.file.".claude/shell-init.sh".source = mkLink "${privateConfig}/claude/shell-init.sh";
-  home.file.".claude/hooks".source = mkLink "${privateConfig}/claude/hooks";
+  home.file.".agents/skills".source = mkLink "${agentConfig}/skills";
+  home.file.".claude/skills".source = mkLink "${agentConfig}/skills";
+  home.file.".claude/settings.json".source = mkLink "${agentConfig}/claude/settings.json";
+  home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
+  home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
   # ssh client config: home/ssh.nix (programs.ssh + private Include)
   # AGENTS.md is the agent-agnostic source of truth; CLAUDE.md is its alias.
-  home.file.".claude/CLAUDE.md".source = mkLink "${privateConfig}/AGENTS.md";
+  home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
 
   # Hammerspoon profile selector — read by ~/.hammerspoon/init.lua at load.
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).

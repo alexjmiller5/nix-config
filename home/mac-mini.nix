@@ -2,15 +2,15 @@
 
 # Mini home profile: shared base + the laptop's shell (zsh/starship/aliases,
 # minus personal-infra aliases — those reference laptop-only workflows) + the
-# private-config fan-out so Claude Code on the mini gets the same skills,
+# agent-config fan-out so Claude Code on the mini gets the same skills,
 # settings, AGENTS.md, and hooks.
 #
-# The private-config working clone reaches the mini via iCloud Desktop sync
+# The agent-config working clone reaches the mini via iCloud Desktop sync
 # (~/Desktop is pinned "Keep Downloaded" there). Git sync runs ONLY on the
 # laptop's launchd agent — two machines pushing the same iCloud-synced clone
 # would race; the mini is a consumer.
 let
-  privateConfig = "${config.home.homeDirectory}/Desktop/coding/active-projects/private-config";
+  agentConfig = "${config.home.homeDirectory}/Desktop/coding/active-projects/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
 in
 {
@@ -33,10 +33,10 @@ in
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
-  home.file.".agents/skills".source = mkLink "${privateConfig}/skills";
-  home.file.".claude/skills".source = mkLink "${privateConfig}/skills";
-  home.file.".claude/settings.json".source = mkLink "${privateConfig}/claude/settings.json";
-  home.file.".claude/shell-init.sh".source = mkLink "${privateConfig}/claude/shell-init.sh";
-  home.file.".claude/hooks".source = mkLink "${privateConfig}/claude/hooks";
-  home.file.".claude/CLAUDE.md".source = mkLink "${privateConfig}/AGENTS.md";
+  home.file.".agents/skills".source = mkLink "${agentConfig}/skills";
+  home.file.".claude/skills".source = mkLink "${agentConfig}/skills";
+  home.file.".claude/settings.json".source = mkLink "${agentConfig}/claude/settings.json";
+  home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
+  home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
+  home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
 }

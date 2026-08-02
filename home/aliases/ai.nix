@@ -1,5 +1,5 @@
 # AI agent / Claude Code aliases. The op-* scripts resolve through
-# ~/.claude/skills (a symlink into the private-config repo).
+# ~/.claude/skills (a symlink into the agent-config repo).
 {
   programs.zsh.shellAliases = {
     claude = "claude --model fable";
