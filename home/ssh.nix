@@ -3,7 +3,7 @@
 # SSH client config, split for privacy: this public module declares the
 # structure (1Password agent everywhere); the actual host blocks — tailnet
 # hostnames, server IPs, per-host key selectors — live in the private
-# private-config repo and are pulled in via Include, which ssh resolves at
+# nix-secrets repo and are pulled in via Include, which ssh resolves at
 # runtime. Nothing sensitive enters this repo or the nix store, and a fresh
 # machine (before the private clone exists) just ignores the missing include.
 {
@@ -18,7 +18,7 @@
     };
 
     includes = [
-      "${config.home.homeDirectory}/Desktop/coding/active-projects/private-config/ssh/hosts"
+      "${config.home.homeDirectory}/Desktop/coding/active-projects/nix-secrets/ssh/hosts"
     ];
   };
 }
