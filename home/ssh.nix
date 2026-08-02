@@ -21,4 +21,12 @@
       "${config.home.homeDirectory}/Desktop/coding/active-projects/nix-secrets/ssh/hosts"
     ];
   };
+
+  # Public-key selectors for the 1Password SSH agent — public by nature (GitHub
+  # serves them at github.com/<user>.keys), so they live in this public repo
+  # and a fresh machine gets them without any copying.
+  home.file.".ssh/github.pub".source = ../dotfiles/ssh/github.pub;
+  home.file.".ssh/mac_mini.pub".source = ../dotfiles/ssh/mac_mini.pub;
+  home.file.".ssh/gcp_vm.pub".source = ../dotfiles/ssh/gcp_vm.pub;
+  home.file.".ssh/claude-code-signing.pub".source = ../dotfiles/ssh/claude-code-signing.pub;
 }
