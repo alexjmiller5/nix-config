@@ -11,7 +11,7 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
    repo to `~/Desktop/coding/active-projects/nix-config`, run `just switch-laptop`.
 3. `gh auth login`, sign into the 1Password app, `op signin` once.
 4. Clone the private companions (nix symlinks point into them):
-   - `gh repo clone alexjmiller5/agent-config ~/Desktop/coding/active-projects/agent-config`
+   - `gh repo clone alexjmiller5/private-config ~/Desktop/coding/active-projects/private-config`
    - `gh repo clone alexjmiller5/hammerspoon ~/.hammerspoon`
 5. Re-run `just switch-laptop` (out-of-store symlinks now resolve).
 6. Trust the third-party taps (brew's tap-trust gate blocks formula loads
@@ -19,7 +19,7 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 ## SSH
 
-- `~/.ssh/config` is nix-symlinked into agent-config (private). Keys are held
+- `~/.ssh/config` is nix-symlinked into private-config (private). Keys are held
   by the 1Password SSH agent; the `.pub` files in `~/.ssh` are its selectors.
 - Deliberately imperative: `~/.ssh/agenix` (the agenix "laptop" recipient key
   — age can't use the 1P agent, so this is a real on-disk secret, never
