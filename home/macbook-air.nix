@@ -22,6 +22,7 @@ in
     ./macos-tweaks.nix
     ./agents.nix
     ./reference-repos.nix
+    ./ssh.nix
   ];
 
   # yabai config (formula declared in the host; the com.asmvik.yabai launchd
@@ -64,9 +65,7 @@ in
   home.file.".claude/settings.json".source = mkLink "${agentConfig}/claude/settings.json";
   home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
   home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
-  # ssh client config lives in agent-config (tailnet names + IPs stay private);
-  # keys themselves are 1P-agent-held (.pub selectors) or deliberately imperative.
-  home.file.".ssh/config".source = mkLink "${agentConfig}/ssh/config";
+  # ssh client config: home/ssh.nix (programs.ssh + private Include)
   # AGENTS.md is the agent-agnostic source of truth; CLAUDE.md is its alias.
   home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
 
