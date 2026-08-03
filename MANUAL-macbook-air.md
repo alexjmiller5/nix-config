@@ -69,6 +69,21 @@ mini authorized_keys. No agenix key exists on the laptop — none is needed:
 - **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 - **Nightlight**: the activation script needs a display connected on first run.
 
+## Menu bar: third-party icon order & hiding (manual by design)
+
+Dock order and system/Control Center icon visibility ARE declared
+(`hosts/macbook-air.nix` dock block, `modules/macos-defaults.nix`
+controlcenter block). Third-party icon order and what iBar hides are not,
+and can't sanely be: each icon's spot is an `"NSStatusItem Preferred
+Position"` key in that app's own defaults domain holding an absolute pixel
+offset from the right screen edge — offsets shift whenever any icon
+appears/disappears or the display width changes, macOS rewrites them on
+drag, and apps only reread them at launch. "Hidden" isn't a macOS concept
+either: an item is hidden iff its offset sits left of iBar's separator.
+Machine state, not config — arrange icons and iBar's hide boundary by hand
+(⌘-drag). Full research: Notion note "Menu bar / dock in nix — findings"
+(2026-08-02).
+
 ## Known imperative leftovers (deliberate)
 
 - `com.asmvik.yabai.plist`, `com.alexmiller.geminidesktop.plist`, OpenClaw

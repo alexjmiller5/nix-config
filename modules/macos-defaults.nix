@@ -71,6 +71,28 @@
       };
       "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
       "com.google.Chrome".DisablePrintPreview = true;
+      # Menu bar system icons (snapshotted 2026-08-02): shown modules pinned
+      # true, hidden pinned false; WiFi left at macOS default (shown). Editing
+      # these needs `killall ControlCenter` (or re-login) to take effect.
+      # Third-party icon order/hiding is NOT declarable — see
+      # MANUAL-macbook-air.md.
+      "com.apple.controlcenter" = {
+        "NSStatusItem Visible AccessibilityShortcuts" = false;
+        "NSStatusItem Visible AirDrop" = true;
+        "NSStatusItem Visible Battery" = true;
+        "NSStatusItem Visible BentoBox" = true; # the Control Center icon itself
+        "NSStatusItem Visible Bluetooth" = true;
+        "NSStatusItem Visible Hearing" = false;
+        "NSStatusItem Visible KeyboardBrightness" = false;
+        "NSStatusItem Visible ScreenMirroring" = true;
+        "NSStatusItem Visible Shortcuts" = false;
+        "NSStatusItem Visible Sound" = true;
+      };
+      "com.apple.Siri".StatusMenuVisible = false;
+      "com.apple.menuextra.clock" = {
+        IsAnalog = false;
+        TimeAnnouncementsEnabled = false;
+      };
     };
   };
 }
