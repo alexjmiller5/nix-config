@@ -41,6 +41,23 @@
     };
   };
 
+  # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
+  # nix rewrites it on switch, so manual drag-ins don't survive.
+  system.defaults.dock.persistent-apps = [
+    { app = "/Applications/Spotify.app"; }
+    { app = "/System/Applications/Messages.app"; }
+    { app = "/Applications/WhatsApp.app"; }
+    { app = "/System/Applications/Mail.app"; }
+    { app = "/Applications/Ghostty.app"; }
+    { app = "/Applications/Visual Studio Code.app"; }
+    { app = "/Applications/Google Chrome.app"; }
+    { app = "/Applications/Notion Calendar.app"; }
+    { app = "/Applications/Notion.app"; }
+    { app = "/Applications/Gemini.app"; }
+    { app = "/Applications/Claude.app"; }
+    { app = "/Users/alexmiller/Applications/Chrome Apps.localized/Google Maps.app"; }
+  ];
+
   # Snapshot of the laptop's imperatively-installed brew state (refreshed
   # 2026-07-28 during Phase 0 reconcile), so the first switch changes nothing.
   homebrew = {
