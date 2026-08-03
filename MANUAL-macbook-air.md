@@ -7,17 +7,20 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 ## Fresh-machine bootstrap order
 
 1. Sign in Apple ID; sign into the **App Store** (masApps installs need it).
-2. Install [Determinate Nix](https://install.determinate.systems), clone this
-   repo to `~/.config/nix-config`, run `just switch-laptop` from it. (After the
-   first switch, `/etc/nix-darwin` symlinks here and the `switch-laptop` alias
-   works from anywhere.)
+2. Install [Determinate Nix](https://install.determinate.systems), then
+   bootstrap straight from GitHub — no clone needed (this repo is public):
+   ```bash
+   nix build github:alexjmiller5/nix-config#darwinConfigurations.macbook-air.system
+   sudo ./result/sw/bin/darwin-rebuild switch --flake github:alexjmiller5/nix-config#macbook-air
+   ```
+   Activation clones `~/.config/nix-config` itself (companion-repos, in
+   home/macbook-air.nix) and links `/etc/nix-darwin` to it, so from here on
+   the `switch-laptop` alias works from anywhere.
 3. `gh auth login`, sign into the 1Password app, `op signin` once.
-4. Clone the private companions (nix symlinks/includes point into them):
-   - `gh repo clone alexjmiller5/agent-config ~/Desktop/coding/active-projects/agent-config`
-   - `gh repo clone alexjmiller5/nix-secrets ~/.config/nix-secrets`
-   - `gh repo clone alexjmiller5/hammerspoon ~/.hammerspoon`
-5. Re-run `just switch-laptop` (out-of-store symlinks now resolve).
-6. Trust the third-party taps (brew's tap-trust gate blocks formula loads
+4. `switch-laptop` again — activation now clones the private companions
+   (agent-config, nix-secrets, hammerspoon) via gh's auth, and the
+   out-of-store symlinks resolve.
+5. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
 
 ## SSH + secrets — zero manual keys

@@ -10,6 +10,10 @@
       name = lib.mkDefault "Alex Miller";
       email = lib.mkDefault "98389659+alexjmiller5@users.noreply.github.com";
     };
+    # GitHub https auth rides gh's login — no PAT in the keychain to recreate
+    # by hand; `gh auth login` once and every private clone (incl. the
+    # companion-repos activation) works.
+    settings.credential."https://github.com".helper = "!gh auth git-credential";
   };
 
   xdg.configFile."git/ignore".text = ''

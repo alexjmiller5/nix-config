@@ -76,4 +76,21 @@ in
   # Hammerspoon profile selector — read by ~/.hammerspoon/init.lua at load.
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
   home.file.".config/hammerspoon-profile".text = "personal";
+
+  # Companion working clones — clone-if-missing at activation, same pattern as
+  # reference-repos.nix. Makes the MANUAL clone steps self-healing: a fresh
+  # machine bootstraps straight from github:alexjmiller5/nix-config, and the
+  # first switch materializes the clones. Private repos need `gh auth login`
+  # first; until then they warn and skip — re-run switch after signing in.
+  home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    export PATH="/opt/homebrew/bin:/etc/profiles/per-user/${config.home.username}/bin:$PATH"
+    companionClone() {
+      [ -d "$2" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/$1.git" "$2" \
+        || echo "companion-repos: clone of $1 failed (gh auth missing?) — sign in, re-run switch" >&2
+    }
+    companionClone nix-config "${nixConfig}"
+    companionClone nix-secrets "${config.home.homeDirectory}/.config/nix-secrets"
+    companionClone agent-config "${agentConfig}"
+    companionClone hammerspoon "${config.home.homeDirectory}/.hammerspoon"
+  '';
 }
