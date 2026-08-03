@@ -156,9 +156,10 @@
         truncate_to_repo = false;
       };
       git_branch = {
+        # symbol left at starship's default (the branch glyph)
         format = "[$symbol$branch]($style) ";
-        symbol = " ";
-        style = "magenta";
+        # starship's name for magenta is "purple" — "magenta" is silently ignored
+        style = "purple";
       };
       character = {
         success_symbol = "[✔](green) [❯](bold)";
