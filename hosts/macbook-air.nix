@@ -30,6 +30,11 @@
     just
   ];
 
+  # Canonical flake location: darwin-rebuild finds /etc/nix-darwin/flake.nix on
+  # its own, so rebuild commands never need to know where the working clone
+  # lives. A string (not a path literal) keeps the symlink out-of-store.
+  environment.etc."nix-darwin".source = "/Users/${username}/.config/nix-config";
+
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 

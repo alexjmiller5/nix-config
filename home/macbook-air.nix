@@ -8,8 +8,12 @@
 #  - mkOutOfStoreSymlink: symlink into a live git working copy — tracked, but
 #    the app can write at runtime (VS Code settings, Claude settings, skills).
 let
-  repoRoot = "${config.home.homeDirectory}/Desktop/coding/active-projects";
-  agentConfig = "${repoRoot}/agent-config";
+  # nix-config + nix-secrets working clones live in ~/.config (out of iCloud);
+  # /etc/nix-darwin symlinks to nixConfig as the canonical rebuild path.
+  # agent-config stays in iCloud Desktop for now — it's the mini's transport
+  # (see home/mac-mini.nix).
+  nixConfig = "${config.home.homeDirectory}/.config/nix-config";
+  agentConfig = "${config.home.homeDirectory}/Desktop/coding/active-projects/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
 in
 {
@@ -54,9 +58,9 @@ in
 
   # --- VS Code (app-writable → out-of-store into THIS repo's working clone) ---
   home.file."Library/Application Support/Code/User/settings.json".source =
-    mkLink "${repoRoot}/nix-config/dotfiles/vscode/settings.json";
+    mkLink "${nixConfig}/dotfiles/vscode/settings.json";
   home.file."Library/Application Support/Code/User/keybindings.json".source =
-    mkLink "${repoRoot}/nix-config/dotfiles/vscode/keybindings.json";
+    mkLink "${nixConfig}/dotfiles/vscode/keybindings.json";
 
   # --- agent-config fan-out (private repo; app-writable working copy) ---
   # skills served to BOTH the cross-agent standard location and Claude Code's.

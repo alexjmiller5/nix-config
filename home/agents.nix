@@ -29,7 +29,7 @@ let
   weeklyUpdates = pkgs.writeShellScript "weekly-updates" ''
     set -uo pipefail
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/opt/homebrew/bin:/usr/bin:/bin"
-    cd "$HOME/Desktop/coding/active-projects/nix-config"
+    cd "$HOME/.config/nix-config"
     nix flake update
     if nix build .#darwinConfigurations.macbook-air.system; then
       status="flake inputs updated + system builds — review lock diff, then just switch-laptop"
