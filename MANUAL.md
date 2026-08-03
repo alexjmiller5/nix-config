@@ -18,14 +18,17 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 6. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
 
-## SSH — the one manual piece
+## SSH + secrets — zero manual keys
 
-Everything else is declared (programs.ssh + nix-secrets Include, .pub
-selectors, mini authorized_keys). The exception: `~/.ssh/agenix`, the agenix
-"laptop" recipient key — age can't use the 1P agent, so it's a real on-disk
-secret no repo can carry. On a fresh machine (or if lost):
-`ssh-keygen -t ed25519 -f ~/.ssh/agenix -N ""`, update `secrets/secrets.nix`,
-re-encrypt the secrets.
+Everything is declared: programs.ssh + nix-secrets Include, .pub selectors,
+mini authorized_keys. No agenix key exists on the laptop — none is needed:
+
+- **Rotating/editing a secret** = recreate, not decrypt (encryption uses only
+  the public keys in `secrets/secrets.nix`; the value's source of truth is
+  1Password): `cd secrets && rm op-token.age && EDITOR=nano nix run
+  github:ryantm/agenix -- -e op-token.age` → paste from 1P, save, commit, deploy.
+- **Viewing a secret's current value** → look in 1Password (only the mini can
+  decrypt, via its host key, at activation).
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
