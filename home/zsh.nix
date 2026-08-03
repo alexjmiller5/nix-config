@@ -40,7 +40,6 @@
       export DENO_INSTALL="$HOME/.deno"
       export PATH="$DENO_INSTALL/bin:$PATH"
       export PATH="/usr/local/opt/node@20/bin:$PATH"
-      [[ -f "$HOME/ca-certificates.crt" ]] && export NODE_EXTRA_CA_CERTS="$HOME/ca-certificates.crt"
 
       # Homebrew env + its zsh completions
       if [[ -x /opt/homebrew/bin/brew ]]; then
