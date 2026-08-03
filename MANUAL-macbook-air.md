@@ -1,4 +1,4 @@
-# MANUAL.md — MacBook steps nix cannot do
+# MANUAL-macbook-air.md — MacBook steps nix cannot do
 
 Everything on the laptop that can't be declared, in bootstrap order. (The
 mini's equivalent lives in README.md §Manual setup steps.) Sources: blueprint's

@@ -4,7 +4,7 @@
 # system.defaults: -currentHost domains, symbolic hotkeys, xattrs, and
 # third-party CLIs. All idempotent; ported from blueprint's defaults.sh.
 # (universalaccess scroll-zoom stays manual — writing it needs Full Disk
-# Access; see MANUAL.md.)
+# Access; see MANUAL-macbook-air.md.)
 {
   # Menu bar item spacing (tighter). -currentHost → per-machine ByHost plist,
   # which system.defaults.CustomUserPreferences can't target. Guarded so the

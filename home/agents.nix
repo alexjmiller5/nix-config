@@ -2,7 +2,7 @@
 
 # User launchd agents (laptop): agent-config sync, claude-code updater, and
 # login items as RunAtLoad agents (no TCC prompts, fully declarative — the
-# System Settings login-item list should be emptied by hand, see MANUAL.md).
+# System Settings login-item list should be emptied by hand, see MANUAL-macbook-air.md).
 let
   # Commit → pull --rebase → push for the agent-config working clone.
   # Robot commits are unsigned on purpose (no 1P dependency in launchd).

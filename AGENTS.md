@@ -20,7 +20,7 @@ routing table and workflow; this file is the in-repo map.
 - `modules/` — darwin modules shared across hosts (`macos-defaults.nix`, `notunes.nix`)
 - `dotfiles/` — file payloads (ghostty, karabiner, nvim, vscode, ssh pubs, duti list)
 - `secrets/` — agenix (recipients in `secrets.nix`; edit with `-i ~/.ssh/agenix`)
-- `MANUAL.md` — every step nix cannot do (TCC, SIP, sign-ins, bootstrap order)
+- `MANUAL-macbook-air.md` — every step nix cannot do (TCC, SIP, sign-ins, bootstrap order)
 
 ## Conventions
 
