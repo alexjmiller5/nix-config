@@ -26,7 +26,7 @@ in
   ];
 
   # yabai config (formula declared in the host; the com.asmvik.yabai launchd
-  # agent and the sudoers scripting-addition entry stay manual — MANUAL.md).
+  # agent and the sudoers scripting-addition entry stay manual — MANUAL-macbook-air.md).
   home.file.".yabairc" = {
     source = ../dotfiles/yabai/yabairc;
     executable = true;
