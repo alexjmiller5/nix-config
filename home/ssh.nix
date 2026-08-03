@@ -18,7 +18,7 @@
     };
 
     includes = [
-      "${config.home.homeDirectory}/Desktop/coding/active-projects/nix-secrets/ssh/hosts"
+      "${config.home.homeDirectory}/.config/nix-secrets/ssh/hosts"
     ];
   };
 
