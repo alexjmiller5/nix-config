@@ -20,12 +20,12 @@
   # Menu bar system-icon visibility (snapshotted 2026-08-04, macOS 26). Lives
   # in the ByHost controlcenter domain as ints — the plain-domain
   # "NSStatusItem Visible" keys are ignored since the menu bar workflow
-  # migration. Observed encoding: 2/18 = shown in menu bar, 8/9/24 = hidden
+  # migration. Observed encoding: 2/3/18 = shown in menu bar, 8/9/24 = hidden
   # (24 = still in the Control Center panel). Guarded: writes + one
   # ControlCenter restart only when a value actually differs.
   home.activation.menuBarModules = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     _cc_changed=0
-    for _pair in AccessibilityShortcuts=9 AirDrop=2 Battery=9 \
+    for _pair in AccessibilityShortcuts=9 AirDrop=2 Battery=3 \
         BatteryShowPercentage=1 Bluetooth=2 Display=24 FocusModes=24 \
         Hearing=9 KeyboardBrightness=9 MusicRecognition=9 NowPlaying=24 \
         ScreenMirroring=18 Siri=8 Sound=18 StageManager=8 VoiceControl=8 \
