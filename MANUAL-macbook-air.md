@@ -60,8 +60,9 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 ## Menu bar: third-party icon order & hiding (manual by design)
 
 Dock order and system/Control Center icon visibility ARE declared
-(`hosts/macbook-air.nix` dock block, `modules/macos-defaults.nix`
-controlcenter block). Third-party icon order and what iBar hides are not,
+(`hosts/macbook-air.nix` dock block; visibility via the ByHost ints in
+`home/macos-tweaks.nix` menuBarModules — macOS 26 ignores the legacy
+plain-domain "NSStatusItem Visible" keys). Third-party icon order and what iBar hides are not,
 and can't sanely be: each icon's spot is an `"NSStatusItem Preferred
 Position"` key in that app's own defaults domain holding an absolute pixel
 offset from the right screen edge — offsets shift whenever any icon
