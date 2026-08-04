@@ -8,12 +8,10 @@
 #  - mkOutOfStoreSymlink: symlink into a live git working copy — tracked, but
 #    the app can write at runtime (VS Code settings, Claude settings, skills).
 let
-  # nix-config + nix-secrets working clones live in ~/.config (out of iCloud);
+  # All companion working clones live in ~/.config (out of iCloud);
   # /etc/nix-darwin symlinks to nixConfig as the canonical rebuild path.
-  # agent-config stays in iCloud Desktop for now — it's the mini's transport
-  # (see home/mac-mini.nix).
   nixConfig = "${config.home.homeDirectory}/.config/nix-config";
-  agentConfig = "${config.home.homeDirectory}/Desktop/coding/active-projects/agent-config";
+  agentConfig = "${config.home.homeDirectory}/.config/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
 in
 {
