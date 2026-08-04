@@ -1,17 +1,23 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 # Mini home profile: shared base + the laptop's shell (zsh/starship/aliases,
 # minus personal-infra aliases — those reference laptop-only workflows) + the
 # agent-config fan-out so Claude Code on the mini gets the same skills,
 # settings, AGENTS.md, and hooks.
 #
-# The agent-config working clone reaches the mini via iCloud Desktop sync
-# (~/Desktop is pinned "Keep Downloaded" there). Git sync runs ONLY on the
-# laptop's launchd agent — two machines pushing the same iCloud-synced clone
-# would race; the mini is a consumer.
+# agent-config is a real git clone (cloned at activation, refreshed by a
+# daily pull-only agent below) — no iCloud involved. The laptop stays the
+# ONLY pusher (its sync agent commits+pushes); the mini never writes, so
+# there's no push race. Clone/pull auth = `gh auth login` once (MANUAL §6).
 let
-  agentConfig = "${config.home.homeDirectory}/Desktop/coding/active-projects/agent-config";
+  agentConfig = "${config.home.homeDirectory}/.config/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
+  agentConfigPull = pkgs.writeShellScript "agent-config-pull" ''
+    set -euo pipefail
+    export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
+    cd "${agentConfig}"
+    git pull --ff-only --quiet origin main
+  '';
 in
 {
   imports = [
@@ -32,6 +38,31 @@ in
     echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGVySz6jbVH+sW9q4+ru4CjHZjqmlMJ3p//0sLH1j8vH mac-mini' > "$HOME/.ssh/authorized_keys"
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
+
+  # gh = the git credential source for the private clone (git.nix routes
+  # github https through `gh auth git-credential`).
+  home.packages = [ pkgs.gh ];
+
+  # Clone-if-missing at activation (mini analog of the laptop's companion-repos).
+  home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    export PATH="/etc/profiles/per-user/${config.home.username}/bin:$PATH"
+    [ -d "${agentConfig}" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/agent-config.git" "${agentConfig}" \
+      || echo "companion-repos: agent-config clone failed (gh auth missing?) — gh auth login, redeploy" >&2
+  '';
+
+  # Daily pull, 30min after the laptop's 10:00 push window; RunAtLoad catches
+  # up after downtime.
+  launchd.agents.agent-config-pull = {
+    enable = true;
+    config = {
+      Label = "com.alexmiller.agent-config-pull";
+      ProgramArguments = [ "${agentConfigPull}" ];
+      RunAtLoad = true;
+      StartCalendarInterval = [ { Hour = 10; Minute = 30; } ];
+      StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-config-pull.log";
+      StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-pull.log";
+    };
+  };
 
   home.file.".agents/skills".source = mkLink "${agentConfig}/skills";
   home.file.".claude/skills".source = mkLink "${agentConfig}/skills";

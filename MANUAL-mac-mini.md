@@ -27,7 +27,7 @@ No `ssh-copy-id` needed: the bootstrap (step 5) authenticates with the account p
 
 ### 4. GUI-only configuration (via Screen Sharing)
 
-1. System Settings → Apple ID → **iCloud → iCloud Drive → enable "Desktop & Documents Folders"**, and turn **on "Optimize Mac Storage"** (the full Desktop+Documents mirror outgrew the mini's 228GB disk — it hit 0 bytes free with Optimize off). Then in Finder, right-click the **Desktop** folder → **Keep Downloaded**, so scripts reading from Desktop always see real files while Documents stays evictable. Any job needing a real file elsewhere should run `brctl download "<path>"` first.
+1. *(Optional — only for replicating the weekly backup output off the mini.)* Nothing on the mini **reads** from iCloud anymore (agent-config arrives via git, see §6), but screentime/callhistory snapshots **write** to `~/Documents`; to have iCloud carry those off-machine: System Settings → Apple ID → **iCloud → iCloud Drive → enable "Desktop & Documents Folders"** with **"Optimize Mac Storage" on** (the full mirror outgrew the mini's 228GB disk — it hit 0 bytes free with Optimize off).
 2. System Settings → Users & Groups → enable **automatic login** (so GUI apps come up after an unattended reboot).
 3. Grant any TCC prompts (Full Disk Access etc.) as they appear — macOS permission grants are GUI-only by design.
 
@@ -76,6 +76,10 @@ the tailnet ACL so tagged devices are approved automatically:
 
 ### 6. Per-module manual steps (TCC — GUI-only by design)
 
+- **agent-config (Claude skills/settings fan-out)**: `ssh mac-mini-tailscale`,
+  run `gh auth login` once (the clone + daily pull authenticate through gh),
+  then `just deploy` from the laptop again — activation clones
+  `~/.config/agent-config` and the symlinks resolve.
 - **screentime-backup** + **callhistory-backup** (weekly Apple-data snapshots):
   grant Full Disk Access once per app — System Settings → Privacy & Security →
   **Full Disk Access** → **[+]** → `/Applications/ScreenTimeBackup.app` and

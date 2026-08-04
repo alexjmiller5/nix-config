@@ -12,7 +12,7 @@ let
   agentConfigSync = pkgs.writeShellScript "agent-config-sync" ''
     set -euo pipefail
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
-    cd "$HOME/Desktop/coding/active-projects/agent-config"
+    cd "$HOME/.config/agent-config"
     git add -A
     git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
     if ! git pull --rebase origin main; then
