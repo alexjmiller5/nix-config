@@ -23,18 +23,6 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 5. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
 
-## SSH + secrets — zero manual keys
-
-Everything is declared: programs.ssh + nix-secrets Include, .pub selectors,
-mini authorized_keys. No agenix key exists on the laptop — none is needed:
-
-- **Rotating/editing a secret** = recreate, not decrypt (encryption uses only
-  the public keys in `secrets/secrets.nix`; the value's source of truth is
-  1Password): `cd secrets && rm op-token.age && EDITOR=nano nix run
-  github:ryantm/agenix -- -e op-token.age` → paste from 1P, save, commit, deploy.
-- **Viewing a secret's current value** → look in 1Password (only the mini can
-  decrypt, via its host key, at activation).
-
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
 - **Accessibility**: Hammerspoon, Karabiner-Elements, yabai, AltTab, Raycast,
@@ -56,11 +44,6 @@ mini authorized_keys. No agenix key exists on the laptop — none is needed:
 
 ## One-time app/setting setup
 
-- **Login items**: keep System Settings → Open at Login EMPTY (nix launchd
-  agents own app startup). Also uncheck the in-app "launch at login" toggles —
-  1Password, Raycast, Raycast Beta, BetterDisplay, Hammerspoon, CodexBar,
-  RepoBar — or they re-register themselves. FigmaAgent is Figma-managed; leave it.
-- **Screen Time**: enable "Share across devices" (feeds iOS data to the mac).
 - **Accessibility → Zoom**: enable scroll-gesture-with-modifier zoom (ctrl) —
   `com.apple.universalaccess` is FDA-gated, not worth automating.
 - **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →
@@ -88,6 +71,11 @@ either: an item is hidden iff its offset sits left of iBar's separator.
 Machine state, not config — arrange icons and iBar's hide boundary by hand
 (⌘-drag). Full research: Notion note "Menu bar / dock in nix — findings"
 (2026-08-02).
+
+Reference layout to re-create by hand, right → left (snapshotted 2026-08-04):
+clock, Control Center, Sound, WiFi, BetterDisplay, Tailscale, Battery,
+Bluetooth, Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar,
+CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
