@@ -27,6 +27,28 @@ in
     ./ssh.nix
   ];
 
+  # Menu bar system-module ORDER (right → left below). ControlCenter honors
+  # relative "Preferred Position" plain-domain values at launch (macOS 26,
+  # verified 2026-08-04). On-demand command, not activation: ControlCenter
+  # renormalizes the numbers after layout, so enforcing exact values every
+  # switch would flap. Third-party icon order stays manual (⌘-drag) — see
+  # MANUAL-macbook-air.md.
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "menubar-layout";
+      text = ''
+        pos=110
+        for mod in Sound WiFi Battery Bluetooth ScreenMirroring AirDrop; do
+          /usr/bin/defaults write com.apple.controlcenter \
+            "NSStatusItem Preferred Position $mod" -int "$pos"
+          pos=$((pos + 50))
+        done
+        /usr/bin/killall ControlCenter 2>/dev/null || true
+        echo "system modules re-laid out, right→left: Sound WiFi Battery Bluetooth ScreenMirroring AirDrop"
+      '';
+    })
+  ];
+
   # yabai config (formula declared in the host; the com.asmvik.yabai launchd
   # agent and the sudoers scripting-addition entry stay manual — MANUAL-macbook-air.md).
   home.file.".yabairc" = {

@@ -57,26 +57,28 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 - **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 - **Nightlight**: the activation script needs a display connected on first run.
 
-## Menu bar: third-party icon order & hiding (manual by design)
+## Menu bar: what's declared vs manual
 
-Dock order and system/Control Center icon visibility ARE declared
-(`hosts/macbook-air.nix` dock block; visibility via the ByHost ints in
-`home/macos-tweaks.nix` menuBarModules — macOS 26 ignores the legacy
-plain-domain "NSStatusItem Visible" keys). Third-party icon order and what iBar hides are not,
-and can't sanely be: each icon's spot is an `"NSStatusItem Preferred
-Position"` key in that app's own defaults domain holding an absolute pixel
-offset from the right screen edge — offsets shift whenever any icon
-appears/disappears or the display width changes, macOS rewrites them on
-drag, and apps only reread them at launch. "Hidden" isn't a macOS concept
-either: an item is hidden iff its offset sits left of iBar's separator.
-Machine state, not config — arrange icons and iBar's hide boundary by hand
-(⌘-drag). Full research: Notion note "Menu bar / dock in nix — findings"
-(2026-08-02).
+Declared: dock order (`hosts/macbook-air.nix` dock block), system icon
+visibility (ByHost ints in `home/macos-tweaks.nix` menuBarModules — macOS 26
+ignores the legacy plain-domain "NSStatusItem Visible" keys), and system
+icon ORDER via the `menubar-layout` command (declared in
+`home/macbook-air.nix`; run it whenever the system modules drift — it's
+on-demand, not activation, because ControlCenter renormalizes the position
+numbers after each layout and enforcing exact values every switch would
+flap).
 
-Reference layout to re-create by hand, right → left (snapshotted 2026-08-04):
-clock, Control Center, Sound, WiFi, BetterDisplay, Tailscale, Battery,
-Bluetooth, Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar,
-CodexBar.
+Manual: THIRD-PARTY icon order (⌘-drag). Can't sanely be declared: each
+app's spot is an `"NSStatusItem Preferred Position"` pixel-offset key in
+that app's own defaults domain, reread only at app launch — and apps that
+skip `autosaveName` (e.g. CodexBar) get no position persistence from macOS
+at all. If arrangement drift ever gets annoying, the Thaw cask
+(Accessibility-based layout profiles) is the tool-shaped answer. Full
+research: Notion note "Menu bar / dock in nix — findings" (2026-08-02).
+
+Reference layout, right → left (snapshotted 2026-08-04): clock,
+Control Center, Sound, WiFi, BetterDisplay, Tailscale, Battery, Bluetooth,
+Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar, CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
