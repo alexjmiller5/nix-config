@@ -17,6 +17,31 @@
     fi
   '';
 
+  # Menu bar system-icon visibility (snapshotted 2026-08-04, macOS 26). Lives
+  # in the ByHost controlcenter domain as ints — the plain-domain
+  # "NSStatusItem Visible" keys are ignored since the menu bar workflow
+  # migration. Observed encoding: 2/18 = shown in menu bar, 8/9/24 = hidden
+  # (24 = still in the Control Center panel). Guarded: writes + one
+  # ControlCenter restart only when a value actually differs.
+  home.activation.menuBarModules = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    _cc_changed=0
+    for _pair in AccessibilityShortcuts=9 AirDrop=2 Battery=9 \
+        BatteryShowPercentage=1 Bluetooth=2 Display=24 FocusModes=24 \
+        Hearing=9 KeyboardBrightness=9 MusicRecognition=9 NowPlaying=24 \
+        ScreenMirroring=18 Siri=8 Sound=18 StageManager=8 VoiceControl=8 \
+        Weather=2 WiFi=18; do
+      _mod="''${_pair%%=*}"
+      _val="''${_pair#*=}"
+      if [ "$(/usr/bin/defaults -currentHost read com.apple.controlcenter "$_mod" 2>/dev/null)" != "$_val" ]; then
+        /usr/bin/defaults -currentHost write com.apple.controlcenter "$_mod" -int "$_val"
+        _cc_changed=1
+      fi
+    done
+    if [ "$_cc_changed" = "1" ]; then
+      /usr/bin/killall ControlCenter 2>/dev/null || true
+    fi
+  '';
+
   # Disable the ⌘Space Spotlight hotkey (id 64) — Raycast owns ⌘Space.
   home.activation.disableSpotlightHotkey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if ! /usr/libexec/PlistBuddy -c "Print :AppleSymbolicHotKeys:64:enabled" \
