@@ -2,14 +2,14 @@
 
 Everything on the laptop that can't be declared, in bootstrap order. (The
 mini's equivalent lives in README.md §Manual setup steps.) Sources: blueprint's
-MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
+MANUAL\_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 ## Fresh-machine bootstrap order
 
 1. Sign in Apple ID; sign into the **App Store** (masApps installs need it).
 2. Install [Determinate Nix](https://install.determinate.systems), then
    bootstrap straight from GitHub — no clone needed (this repo is public):
-   ```bash
+   ```Shell
    nix build github:alexjmiller5/nix-config#darwinConfigurations.macbook-air.system
    sudo ./result/sw/bin/darwin-rebuild switch --flake github:alexjmiller5/nix-config#macbook-air
    ```
@@ -25,12 +25,12 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
-- **Accessibility**: Hammerspoon, Karabiner-Elements, yabai, AltTab, Raycast,
+* **Accessibility**: Hammerspoon, Karabiner-Elements, yabai, AltTab, Raycast,
   BetterDisplay, Ghostty, VS Code, Claude
-- **Input Monitoring**: Karabiner-Elements, Ghostty, VS Code
-- **Screen Recording**: AltTab, 1Password, Raycast, Notion
-- **Full Disk Access**: VS Code, Ghostty, Raycast
-- **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
+* **Input Monitoring**: Karabiner-Elements, Ghostty, VS Code
+* **Screen Recording**: AltTab, 1Password, Raycast, Notion
+* **Full Disk Access**: VS Code, Ghostty, Raycast
+* **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
 
 ## yabai (SIP + sudoers)
 
@@ -44,18 +44,18 @@ MANUAL_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 ## One-time app/setting setup
 
-- **Accessibility → Zoom**: enable scroll-gesture-with-modifier zoom (ctrl) —
+* **Accessibility → Zoom**: enable scroll-gesture-with-modifier zoom (ctrl) —
   `com.apple.universalaccess` is FDA-gated, not worth automating.
-- **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →
+* **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →
   hide dock icon.
-- **Chrome**: load-unpacked extensions (bypass-paywalls et al from
+* **Chrome**: load-unpacked extensions (bypass-paywalls et al from
   `~/Desktop/coding/built-from-source`); per-PWA "open links in Chrome".
-- **1Password** app settings can't be restored from backup (checksummed) —
+* **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
-- **Raycast**: clipboard history retention → 7 days; custom extensions load
+* **Raycast**: clipboard history retention → 7 days; custom extensions load
   from their dev source directories.
-- **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
-- **Nightlight**: the activation script needs a display connected on first run.
+* **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
+* **Nightlight**: the activation script needs a display connected on first run.
 
 ## Menu bar: what's declared vs manual
 
@@ -82,7 +82,8 @@ Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar, CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
-- `com.asmvik.yabai.plist`, `com.alexmiller.geminidesktop.plist`, OpenClaw
+* `com.asmvik.yabai.plist`, `com.alexmiller.geminidesktop.plist`, OpenClaw
   agents — owned by their own projects, not this repo.
-- `gh`/`gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
+* `gh`/`gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
   declared.
+

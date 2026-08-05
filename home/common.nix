@@ -13,18 +13,16 @@
     deno
     ripgrep
     jq
-    # First brew→nixpkgs tranche (2026-08-01): pure CLI tools with no macOS
-    # quirks; their brew formulae are undeclared so zap removes the dupes.
     act
     bat
     d2
     fzf
     git-filter-repo
     gitleaks
-    _7zz       # brew "sevenzip"
+    _7zz
     shellcheck
     sshpass
     tree
-    yq-go      # brew "yq" is mikefarah's Go yq, matching this
+    yq-go
   ];
 }

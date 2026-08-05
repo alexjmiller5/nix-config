@@ -42,7 +42,7 @@ keys cap at 90 days. Mint it from the laptop using the OAuth client in
 1Password (items "Tailscale OAuth Client ID" / "Tailscale OAuth Client Secret",
 Personal vault); keys minted this way **must** carry `tag:oauth-generated`:
 
-```sh
+```Shell
 TOKEN=$(curl -s https://api.tailscale.com/api/v2/oauth/token \
   -d "client_id=$(op item get 'Tailscale OAuth Client ID' --fields credential --reveal)" \
   -d "client_secret=$(op item get 'Tailscale OAuth Client Secret' --fields credential --reveal)" \
@@ -57,7 +57,7 @@ AUTHKEY=$(curl -s -X POST https://api.tailscale.com/api/v2/tailnet/-/keys \
 Then the one command (first time it authenticates with the account password;
 afterwards the flake-installed key takes over). `-t` because the script sudo-prompts:
 
-```sh
+```Shell
 ssh -t mac-mini-local "bash <(curl -fsSL https://raw.githubusercontent.com/alexjmiller5/nix-config/main/scripts/bootstrap.sh) $AUTHKEY"
 ```
 
@@ -76,24 +76,24 @@ the tailnet ACL so tagged devices are approved automatically:
 
 ### 6. Per-module manual steps (TCC — GUI-only by design)
 
-- **agent-config (Claude skills/settings fan-out)**: `ssh mac-mini-tailscale`,
+* **agent-config (Claude skills/settings fan-out)**: `ssh mac-mini-tailscale`,
   run `gh auth login` once (the clone + daily pull authenticate through gh),
   then `just deploy` from the laptop again — activation clones
   `~/.config/agent-config` and the symlinks resolve.
-- **screentime-backup** + **callhistory-backup** (weekly Apple-data snapshots):
+* **screentime-backup** + **callhistory-backup** (weekly Apple-data snapshots):
   grant Full Disk Access once per app — System Settings → Privacy & Security →
-  **Full Disk Access** → **[+]** → `/Applications/ScreenTimeBackup.app` and
+  **Full Disk Access** → **\[+]** → `/Applications/ScreenTimeBackup.app` and
   `/Applications/CallHistoryBackup.app`, toggle on. Each app is re-signed with
   its same stable cert every rebuild, so the grants persist. Verify:
   `launchctl kickstart -k gui/$(id -u)/com.alexmiller.screentime-backup` (and
   `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
   `backup OK` lines (a `cannot read` line means the grant is missing).
-- **whatsapp (companion device for callhistory-backup)**: via Screen Sharing,
+* **whatsapp (companion device for callhistory-backup)**: via Screen Sharing,
   open WhatsApp once → Settings on the iPhone → Linked Devices → Link a Device
   → scan the QR on the mini's screen. The keep-alive agent keeps it running
   afterward; no re-linking needed as long as the phone comes online every
   14 days and the app keeps running.
-- **notion-finance-sync**: FDA for `/Applications/NotionFinanceSync.app` + the
+* **notion-finance-sync**: FDA for `/Applications/NotionFinanceSync.app` + the
   rest of its runbook — see that repo's `docs/DEPLOY.md`.
 
 ### 7. Exit exam

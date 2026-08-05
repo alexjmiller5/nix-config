@@ -96,7 +96,6 @@
       "ffmpeg"
       "fswatch"
       "gdbm"
-      "gemini-cli"
       "gh"
       "gogcli"
       "gsettings-desktop-schemas"
@@ -199,9 +198,7 @@
       "Telegram" = 747648890;
       "Xcode" = 497799835;
     };
-    # Fully declarative since 2026-08-01: anything installed but undeclared
-    # gets uninstalled on switch (dry-run reviewed before flipping — only
-    # orphaned libevent + the nixpkgs-replaced zsh-autosuggestions).
+
     onActivation.cleanup = "zap";
   };
 }
