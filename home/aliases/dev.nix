@@ -8,12 +8,11 @@
     npm = "pnpm";
 
     # git
-    gs = "git status";
-    gc = "git commit";
-    ga = "git add -A";
-    gp = "git push";
-    gb = "git branch";
-    gba = "git branch -a";
+    status = "git status";
+    commit = "git commit";
+    add = "git add -A";
+    push = "git push";
+    branch = "git branch";
     gl = "git log";
     gundo = "git reset --mixed HEAD~1";
 

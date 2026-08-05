@@ -72,29 +72,6 @@ just() {
     command just "$@"
   fi
 }
-gworktree() {
-  # gworktree add <branch> — create (creating the branch if needed) a git
-  # worktree in the parent directory named "<repo>-<branch>".
-  if [[ "$1" != "add" || -z "$2" ]]; then
-    echo "Usage: gworktree add <branch>"
-    return 1
-  fi
-  local branch="$2" toplevel repo parent safe target
-  toplevel="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "Not inside a git repo."; return 1; }
-  repo="$(basename "$toplevel")"
-  parent="$(dirname "$toplevel")"
-  safe="${branch//\//-}"                 # flatten any slashes for the dir name
-  target="${parent}/${repo}-${safe}"
-  if [[ -e "$target" ]]; then
-    echo "Target already exists: $target"
-    return 1
-  fi
-  if git show-ref --verify --quiet "refs/heads/${branch}"; then
-    git worktree add "$target" "$branch"
-  else
-    git worktree add -b "$branch" "$target"
-  fi && echo "Worktree ready: $target (branch: $branch)"
-}
 scpfrom() {
   # scpfrom <ssh-host-alias> <remote-path> [local-dest]
   # Uses your ~/.ssh/config Host aliases, so scp resolves hostname/user for you.
@@ -157,5 +134,3 @@ code() {
     command code "$@"
   fi
 }
-
-

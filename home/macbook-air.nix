@@ -72,8 +72,6 @@ in
   home.file."Library/Application Support/com.mitchellh.ghostty/config".source =
     ../dotfiles/ghostty/config;
   xdg.configFile."nvim/init.lua".source = ../dotfiles/nvim/init.lua;
-  # Karabiner GUI edits will fail on the read-only file (accepted trade-off);
-  # only karabiner.json is managed — assets/ and automatic_backups/ stay real.
   xdg.configFile."karabiner/karabiner.json".source = ../dotfiles/karabiner/karabiner.json;
 
   # --- VS Code (app-writable → out-of-store into THIS repo's working clone) ---
@@ -89,8 +87,6 @@ in
   home.file.".claude/settings.json".source = mkLink "${agentConfig}/claude/settings.json";
   home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
   home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
-  # ssh client config: home/ssh.nix (programs.ssh + private Include)
-  # AGENTS.md is the agent-agnostic source of truth; CLAUDE.md is its alias.
   home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
 
   # Hammerspoon profile selector — read by ~/.hammerspoon/init.lua at load.
