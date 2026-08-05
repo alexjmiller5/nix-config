@@ -16,6 +16,8 @@ routing table and workflow; this file is the in-repo map.
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
   `macos-tweaks.nix` (activation-script defaults: currentHost, duti, xattr),
   `ssh.nix` (programs.ssh + private Include), `reference-repos.nix`,
+  `scripts.nix` (standalone commands as writeShellApplication — shell-state
+  functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`
 * `modules/` — darwin modules shared across hosts (`macos-defaults.nix`, `notunes.nix`)
 * `dotfiles/` — file payloads (ghostty, karabiner, nvim, vscode, ssh pubs, duti list)
