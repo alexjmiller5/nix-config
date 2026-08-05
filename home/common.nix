@@ -2,7 +2,7 @@
 
 # Shared home-manager base for every host.
 {
-  imports = [ ./git.nix ];
+  imports = [ ./git.nix ./scripts.nix ];
 
   home.stateVersion = "25.05";
   home.username = username;
