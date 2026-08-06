@@ -11,10 +11,12 @@ routing table and workflow; this file is the in-repo map.
   flakes (planned work-laptop config pins this repo)
 * `hosts/*.nix` — system layer: brew taps/brews/casks/masApps (zap cleanup:
   the lists ARE the machine), power, per-host defaults
-* `home/` — home-manager modules by concern: `common` (shared packages, git
-  via `git.nix`), `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
+* `home/` — home-manager modules by concern: `common` (base identity; pulls
+  `git.nix`, `scripts.nix`, and `cli-tools.nix`'s shared package list),
+  `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
-  `macos-tweaks.nix` (activation-script defaults: currentHost, duti, xattr),
+  `macos/{menu-bar,duti,nightlight,spotlight-raycast}.nix` (activation-script
+  defaults by concern, each exported via `homeModules`),
   `ssh.nix` (programs.ssh + private Include),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
