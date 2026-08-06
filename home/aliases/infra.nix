@@ -5,7 +5,6 @@
     coding = "cd ~/Desktop/coding";
     projects = "cd ~/Desktop/coding/active-projects";
     inactive-projects = "cd ~/Desktop/coding/inactive-projects";
-    reference-repos = "cd ~/Desktop/coding/reference-repos";
 
     # /etc/nix-darwin is the canonical path to the nix-config clone (declared
     # in hosts/macbook-air.nix) — these survive the clone moving again.
