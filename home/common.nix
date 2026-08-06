@@ -1,28 +1,12 @@
-{ pkgs, username, lib, ... }:
+{ username, ... }:
 
-# Shared home-manager base for every host.
+# Shared home-manager base for every host. The package list lives in
+# cli-tools.nix (exported via homeModules); this file adds only the
+# machine-identity bits external consumers set themselves.
 {
-  imports = [ ./git.nix ./scripts.nix ];
+  imports = [ ./git.nix ./scripts.nix ./cli-tools.nix ];
 
   home.stateVersion = "25.05";
   home.username = username;
   home.homeDirectory = "/Users/${username}";
-
-  home.packages = with pkgs; [
-    uv
-    deno
-    ripgrep
-    jq
-    act
-    bat
-    d2
-    fzf
-    git-filter-repo
-    gitleaks
-    _7zz
-    shellcheck
-    sshpass
-    tree
-    yq-go
-  ];
 }
