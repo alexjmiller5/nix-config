@@ -6,22 +6,66 @@ MANUAL\_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 ## Fresh-machine bootstrap order
 
+Written for total loss (laptop in the ocean): nothing survives but GitHub,
+1Password, and the mini. The replacement machine's SSH host key is new, so
+the laptop `.age` secrets must be recreated for it BEFORE the first switch —
+that's the only reason bootstrap needs a local clone instead of building
+straight from the github: ref.
+
 1. Sign in Apple ID; sign into the **App Store** (masApps installs need it).
-2. Install [Determinate Nix](https://install.determinate.systems), then
-   bootstrap straight from GitHub — no clone needed (this repo is public):
+2. Install [Determinate Nix](https://install.determinate.systems).
+3. Clone this repo (public — no auth) and enroll the new machine's host key:
    ```Shell
-   nix build github:alexjmiller5/nix-config#darwinConfigurations.macbook-air.system
-   sudo ./result/sw/bin/darwin-rebuild switch --flake github:alexjmiller5/nix-config#macbook-air
+   nix run nixpkgs#git -- clone https://github.com/alexjmiller5/nix-config ~/.config/nix-config
+   cd ~/.config/nix-config
+   cat /etc/ssh/ssh_host_ed25519_key.pub   # → paste over laptopHost in secrets/secrets.nix
    ```
-   Activation clones `~/.config/nix-config` itself (companion-repos, in
-   home/macbook-air.nix) and links `/etc/nix-darwin` to it, so from here on
+   Then recreate the laptop's git token for the new key (recreate-not-decrypt —
+   no master key, no rekey; encryption needs only the public keys in
+   secrets.nix). Read the PAT from the 1Password **web vault** (1password.com
+   in Safari — the 1P app isn't installed until the first switch):
+   ```Shell
+   cd secrets && rm github-git-laptop.age
+   EDITOR=nano nix run github:ryantm/agenix -- -e github-git-laptop.age   # paste PAT from 1P web
+   cd .. && nix run nixpkgs#git -- add -A   # flakes only see tracked files
+   ```
+4. First switch, from the local tree:
+   ```Shell
+   nix build .#darwinConfigurations.macbook-air.system
+   sudo ./result/sw/bin/darwin-rebuild switch --flake .#macbook-air
+   ```
+   Activation decrypts the token onto the agenix RAM disk, the git credential
+   helper goes live, and `/etc/nix-darwin` links to the clone — from here on
    the `switch-laptop` alias works from anywhere.
-3. `gh auth login`, sign into the 1Password app, `op signin` once.
-4. `switch-laptop` again — activation now clones the private companions
-   (agent-config, nix-secrets, hammerspoon) via gh's auth, and the
-   out-of-store symlinks resolve.
-5. Trust the third-party taps (brew's tap-trust gate blocks formula loads
+5. Sign into the 1Password app (installed by the switch); `op signin`; then
+   `op plugin init gh` so interactive `gh` rides 1P per-invocation. There is
+   NO `gh auth login` — git auth is the agenix PAT, and no token enters the
+   keychain.
+6. `switch-laptop` again — activation now clones the private companions
+   (agent-config, nix-secrets, hammerspoon) via the credential helper, and
+   the out-of-store symlinks resolve.
+7. Commit + push the step-3 changes (secrets.nix + the recreated .age) — push
+   auth works now.
+8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
+
+## GitHub PATs for git (mint by hand — GitHub has no token-creation API)
+
+github.com → Settings → Developer settings → Fine-grained tokens. Two tokens,
+each stored in 1P (tagged per the 1password-skill conventions) and then pasted
+into its `.age` file:
+
+* **nix-config-git-laptop** — Repository access: `agent-config`,
+  `nix-secrets`, `hammerspoon`; Permissions: Contents **read/write** (the
+  laptop sync agent pushes agent-config). → `secrets/github-git-laptop.age`.
+* **nix-config-git-mini** — same repos; Contents **read-only** (the mini is
+  pull-only by design). → `secrets/github-git-mini.age`.
+
+Fine-grained PATs cap at 1-year expiry: re-mint + re-paste both annually
+(recreate-not-decrypt, commands in secrets/secrets.nix header). Rotation is
+also the revocation move if a machine is lost — a stolen disk holds the host
+key + old .age blobs, so retiring a machine = drop its pubkey from
+secrets.nix, recreate the .age files, AND re-mint the underlying PATs.
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
@@ -60,7 +104,7 @@ MANUAL\_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 ## Menu bar: what's declared vs manual
 
 Declared: dock order (`hosts/macbook-air.nix` dock block), system icon
-visibility (ByHost ints in `home/macos-tweaks.nix` menuBarModules — macOS 26
+visibility (ByHost ints in `home/macos/menu-bar.nix` menuBarModules — macOS 26
 ignores the legacy plain-domain "NSStatusItem Visible" keys), and system
 icon ORDER via the `menubar-layout` command (declared in
 `home/macbook-air.nix`; run it whenever the system modules drift — it's
@@ -84,6 +128,7 @@ Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar, CodexBar.
 
 * `com.asmvik.yabai.plist`, `com.alexmiller.geminidesktop.plist`, OpenClaw
   agents — owned by their own projects, not this repo.
-* `gh`/`gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
-  declared.
+* `gcloud`/`op` credentials, `~/.claude.json`, `~/.config/op/plugins` (the
+  `op plugin init gh` state) — runtime auth state, never declared. git's
+  GitHub auth is NOT in this list anymore: it's the agenix PAT.
 
