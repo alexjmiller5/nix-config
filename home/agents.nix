@@ -41,6 +41,15 @@ let
     /usr/bin/osascript -e "display notification \"$status\" with title \"nix weekly updates\""
   '';
 
+  # Monthly: delete iOS simulator runtimes unused for 30+ days (each is
+  # 5-8 GB; Xcode re-downloads on demand so over-deleting costs a download,
+  # not breakage) and clear simulator devices orphaned by removed runtimes.
+  simulatorPrune = pkgs.writeShellScript "simulator-prune" ''
+    set -uo pipefail
+    /usr/bin/xcrun simctl runtime delete --notUsedSinceDays 30 || true
+    /usr/bin/xcrun simctl delete unavailable || true
+  '';
+
   # A login item as a launchd agent: launch the app hidden (-j) and without
   # stealing focus (-g) — it runs in the background, no window on startup.
   loginItem = app: {
@@ -89,6 +98,17 @@ in
         ProgramArguments = [ "/Applications/Gemini.app/Contents/MacOS/Gemini" "--background" ];
         RunAtLoad = true;
         ProcessType = "Interactive";
+      };
+    };
+
+    simulator-prune = {
+      enable = true;
+      config = {
+        Label = "com.alexmiller.simulator-prune";
+        ProgramArguments = [ "${simulatorPrune}" ];
+        StartCalendarInterval = [ { Day = 1; Hour = 9; Minute = 45; } ];
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/simulator-prune.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/simulator-prune.log";
       };
     };
 
