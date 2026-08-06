@@ -23,6 +23,8 @@
     ghbranch = ''gh browse --branch "$(git branch --show-current)"'';
 
     # files / clipboard
+    # cat with syntax highlighting, otherwise cat-like (no pager, no gutter)
+    cat = "bat --paging=never --style=plain";
     copy = "pbcopy <";
     nfiles = "find . -maxdepth 1 -type f | wc -l | tr -d ' '";
 
