@@ -23,7 +23,6 @@ in
     ./aliases/infra.nix
     ./macos-tweaks.nix
     ./agents.nix
-    ./reference-repos.nix
     ./ssh.nix
   ];
 
@@ -93,8 +92,8 @@ in
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
   home.file.".config/hammerspoon-profile".text = "personal";
 
-  # Companion working clones — clone-if-missing at activation, same pattern as
-  # reference-repos.nix. Makes the MANUAL clone steps self-healing: a fresh
+  # Companion working clones — clone-if-missing at activation. Makes the
+  # MANUAL clone steps self-healing: a fresh
   # machine bootstraps straight from github:alexjmiller5/nix-config, and the
   # first switch materializes the clones. Private repos need `gh auth login`
   # first; until then they warn and skip — re-run switch after signing in.
