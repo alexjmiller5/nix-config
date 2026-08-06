@@ -19,6 +19,10 @@
 
     includes = [
       "${config.home.homeDirectory}/.config/nix-secrets/ssh/hosts"
+      # 1Password SSH bookmarks: app-generated host→key map (Settings →
+      # Developer → SSH bookmarks config file). Ignored while absent, like
+      # the nix-secrets include above.
+      "${config.home.homeDirectory}/.ssh/1Password/config"
     ];
   };
 
