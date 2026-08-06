@@ -16,6 +16,13 @@
     settings.credential."https://github.com".helper = "!gh auth git-credential";
   };
 
+  # Syntax-highlighted pager for git diff/log/show/blame
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options.navigate = true; # n/N jump between files in a diff
+  };
+
   xdg.configFile."git/ignore".text = ''
     **/.claude/settings.local.json
   '';
