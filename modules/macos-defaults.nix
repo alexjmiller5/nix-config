@@ -1,12 +1,5 @@
-# macOS settings shared by all hosts. Ported from the old defaults-write script.
-#
-# Not covered here (nix-darwin/defaults can't express them):
-#   - Apple ID / iCloud sign-in, iCloud Drive toggles, TCC grants, auto-login,
-#     Remote Login — interactive/SIP-protected, see README manual steps.
-#   - universalaccess zoom keys — writing com.apple.universalaccess requires
-#     granting Full Disk Access to the terminal running darwin-rebuild; not
-#     worth it on a headless box.
-#   - nightlight schedule — needs the third-party `nightlight` CLI and a display.
+# macOS settings shared by all hosts
+
 { ... }:
 
 {
