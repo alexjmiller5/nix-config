@@ -74,9 +74,15 @@
       homeModules = {
         git = ./home/git.nix;
         zsh = ./home/zsh.nix;
+        scripts = ./home/scripts.nix;
+        cli-tools = ./home/cli-tools.nix;
         aliases-dev = ./home/aliases/dev.nix;
         aliases-ai = ./home/aliases/ai.nix;
         aliases-infra = ./home/aliases/infra.nix;
+        macos-duti = ./home/macos/duti.nix;
+        macos-menu-bar = ./home/macos/menu-bar.nix;
+        macos-spotlight-raycast = ./home/macos/spotlight-raycast.nix;
+        macos-nightlight = ./home/macos/nightlight.nix;
       };
     };
 }
