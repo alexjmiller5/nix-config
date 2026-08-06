@@ -179,6 +179,10 @@
       "qflipper"
       "raspberry-pi-imager"
       "raycast"
+      # TODO: uncomment after receptor's first release publishes
+      # Casks/receptor.rb to alexjmiller5/tap — brew fails on a missing cask
+      # and would break the switch. Replaces the DerivedData rm-cp-codesign flow.
+      # "receptor"
       "repobar"
       "sf-symbols"
       "slack"
