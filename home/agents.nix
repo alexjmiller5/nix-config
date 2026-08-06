@@ -41,12 +41,13 @@ let
     /usr/bin/osascript -e "display notification \"$status\" with title \"nix weekly updates\""
   '';
 
-  # A login item as a launchd agent: launch the app without stealing focus.
+  # A login item as a launchd agent: launch the app hidden (-j) and without
+  # stealing focus (-g) — it runs in the background, no window on startup.
   loginItem = app: {
     enable = true;
     config = {
       Label = "com.alexmiller.login.${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] app)}";
-      ProgramArguments = [ "/usr/bin/open" "-g" "-a" app ];
+      ProgramArguments = [ "/usr/bin/open" "-g" "-j" "-a" app ];
       RunAtLoad = true;
     };
   };
