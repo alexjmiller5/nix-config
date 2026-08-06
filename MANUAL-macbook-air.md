@@ -20,13 +20,17 @@ straight from the github: ref.
    cd ~/.config/nix-config
    cat /etc/ssh/ssh_host_ed25519_key.pub   # → paste over laptopHost in secrets/secrets.nix
    ```
-   Then recreate the laptop's git token for the new key (recreate-not-decrypt —
-   no master key, no rekey; encryption needs only the public keys in
-   secrets.nix). Read the PAT from the 1Password **web vault** (1password.com
-   in Safari — the 1P app isn't installed until the first switch):
+   Then recreate the laptop's ONE secret — the `macbook-air-machine` 1P
+   service-account token — for the new key (recreate-not-decrypt — no master
+   key, no rekey; encryption needs only the public keys in secrets.nix). Read
+   the token from the 1Password **web vault** (1password.com in Safari — the
+   1P app isn't installed until the first switch; the SA token item lives in
+   the "MacBook Air" vault). Every other secret (git PAT, future ones) is
+   fetched from that vault at runtime via `op read`, so this is the only
+   paste:
    ```Shell
-   cd secrets && rm github-git-laptop.age
-   EDITOR=nano nix run github:ryantm/agenix -- -e github-git-laptop.age   # paste PAT from 1P web
+   cd secrets && rm machine-sa-laptop.age
+   EDITOR=nano nix run github:ryantm/agenix -- -e machine-sa-laptop.age   # paste SA token from 1P web
    cd .. && nix run nixpkgs#git -- add -A   # flakes only see tracked files
    ```
 4. First switch, from the local tree:
@@ -49,23 +53,30 @@ straight from the github: ref.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
 
-## GitHub PATs for git (mint by hand — GitHub has no token-creation API)
+## Machine vaults (1P) — the secret architecture
 
-github.com → Settings → Developer settings → Fine-grained tokens. Two tokens,
-each stored in 1P (tagged per the 1password-skill conventions) and then pasted
-into its `.age` file:
+Each machine has a 1P vault ("MacBook Air" / "Mac Mini") and a read-only
+service account (`macbook-air-machine` / `mac-mini-machine`). agenix encrypts
+exactly ONE secret per machine — its SA token — and everything else lives in
+the machine vault, fetched at runtime with `op read` (by vault/item **ID**,
+never name). Adding or rotating a secret = edit the 1P item; the repo and the
+machines don't change.
 
-* **nix-config-git-laptop** — Repository access: `agent-config`,
-  `nix-secrets`, `hammerspoon`; Permissions: Contents **read/write** (the
-  laptop sync agent pushes agent-config). → `secrets/github-git-laptop.age`.
-* **nix-config-git-mini** — same repos; Contents **read-only** (the mini is
-  pull-only by design). → `secrets/github-git-mini.age`.
+In the vaults today:
 
-Fine-grained PATs cap at 1-year expiry: re-mint + re-paste both annually
-(recreate-not-decrypt, commands in secrets/secrets.nix header). Rotation is
-also the revocation move if a machine is lost — a stolen disk holds the host
-key + old .age blobs, so retiring a machine = drop its pubkey from
-secrets.nix, recreate the .age files, AND re-mint the underlying PATs.
+* **MacBook Air**: `GitHub PAT nix-config-git-laptop` — fine-grained, repos
+  `agent-config`/`nix-secrets`/`hammerspoon`, Contents **read/write** (the
+  sync agent pushes agent-config). Feeds the git credential helper.
+* **Mac Mini**: `GitHub PAT nix-config-git-mini` — same repos, Contents
+  **read-only** (the mini is pull-only by design); plus the finance-project
+  SA token (read at run time by notion-finance-sync).
+
+PATs are minted by hand (GitHub has no token-creation API): github.com →
+Settings → Developer settings → Fine-grained tokens; they cap at 1-year
+expiry, so re-mint + update the 1P item annually — no repo commit, no
+rebuild. Machine lost = revoke that machine's SA (1P dashboard), drop its
+pubkey from secrets.nix, recreate its .age; the vault contents rotate at
+leisure since the SA token was the only thing the disk could yield.
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
