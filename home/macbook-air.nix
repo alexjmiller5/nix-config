@@ -21,10 +21,21 @@ in
     ./aliases/dev.nix
     ./aliases/ai.nix
     ./aliases/infra.nix
-    ./macos-tweaks.nix
+    ./macos/menu-bar.nix
+    ./macos/spotlight-raycast.nix
+    ./macos/nightlight.nix
+    ./macos/duti.nix
     ./agents.nix
     ./ssh.nix
   ];
+
+  # Keep ~/Desktop materialized (never iCloud-evicted) — symlink targets and
+  # working clones live under it. Laptop-personal, so not a home/macos module.
+  home.activation.pinDesktop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ "$(/usr/bin/xattr -p com.apple.fileprovider.pinned "$HOME/Desktop" 2>/dev/null)" != "1" ]; then
+      /usr/bin/xattr -w com.apple.fileprovider.pinned 1 "$HOME/Desktop"
+    fi
+  '';
 
   # Menu bar system-module ORDER (right → left below). ControlCenter honors
   # relative "Preferred Position" plain-domain values at launch (macOS 26,
