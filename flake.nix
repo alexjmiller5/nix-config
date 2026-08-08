@@ -26,9 +26,14 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Cherri language compiler (iOS Shortcuts) — not in nixpkgs; upstream ships a flake.
+    cherri = {
+      url = "github:electrikmilk/cherri";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix, cherri }:
     let
       username = "alexmiller";
       mkHost = { host, home }: nix-darwin.lib.darwinSystem {
@@ -52,7 +57,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit username; };
+            home-manager.extraSpecialArgs = { inherit username cherri; };
             home-manager.users.${username} = import home;
           }
         ];
