@@ -1,4 +1,4 @@
-{ config, pkgs, lib, username, ... }:
+{ config, pkgs, lib, username, cherri, ... }:
 
 # Laptop home profile: full shell + dotfiles + the agent-config fan-out.
 #
@@ -44,6 +44,8 @@ in
   # switch would flap. Third-party icon order stays manual (⌘-drag) — see
   # MANUAL-macbook-air.md.
   home.packages = [
+    # Cherri compiler for the ios-shortcuts project (flake input; not in nixpkgs).
+    cherri.packages.${pkgs.system}.default
     (pkgs.writeShellApplication {
       name = "menubar-layout";
       text = ''
