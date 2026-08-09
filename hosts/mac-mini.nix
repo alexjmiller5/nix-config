@@ -55,24 +55,29 @@
     installWhatsApp = true;
   };
 
+  # The mini's ONE agenix secret: the mac-mini-machine 1P service-account
+  # token (read-only on the "Mac Mini" vault). Every other secret — the git
+  # PAT, the finance SA token — lives in that vault, fetched at runtime via
+  # op read; see secrets/secrets.nix.
+  age.secrets.machine-sa = {
+    file = ../secrets/machine-sa-mini.age;
+    owner = username;
+  };
+
   # Daily bank -> Notion sync. The module builds the app (uv2nix) and installs
   # Chrome + the `op` CLI + a launchd agent — no checkout, no uv sync. `settings`
   # is the (non-secret) config.toml, rendered into the store. Secrets stay in
-  # 1Password; remaining manual setup (OP token in Keychain, Full Disk Access,
-  # first per-bank login) is in the notion-finance-sync repo's docs/DEPLOY.md.
-  # OP service-account token: age-encrypted in the repo, decrypted at activation to
-  # a file the sync reads (owner = the user the launchd agent runs as).
-  age.secrets.op-token = {
-    file = ../secrets/op-token.age;
-    owner = username;
-  };
+  # 1Password; remaining manual setup (Full Disk Access, first per-bank login)
+  # is in the notion-finance-sync repo's docs/DEPLOY.md. Its own SA token is
+  # read from the machine vault at job start (tokenOpRef, IDs not names).
 
   services.notion-finance-sync = {
     enable = true;
     user = username;
     hour = 3;
     minute = 30;
-    tokenFile = config.age.secrets.op-token.path;
+    tokenOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/dkefgdiep33rztuh7kzeokq3by/password";
+    tokenOpAuthFile = config.age.secrets.machine-sa.path;
     settings = {
       # gmail address + Bilt phone come from 1Password ("Personal Identifiers"
       # in the project vault) — personal identifiers stay out of this public repo.

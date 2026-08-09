@@ -23,9 +23,4 @@ in
   # "mac-mini-machine" SAs, read-only on the "MacBook Air" / "Mac Mini" vaults).
   "machine-sa-laptop.age".publicKeys = [ laptopHost ];
   "machine-sa-mini.age".publicKeys = [ miniHost ];
-
-  # LEGACY — finance-project SA token, decrypted for notion-finance-sync.
-  # Removed once the sync fetches it from the Mac Mini machine vault at run
-  # time (op read via machine-sa-mini).
-  "op-token.age".publicKeys = [ miniHost ];
 }
