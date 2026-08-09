@@ -116,15 +116,16 @@ in
   home.file.".config/hammerspoon-profile".text = "personal";
 
   # Companion working clones — clone-if-missing at activation. Makes the
-  # MANUAL clone steps self-healing: a fresh
-  # machine bootstraps straight from github:alexjmiller5/nix-config, and the
-  # first switch materializes the clones. Private repos need `gh auth login`
-  # first; until then they warn and skip — re-run switch after signing in.
+  # MANUAL clone steps self-healing: a fresh machine bootstraps from a local
+  # clone (MANUAL §3 — the machine-sa secret must be recreated first), and
+  # the first switch materializes the rest. Private clones auth via the
+  # machine-vault credential helper; on failure they warn and skip —
+  # re-run switch once the machine-sa secret decrypts.
   home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export PATH="/opt/homebrew/bin:/etc/profiles/per-user/${config.home.username}/bin:$PATH"
     companionClone() {
       [ -d "$2" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/$1.git" "$2" \
-        || echo "companion-repos: clone of $1 failed (gh auth missing?) — sign in, re-run switch" >&2
+        || echo "companion-repos: clone of $1 failed — machine-sa decrypted? op reachable? re-run switch" >&2
     }
     companionClone nix-config "${nixConfig}"
     companionClone nix-secrets "${config.home.homeDirectory}/.config/nix-secrets"
