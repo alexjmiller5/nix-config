@@ -14,9 +14,8 @@
     # Installs and pins Homebrew itself declaratively (no curl|bash installer).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     # Daily bank -> Notion sync (provides a nix-darwin module).
-    # TODO: repoint to main (drop the branch) once its PR #1 (tokenOpRef) merges.
     notion-finance-sync = {
-      url = "github:alexjmiller5/notion-finance-sync/machine-vault-token";
+      url = "github:alexjmiller5/notion-finance-sync";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Weekly Screen Time + call history snapshots (each provides a nix-darwin module).
