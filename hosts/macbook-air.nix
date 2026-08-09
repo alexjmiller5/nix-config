@@ -1,4 +1,4 @@
-{ pkgs, username, ... }:
+{ pkgs, lib, username, ... }:
 
 # MacBook Air — LIVE since 2026-07-28 (generation 1). Mirrors the mini minus
 # its headless-server bits (never-sleep power settings, headless tailscaled)
@@ -11,6 +11,17 @@
   system.stateVersion = 6;
   system.primaryUser = username;
   nixpkgs.hostPlatform = "aarch64-darwin";
+
+  # The 1Password CLI (op) — used by the git credential helper — is unfree.
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" ];
+
+  # The laptop's ONE agenix secret: the macbook-air-machine 1P service-account
+  # token (read-only on the "MacBook Air" vault). Every other secret lives in
+  # that vault, fetched at runtime via op read — see secrets/secrets.nix.
+  age.secrets.machine-sa = {
+    file = ../secrets/machine-sa-laptop.age;
+    owner = username;
+  };
 
   # The laptop's nix came from the standalone installer, which manages the
   # daemon itself; nix-darwin must not.

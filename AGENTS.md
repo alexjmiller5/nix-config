@@ -23,7 +23,10 @@ routing table and workflow; this file is the in-repo map.
   per-host `macbook-air.nix` / `mac-mini.nix`
 * `modules/` — darwin modules shared across hosts (`macos-defaults.nix`, `notunes.nix`)
 * `dotfiles/` — file payloads (ghostty, karabiner, nvim, vscode, ssh pubs, duti list)
-* `secrets/` — agenix (recipients in `secrets.nix`; edit with `-i ~/.ssh/agenix`)
+* `secrets/` — agenix: exactly ONE secret per machine (its 1P machine-vault
+  SA token); all other secrets live in the per-machine 1P vaults, fetched at
+  runtime via `op read` by ID. Edit = recreate-not-decrypt (see
+  `secrets/secrets.nix` header); no master key exists.
 * `MANUAL-macbook-air.md` — every step nix cannot do (TCC, SIP, sign-ins, bootstrap order)
 
 ## Conventions

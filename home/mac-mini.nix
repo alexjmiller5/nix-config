@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, osConfig, lib, pkgs, ... }:
 
 # Mini home profile: shared base + the laptop's shell (zsh/starship/aliases,
 # minus personal-infra aliases — those reference laptop-only workflows) + the
@@ -39,15 +39,26 @@ in
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
-  # gh = the git credential source for the private clone (git.nix routes
-  # github https through `gh auth git-credential`).
+  # git-over-https auth (overrides git.nix's gh mkDefault): the read-only
+  # fine-grained PAT is read from the "Mac Mini" 1P vault at credential time,
+  # authenticated by the agenix-decrypted machine SA token. IDs, not names.
+  # No gh auth involved — nothing to log in at bootstrap.
+  programs.git.settings.credential."https://github.com".helper =
+    "!${pkgs.writeShellScript "git-credential-machine-vault" ''
+      [ "$1" = get ] || exit 0
+      printf 'username=alexjmiller5\n'
+      printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential')"
+    ''}";
+
+  # gh stays for interactive CLI use (PRs etc.) — no longer the git
+  # credential source.
   home.packages = [ pkgs.gh ];
 
   # Clone-if-missing at activation (mini analog of the laptop's companion-repos).
   home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:$PATH"
     [ -d "${agentConfig}" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/agent-config.git" "${agentConfig}" \
-      || echo "companion-repos: agent-config clone failed (gh auth missing?) — gh auth login, redeploy" >&2
+      || echo "companion-repos: agent-config clone failed — machine-sa secret decrypted? op read reachable? redeploy" >&2
   '';
 
   # Daily pull, 30min after the laptop's 10:00 push window; RunAtLoad catches
