@@ -76,10 +76,13 @@ the tailnet ACL so tagged devices are approved automatically:
 
 ### 6. Per-module manual steps (TCC — GUI-only by design)
 
-* **agent-config (Claude skills/settings fan-out)**: `ssh mac-mini-tailscale`,
-  run `gh auth login` once (the clone + daily pull authenticate through gh),
-  then `just deploy` from the laptop again — activation clones
-  `~/.config/agent-config` and the symlinks resolve.
+* **agent-config (Claude skills/settings fan-out)**: no login — the clone +
+  daily pull authenticate via the machine-vault git credential helper
+  (agenix `machine-sa-mini` → `op read` of the read-only PAT). If the mini is
+  rebuilt from scratch its host key is new: recreate `machine-sa-mini.age`
+  (recreate-not-decrypt, commands in `secrets/secrets.nix` header, token from
+  the 1P "Mac Mini" vault) BEFORE the first deploy, then `just deploy` again
+  so activation clones `~/.config/agent-config` and the symlinks resolve.
 * **screentime-backup** + **callhistory-backup** (weekly Apple-data snapshots):
   grant Full Disk Access once per app — System Settings → Privacy & Security →
   **Full Disk Access** → **\[+]** → `/Applications/ScreenTimeBackup.app` and
