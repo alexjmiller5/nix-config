@@ -32,13 +32,11 @@ in
   # git-over-https auth (overrides git.nix's gh mkDefault): the fine-grained
   # PAT is read from the "MacBook Air" 1P vault at credential time,
   # authenticated by the agenix-decrypted machine SA token. IDs, not names.
-  # TODO: the PAT item currently sits in the Mac Mini vault by mistake —
-  # after `op item move` re-homes it, update the item ID below.
   programs.git.settings.credential."https://github.com".helper =
     "!${pkgs.writeShellScript "git-credential-machine-vault" ''
       [ "$1" = get ] || exit 0
       printf 'username=alexjmiller5\n'
-      printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://a4gdaq4rjdpewl4uppphpjqewm/iueebviq7hdximjb4djtkl5iha/credential')"
+      printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential')"
     ''}";
 
   # Keep ~/Desktop materialized (never iCloud-evicted) — symlink targets and
