@@ -110,7 +110,6 @@
       "ffmpeg"
       "fswatch"
       "gdbm"
-      "gh"
       "gogcli"
       "gsettings-desktop-schemas"
       "jupyterlab"
