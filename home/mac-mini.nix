@@ -50,9 +50,11 @@ in
       printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential')"
     ''}";
 
-  # gh stays for interactive CLI use (PRs etc.) — no longer the git
-  # credential source.
-  home.packages = [ pkgs.gh ];
+  # gh (for interactive CLI use — no longer the git credential source) comes
+  # from the scripts.nix op-authed wrapper; no bare pkgs.gh here. NOTE: on the
+  # mini the wrapper has no op auth source (no desktop app, no claude-code SA
+  # in the Keychain), so gh API calls are unauthenticated until a PAT lands in
+  # the Mac Mini machine vault.
 
   # Clone-if-missing at activation (mini analog of the laptop's companion-repos).
   home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

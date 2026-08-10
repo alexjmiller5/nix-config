@@ -20,6 +20,32 @@ in
       '';
     })
 
+    # gh, ALWAYS authed via 1Password (PAT item in the AI Agent vault) — the
+    # keyring is not used. PATH-level shadow (not an alias/function) so
+    # scripts, launchd, and agent shells get auth too; the interactive
+    # `op plugin run` alias still wins in zsh and just passes through here.
+    # gh must not be installed anywhere else (brew/nix) or PATH order decides.
+    (script "gh" {
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
+          # Claude shells that skipped zshrc: SA token from the Keychain.
+          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}" ]; then
+            OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
+            if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+              export OP_SERVICE_ACCOUNT_TOKEN
+            else
+              unset OP_SERVICE_ACCOUNT_TOKEN
+            fi
+          fi
+          # SA token → headless; otherwise desktop-app auth (Touch ID).
+          GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
+          if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
+        fi
+        exec ${pkgs.gh}/bin/gh "$@"
+      '';
+    })
+
     # Copy an absolute path (or cwd) to the clipboard.
     (script "crpath" {
       text = ''
