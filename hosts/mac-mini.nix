@@ -36,7 +36,13 @@
   # cleanup = "zap" that's fine — declared casks merge across modules.
   homebrew = {
     enable = true;
-    casks = [ "claude-code" ];
+    casks = [
+      "claude-code"
+      # Normally declared by the notion-finance-sync module — pinned here while
+      # the sync is paused so zap doesn't uninstall Chrome (bank session
+      # profiles keep their browser). Drop when the sync is re-enabled.
+      "google-chrome"
+    ];
     onActivation.cleanup = "zap"; # remove anything not declared here
   };
 
@@ -72,7 +78,11 @@
   # read from the machine vault at job start (tokenOpRef, IDs not names).
 
   services.notion-finance-sync = {
-    enable = true;
+    # PAUSED 2026-08-10 while the bank flows get fixed (bofa/fidelity OTP
+    # element drift, everbank already-logged-in path, etrade re-login) — it
+    # was failing every 3:30 run. Re-enable + drop the pinned google-chrome
+    # cask above when the app is fixed.
+    enable = false;
     user = username;
     hour = 3;
     minute = 30;
