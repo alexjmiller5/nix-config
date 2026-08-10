@@ -57,6 +57,28 @@ in
     # Spotify TUI + scripting CLI (binary: spotify_player). Laptop-personal,
     # not cli-tools.nix — a music player has no place in the work-exportable list.
     pkgs.spotify-player
+
+    # Migrated from the laptop brews list 2026-08-10 (nixpkgs-first rule).
+    # Laptop-scoped like the brews were — not cli-tools.nix, which both hosts
+    # and the work-laptop export share.
+    pkgs.bun
+    pkgs.create-dmg
+    pkgs.duti
+    pkgs.exiftool
+    pkgs.fastlane
+    pkgs.ffmpeg
+    pkgs.gogcli
+    pkgs.libimobiledevice
+    pkgs.lua5_4
+    pkgs.mas
+    pkgs.neovim
+    pkgs.nodejs
+    pkgs.oci-cli
+    pkgs.pnpm
+    pkgs.terraform # unfree (BSL) — allowed in hosts/macbook-air.nix predicate
+    pkgs.wrangler # brew name: cloudflare-wrangler
+    pkgs.xcodegen
+    pkgs.yt-dlp
     # gcloud, ALWAYS authed via 1Password (GCP SA key item in the AI Agent
     # vault) — same paradigm as the gh wrapper in scripts.nix, laptop-only
     # because the mini has no GCP use. Replaces the brew gcloud-cli cask and

@@ -12,8 +12,9 @@
   system.primaryUser = username;
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # The 1Password CLI (op) — used by the git credential helper — is unfree.
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" ];
+  # 1password-cli: op, used by the git credential helper. terraform: BSL,
+  # kept for the OCI VM fleet (infra skill says Terraform is fine there).
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" "terraform" ];
 
   # The laptop's ONE agenix secret: the macbook-air-machine 1P service-account
   # token (read-only on the "MacBook Air" vault). Every other secret lives in
@@ -74,77 +75,35 @@
     { app = "/Users/alexmiller/Applications/Chrome Apps.localized/Google Maps.app"; }
   ];
 
-  # Snapshot of the laptop's imperatively-installed brew state (refreshed
-  # 2026-07-28 during Phase 0 reconcile), so the first switch changes nothing.
+  # Brew-ONLY leftovers — everything available in nixpkgs migrated to
+  # home/macbook-air.nix home.packages on 2026-08-10 (dep cruft and the
+  # unused ruby managers dropped outright; brew auto-keeps real deps).
   homebrew = {
     enable = true;
     taps = [
       # Alex's personal cask tap — apps released by their repos' CI
       # (gemini-desktop, receptor, ...).
       "alexjmiller5/tap"
-      "asmvik/formulae"
-      "ddev/ddev"
-      "electrikmilk/cherri"
-      "jellycuts/formulae"
       # yabai's formula tap — was untapped at some point but the formula is
       # still installed from it; nix-darwin re-taps it.
       "koekeishiya/formulae"
       "smudge/smudge"
       "steipete/tap"
-      "supabase/tap"
     ];
     brews = [
-      "automake"
-      "base64"
-      "bison"
-      "bun"
       "chrome-cli"
-      "chruby"
-      "cloudflare-wrangler"
-      "cmake"
-      "create-dmg"
-      "duti"
-      "electrikmilk/cherri/cherri"
-      "exiftool"
-      "fastlane"
-      "ffmpeg"
-      "fswatch"
-      "gdbm"
-      "gogcli"
-      "gsettings-desktop-schemas"
-      "jupyterlab"
-      # window manager — runs via the custom com.asmvik.yabai launchd agent
+      # window manager — runs via the custom com.asmvik.yabai launchd agent.
+      # TODO: try moving to pkgs.yabai someday — touches the SIP/sudoers +
+      # launchd arrangement, so it needs a careful switch, not a line swap.
       "koekeishiya/formulae/yabai"
-      "libffi"
-      "libimobiledevice"
-      "libomp"
-      "libyaml"
-      "lua@5.4"
-      "luarocks"
-      "mas"
-      "mlton"
-      "neovim"
-      "node"
-      "oci-cli"
-      "openclaw-cli"
-      "openssl@3"
-      "perl"
-      "pnpm"
-      "python@3.10"
-      "rbenv"
-      "ruby-install"
       "skills"
       "smudge/smudge/nightlight"
-      "supabase/tap/supabase"
-      "terraform"
-      "tree-sitter-cli"
-      "vips"
-      "vsce"
-      "xcodegen"
-      "yt-dlp"
     ];
     casks = [
       "1password"
+      # TODO: try moving to pkgs._1password-cli someday (already in the closure
+      # via the gh/gcloud wrappers) — verify desktop-app integration (Touch ID
+      # in Alex's terminals) still accepts the nix-built op before zapping this.
       "1password-cli"
       "alt-tab"
       "betterdisplay"
