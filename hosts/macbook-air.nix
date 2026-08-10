@@ -116,8 +116,9 @@
       "docker-desktop"
       "dolphin"
       # From alexjmiller5/tap — released + notarized by gemini-desktop's CI.
-      # Replaces the old imperative install.sh install.
-      "gemini"
+      # Replaces the old imperative install.sh install. MUST stay fully
+      # qualified: bare "gemini" is MacPaw's disk cleaner in homebrew/cask.
+      "alexjmiller5/tap/gemini"
       "ghostty"
       "google-chrome"
       "hammerspoon"
@@ -132,8 +133,9 @@
       "processing"
       "raycast"
       # From alexjmiller5/tap — released + notarized by receptor's CI.
-      # Replaces the DerivedData rm-cp-codesign flow.
-      "receptor"
+      # Replaces the DerivedData rm-cp-codesign flow. Fully qualified to
+      # avoid any future homebrew/cask collision.
+      "alexjmiller5/tap/receptor"
       "repobar"
       "slack"
       "spotify"

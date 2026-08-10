@@ -51,7 +51,7 @@ straight from the github: ref.
 7. Commit + push the step-3 changes (secrets.nix + the recreated .age) — push
    auth works now.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
-   otherwise): `for t in asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
+   otherwise): `for t in alexjmiller5/tap asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
 
 ## Machine vaults (1P) — the secret architecture
 
