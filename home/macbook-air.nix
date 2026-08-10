@@ -57,6 +57,36 @@ in
     # Spotify TUI + scripting CLI (binary: spotify_player). Laptop-personal,
     # not cli-tools.nix — a music player has no place in the work-exportable list.
     pkgs.spotify-player
+    # gcloud, ALWAYS authed via 1Password (GCP SA key item in the AI Agent
+    # vault) — same paradigm as the gh wrapper in scripts.nix, laptop-only
+    # because the mini has no GCP use. Replaces the brew gcloud-cli cask and
+    # the interactive-only op plugin alias so scripts/launchd/agent shells
+    # are authed too. The key JSON transits a 0600 mktemp file removed on
+    # exit (same mechanism `op plugin run` uses internally).
+    (pkgs.writeShellApplication {
+      name = "gcloud";
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
+          exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
+        fi
+        # Claude shells that skipped zshrc: SA token from the Keychain.
+        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}" ]; then
+          OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
+          if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+            export OP_SERVICE_ACCOUNT_TOKEN
+          else
+            unset OP_SERVICE_ACCOUNT_TOKEN
+          fi
+        fi
+        keyfile="$(mktemp "''${TMPDIR:-/tmp}/gcloud-key-XXXXXX")"
+        trap 'rm -f "$keyfile"' EXIT
+        if op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/iqywn6he6twhyonw3fhnqmot5i/credential' > "$keyfile" 2>/dev/null && [ -s "$keyfile" ]; then
+          export CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE="$keyfile"
+        fi
+        ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
+      '';
+    })
     # Cherri compiler for the ios-shortcuts project (flake input; not in nixpkgs).
     cherri.packages.${pkgs.stdenv.hostPlatform.system}.default
     # EGGNOGG+ (madgarden.itch.io/eggnogg) — itch.io-only, served via signed
