@@ -111,6 +111,9 @@ leisure since the SA token was the only thing the disk could yield.
   from their dev source directories.
 * **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 * **Nightlight**: the activation script needs a display connected on first run.
+* **spotify_player**: run `spotify_player authenticate` once (interactive
+  browser OAuth; needs Premium) — tokens then self-refresh from
+  `~/.cache/spotify-player/`. Agents can't do this step (see `spotify` skill).
 
 ## Menu bar: what's declared vs manual
 
