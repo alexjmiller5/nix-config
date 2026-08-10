@@ -156,10 +156,9 @@
       "discord"
       "docker-desktop"
       "dolphin"
-      # TODO: uncomment after gemini-desktop's first release (v1.0.0) publishes
-      # Casks/gemini.rb to alexjmiller5/tap — brew fails on a missing cask and
-      # would break the switch. Replaces the old imperative install.sh install.
-      # "gemini"
+      # From alexjmiller5/tap — released + notarized by gemini-desktop's CI.
+      # Replaces the old imperative install.sh install.
+      "gemini"
       "ghostty"
       "google-chrome"
       "hammerspoon"
@@ -173,10 +172,9 @@
       # notunes comes from modules/notunes.nix
       "processing"
       "raycast"
-      # TODO: uncomment after receptor's first release publishes
-      # Casks/receptor.rb to alexjmiller5/tap — brew fails on a missing cask
-      # and would break the switch. Replaces the DerivedData rm-cp-codesign flow.
-      # "receptor"
+      # From alexjmiller5/tap — released + notarized by receptor's CI.
+      # Replaces the DerivedData rm-cp-codesign flow.
+      "receptor"
       "repobar"
       "slack"
       "spotify"
