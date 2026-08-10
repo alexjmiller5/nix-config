@@ -10,6 +10,13 @@
       name = lib.mkDefault "Alex Miller";
       email = lib.mkDefault "98389659+alexjmiller5@users.noreply.github.com";
     };
+    # nixpkgs git ships credential.helper=osxkeychain in its SYSTEM gitconfig;
+    # on a locked keychain (headless mini's launchd session, any ssh session)
+    # it BLOCKS forever waiting for an unlock that never comes — this hung the
+    # mini's agent-config pulls. An empty first helper resets the inherited
+    # list; the per-URL helper below still applies.
+    settings.credential.helper = "";
+
     # Default GitHub https auth for external consumers of this module (work
     # laptop etc.). Alex's machines override it with the machine-vault
     # credential helper in their per-host home files.
