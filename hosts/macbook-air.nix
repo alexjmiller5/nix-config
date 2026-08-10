@@ -118,9 +118,7 @@
       # From alexjmiller5/tap — released + notarized by gemini-desktop's CI.
       # Replaces the old imperative install.sh install. MUST stay fully
       # qualified: bare "gemini" is MacPaw's disk cleaner in homebrew/cask.
-      # no_quarantine: self-built + notarized, skip the first-open Gatekeeper
-      # prompt (scoped per-cask; everything else keeps normal checks).
-      { name = "alexjmiller5/tap/gemini"; args = { no_quarantine = true; }; }
+      "alexjmiller5/tap/gemini"
       "ghostty"
       "google-chrome"
       "hammerspoon"
@@ -137,7 +135,7 @@
       # From alexjmiller5/tap — released + notarized by receptor's CI.
       # Replaces the DerivedData rm-cp-codesign flow. Fully qualified to
       # avoid any future homebrew/cask collision.
-      { name = "alexjmiller5/tap/receptor"; args = { no_quarantine = true; }; }
+      "alexjmiller5/tap/receptor"
       "repobar"
       "slack"
       "spotify"
@@ -161,5 +159,9 @@
     };
 
     onActivation.cleanup = "zap";
+
+    # Install every cask without the quarantine xattr — no Gatekeeper
+    # first-open prompt for anything brew installs (Alex's call, 2026-08-10).
+    caskArgs.no_quarantine = true;
   };
 }
