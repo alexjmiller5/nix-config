@@ -111,9 +111,6 @@ leisure since the SA token was the only thing the disk could yield.
   from their dev source directories.
 * **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 * **Nightlight**: the activation script needs a display connected on first run.
-* **Spicetify**: `spicetify backup apply` once (patches the Spotify cask's
-  client in place — inherently imperative). After any Spotify auto-update the
-  patch is wiped: `spicetify restore backup apply`.
 
 ## Menu bar: what's declared vs manual
 

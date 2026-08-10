@@ -56,10 +56,6 @@ in
   home.packages = [
     # Cherri compiler for the ios-shortcuts project (flake input; not in nixpkgs).
     cherri.packages.${pkgs.stdenv.hostPlatform.system}.default
-    # Patches the Spotify cask's client (themes/extensions). Laptop-only: the
-    # mini has no Spotify. After any Spotify auto-update, re-run
-    # `spicetify restore backup apply`.
-    pkgs.spicetify-cli
     (pkgs.writeShellApplication {
       name = "menubar-layout";
       text = ''
