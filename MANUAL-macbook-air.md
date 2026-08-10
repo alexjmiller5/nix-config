@@ -111,11 +111,9 @@ leisure since the SA token was the only thing the disk could yield.
   `spotify_player authenticate` once (interactive browser OAuth; needs
   Premium) — tokens then self-refresh from `~/.cache/spotify-player/`.
   Agents can't do this step (see `spotify` skill).
-* **Google accounts** — System Settings → Internet Accounts: four Google
-  accounts with per-account service toggles (two Mail-only gmails; BU =
-  Mail + Calendars; Personal = Mail, Contacts, Calendars, Messages).
-  Exact addresses: nix-secrets `manual/google-accounts.md` (public-repo
-  privacy rule).
+* **Google accounts** — System Settings → Internet Accounts: account list,
+  addresses, and per-service toggles live in nix-secrets
+  `manual/google-accounts.md` (public-repo privacy rule).
 
 ## One-time app/setting setup
 
