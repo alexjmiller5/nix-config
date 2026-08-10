@@ -37,8 +37,6 @@
       export PATH="/opt/homebrew/bin:$PATH"
       export PATH="$PATH:/usr/local/mysql/bin"
       export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
-      export DENO_INSTALL="$HOME/.deno"
-      export PATH="$DENO_INSTALL/bin:$PATH"
       export PATH="/usr/local/opt/node@20/bin:$PATH"
 
       # Homebrew env + its zsh completions
