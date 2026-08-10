@@ -54,6 +54,9 @@ in
   # switch would flap. Third-party icon order stays manual (⌘-drag) — see
   # MANUAL-macbook-air.md.
   home.packages = [
+    # Spotify TUI + scripting CLI (binary: spotify_player). Laptop-personal,
+    # not cli-tools.nix — a music player has no place in the work-exportable list.
+    pkgs.spotify-player
     # Cherri compiler for the ios-shortcuts project (flake input; not in nixpkgs).
     cherri.packages.${pkgs.stdenv.hostPlatform.system}.default
     # EGGNOGG+ (madgarden.itch.io/eggnogg) — itch.io-only, served via signed
