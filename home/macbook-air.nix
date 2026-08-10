@@ -29,15 +29,31 @@ in
     ./ssh.nix
   ];
 
-  # git-over-https auth (overrides git.nix's gh mkDefault): the fine-grained
-  # PAT is read from the "MacBook Air" 1P vault at credential time,
-  # authenticated by the agenix-decrypted machine SA token. IDs, not names.
-  programs.git.settings.credential."https://github.com".helper =
-    "!${pkgs.writeShellScript "git-credential-machine-vault" ''
-      [ "$1" = get ] || exit 0
-      printf 'username=alexjmiller5\n'
-      printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential')"
-    ''}";
+  # git-over-https auth, split by repo (2026-08-10; discovered when the
+  # osxkeychain neutralization exposed that general pushes had been riding a
+  # cached keychain token):
+  #  - agent-config + nix-secrets: the machine-vault fine-grained PAT
+  #    (contents:write on exactly those two repos), read at credential time
+  #    via the agenix-decrypted machine SA — headless, so the launchd sync
+  #    agents keep working. IDs, not names.
+  #  - everything else: git.nix's `gh auth git-credential` default, which is
+  #    the op-authed gh PATH wrapper — desktop-app auth in Alex's terminals,
+  #    SA token in agent shells. The machine PAT is deliberately NOT write-
+  #    broadened; general pushes belong to the gh PAT.
+  # useHttpPath makes git consult the repo-scoped helper keys; the .git
+  # suffix is REQUIRED — path matching is exact and the remotes carry it.
+  programs.git.settings.credential =
+    let
+      machineVault = "!${pkgs.writeShellScript "git-credential-machine-vault" ''
+        [ "$1" = get ] || exit 0
+        printf 'username=alexjmiller5\n'
+        printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential')"
+      ''}";
+    in {
+      "https://github.com".useHttpPath = true;
+      "https://github.com/alexjmiller5/agent-config.git".helper = machineVault;
+      "https://github.com/alexjmiller5/nix-secrets.git".helper = machineVault;
+    };
 
   # Keep ~/Desktop materialized (never iCloud-evicted) — symlink targets and
   # working clones live under it. Laptop-personal, so not a home/macos module.
