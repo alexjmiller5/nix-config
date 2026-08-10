@@ -55,7 +55,7 @@ in
   # MANUAL-macbook-air.md.
   home.packages = [
     # Cherri compiler for the ios-shortcuts project (flake input; not in nixpkgs).
-    cherri.packages.${pkgs.system}.default
+    cherri.packages.${pkgs.stdenv.hostPlatform.system}.default
     # Patches the Spotify cask's client (themes/extensions). Laptop-only: the
     # mini has no Spotify. After any Spotify auto-update, re-run
     # `spicetify restore backup apply`.
