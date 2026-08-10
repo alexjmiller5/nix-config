@@ -156,7 +156,6 @@
       "discord"
       "docker-desktop"
       "dolphin"
-      "gcloud-cli"
       # TODO: uncomment after gemini-desktop's first release (v1.0.0) publishes
       # Casks/gemini.rb to alexjmiller5/tap — brew fails on a missing cask and
       # would break the switch. Replaces the old imperative install.sh install.

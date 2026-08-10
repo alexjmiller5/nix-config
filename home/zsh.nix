@@ -73,8 +73,9 @@
           return 0
       }
 
-      # 1Password gh/gcloud cli plugins (file exists once `op plugin init` has run)
-      [[ -f "$HOME/.config/op/plugins.sh" ]] && source "$HOME/.config/op/plugins.sh"
+      # gh/gcloud op auth: PATH-level wrappers (scripts.nix / macbook-air.nix)
+      # inject tokens via op read in EVERY context — the old interactive-only
+      # `op plugin run` aliases (~/.config/op/plugins.sh) are retired.
 
       # 1Password CLI: desktop-app session delegation is scoped per shell process,
       # so every fresh shell (incl. each Claude Code Bash call) needs its own signin.
