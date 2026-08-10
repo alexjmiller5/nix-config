@@ -14,11 +14,6 @@
     # `../some-folder/deeper`, bare subdir names — all work without `cd`.
     autocd = true;
 
-    # Live command-line syntax coloring (valid commands green, errors red,
-    # strings/paths highlighted). HM sources it after initContent (mkOrder
-    # 1500), which is the ordering the plugin requires.
-    syntaxHighlighting.enable = true;
-
     enableCompletion = true;
     completionInit = ''
       autoload -Uz compinit
