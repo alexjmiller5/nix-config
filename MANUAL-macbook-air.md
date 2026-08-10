@@ -97,6 +97,26 @@ leisure since the SA token was the only thing the disk could yield.
 3. `yabai --start-service` (the custom `com.asmvik.yabai` launchd plist is a
    deliberate imperative leftover).
 
+## App sign-ins (after first switch; GUI-only, none scriptable)
+
+* **1Password** — covered in bootstrap step 5 (app sign-in, `op signin`,
+  `op plugin init gh`).
+* **Claude** — sign into the Claude desktop app and Claude Code (`claude` →
+  `/login`); auth state lands in `~/.claude.json` (deliberate leftover).
+* **Notion** — sign into the desktop app.
+* **VS Code** — sign into GitHub in-app (Copilot etc.). No Settings Sync —
+  settings/keybindings are nix-managed.
+* **WhatsApp** — pair from the phone (Settings → Linked Devices → QR).
+* **Spotify** — sign into the desktop app. Separately, run
+  `spotify_player authenticate` once (interactive browser OAuth; needs
+  Premium) — tokens then self-refresh from `~/.cache/spotify-player/`.
+  Agents can't do this step (see `spotify` skill).
+* **Google accounts** — System Settings → Internet Accounts: four Google
+  accounts with per-account service toggles (two Mail-only gmails; BU =
+  Mail + Calendars; Personal = Mail, Contacts, Calendars, Messages).
+  Exact addresses: nix-secrets `manual/google-accounts.md` (public-repo
+  privacy rule).
+
 ## One-time app/setting setup
 
 * **Accessibility → Zoom**: enable scroll-gesture-with-modifier zoom (ctrl) —
@@ -111,9 +131,6 @@ leisure since the SA token was the only thing the disk could yield.
   from their dev source directories.
 * **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 * **Nightlight**: the activation script needs a display connected on first run.
-* **spotify_player**: run `spotify_player authenticate` once (interactive
-  browser OAuth; needs Premium) — tokens then self-refresh from
-  `~/.cache/spotify-player/`. Agents can't do this step (see `spotify` skill).
 
 ## Menu bar: what's declared vs manual
 
