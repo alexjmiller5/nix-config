@@ -148,75 +148,55 @@
       "1password"
       "1password-cli"
       "alt-tab"
-      "bambu-studio"
       "betterdisplay"
       "binary-ninja-free"
       "burp-suite"
-      "chatgpt"
       "claude"
       "claude-code"
       "codexbar"
       "discord"
       "docker-desktop"
       "dolphin"
-      "duckduckgo"
-      "figma"
       "gcloud-cli"
       # TODO: uncomment after gemini-desktop's first release (v1.0.0) publishes
       # Casks/gemini.rb to alexjmiller5/tap — brew fails on a missing cask and
       # would break the switch. Replaces the old imperative install.sh install.
       # "gemini"
       "ghostty"
-      "github"
       "google-chrome"
       "hammerspoon"
-      "ipfs-desktop"
       "karabiner-elements"
       "keyclu"
-      "legcord"
       "libreoffice"
       "mactex-no-gui"
-      "mysqlworkbench"
       "notion"
       "notion-calendar"
       "notion-cli"
       # notunes comes from modules/notunes.nix
-      "numi"
-      "obsidian"
-      "openclaw"
-      "postman"
       "processing"
-      "qbittorrent"
-      "qflipper"
-      "raspberry-pi-imager"
       "raycast"
       # TODO: uncomment after receptor's first release publishes
       # Casks/receptor.rb to alexjmiller5/tap — brew fails on a missing cask
       # and would break the switch. Replaces the DerivedData rm-cp-codesign flow.
       # "receptor"
       "repobar"
-      "sf-symbols"
       "slack"
       "spotify"
       "tailscale-app"
-      "temurin"
-      "tor-browser"
       "visual-studio-code"
       "whatsapp"
       "wireshark-app"
-      "xquartz"
-      "yaak"
       "zoom"
     ];
     # App Store apps (enumerated via `mas list`, 2026-07-28). Requires being
     # signed in to the App Store; mas can't install un-purchased apps.
+    # NOTE: cleanup = "zap" does NOT uninstall masApps (brew bundle skips App
+    # Store apps; mas has no uninstall). Removing one = delete its line here
+    # AND rm the .app manually.
     masApps = {
-      "Developer" = 640199958;
       "Flappy Golf 2" = 1154174205;
       "Flighty" = 1358823008;
-      "hide.me" = 953040671;
       "Octagon" = 691956219;
-      "ScreenZen" = 1541027222;
       "Telegram" = 747648890;
       "Xcode" = 497799835;
     };

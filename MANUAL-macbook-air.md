@@ -139,6 +139,10 @@ Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar, CodexBar.
 
 * `com.asmvik.yabai.plist`, `com.alexmiller.geminidesktop.plist`, OpenClaw
   agents — owned by their own projects, not this repo.
+* `/Applications/eggnoggplus.app` — EGGNOGG+ (madgarden). No cask exists and
+  the itch.io download has no stable URL, so it can't be declared without
+  rehosting the binary. Kept as a manual install; zap ignores non-brew apps.
+  Reinstall from https://madgarden.itch.io/eggnogg.
 * `gcloud`/`op` credentials, `~/.claude.json`, `~/.config/op/plugins` (the
   `op plugin init gh` state) — runtime auth state, never declared. git's
   GitHub auth is NOT in this list anymore: it's the agenix PAT.
