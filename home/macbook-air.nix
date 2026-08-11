@@ -1,4 +1,4 @@
-{ config, osConfig, pkgs, lib, username, cherri, workspace-snapshot, ... }:
+{ config, osConfig, pkgs, lib, username, cherri, ... }:
 
 # Laptop home profile: full shell + dotfiles + the agent-config fan-out.
 #
@@ -243,17 +243,12 @@ in
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
   home.file.".config/hammerspoon-profile".text = "personal";
 
-  # Workspace Snapshot (flake input) — replaces the repo's install.sh:
-  #  - the Spoon (the hammerspoon repo gitignores this path; nix owns it)
-  #  - scripts/ at the stable Application Support path the Claude SessionStart
-  #    hook in agent-config references. Runtime snapshot state is app-written
-  #    siblings in the same dir — only these two paths are nix-managed.
-  # The VS Code extension half lives in home/vscode.nix. Updates ride the
-  # weekly flake input bump.
-  home.file.".hammerspoon/Spoons/WorkspaceSnapshot.spoon".source =
-    "${workspace-snapshot}/WorkspaceSnapshot.spoon";
-  home.file."Library/Application Support/WorkspaceSnapshot/scripts".source =
-    "${workspace-snapshot}/scripts";
+  # Workspace Snapshot — its flake's home-manager module (imported via
+  # sharedModules in flake.nix) installs the Spoon (the hammerspoon repo
+  # gitignores that path), the Application Support scripts dir the Claude
+  # SessionStart hook references, and the VS Code terminals extension.
+  # Replaces the repo's install.sh; updates ride the weekly flake input bump.
+  programs.workspace-snapshot.enable = true;
 
   # Companion working clones — clone-if-missing at activation. Makes the
   # MANUAL clone steps self-healing: a fresh machine bootstraps from a local

@@ -37,11 +37,11 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Workspace Snapshot (own repo, not a flake) — source for its sideloaded
-    # VS Code extension, packaged in home/vscode.nix.
+    # Workspace Snapshot — ships a home-manager module (Spoon + scripts +
+    # VS Code extension); enabled in home/macbook-air.nix.
     workspace-snapshot = {
       url = "github:alexjmiller5/workspace-snapshot";
-      flake = false;
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -69,7 +69,8 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit username cherri nix-vscode-extensions workspace-snapshot; };
+            home-manager.sharedModules = [ workspace-snapshot.homeModules.default ];
+            home-manager.extraSpecialArgs = { inherit username cherri nix-vscode-extensions; };
             home-manager.users.${username} = import home;
           }
         ];
