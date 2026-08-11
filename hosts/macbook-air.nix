@@ -130,6 +130,15 @@
       "jabopobgcpjmedljpbcaablpmlmfcogm" # WhatFont
       "jiaopdjbehhjgokpphdfgmapkobbnmjp" # Youtube-shorts block
     ];
+
+    # PWAs, declared (same policy plist). Force-installed per profile at
+    # Chrome launch; the ~/Applications/Chrome Apps.localized/<Name>.app
+    # shims (dock references Google Maps.app) are created on install and
+    # can't be uninstalled in the UI while listed here.
+    WebAppInstallForceList = [
+      { url = "https://www.google.com/maps"; default_launch_container = "window"; }
+      { url = "https://www.youtube.com"; default_launch_container = "window"; }
+    ];
   };
 
   # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
