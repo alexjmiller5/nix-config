@@ -62,6 +62,76 @@
     };
   };
 
+  # Chrome extensions, declared (enterprise-policy plist read by Chrome —
+  # the list IS the extension set: entries force-install from the Web Store,
+  # auto-update, and can't be removed in the UI; removing a line here
+  # uninstalls the extension after the next switch + Chrome restart.
+  # Unpacked/dev extensions (own tools, bypass-paywalls) are NOT policy-
+  # installable — those stay manual, see MANUAL-macbook-air.md.
+  # NOTE: laptop-only — the mini's Chrome (finance scrapers) must stay bare.
+  system.defaults.CustomUserPreferences."com.google.Chrome" = {
+    ExtensionInstallForcelist = [
+      "aeblfdkhhhdcdjpifhhbdiojplfjncoa" # 1Password – Password Manager
+      "gighmmpiobklfepjocnamgkkbiglidom" # AdBlock
+      "efaidnbmnnnibpcajpcglclefindmkaj" # Adobe Acrobat
+      "kfaknphcidikmjhmmfmphghhlcoknflj" # Amazon Unsponsor
+      "kagpmnfgpdecdkbhongbgkgppnpimime" # Bookmarks Exporter
+      "iiikidmnimlpahbeknmkeonmemajpccj" # Button Stealer
+      "cbhilkcodigmigfbnphipnnmamjfkipp" # Calendly
+      "nenlahapcbofgnanklpelkaejcehkggg" # Capital One Shopping
+      "ejcfepkfckglbgocfkanmcdngdijcgld" # ChatGPT search
+      "fcoeoabgfenejglbffodgkkbkcdhcgfn" # Claude
+      "fcalilbnpkfikdppppppchmkdipibalb" # Cloaq
+      "ifjhcahbhkfojdmkndpkmkffbjnefido" # Cookie Guard
+      "jlmpjdjjbgclbocgajdjefcidcncaied" # daily.dev | Where developers discover what's next
+      "eimadpbcbfnmbkopoojfekhnkhdbieeh" # Dark Reader
+      "gdkfehnloabjkmccddnjckpnlhcdcalh" # De-Sponsor for Amazon
+      "cnpgabmfnfehdamobkafalnpdoigdlil" # FaviGrab
+      "hnmpcagpplmpfojmgmnngilcnanddlhb" # Free VPN For Chrome
+      "kfgepjmmgamniaefbjlbacahkjjnjoaa" # Gmail reverse conversation
+      "jgjaapljoafhkohbnfigoekjgdfddnnn" # Gmail Show Time
+      "fdpohaocaechififmbbbbbknoalclacl" # GoFullPage
+      "mgijmajocgfcbeboacabfgobmjgjcoja" # Google Dictionary (by Google)
+      "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
+      "aapbdbdomjkkjkaonfhkkikfgjllcleb" # Google Translate
+      "gjbnlmbnepomgkknbhclokdameangdan" # Insta Content Blocker
+      "bcjindcccaagfpapjjmafapmmgkkhgoa" # JSON Formatter
+      "chklaanhfefbnpoihckbnefhakgolnmc" # JSONVue
+      "dijpdmknlincdehpemajfobhfcmjkhof" # LinkedIn Feed Blocker
+      "iepgempfdndmbciedjdladndpoeodepl" # Lovable Project Downloader
+      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
+      "pobhoodpcipjmedfenaigbeloiidbflp" # Minimal Theme for Twitter / X
+      "knheggckgoiihginacbkhaalnibhilkk" # Notion Web Clipper
+      "bkhaagjahfmjljalopjnoealnfndnagc" # Octotree
+      "jlgojbammkhdbbohlihccohgbaccgpbm" # Open Links in Tabs
+      "chhjbpecpncaggjpdakmflnfcopglcmi" # Rakuten
+      "fgacdjnoljjfikkadhogeofgjoglooma" # Raycast Companion
+      "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
+      "mmnhjecbajmgkapcinkhdnjabclcnfpg" # Reddit Promoted Ad Blocker
+      "hlepfoohegkhhmjieoechaddaejaokhf" # Refined GitHub
+      "gebbhagfogifgggkldgodflihgfeippi" # Return YouTube Dislike
+      "bnhjfbjmbgmgllkojikabliaidpihfnp" # Reverbify
+      "mpdajninpobndbfcldcmbpnnbhibjmch" # SAML-tracer
+      "gmbmikajjgmnabiglmofipeabaddhgne" # Save to Google Drive
+      "pbanhockgagggenencehbnadejlgchfc" # Simplify Copilot
+      "mnjggcdmjocbbbhaepdhchncahnbgone" # SponsorBlock for YouTube
+      "nfmlkliedggdodlbgghmmchhgckjoaml" # Spotify Ad Blocker
+      "bgehnoihoklmofgehcefiaicdcdgppck" # Spotify Playback Speed
+      "jcgpgjhaendighananonflfmjjefjjlp" # Streak Email Tracking for Gmail
+      "pdmhehfogekmpmdoemhabjpaiadagpgp" # Student Beans
+      "micdllihgoppmejpecmkilggmaagfdmb" # Tab Copy
+      "dhdgffkkebhmkfjojejmpbldmpobfkfo" # Tampermonkey
+      "ddkjiahejlhfcafbddmgiahcphecmpfh" # uBlock Origin Lite
+      "pmbneaajfhcoecedlmkfkdnjemmebbcb" # UnSponsored
+      "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher for Chrome
+      "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium
+      "bfbameneiokkgbdmiekhjnmfkcnldhhm" # Web Developer
+      "ppaojnbmmaigjmlpjaldnkgnklhicppk" # Webtime Tracker
+      "jabopobgcpjmedljpbcaablpmlmfcogm" # WhatFont
+      "jiaopdjbehhjgokpphdfgmapkobbnmjp" # Youtube-shorts block
+    ];
+  };
+
   # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
   # nix rewrites it on switch, so manual drag-ins don't survive.
   system.defaults.dock.persistent-apps = [
