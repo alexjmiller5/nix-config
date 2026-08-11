@@ -120,8 +120,13 @@ leisure since the SA token was the only thing the disk could yield.
   `com.apple.universalaccess` is FDA-gated, not worth automating.
 * **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →
   hide dock icon.
-* **Chrome**: load-unpacked extensions (bypass-paywalls et al from
-  `~/Desktop/coding/built-from-source`); per-PWA "open links in Chrome".
+* **Chrome**: load-unpacked extensions — Developer mode ON, then Load
+  unpacked for each: bypass-paywalls et al from
+  `~/Desktop/coding/built-from-source`, and own `chrome-extension`-template
+  projects from their repo's `extension/` dir (upcoming: workspace-snapshot's
+  Chrome bridge, bookmark-extension-sync). Store extensions need NO manual
+  steps — force-installed by the `ExtensionInstallForcelist` block in
+  `hosts/macbook-air.nix`. Per-PWA "open links in Chrome".
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
 * **Raycast**: clipboard history retention → 7 days; custom extensions load
