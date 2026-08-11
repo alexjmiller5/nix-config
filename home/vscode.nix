@@ -1,37 +1,20 @@
-{ pkgs, nix-vscode-extensions, workspace-snapshot, ... }:
+{ pkgs, nix-vscode-extensions, ... }:
 
 # VS Code extensions, fully declared (snapshot 2026-08-11). The app itself
 # stays the visual-studio-code cask — package = null installs nothing — but
 # home-manager owns ~/.vscode/extensions as an immutable set: VS Code can no
 # longer install or update extensions itself. Add/remove = edit this list +
 # rebuild; versions ride the weekly nix-vscode-extensions input bump.
+# (workspace-snapshot-terminals joins this set via the workspace-snapshot
+# flake module — see programs.workspace-snapshot in macbook-air.nix.)
 let
   mkt = nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system}.vscode-marketplace;
-  # Own unpublished extension, built from the workspace-snapshot flake input
-  # (dist/ is gitignored upstream — tsc compile; deps are devDependencies only).
-  # npmDepsHash tracks vscode-extension/package-lock.json: re-prefetch on bump
-  # (`nix run nixpkgs#prefetch-npm-deps -- <input>/vscode-extension/package-lock.json`).
-  workspace-snapshot-terminals = pkgs.buildNpmPackage {
-    pname = "workspace-snapshot-terminals";
-    version = "0.1.0";
-    src = "${workspace-snapshot}/vscode-extension";
-    npmDepsHash = "sha256-x1iH1g5Ji8s04ORn47lxPtQMsmXlbr8j0BgZlVgyJKQ=";
-    npmBuildScript = "compile";
-    dontNpmInstall = true;
-    installPhase = ''
-      runHook preInstall
-      dst=$out/share/vscode/extensions/alexmiller.workspace-snapshot-terminals
-      mkdir -p "$dst"
-      cp -r package.json dist "$dst"/
-      runHook postInstall
-    '';
-  };
 in
 {
   programs.vscode = {
     enable = true;
     package = null; # app comes from the cask
-    profiles.default.extensions = [ workspace-snapshot-terminals ] ++ (with mkt; [
+    profiles.default.extensions = (with mkt; [
       aaron-bond.better-comments
       albert.tabout
       alefragnani.rtf

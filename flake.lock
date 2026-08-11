@@ -391,13 +391,17 @@
       }
     },
     "workspace-snapshot": {
-      "flake": false,
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1783557560,
-        "narHash": "sha256-a53+cs8dh0uPAcv6FwwmPpiZaSPiiIbaSFYAylMZlWg=",
+        "lastModified": 1786423735,
+        "narHash": "sha256-ozYs+Q28hli3DSEDwEN4SC+ZyLD3+KAfCwxuhh/JBIw=",
         "owner": "alexjmiller5",
         "repo": "workspace-snapshot",
-        "rev": "37383784ef490ca6a7416e37cf2e4e1a7b75adec",
+        "rev": "e1143919ed8cc816d71e9a1272a2b33ffbfeabf6",
         "type": "github"
       },
       "original": {
