@@ -14,7 +14,11 @@
 
   # 1password-cli: op, used by the git credential helper. terraform: BSL,
   # kept for the OCI VM fleet (infra skill says Terraform is fine there).
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" "terraform" ];
+  # vscode-extension- prefix: the licensed/platform-specific extensions that
+  # come from pkgs.vscode-extensions in home/vscode.nix.
+  nixpkgs.config.allowUnfreePredicate = pkg:
+    builtins.elem (lib.getName pkg) [ "1password-cli" "terraform" ]
+    || lib.hasPrefix "vscode-extension-" (lib.getName pkg);
 
   # The laptop's ONE agenix secret: the macbook-air-machine 1P service-account
   # token (read-only on the "MacBook Air" vault). Every other secret lives in

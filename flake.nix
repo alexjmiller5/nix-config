@@ -31,9 +31,21 @@
       url = "github:electrikmilk/cherri";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Nightly-updated VS Code marketplace mirror — extension set declared in
+    # home/vscode.nix; versions ride the weekly input bump.
+    nix-vscode-extensions = {
+      url = "github:nix-community/nix-vscode-extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Workspace Snapshot (own repo, not a flake) — source for its sideloaded
+    # VS Code extension, packaged in home/vscode.nix.
+    workspace-snapshot = {
+      url = "github:alexjmiller5/workspace-snapshot";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix, cherri }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix, cherri, nix-vscode-extensions, workspace-snapshot }:
     let
       username = "alexmiller";
       mkHost = { host, home }: nix-darwin.lib.darwinSystem {
@@ -57,7 +69,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit username cherri; };
+            home-manager.extraSpecialArgs = { inherit username cherri nix-vscode-extensions workspace-snapshot; };
             home-manager.users.${username} = import home;
           }
         ];

@@ -196,6 +196,26 @@
         "type": "github"
       }
     },
+    "nix-vscode-extensions": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786414389,
+        "narHash": "sha256-Q+jrZJGeXuJryRGIw70qOhnAEowpBhYwqNCCFHCkB2o=",
+        "owner": "nix-community",
+        "repo": "nix-vscode-extensions",
+        "rev": "664c5cfc239449f3e8acee0f25bf4a9b4f621f01",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-vscode-extensions",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1782918843,
@@ -293,9 +313,11 @@
         "home-manager": "home-manager_2",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
+        "nix-vscode-extensions": "nix-vscode-extensions",
         "nixpkgs": "nixpkgs",
         "notion-finance-sync": "notion-finance-sync",
-        "screentime-backup": "screentime-backup"
+        "screentime-backup": "screentime-backup",
+        "workspace-snapshot": "workspace-snapshot"
       }
     },
     "screentime-backup": {
@@ -365,6 +387,22 @@
       "original": {
         "owner": "pyproject-nix",
         "repo": "uv2nix",
+        "type": "github"
+      }
+    },
+    "workspace-snapshot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783557560,
+        "narHash": "sha256-a53+cs8dh0uPAcv6FwwmPpiZaSPiiIbaSFYAylMZlWg=",
+        "owner": "alexjmiller5",
+        "repo": "workspace-snapshot",
+        "rev": "37383784ef490ca6a7416e37cf2e4e1a7b75adec",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "workspace-snapshot",
         "type": "github"
       }
     }

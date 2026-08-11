@@ -83,4 +83,5 @@ in
   home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
   home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
   home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
+  home.file.".claude/statusline.sh".source = mkLink "${agentConfig}/claude/statusline.sh";
 }
