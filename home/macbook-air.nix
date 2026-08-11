@@ -80,6 +80,9 @@ in
     # and the work-laptop export share.
     pkgs.bun
     pkgs.create-dmg
+    # VS Code's editor font — home-manager copies package fonts into
+    # ~/Library/Fonts/HomeManager. Replaces the hand-installed ttfs.
+    pkgs.fira-code
     pkgs.duti
     pkgs.exiftool
     pkgs.fastlane

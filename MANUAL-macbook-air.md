@@ -41,10 +41,10 @@ straight from the github: ref.
    Activation decrypts the token onto the agenix RAM disk, the git credential
    helper goes live, and `/etc/nix-darwin` links to the clone — from here on
    the `switch-laptop` alias works from anywhere.
-5. Sign into the 1Password app (installed by the switch); `op signin`; then
-   `op plugin init gh` so interactive `gh` rides 1P per-invocation. There is
-   NO `gh auth login` — git auth is the agenix PAT, and no token enters the
-   keychain.
+5. Sign into the 1Password app (installed by the switch); `op signin`. There
+   is NO `gh auth login` and no `op plugin` setup — git auth is the agenix
+   PAT, `gh`/`gcloud` are the op-authed PATH wrappers, and no token enters
+   the keychain.
 6. `switch-laptop` again — activation now clones the private companions
    (agent-config, nix-secrets, hammerspoon) via the credential helper, and
    the out-of-store symlinks resolve.
@@ -99,8 +99,7 @@ leisure since the SA token was the only thing the disk could yield.
 
 ## App sign-ins (after first switch; GUI-only, none scriptable)
 
-* **1Password** — covered in bootstrap step 5 (app sign-in, `op signin`,
-  `op plugin init gh`).
+* **1Password** — covered in bootstrap step 5 (app sign-in, `op signin`).
 * **Claude** — sign into the Claude desktop app and Claude Code (`claude` →
   `/login`); auth state lands in `~/.claude.json` (deliberate leftover).
 * **Notion** — sign into the desktop app.
@@ -129,6 +128,9 @@ leisure since the SA token was the only thing the disk could yield.
   from their dev source directories.
 * **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 * **Nightlight**: the activation script needs a display connected on first run.
+* **Fonts in `/Library/Fonts`**: MuseoSans (commercial), LG SmartHan, TI Uni,
+  Arial Unicode — licensed/niche, not in nixpkgs; reinstall by hand (Font
+  Book) on a fresh machine. Free fonts (Fira Code) are nix-managed instead.
 
 ## Menu bar: what's declared vs manual
 
@@ -155,13 +157,11 @@ Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar, CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
-* `com.asmvik.yabai.plist`, `com.alexmiller.geminidesktop.plist`, OpenClaw
-  agents — owned by their own projects, not this repo.
+* `com.asmvik.yabai.plist` — owned by the yabai setup, not this repo.
 * `/Applications/Raycast Beta.app` — manual download from raycast.com (no
   cask exists for the beta channel; it self-updates). Its login item IS
   declared (`home/agents.nix`); only the install itself is manual. Stable
   Raycast stays alongside it as the declared `raycast` cask.
-* `gcloud`/`op` credentials, `~/.claude.json`, `~/.config/op/plugins` (the
-  `op plugin init gh` state) — runtime auth state, never declared. git's
-  GitHub auth is NOT in this list anymore: it's the agenix PAT.
+* `gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
+  declared. git's GitHub auth is NOT in this list anymore: it's the agenix PAT.
 

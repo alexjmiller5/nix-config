@@ -22,8 +22,7 @@ in
 
     # gh, ALWAYS authed via 1Password (PAT item in the AI Agent vault) — the
     # keyring is not used. PATH-level shadow (not an alias/function) so
-    # scripts, launchd, and agent shells get auth too; the interactive
-    # `op plugin run` alias still wins in zsh and just passes through here.
+    # scripts, launchd, and agent shells get auth too.
     # gh must not be installed anywhere else (brew/nix) or PATH order decides.
     (script "gh" {
       runtimeInputs = [ pkgs._1password-cli ];
