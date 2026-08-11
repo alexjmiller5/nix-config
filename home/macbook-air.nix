@@ -1,4 +1,4 @@
-{ config, osConfig, pkgs, lib, username, cherri, ... }:
+{ config, osConfig, pkgs, lib, username, cherri, workspace-snapshot, ... }:
 
 # Laptop home profile: full shell + dotfiles + the agent-config fan-out.
 #
@@ -25,6 +25,7 @@ in
     ./macos/spotlight-raycast.nix
     ./macos/nightlight.nix
     ./macos/duti.nix
+    ./vscode.nix
     ./agents.nix
     ./ssh.nix
   ];
@@ -125,6 +126,26 @@ in
         ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
       '';
     })
+    # memo (Apple Notes CLI, antoniorodr/memo) — needed by the apple-notes /
+    # triage-apple-notes agent skills. Not in nixpkgs, and its brew formula's
+    # python was broken on this machine, so run it uv-style: uvx resolves from
+    # git once and reuses the cached env (refresh = `uvx --refresh --from … memo`).
+    # Replaces the imperative `uv tool install` copy in ~/.local/bin.
+    (pkgs.writeShellApplication {
+      name = "memo";
+      runtimeInputs = [ pkgs.uv ];
+      text = ''
+        exec uvx --from git+https://github.com/antoniorodr/memo memo "$@"
+      '';
+    })
+    # Tailscale CLI for the GUI app (tailscale-app cask ships no PATH binary) —
+    # replaces the hand-written /usr/local/bin/tailscale shim.
+    (pkgs.writeShellApplication {
+      name = "tailscale";
+      text = ''
+        exec "/Applications/Tailscale.app/Contents/MacOS/Tailscale" "$@"
+      '';
+    })
     # Cherri compiler for the ios-shortcuts project (flake input; not in nixpkgs).
     cherri.packages.${pkgs.stdenv.hostPlatform.system}.default
     # EGGNOGG+ (madgarden.itch.io/eggnogg) — itch.io-only, served via signed
@@ -216,10 +237,23 @@ in
   home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
   home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
   home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
+  home.file.".claude/statusline.sh".source = mkLink "${agentConfig}/claude/statusline.sh";
 
   # Hammerspoon profile selector — read by ~/.hammerspoon/init.lua at load.
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
   home.file.".config/hammerspoon-profile".text = "personal";
+
+  # Workspace Snapshot (flake input) — replaces the repo's install.sh:
+  #  - the Spoon (the hammerspoon repo gitignores this path; nix owns it)
+  #  - scripts/ at the stable Application Support path the Claude SessionStart
+  #    hook in agent-config references. Runtime snapshot state is app-written
+  #    siblings in the same dir — only these two paths are nix-managed.
+  # The VS Code extension half lives in home/vscode.nix. Updates ride the
+  # weekly flake input bump.
+  home.file.".hammerspoon/Spoons/WorkspaceSnapshot.spoon".source =
+    "${workspace-snapshot}/WorkspaceSnapshot.spoon";
+  home.file."Library/Application Support/WorkspaceSnapshot/scripts".source =
+    "${workspace-snapshot}/scripts";
 
   # Companion working clones — clone-if-missing at activation. Makes the
   # MANUAL clone steps self-healing: a fresh machine bootstraps from a local
