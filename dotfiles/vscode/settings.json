@@ -1,12 +1,5 @@
 {
-	// Vscode Theme
-	// Good Choices: "SynthWave '84", "City Lights", "Horizon", "An Old Hope Classic", 
-	// "Default Dark+", "Default Light+", "Default High Contrast"
-	"workbench.colorTheme": "GitHub Dark Default",
-	// SynthWave '84 theme customization
 	"synthwave84.brightness": 0.25,
-	// File icon configuration
-	"workbench.iconTheme": "vscode-great-icons",
 	// Autosave enabled
 	"files.autoSave": "afterDelay",
 	"files.autoSaveDelay": 1000,
@@ -255,5 +248,7 @@
 		"**/.forgejo/workflows/*.yml",
 		"**/.forgejo/workflows/*.yaml"
 	],
+	"workbench.colorTheme": "GitHub Dark Default",
+	"workbench.iconTheme": "vscode-great-icons",
 	// ⬆️ New settings (past the "workbench.secondarySideBar.defaultVisibility" suggestions) autonatically added by VSCode or an extension which need comments or removal
 }

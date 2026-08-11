@@ -1,8 +1,18 @@
 # macOS settings shared by all hosts
 
-{ ... }:
+{ lib, ... }:
 
 {
+  # Skip building nix-darwin's own manual (options.json → man configuration.nix
+  # + darwin-help HTML): it trips a "store path without context" warning on
+  # every switch (upstream nix-darwin issue) and nobody reads it here — options
+  # get looked up via search.nixos.org/mcp-nixos. mkForce keeps regular package
+  # man pages: the documentation module hard-assigns programs.man.enable from
+  # documentation.man.enable, which we're turning off.
+  documentation.man.enable = false;
+  documentation.doc.enable = false;
+  programs.man.enable = lib.mkForce true;
+
   system.defaults = {
     NSGlobalDomain = {
       "com.apple.trackpad.scaling" = 5.0;
