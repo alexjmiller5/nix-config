@@ -131,7 +131,6 @@ leisure since the SA token was the only thing the disk could yield.
   configure by hand.
 * **Raycast**: clipboard history retention → 7 days; custom extensions load
   from their dev source directories.
-* **Own apps**: build Synapse macOS app + Receptor from source → /Applications.
 * **Nightlight**: the activation script needs a display connected on first run.
 * **Fonts in `/Library/Fonts`**: MuseoSans (commercial), LG SmartHan, TI Uni,
   Arial Unicode — licensed/niche, not in nixpkgs; reinstall by hand (Font
@@ -158,7 +157,7 @@ research: Notion note "Menu bar / dock in nix — findings" (2026-08-02).
 
 Reference layout, right → left (snapshotted 2026-08-04): clock,
 Control Center, Sound, WiFi, BetterDisplay, Tailscale, Battery, Bluetooth,
-Screen Mirroring, Weather, 1Password, AirDrop, Synapse, RepoBar, CodexBar.
+Screen Mirroring, Weather, 1Password, AirDrop, RepoBar, CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
