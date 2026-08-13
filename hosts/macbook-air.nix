@@ -113,7 +113,7 @@
           "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal; # 1Password – Password Manager
           # "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock (off — uncomment to install)
           # "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat (off — uncomment to install)
-          # "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor (off — uncomment to install)
+          "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor
           "kagpmnfgpdecdkbhongbgkgppnpimime" = normal; # Bookmarks Exporter
           "iiikidmnimlpahbeknmkeonmemajpccj" = normal; # Button Stealer
           # "cbhilkcodigmigfbnphipnnmamjfkipp" = normal; # Calendly (off — uncomment to install)
