@@ -112,6 +112,11 @@
       webstore = "https://clients2.google.com/service/update2/crx";
       normal = { installation_mode = "normal_installed"; update_url = webstore; };
       allowed = { installation_mode = "allowed"; };
+      # toolbar_pin "force_pinned" = pinned to the toolbar, pin locked
+      # (unpinning = remove the attr + switch). Only honored on
+      # policy-installed extensions; on `allowed` ones Chrome may ignore it
+      # and keep the user's own pin state.
+      pin = { toolbar_pin = "force_pinned"; };
       chromePolicy = pkgs.writeText "com.google.Chrome.policy.plist" (lib.generators.toPlist { escape = true; } {
         ExtensionSettings = lib.optionalAttrs lockdown {
           "*" = {
@@ -167,7 +172,7 @@
           # "pdmhehfogekmpmdoemhabjpaiadagpgp" = normal; # Student Beans (off — uncomment to install)
           "micdllihgoppmejpecmkilggmaagfdmb" = normal; # Tab Copy
           "dhdgffkkebhmkfjojejmpbldmpobfkfo" = normal; # Tampermonkey
-          "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal; # uBlock Origin Lite
+          "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal // pin; # uBlock Origin Lite
           "pmbneaajfhcoecedlmkfkdnjemmebbcb" = normal; # UnSponsored
           "djflhoibgkdhkhhcedjiklpkjnoahfmg" = normal; # User-Agent Switcher for Chrome
           # "dbepggeogbaibhgnhhndojpepiihcmeb" = normal; # Vimium (off — uncomment to install)
@@ -177,7 +182,7 @@
           "jiaopdjbehhjgokpphdfgmapkobbnmjp" = normal; # Youtube-shorts block
 
           # Unpacked / dev-mode (path-derived IDs, see header):
-          "lkbebcjgcmobigpeffafkodonchffocl" = allowed; # bypass-paywalls-chrome-clean (built-from-source)
+          "lkbebcjgcmobigpeffafkodonchffocl" = allowed // pin; # bypass-paywalls-chrome-clean (built-from-source)
           "ogjfmlhndbkglaiednoodaeceffhpnha" = allowed; # lovable-downloader (active-projects)
         };
 
