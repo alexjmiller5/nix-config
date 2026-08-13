@@ -164,6 +164,22 @@ The agent, scripting-addition loader, and sudoers entry are all declarative
   installed by the Chrome policy plist (`ExtensionSettings` +
   `WebAppInstallForceList`, written to Managed Preferences by the activation
   script in `hosts/macbook-air.nix`). Per-PWA "open links in Chrome".
+* **Chrome UI prefs** — app-owned profile `Preferences`, NO policy exists
+  (Chrome rewrites the file constantly, so nix can't own it either) — this
+  snapshot IS the declaration (2026-08-13):
+  - **Tab position: Vertical**, sidebar collapsed (right-click tab strip →
+    Show Tabs Vertically, or Settings → Appearance → Tab strip position).
+  - **Toolbar toggles ON** (Customize Chrome → Toolbar): Forward, Downloads,
+    Translate, Developer Tools. Pinned toolbar order: Chrome Labs, DevTools,
+    Downloads, Translate.
+  - **OFF but present** (not removable — no policy for these buttons): Home,
+    Open In Split View, New Incognito Window, Bookmarks, Reading List,
+    History, Delete Browsing Data, Print, Search with Google Lens, Create QR
+    Code, Cast, Reading Mode, Copy Link, Send to your devices, Task Manager.
+  - Google Password Manager / Payment Methods / Addresses entries are
+    REMOVED outright by the policy plist (`PasswordManagerEnabled` /
+    `AutofillCreditCardEnabled` / `AutofillAddressEnabled` = false —
+    1Password owns those), so they never appear in this panel.
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
 * **Raycast**: clipboard history retention → 7 days; extensions → see

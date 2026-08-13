@@ -186,6 +186,13 @@
           "ogjfmlhndbkglaiednoodaeceffhpnha" = allowed; # lovable-downloader (active-projects)
         };
 
+        # Google's built-in password / payment / address managers OFF —
+        # 1Password owns all three. Also removes their entries from
+        # Customize Chrome → Toolbar and kills the "save in Google?" prompts.
+        PasswordManagerEnabled = false;
+        AutofillCreditCardEnabled = false;
+        AutofillAddressEnabled = false;
+
         # PWAs, force-installed per profile at Chrome launch; the
         # ~/Applications/Chrome Apps.localized/<Name>.app shims (dock
         # references Google Maps.app) are created on install and can't be
