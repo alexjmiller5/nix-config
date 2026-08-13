@@ -74,96 +74,112 @@
     };
   };
 
-  # Chrome extensions, declared (enterprise-policy plist read by Chrome —
-  # the list IS the extension set: entries force-install from the Web Store,
-  # auto-update, and can't be removed in the UI; removing a line here
-  # uninstalls the extension after the next switch + Chrome restart.
-  # Unpacked/dev extensions (own tools, bypass-paywalls) are NOT policy-
-  # installable — those stay manual, see MANUAL-macbook-air.md.
-  # NOTE: laptop-only — the mini's Chrome (finance scrapers) must stay bare.
-  system.defaults.CustomUserPreferences."com.google.Chrome" = {
-    ExtensionInstallForcelist = [
-      "aeblfdkhhhdcdjpifhhbdiojplfjncoa" # 1Password – Password Manager
-      "gighmmpiobklfepjocnamgkkbiglidom" # AdBlock
-      "efaidnbmnnnibpcajpcglclefindmkaj" # Adobe Acrobat
-      "kfaknphcidikmjhmmfmphghhlcoknflj" # Amazon Unsponsor
-      "kagpmnfgpdecdkbhongbgkgppnpimime" # Bookmarks Exporter
-      "iiikidmnimlpahbeknmkeonmemajpccj" # Button Stealer
-      "cbhilkcodigmigfbnphipnnmamjfkipp" # Calendly
-      "nenlahapcbofgnanklpelkaejcehkggg" # Capital One Shopping
-      "ejcfepkfckglbgocfkanmcdngdijcgld" # ChatGPT search
-      "fcoeoabgfenejglbffodgkkbkcdhcgfn" # Claude
-      "fcalilbnpkfikdppppppchmkdipibalb" # Cloaq
-      "ifjhcahbhkfojdmkndpkmkffbjnefido" # Cookie Guard
-      "jlmpjdjjbgclbocgajdjefcidcncaied" # daily.dev | Where developers discover what's next
-      "eimadpbcbfnmbkopoojfekhnkhdbieeh" # Dark Reader
-      "gdkfehnloabjkmccddnjckpnlhcdcalh" # De-Sponsor for Amazon
-      "cnpgabmfnfehdamobkafalnpdoigdlil" # FaviGrab
-      "hnmpcagpplmpfojmgmnngilcnanddlhb" # Free VPN For Chrome
-      "kfgepjmmgamniaefbjlbacahkjjnjoaa" # Gmail reverse conversation
-      "jgjaapljoafhkohbnfigoekjgdfddnnn" # Gmail Show Time
-      "fdpohaocaechififmbbbbbknoalclacl" # GoFullPage
-      "mgijmajocgfcbeboacabfgobmjgjcoja" # Google Dictionary (by Google)
-      "ghbmnnjooekpmoecnnnilnnbdlolhkhi" # Google Docs Offline
-      "aapbdbdomjkkjkaonfhkkikfgjllcleb" # Google Translate
-      "gjbnlmbnepomgkknbhclokdameangdan" # Insta Content Blocker
-      "bcjindcccaagfpapjjmafapmmgkkhgoa" # JSON Formatter
-      "chklaanhfefbnpoihckbnefhakgolnmc" # JSONVue
-      "dijpdmknlincdehpemajfobhfcmjkhof" # LinkedIn Feed Blocker
-      "iepgempfdndmbciedjdladndpoeodepl" # Lovable Project Downloader
-      "nkbihfbeogaeaoehlefnkodbefgpgknn" # MetaMask
-      "pobhoodpcipjmedfenaigbeloiidbflp" # Minimal Theme for Twitter / X
-      "knheggckgoiihginacbkhaalnibhilkk" # Notion Web Clipper
-      "bkhaagjahfmjljalopjnoealnfndnagc" # Octotree
-      "jlgojbammkhdbbohlihccohgbaccgpbm" # Open Links in Tabs
-      "chhjbpecpncaggjpdakmflnfcopglcmi" # Rakuten
-      "fgacdjnoljjfikkadhogeofgjoglooma" # Raycast Companion
-      "fmkadmapgofadopljbjfkapdkoienihi" # React Developer Tools
-      "mmnhjecbajmgkapcinkhdnjabclcnfpg" # Reddit Promoted Ad Blocker
-      "hlepfoohegkhhmjieoechaddaejaokhf" # Refined GitHub
-      "gebbhagfogifgggkldgodflihgfeippi" # Return YouTube Dislike
-      "bnhjfbjmbgmgllkojikabliaidpihfnp" # Reverbify
-      "mpdajninpobndbfcldcmbpnnbhibjmch" # SAML-tracer
-      "gmbmikajjgmnabiglmofipeabaddhgne" # Save to Google Drive
-      "pbanhockgagggenencehbnadejlgchfc" # Simplify Copilot
-      "mnjggcdmjocbbbhaepdhchncahnbgone" # SponsorBlock for YouTube
-      "nfmlkliedggdodlbgghmmchhgckjoaml" # Spotify Ad Blocker
-      "bgehnoihoklmofgehcefiaicdcdgppck" # Spotify Playback Speed
-      "jcgpgjhaendighananonflfmjjefjjlp" # Streak Email Tracking for Gmail
-      "pdmhehfogekmpmdoemhabjpaiadagpgp" # Student Beans
-      "micdllihgoppmejpecmkilggmaagfdmb" # Tab Copy
-      "dhdgffkkebhmkfjojejmpbldmpobfkfo" # Tampermonkey
-      "ddkjiahejlhfcafbddmgiahcphecmpfh" # uBlock Origin Lite
-      "pmbneaajfhcoecedlmkfkdnjemmebbcb" # UnSponsored
-      "djflhoibgkdhkhhcedjiklpkjnoahfmg" # User-Agent Switcher for Chrome
-      "dbepggeogbaibhgnhhndojpepiihcmeb" # Vimium
-      "bfbameneiokkgbdmiekhjnmfkcnldhhm" # Web Developer
-      "ppaojnbmmaigjmlpjaldnkgnklhicppk" # Webtime Tracker
-      "jabopobgcpjmedljpbcaablpmlmfcogm" # WhatFont
-      "jiaopdjbehhjgokpphdfgmapkobbnmjp" # Youtube-shorts block
-    ];
+  # Chrome policy, declared. macOS Chrome reads enterprise policy ONLY from
+  # /Library/Managed Preferences (root-owned) — policy keys in the normal user
+  # defaults domain are silently ignored, so this is written by a root
+  # activation script, not system.defaults. Laptop-only: the mini's Chrome
+  # (finance scrapers) must stay bare. Chrome reloads policy on restart
+  # (chrome://policy → Reload policies to force it).
+  #
+  # ExtensionSettings with installation_mode "normal_installed": auto-installs
+  # from the Web Store, blocks UI uninstall, auto-updates — but the
+  # enable/disable toggle stays Alex's, and a disable sticks. Flip an entry to
+  # `force = true` (force_installed) to also force-enable it. Unlisted
+  # extensions keep default behavior, so manual/dev-mode installs still work;
+  # removing an entry returns that extension to manual control (it is NOT
+  # auto-uninstalled).
+  system.activationScripts.postActivation.text =
+    let
+      webstore = "https://clients2.google.com/service/update2/crx";
+      normal = { installation_mode = "normal_installed"; update_url = webstore; };
+      chromePolicy = pkgs.writeText "com.google.Chrome.policy.plist" (lib.generators.toPlist { escape = true; } {
+        ExtensionSettings = {
+          "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal; # 1Password – Password Manager
+          "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock
+          "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat
+          "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor
+          "kagpmnfgpdecdkbhongbgkgppnpimime" = normal; # Bookmarks Exporter
+          "iiikidmnimlpahbeknmkeonmemajpccj" = normal; # Button Stealer
+          "cbhilkcodigmigfbnphipnnmamjfkipp" = normal; # Calendly
+          "nenlahapcbofgnanklpelkaejcehkggg" = normal; # Capital One Shopping
+          "ejcfepkfckglbgocfkanmcdngdijcgld" = normal; # ChatGPT search
+          "fcoeoabgfenejglbffodgkkbkcdhcgfn" = normal; # Claude
+          "fcalilbnpkfikdppppppchmkdipibalb" = normal; # Cloaq
+          "ifjhcahbhkfojdmkndpkmkffbjnefido" = normal; # Cookie Guard
+          "jlmpjdjjbgclbocgajdjefcidcncaied" = normal; # daily.dev | Where developers discover what's next
+          "eimadpbcbfnmbkopoojfekhnkhdbieeh" = normal; # Dark Reader
+          "gdkfehnloabjkmccddnjckpnlhcdcalh" = normal; # De-Sponsor for Amazon
+          "cnpgabmfnfehdamobkafalnpdoigdlil" = normal; # FaviGrab
+          "hnmpcagpplmpfojmgmnngilcnanddlhb" = normal; # Free VPN For Chrome
+          "kfgepjmmgamniaefbjlbacahkjjnjoaa" = normal; # Gmail reverse conversation
+          "jgjaapljoafhkohbnfigoekjgdfddnnn" = normal; # Gmail Show Time
+          "mgijmajocgfcbeboacabfgobmjgjcoja" = normal; # Google Dictionary (by Google)
+          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" = normal; # Google Docs Offline
+          "aapbdbdomjkkjkaonfhkkikfgjllcleb" = normal; # Google Translate
+          "gjbnlmbnepomgkknbhclokdameangdan" = normal; # Insta Content Blocker
+          "bcjindcccaagfpapjjmafapmmgkkhgoa" = normal; # JSON Formatter
+          "chklaanhfefbnpoihckbnefhakgolnmc" = normal; # JSONVue
+          "dijpdmknlincdehpemajfobhfcmjkhof" = normal; # LinkedIn Feed Blocker
+          "iepgempfdndmbciedjdladndpoeodepl" = normal; # Lovable Project Downloader
+          "nkbihfbeogaeaoehlefnkodbefgpgknn" = normal; # MetaMask
+          "pobhoodpcipjmedfenaigbeloiidbflp" = normal; # Minimal Theme for Twitter / X
+          "knheggckgoiihginacbkhaalnibhilkk" = normal; # Notion Web Clipper
+          "bkhaagjahfmjljalopjnoealnfndnagc" = normal; # Octotree
+          "jlgojbammkhdbbohlihccohgbaccgpbm" = normal; # Open Links in Tabs
+          "chhjbpecpncaggjpdakmflnfcopglcmi" = normal; # Rakuten
+          "fgacdjnoljjfikkadhogeofgjoglooma" = normal; # Raycast Companion
+          "fmkadmapgofadopljbjfkapdkoienihi" = normal; # React Developer Tools
+          "mmnhjecbajmgkapcinkhdnjabclcnfpg" = normal; # Reddit Promoted Ad Blocker
+          "hlepfoohegkhhmjieoechaddaejaokhf" = normal; # Refined GitHub
+          "gebbhagfogifgggkldgodflihgfeippi" = normal; # Return YouTube Dislike
+          "bnhjfbjmbgmgllkojikabliaidpihfnp" = normal; # Reverbify
+          "mpdajninpobndbfcldcmbpnnbhibjmch" = normal; # SAML-tracer
+          "gmbmikajjgmnabiglmofipeabaddhgne" = normal; # Save to Google Drive
+          "pbanhockgagggenencehbnadejlgchfc" = normal; # Simplify Copilot
+          "mnjggcdmjocbbbhaepdhchncahnbgone" = normal; # SponsorBlock for YouTube
+          "bgehnoihoklmofgehcefiaicdcdgppck" = normal; # Spotify Playback Speed
+          "jcgpgjhaendighananonflfmjjefjjlp" = normal; # Streak Email Tracking for Gmail
+          "pdmhehfogekmpmdoemhabjpaiadagpgp" = normal; # Student Beans
+          "micdllihgoppmejpecmkilggmaagfdmb" = normal; # Tab Copy
+          "dhdgffkkebhmkfjojejmpbldmpobfkfo" = normal; # Tampermonkey
+          "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal; # uBlock Origin Lite
+          "pmbneaajfhcoecedlmkfkdnjemmebbcb" = normal; # UnSponsored
+          "djflhoibgkdhkhhcedjiklpkjnoahfmg" = normal; # User-Agent Switcher for Chrome
+          "dbepggeogbaibhgnhhndojpepiihcmeb" = normal; # Vimium
+          "bfbameneiokkgbdmiekhjnmfkcnldhhm" = normal; # Web Developer
+          "ppaojnbmmaigjmlpjaldnkgnklhicppk" = normal; # Webtime Tracker
+          "jabopobgcpjmedljpbcaablpmlmfcogm" = normal; # WhatFont
+          "jiaopdjbehhjgokpphdfgmapkobbnmjp" = normal; # Youtube-shorts block
+        };
 
-    # PWAs, declared (same policy plist). Force-installed per profile at
-    # Chrome launch; the ~/Applications/Chrome Apps.localized/<Name>.app
-    # shims (dock references Google Maps.app) are created on install and
-    # can't be uninstalled in the UI while listed here.
-    WebAppInstallForceList = [
-      { url = "https://secure.bankofamerica.com/myaccounts/signin/signIn.go"; default_launch_container = "window"; }
-      { url = "https://contacts.google.com/"; default_launch_container = "window"; }
-      { url = "https://www.google.com/maps"; default_launch_container = "window"; }
-      { url = "https://translate.google.com/"; default_launch_container = "window"; }
-      { url = "https://web.groupme.com/"; default_launch_container = "window"; }
-      { url = "https://www.instagram.com/"; default_launch_container = "window"; }
-      { url = "https://www.linkedin.com/feed/"; default_launch_container = "window"; }
-      { url = "https://settleup.app/"; default_launch_container = "window"; }
-      { url = "https://www.snapchat.com/web"; default_launch_container = "window"; }
-      { url = "https://login.tailscale.com/admin"; default_launch_container = "window"; }
-      { url = "https://account.venmo.com/"; default_launch_container = "window"; }
-      { url = "https://www.wordreference.com/enes/"; default_launch_container = "window"; }
-      { url = "https://x.com/"; default_launch_container = "window"; }
-      { url = "https://www.youtube.com"; default_launch_container = "window"; }
-    ];
-  };
+        # PWAs, force-installed per profile at Chrome launch; the
+        # ~/Applications/Chrome Apps.localized/<Name>.app shims (dock
+        # references Google Maps.app) are created on install and can't be
+        # uninstalled in the UI while listed here.
+        WebAppInstallForceList = [
+    { url = "https://secure.bankofamerica.com/myaccounts/signin/signIn.go"; default_launch_container = "window"; }
+    { url = "https://contacts.google.com/"; default_launch_container = "window"; }
+    { url = "https://www.google.com/maps"; default_launch_container = "window"; }
+    { url = "https://translate.google.com/"; default_launch_container = "window"; }
+    { url = "https://web.groupme.com/"; default_launch_container = "window"; }
+    { url = "https://www.instagram.com/"; default_launch_container = "window"; }
+    { url = "https://www.linkedin.com/feed/"; default_launch_container = "window"; }
+    { url = "https://settleup.app/"; default_launch_container = "window"; }
+    { url = "https://www.snapchat.com/web"; default_launch_container = "window"; }
+    { url = "https://login.tailscale.com/admin"; default_launch_container = "window"; }
+    { url = "https://account.venmo.com/"; default_launch_container = "window"; }
+    { url = "https://www.wordreference.com/enes/"; default_launch_container = "window"; }
+    { url = "https://x.com/"; default_launch_container = "window"; }
+    { url = "https://www.youtube.com"; default_launch_container = "window"; }
+        ];
+      });
+    in
+    ''
+      mkdir -p '/Library/Managed Preferences/${username}'
+      cp -f ${chromePolicy} '/Library/Managed Preferences/${username}/com.google.Chrome.plist'
+      chmod 644 '/Library/Managed Preferences/${username}/com.google.Chrome.plist'
+      /usr/bin/killall cfprefsd 2>/dev/null || true
+    '';
 
   # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
   # nix rewrites it on switch, so manual drag-ins don't survive.
