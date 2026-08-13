@@ -170,11 +170,6 @@ Restore: install each store extension from the Store; for the two custom
 ones run `npm ci && npx ray develop` in each dir, then Ctrl-C once loaded
 (the dev import persists without the watcher).
 
-Backup: Raycast → Settings → Advanced → Export → save the `.rayconfig` to
-`~/Documents/manual-backups/`; re-export after notable extension/settings
-changes. The export restores preferences; this section stays the source of
-truth for what's installed.
-
 ## Menu bar: what's declared vs manual
 
 Declared: dock order (`hosts/macbook-air.nix` dock block), system icon
