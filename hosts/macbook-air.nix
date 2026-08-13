@@ -151,7 +151,7 @@
           "bnhjfbjmbgmgllkojikabliaidpihfnp" = normal; # Reverbify
           "mpdajninpobndbfcldcmbpnnbhibjmch" = normal; # SAML-tracer
           "gmbmikajjgmnabiglmofipeabaddhgne" = normal; # Save to Google Drive
-          # "pbanhockgagggenencehbnadejlgchfc" = normal; # Simplify Copilot (off — uncomment to install)
+          "pbanhockgagggenencehbnadejlgchfc" = normal; # Simplify Copilot
           "mnjggcdmjocbbbhaepdhchncahnbgone" = normal; # SponsorBlock for YouTube
           # "bgehnoihoklmofgehcefiaicdcdgppck" = normal; # Spotify Playback Speed (off — uncomment to install)
           "jcgpgjhaendighananonflfmjjefjjlp" = normal; # Streak Email Tracking for Gmail
