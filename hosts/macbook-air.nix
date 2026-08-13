@@ -108,7 +108,7 @@
       #   2. chrome://extensions → Load unpacked (and add the path-derived ID
       #      as an `allowed` entry below so it survives re-lock)
       #   3. lockdown = true → switch → restart Chrome
-      lockdown = false;
+      lockdown = true;
       webstore = "https://clients2.google.com/service/update2/crx";
       normal = { installation_mode = "normal_installed"; update_url = webstore; };
       allowed = { installation_mode = "allowed"; };
