@@ -159,9 +159,9 @@ Store extensions — install via Raycast Store or `https://raycast.com/<slug>`:
 Custom-built (modified store forks, dev-imported, NOT from the store;
 clone to these paths):
 
-* Git Repos — `~/Desktop/coding/active-projects/git-repos`
+* Git Repos — `~/Desktop/coding/active-projects/raycast-git-repos`
   (github.com/alexjmiller5/raycast-git-repos)
-* Messages — `~/Desktop/coding/active-projects/messages`
+* Messages — `~/Desktop/coding/active-projects/raycast-messages`
   (github.com/alexjmiller5/raycast-messages)
 
 Restore: install each store extension from the Store; for the two custom
