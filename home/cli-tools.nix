@@ -26,6 +26,9 @@
     enable = true;
     defaultEditor = true;
     vimAlias = true;
+    # New 26.05 defaults, made explicit: no plugins need the providers
+    withRuby = false;
+    withPython3 = false;
   };
   xdg.configFile."nvim/init.lua".source = ../dotfiles/nvim/init.lua;
 }
