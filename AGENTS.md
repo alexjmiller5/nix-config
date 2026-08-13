@@ -22,7 +22,7 @@ routing table and workflow; this file is the in-repo map.
   functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`
 * `modules/` — darwin modules shared across hosts (`macos-defaults.nix`, `notunes.nix`)
-* `dotfiles/` — file payloads (ghostty, karabiner, nvim, vscode, ssh pubs, duti list)
+* `dotfiles/` — file payloads (karabiner, nvim, vscode, ssh pubs, duti list)
 * `secrets/` — agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token); all other secrets live in the per-machine 1P vaults, fetched at
   runtime via `op read` by ID. Edit = recreate-not-decrypt (see
@@ -31,8 +31,10 @@ routing table and workflow; this file is the in-repo map.
 
 ## Conventions
 
-* **File-management modes, chosen per file**: generated from options (zsh,
-  git) > store symlink from `dotfiles/` (configs apps never write) >
+* **File-management modes, chosen per file**: native HM module
+  (`programs.*` — check it exists via mcp-nixos before falling back; zsh,
+  git, ssh, neovim, fzf, ghostty, spotify-player, vscode) > store symlink
+  from `dotfiles/` (configs apps never write and no module covers) >
   `mkOutOfStoreSymlink` into a companion working clone (files apps DO write:
   VS Code settings, Claude config/skills). Never manage runtime auth state
   (`~/.claude.json`, `gh hosts.yml`).

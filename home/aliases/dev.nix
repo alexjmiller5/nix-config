@@ -4,7 +4,7 @@
   programs.zsh.shellAliases = {
     la = "ls -a";
     lla = "ls -la";
-    vim = "nvim";
+    # (`vim` = programs.neovim.vimAlias — a real shim, works outside zsh too)
     npm = "pnpm";
 
     # git

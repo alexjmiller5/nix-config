@@ -43,8 +43,7 @@
         fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
       fi
 
-      # Default editor (vim is aliased to nvim)
-      export EDITOR="nvim"
+      # ($EDITOR comes from programs.neovim.defaultEditor in cli-tools.nix)
 
       # macOS-style arrow navigation (Ghostty sends opt+arrows as alt+arrows and,
       # via keybinds in its config, cmd+arrows as Home/End/Ctrl+Home/Ctrl+End)
@@ -137,6 +136,10 @@
       bindkey '^I' tab-accept-or-complete
     '';
   };
+
+  # fzf with shell integration: ctrl-R fuzzy history, ctrl-T file picker,
+  # alt-C fuzzy cd (the package alone wires none of these).
+  programs.fzf.enable = true;
 
   # Prompt: starship, configured to match the old custom PS1
   # (path in blue, git branch in magenta, green ✔ / red ✖, bold ❯;

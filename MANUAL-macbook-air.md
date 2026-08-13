@@ -80,11 +80,25 @@ leisure since the SA token was the only thing the disk could yield.
 
 ## TCC grants (System Settings → Privacy & Security; GUI-only by design)
 
-* **Accessibility**: Hammerspoon, Karabiner-Elements, yabai, AltTab, Raycast,
-  BetterDisplay, Ghostty, VS Code, Claude
-* **Input Monitoring**: Karabiner-Elements, Ghostty, VS Code
-* **Screen Recording**: AltTab, 1Password, Raycast, Notion
-* **Full Disk Access**: VS Code, Ghostty, Raycast
+Snapshot verified against the system TCC db 2026-08-13. Audit anytime with:
+
+```Shell
+sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
+  "SELECT service, client FROM access WHERE auth_value > 0 AND service IN
+   ('kTCCServiceAccessibility','kTCCServiceListenEvent',
+    'kTCCServiceScreenCapture','kTCCServiceSystemPolicyAllFiles')
+   ORDER BY service, client;"
+```
+
+* **Accessibility**: Hammerspoon, Karabiner-Elements, yabai (the nix store
+  binary — re-grant on version bumps), AltTab, Raycast, Raycast Beta,
+  BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
+* **Input Monitoring**: Karabiner-Elements (grants land on its helper
+  binaries), Dolphin
+* **Screen Recording**: AltTab, 1Password, Notion, Claude, Chrome,
+  VS Code, Ghostty, Telegram, Zoom
+* **Full Disk Access**: VS Code, Ghostty, Raycast, Raycast Beta,
+  /bin/zsh (launchd/agent shell scripts)
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
 
 ## yabai (SIP only — the rest is declared)

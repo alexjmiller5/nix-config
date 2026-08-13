@@ -4,7 +4,7 @@
 #
 # Two file-management modes in here, chosen per file:
 #  - store symlink (home.file.source = ./path): immutable, edit via repo+rebuild.
-#    For configs their apps never write (ghostty, karabiner, nvim init).
+#    For configs their apps never write and no HM module covers (karabiner).
 #  - mkOutOfStoreSymlink: symlink into a live git working copy — tracked, but
 #    the app can write at runtime (VS Code settings, Claude settings, skills).
 let
@@ -25,6 +25,8 @@ in
     ./macos/spotlight-raycast.nix
     ./macos/nightlight.nix
     ./macos/duti.nix
+    ./ghostty.nix
+    ./spotify-player.nix
     ./vscode.nix
     ./agents.nix
     ./ssh.nix
@@ -71,10 +73,6 @@ in
   # switch would flap. Third-party icon order stays manual (⌘-drag) — see
   # MANUAL-macbook-air.md.
   home.packages = [
-    # Spotify TUI + scripting CLI (binary: spotify_player). Laptop-personal,
-    # not cli-tools.nix — a music player has no place in the work-exportable list.
-    pkgs.spotify-player
-
     # Migrated from the laptop brews list 2026-08-10 (nixpkgs-first rule).
     # Laptop-scoped like the brews were — not cli-tools.nix, which both hosts
     # and the work-laptop export share.
@@ -91,7 +89,6 @@ in
     pkgs.libimobiledevice
     pkgs.lua5_4
     pkgs.mas
-    pkgs.neovim
     pkgs.nodejs
     pkgs.oci-cli
     pkgs.pnpm
@@ -216,9 +213,6 @@ in
   home.file.".hushlogin".text = "";
 
   # --- static dotfiles (read-only; edit in dotfiles/ + rebuild) ---
-  home.file."Library/Application Support/com.mitchellh.ghostty/config".source =
-    ../dotfiles/ghostty/config;
-  xdg.configFile."nvim/init.lua".source = ../dotfiles/nvim/init.lua;
   # Finder quick action (right-click → Open in VS Code). pbs auto-registers
   # anything in ~/Library/Services; no further wiring needed.
   home.file."Library/Services/Open in VS Code.workflow".source =
