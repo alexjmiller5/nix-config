@@ -203,13 +203,6 @@ in
     })
   ];
 
-  # yabai config, read by the services.yabai agent declared in the host
-  # (runs yabai bare, which loads ~/.yabairc).
-  home.file.".yabairc" = {
-    source = ../dotfiles/yabai/yabairc;
-    executable = true;
-  };
-
   # Commit signing via 1Password (desktop app + op-ssh-sign, laptop-only).
   # The signer script lives in agent-config, reached via the ~/.claude/skills
   # symlink so the path stays stable if the repo moves.
