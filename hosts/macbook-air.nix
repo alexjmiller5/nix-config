@@ -81,20 +81,19 @@
   # (finance scrapers) must stay bare. Chrome reloads policy on restart
   # (chrome://policy → Reload policies to force it).
   #
-  # ExtensionSettings, three tiers + default-deny — the Chrome analog of
-  # brew's zap: an extension not declared here cannot be installed at all
-  # ("*" blocked). Chrome policy cannot express installed-but-disabled, so:
-  #   normal  — auto-installed from the store, auto-updating, no UI
-  #             uninstall; the enable/disable TOGGLE stays manual on purpose
-  #             (a broken extension — 1Password has done this — must be
-  #             switch-off-able without a rebuild). Fresh machines get these
-  #             installed and enabled.
-  #   allowed — the "off" tier: not auto-installed, absent on fresh machines,
-  #             but installable/enableable by hand when wanted.
-  #   unpacked (allowed by ID) — dev-mode Load-unpacked also needs its ID
-  #             declared under the blocked default. Unpacked IDs derive from
-  #             the absolute source path: stable while the path is, a moved
-  #             dir mints a new ID — update the entry.
+  # ExtensionSettings + default-deny — the Chrome analog of brew's zap: the
+  # ACTIVE lines below ARE the extension set; anything undeclared ("*"
+  # blocked) cannot be installed, store or sideload. Active entries are
+  # normal_installed: auto-installed from the store, auto-updating, no UI
+  # uninstall — but the enable/disable TOGGLE stays manual on purpose (a
+  # broken extension — 1Password has done this — must be switch-off-able
+  # without a rebuild). The OFF switch is the comment marker: a commented
+  # entry is blocked like anything undeclared (an existing install gets
+  # policy-disabled; fresh machines never see it); uncomment + switch =
+  # installed and usable.
+  # Exception: unpacked/dev extensions need "allowed" entries by their
+  # path-derived IDs for Load-unpacked to work under the blocked default
+  # (a moved source dir mints a new ID — update the entry).
   system.activationScripts.postActivation.text =
     let
       webstore = "https://clients2.google.com/service/update2/crx";
@@ -108,22 +107,22 @@
           };
 
           "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal; # 1Password – Password Manager
-          "gighmmpiobklfepjocnamgkkbiglidom" = allowed; # AdBlock (off tier)
-          "efaidnbmnnnibpcajpcglclefindmkaj" = allowed; # Adobe Acrobat (off tier)
-          "kfaknphcidikmjhmmfmphghhlcoknflj" = allowed; # Amazon Unsponsor (off tier)
+          # "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock (off — uncomment to install)
+          # "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat (off — uncomment to install)
+          # "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor (off — uncomment to install)
           "kagpmnfgpdecdkbhongbgkgppnpimime" = normal; # Bookmarks Exporter
           "iiikidmnimlpahbeknmkeonmemajpccj" = normal; # Button Stealer
-          "cbhilkcodigmigfbnphipnnmamjfkipp" = allowed; # Calendly (off tier)
-          "nenlahapcbofgnanklpelkaejcehkggg" = allowed; # Capital One Shopping (off tier)
-          "ejcfepkfckglbgocfkanmcdngdijcgld" = allowed; # ChatGPT search (off tier)
+          # "cbhilkcodigmigfbnphipnnmamjfkipp" = normal; # Calendly (off — uncomment to install)
+          # "nenlahapcbofgnanklpelkaejcehkggg" = normal; # Capital One Shopping (off — uncomment to install)
+          # "ejcfepkfckglbgocfkanmcdngdijcgld" = normal; # ChatGPT search (off — uncomment to install)
           "fcoeoabgfenejglbffodgkkbkcdhcgfn" = normal; # Claude
           "fcalilbnpkfikdppppppchmkdipibalb" = normal; # Cloaq
-          "ifjhcahbhkfojdmkndpkmkffbjnefido" = allowed; # Cookie Guard (off tier)
-          "jlmpjdjjbgclbocgajdjefcidcncaied" = allowed; # daily.dev | Where developers discover what's next (off tier)
-          "eimadpbcbfnmbkopoojfekhnkhdbieeh" = allowed; # Dark Reader (off tier)
+          # "ifjhcahbhkfojdmkndpkmkffbjnefido" = normal; # Cookie Guard (off — uncomment to install)
+          # "jlmpjdjjbgclbocgajdjefcidcncaied" = normal; # daily.dev | Where developers discover what's next (off — uncomment to install)
+          # "eimadpbcbfnmbkopoojfekhnkhdbieeh" = normal; # Dark Reader (off — uncomment to install)
           "gdkfehnloabjkmccddnjckpnlhcdcalh" = normal; # De-Sponsor for Amazon
           "cnpgabmfnfehdamobkafalnpdoigdlil" = normal; # FaviGrab
-          "hnmpcagpplmpfojmgmnngilcnanddlhb" = allowed; # Free VPN For Chrome (off tier)
+          # "hnmpcagpplmpfojmgmnngilcnanddlhb" = normal; # Free VPN For Chrome (off — uncomment to install)
           "kfgepjmmgamniaefbjlbacahkjjnjoaa" = normal; # Gmail reverse conversation
           "jgjaapljoafhkohbnfigoekjgdfddnnn" = normal; # Gmail Show Time
           "mgijmajocgfcbeboacabfgobmjgjcoja" = normal; # Google Dictionary (by Google)
@@ -133,13 +132,13 @@
           "bcjindcccaagfpapjjmafapmmgkkhgoa" = normal; # JSON Formatter
           "chklaanhfefbnpoihckbnefhakgolnmc" = normal; # JSONVue
           "dijpdmknlincdehpemajfobhfcmjkhof" = normal; # LinkedIn Feed Blocker
-          "iepgempfdndmbciedjdladndpoeodepl" = allowed; # Lovable Project Downloader (off tier)
+          # "iepgempfdndmbciedjdladndpoeodepl" = normal; # Lovable Project Downloader (off — uncomment to install)
           "nkbihfbeogaeaoehlefnkodbefgpgknn" = normal; # MetaMask
           "pobhoodpcipjmedfenaigbeloiidbflp" = normal; # Minimal Theme for Twitter / X
           "knheggckgoiihginacbkhaalnibhilkk" = normal; # Notion Web Clipper
           "bkhaagjahfmjljalopjnoealnfndnagc" = normal; # Octotree
-          "jlgojbammkhdbbohlihccohgbaccgpbm" = allowed; # Open Links in Tabs (off tier)
-          "chhjbpecpncaggjpdakmflnfcopglcmi" = allowed; # Rakuten (off tier)
+          # "jlgojbammkhdbbohlihccohgbaccgpbm" = normal; # Open Links in Tabs (off — uncomment to install)
+          # "chhjbpecpncaggjpdakmflnfcopglcmi" = normal; # Rakuten (off — uncomment to install)
           "fgacdjnoljjfikkadhogeofgjoglooma" = normal; # Raycast Companion
           "fmkadmapgofadopljbjfkapdkoienihi" = normal; # React Developer Tools
           "mmnhjecbajmgkapcinkhdnjabclcnfpg" = normal; # Reddit Promoted Ad Blocker
@@ -148,17 +147,17 @@
           "bnhjfbjmbgmgllkojikabliaidpihfnp" = normal; # Reverbify
           "mpdajninpobndbfcldcmbpnnbhibjmch" = normal; # SAML-tracer
           "gmbmikajjgmnabiglmofipeabaddhgne" = normal; # Save to Google Drive
-          "pbanhockgagggenencehbnadejlgchfc" = allowed; # Simplify Copilot (off tier)
+          # "pbanhockgagggenencehbnadejlgchfc" = normal; # Simplify Copilot (off — uncomment to install)
           "mnjggcdmjocbbbhaepdhchncahnbgone" = normal; # SponsorBlock for YouTube
-          "bgehnoihoklmofgehcefiaicdcdgppck" = allowed; # Spotify Playback Speed (off tier)
+          # "bgehnoihoklmofgehcefiaicdcdgppck" = normal; # Spotify Playback Speed (off — uncomment to install)
           "jcgpgjhaendighananonflfmjjefjjlp" = normal; # Streak Email Tracking for Gmail
-          "pdmhehfogekmpmdoemhabjpaiadagpgp" = allowed; # Student Beans (off tier)
+          # "pdmhehfogekmpmdoemhabjpaiadagpgp" = normal; # Student Beans (off — uncomment to install)
           "micdllihgoppmejpecmkilggmaagfdmb" = normal; # Tab Copy
           "dhdgffkkebhmkfjojejmpbldmpobfkfo" = normal; # Tampermonkey
-          "ddkjiahejlhfcafbddmgiahcphecmpfh" = allowed; # uBlock Origin Lite (off tier)
+          # "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal; # uBlock Origin Lite (off — uncomment to install)
           "pmbneaajfhcoecedlmkfkdnjemmebbcb" = normal; # UnSponsored
           "djflhoibgkdhkhhcedjiklpkjnoahfmg" = normal; # User-Agent Switcher for Chrome
-          "dbepggeogbaibhgnhhndojpepiihcmeb" = allowed; # Vimium (off tier)
+          # "dbepggeogbaibhgnhhndojpepiihcmeb" = normal; # Vimium (off — uncomment to install)
           "bfbameneiokkgbdmiekhjnmfkcnldhhm" = normal; # Web Developer
           "ppaojnbmmaigjmlpjaldnkgnklhicppk" = normal; # Webtime Tracker
           "jabopobgcpjmedljpbcaablpmlmfcogm" = normal; # WhatFont
