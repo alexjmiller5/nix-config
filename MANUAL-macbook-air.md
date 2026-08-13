@@ -156,9 +156,11 @@ The agent, scripting-addition loader, and sudoers entry are all declarative
   unpacked for each: bypass-paywalls et al from
   `~/Desktop/coding/built-from-source`, and own `chrome-extension`-template
   projects from their repo's `extension/` dir (upcoming:
-  bookmark-extension-sync). NOTE the default-deny policy: an unpacked
-  extension loads only if its path-derived ID has an `allowed` entry in the
-  `ExtensionSettings` block. Store extensions and PWAs need NO manual steps —
+  bookmark-extension-sync). NOTE the default-deny policy blocks Load-unpacked
+  wholesale — loading a new unpacked extension needs the AIRLOCK (lockdown
+  flag) in `hosts/macbook-air.nix`, and its path-derived ID needs an
+  `allowed` entry to stay alive once re-locked (both documented at the flag).
+  Store extensions and PWAs need NO manual steps —
   installed by the Chrome policy plist (`ExtensionSettings` +
   `WebAppInstallForceList`, written to Managed Preferences by the activation
   script in `hosts/macbook-air.nix`). Per-PWA "open links in Chrome".
