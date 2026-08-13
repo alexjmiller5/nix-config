@@ -28,8 +28,13 @@ in
       runtimeInputs = [ pkgs._1password-cli ];
       text = ''
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
-          # Claude shells that skipped zshrc: SA token from the Keychain.
-          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}" ]; then
+          # Claude contexts that skipped zshrc: SA token from the Keychain.
+          # CLAUDECODE marks Bash tool shells; CLAUDE_CODE_ENTRYPOINT marks
+          # claude's own spawns (it runs `gh auth token` at every interactive
+          # startup — without this, that call falls through to desktop-app
+          # auth and pops Touch ID). Alex's own terminal has neither, so his
+          # gh calls keep desktop auth.
+          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
             OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
             if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
               export OP_SERVICE_ACCOUNT_TOKEN

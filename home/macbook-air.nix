@@ -112,8 +112,10 @@ in
         if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
           exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
         fi
-        # Claude shells that skipped zshrc: SA token from the Keychain.
-        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}" ]; then
+        # Claude contexts that skipped zshrc: SA token from the Keychain
+        # (CLAUDECODE = Bash tool shells; CLAUDE_CODE_ENTRYPOINT = claude's
+        # own spawns — see the gh wrapper in scripts.nix).
+        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
           OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
           if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
             export OP_SERVICE_ACCOUNT_TOKEN
