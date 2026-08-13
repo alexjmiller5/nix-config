@@ -5,7 +5,6 @@
     la = "ls -a";
     lla = "ls -la";
     # (`vim` = programs.neovim.vimAlias — a real shim, works outside zsh too)
-    npm = "pnpm";
 
     # git
     status = "git status";
