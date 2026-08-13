@@ -35,9 +35,7 @@
     initContent = ''
       # --- PATH stack (parity with the pre-nix setup) ---
       export PATH="/opt/homebrew/bin:$PATH"
-      export PATH="$PATH:/usr/local/mysql/bin"
       export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
-      export PATH="/usr/local/opt/node@20/bin:$PATH"
 
       # Homebrew env + its zsh completions
       if [[ -x /opt/homebrew/bin/brew ]]; then
