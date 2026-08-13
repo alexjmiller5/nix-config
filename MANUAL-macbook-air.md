@@ -158,10 +158,13 @@ Store extensions — install via Raycast Store or `https://raycast.com/<slug>`:
 `iamyeizi/toggle-menu-bar` · `VladCuciureanu/toothpick` · `eggsy/unsplash` ·
 `truex/whosampled` · `raycast/zoom`
 
-Custom-built (modified store forks, dev-imported, NOT from the store):
+Custom-built (modified store forks, dev-imported, NOT from the store;
+private repos — clone to these paths):
 
 * Git Repos — `~/Desktop/coding/active-projects/git-repos`
+  (github.com/alexjmiller5/raycast-git-repos)
 * Messages — `~/Desktop/coding/active-projects/messages`
+  (github.com/alexjmiller5/raycast-messages)
 
 Restore: install each store extension from the Store; for the two custom
 ones run `npm ci && npx ray develop` in each dir, then Ctrl-C once loaded
