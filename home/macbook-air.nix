@@ -224,6 +224,10 @@ in
   home.file."Library/Application Support/com.mitchellh.ghostty/config".source =
     ../dotfiles/ghostty/config;
   xdg.configFile."nvim/init.lua".source = ../dotfiles/nvim/init.lua;
+  # Finder quick action (right-click → Open in VS Code). pbs auto-registers
+  # anything in ~/Library/Services; no further wiring needed.
+  home.file."Library/Services/Open in VS Code.workflow".source =
+    ../dotfiles/services + "/Open in VS Code.workflow";
   xdg.configFile."karabiner/karabiner.json".source = ../dotfiles/karabiner/karabiner.json;
 
   # --- VS Code (app-writable → out-of-store into THIS repo's working clone) ---

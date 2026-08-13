@@ -131,6 +131,7 @@ in
     #  - Gemini: needs --background, so it has its own login-gemini agent above.
     [
       "1Password"
+      "AltTab"
       "BetterDisplay"
       "CodexBar"
       "Google Chrome"

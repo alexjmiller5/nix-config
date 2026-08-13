@@ -136,7 +136,15 @@
     # shims (dock references Google Maps.app) are created on install and
     # can't be uninstalled in the UI while listed here.
     WebAppInstallForceList = [
+      { url = "https://secure.bankofamerica.com/myaccounts/signin/signIn.go"; default_launch_container = "window"; }
       { url = "https://www.google.com/maps"; default_launch_container = "window"; }
+      { url = "https://web.groupme.com/"; default_launch_container = "window"; }
+      { url = "https://www.instagram.com/"; default_launch_container = "window"; }
+      { url = "https://www.linkedin.com/feed/"; default_launch_container = "window"; }
+      { url = "https://settleup.app/"; default_launch_container = "window"; }
+      { url = "https://www.snapchat.com/web"; default_launch_container = "window"; }
+      { url = "https://login.tailscale.com/admin"; default_launch_container = "window"; }
+      { url = "https://account.venmo.com/"; default_launch_container = "window"; }
       { url = "https://www.youtube.com"; default_launch_container = "window"; }
     ];
   };
@@ -206,7 +214,6 @@
       "google-chrome"
       "hammerspoon"
       "karabiner-elements"
-      "keyclu"
       "libreoffice"
       "mactex-no-gui"
       "notion"
