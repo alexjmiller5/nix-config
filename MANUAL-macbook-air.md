@@ -123,9 +123,7 @@ The agent, scripting-addition loader, and sudoers entry are all declarative
 * **Chrome**: load-unpacked extensions — Developer mode ON, then Load
   unpacked for each: bypass-paywalls et al from
   `~/Desktop/coding/built-from-source`, and own `chrome-extension`-template
-  projects from their repo's `extension/` dir (upcoming: workspace-snapshot's
-  Chrome bridge — everything else about it is declared by its flake's
-  home-manager module, this click is its ONE manual step — and
+  projects from their repo's `extension/` dir (upcoming:
   bookmark-extension-sync). NOTE the default-deny policy: an unpacked
   extension loads only if its path-derived ID has an `allowed` entry in the
   `ExtensionSettings` block. Store extensions and PWAs need NO manual steps —

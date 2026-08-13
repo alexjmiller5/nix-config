@@ -170,7 +170,6 @@
           # Unpacked / dev-mode (path-derived IDs, see header):
           "lkbebcjgcmobigpeffafkodonchffocl" = allowed; # bypass-paywalls-chrome-clean (built-from-source)
           "ogjfmlhndbkglaiednoodaeceffhpnha" = allowed; # lovable-downloader (active-projects)
-          "efhnnjpcppikhghafgpnikhijkancndj" = allowed; # workspace-snapshot chrome bridge (Plan B — pre-allowed for its path)
         };
 
         # PWAs, force-installed per profile at Chrome launch; the
