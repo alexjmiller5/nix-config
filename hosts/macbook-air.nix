@@ -81,75 +81,77 @@
   # (finance scrapers) must stay bare. Chrome reloads policy on restart
   # (chrome://policy → Reload policies to force it).
   #
-  # ExtensionSettings with installation_mode "normal_installed": auto-installs
-  # from the Web Store, blocks UI uninstall, auto-updates — but the
-  # enable/disable toggle stays Alex's, and a disable sticks. Flip an entry to
-  # `force = true` (force_installed) to also force-enable it. Unlisted
-  # extensions keep default behavior, so manual/dev-mode installs still work;
-  # removing an entry returns that extension to manual control (it is NOT
-  # auto-uninstalled).
+  # ExtensionSettings, force_installed: the ACTIVE lines are the enabled
+  # extension set — installed from the store, always enabled, auto-updating,
+  # no UI uninstall. Chrome policy cannot express installed-but-disabled
+  # (enable state is user-only profile data behind MAC-protected prefs), so
+  # the OFF switch is the comment marker: a commented entry is absent on
+  # fresh machines and back under manual control on this one (delisting never
+  # auto-uninstalls). Uncomment + switch = installed and on. Unlisted /
+  # commented extensions keep default behavior, so manual/dev-mode installs
+  # still work.
   system.activationScripts.postActivation.text =
     let
       webstore = "https://clients2.google.com/service/update2/crx";
-      normal = { installation_mode = "normal_installed"; update_url = webstore; };
+      force = { installation_mode = "force_installed"; update_url = webstore; };
       chromePolicy = pkgs.writeText "com.google.Chrome.policy.plist" (lib.generators.toPlist { escape = true; } {
         ExtensionSettings = {
-          "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal; # 1Password – Password Manager
-          "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock
-          "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat
-          "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor
-          "kagpmnfgpdecdkbhongbgkgppnpimime" = normal; # Bookmarks Exporter
-          "iiikidmnimlpahbeknmkeonmemajpccj" = normal; # Button Stealer
-          "cbhilkcodigmigfbnphipnnmamjfkipp" = normal; # Calendly
-          "nenlahapcbofgnanklpelkaejcehkggg" = normal; # Capital One Shopping
-          "ejcfepkfckglbgocfkanmcdngdijcgld" = normal; # ChatGPT search
-          "fcoeoabgfenejglbffodgkkbkcdhcgfn" = normal; # Claude
-          "fcalilbnpkfikdppppppchmkdipibalb" = normal; # Cloaq
-          "ifjhcahbhkfojdmkndpkmkffbjnefido" = normal; # Cookie Guard
-          "jlmpjdjjbgclbocgajdjefcidcncaied" = normal; # daily.dev | Where developers discover what's next
-          "eimadpbcbfnmbkopoojfekhnkhdbieeh" = normal; # Dark Reader
-          "gdkfehnloabjkmccddnjckpnlhcdcalh" = normal; # De-Sponsor for Amazon
-          "cnpgabmfnfehdamobkafalnpdoigdlil" = normal; # FaviGrab
-          "hnmpcagpplmpfojmgmnngilcnanddlhb" = normal; # Free VPN For Chrome
-          "kfgepjmmgamniaefbjlbacahkjjnjoaa" = normal; # Gmail reverse conversation
-          "jgjaapljoafhkohbnfigoekjgdfddnnn" = normal; # Gmail Show Time
-          "mgijmajocgfcbeboacabfgobmjgjcoja" = normal; # Google Dictionary (by Google)
-          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" = normal; # Google Docs Offline
-          "aapbdbdomjkkjkaonfhkkikfgjllcleb" = normal; # Google Translate
-          "gjbnlmbnepomgkknbhclokdameangdan" = normal; # Insta Content Blocker
-          "bcjindcccaagfpapjjmafapmmgkkhgoa" = normal; # JSON Formatter
-          "chklaanhfefbnpoihckbnefhakgolnmc" = normal; # JSONVue
-          "dijpdmknlincdehpemajfobhfcmjkhof" = normal; # LinkedIn Feed Blocker
-          "iepgempfdndmbciedjdladndpoeodepl" = normal; # Lovable Project Downloader
-          "nkbihfbeogaeaoehlefnkodbefgpgknn" = normal; # MetaMask
-          "pobhoodpcipjmedfenaigbeloiidbflp" = normal; # Minimal Theme for Twitter / X
-          "knheggckgoiihginacbkhaalnibhilkk" = normal; # Notion Web Clipper
-          "bkhaagjahfmjljalopjnoealnfndnagc" = normal; # Octotree
-          "jlgojbammkhdbbohlihccohgbaccgpbm" = normal; # Open Links in Tabs
-          "chhjbpecpncaggjpdakmflnfcopglcmi" = normal; # Rakuten
-          "fgacdjnoljjfikkadhogeofgjoglooma" = normal; # Raycast Companion
-          "fmkadmapgofadopljbjfkapdkoienihi" = normal; # React Developer Tools
-          "mmnhjecbajmgkapcinkhdnjabclcnfpg" = normal; # Reddit Promoted Ad Blocker
-          "hlepfoohegkhhmjieoechaddaejaokhf" = normal; # Refined GitHub
-          "gebbhagfogifgggkldgodflihgfeippi" = normal; # Return YouTube Dislike
-          "bnhjfbjmbgmgllkojikabliaidpihfnp" = normal; # Reverbify
-          "mpdajninpobndbfcldcmbpnnbhibjmch" = normal; # SAML-tracer
-          "gmbmikajjgmnabiglmofipeabaddhgne" = normal; # Save to Google Drive
-          "pbanhockgagggenencehbnadejlgchfc" = normal; # Simplify Copilot
-          "mnjggcdmjocbbbhaepdhchncahnbgone" = normal; # SponsorBlock for YouTube
-          "bgehnoihoklmofgehcefiaicdcdgppck" = normal; # Spotify Playback Speed
-          "jcgpgjhaendighananonflfmjjefjjlp" = normal; # Streak Email Tracking for Gmail
-          "pdmhehfogekmpmdoemhabjpaiadagpgp" = normal; # Student Beans
-          "micdllihgoppmejpecmkilggmaagfdmb" = normal; # Tab Copy
-          "dhdgffkkebhmkfjojejmpbldmpobfkfo" = normal; # Tampermonkey
-          "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal; # uBlock Origin Lite
-          "pmbneaajfhcoecedlmkfkdnjemmebbcb" = normal; # UnSponsored
-          "djflhoibgkdhkhhcedjiklpkjnoahfmg" = normal; # User-Agent Switcher for Chrome
-          "dbepggeogbaibhgnhhndojpepiihcmeb" = normal; # Vimium
-          "bfbameneiokkgbdmiekhjnmfkcnldhhm" = normal; # Web Developer
-          "ppaojnbmmaigjmlpjaldnkgnklhicppk" = normal; # Webtime Tracker
-          "jabopobgcpjmedljpbcaablpmlmfcogm" = normal; # WhatFont
-          "jiaopdjbehhjgokpphdfgmapkobbnmjp" = normal; # Youtube-shorts block
+          "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = force; # 1Password – Password Manager
+          # "gighmmpiobklfepjocnamgkkbiglidom" = force; # AdBlock (off — uncomment to install+enable)
+          # "efaidnbmnnnibpcajpcglclefindmkaj" = force; # Adobe Acrobat (off — uncomment to install+enable)
+          # "kfaknphcidikmjhmmfmphghhlcoknflj" = force; # Amazon Unsponsor (off — uncomment to install+enable)
+          "kagpmnfgpdecdkbhongbgkgppnpimime" = force; # Bookmarks Exporter
+          "iiikidmnimlpahbeknmkeonmemajpccj" = force; # Button Stealer
+          # "cbhilkcodigmigfbnphipnnmamjfkipp" = force; # Calendly (off — uncomment to install+enable)
+          # "nenlahapcbofgnanklpelkaejcehkggg" = force; # Capital One Shopping (off — uncomment to install+enable)
+          # "ejcfepkfckglbgocfkanmcdngdijcgld" = force; # ChatGPT search (off — uncomment to install+enable)
+          "fcoeoabgfenejglbffodgkkbkcdhcgfn" = force; # Claude
+          "fcalilbnpkfikdppppppchmkdipibalb" = force; # Cloaq
+          # "ifjhcahbhkfojdmkndpkmkffbjnefido" = force; # Cookie Guard (off — uncomment to install+enable)
+          # "jlmpjdjjbgclbocgajdjefcidcncaied" = force; # daily.dev | Where developers discover what's next (off — uncomment to install+enable)
+          # "eimadpbcbfnmbkopoojfekhnkhdbieeh" = force; # Dark Reader (off — uncomment to install+enable)
+          "gdkfehnloabjkmccddnjckpnlhcdcalh" = force; # De-Sponsor for Amazon
+          "cnpgabmfnfehdamobkafalnpdoigdlil" = force; # FaviGrab
+          # "hnmpcagpplmpfojmgmnngilcnanddlhb" = force; # Free VPN For Chrome (off — uncomment to install+enable)
+          "kfgepjmmgamniaefbjlbacahkjjnjoaa" = force; # Gmail reverse conversation
+          "jgjaapljoafhkohbnfigoekjgdfddnnn" = force; # Gmail Show Time
+          "mgijmajocgfcbeboacabfgobmjgjcoja" = force; # Google Dictionary (by Google)
+          "ghbmnnjooekpmoecnnnilnnbdlolhkhi" = force; # Google Docs Offline
+          "aapbdbdomjkkjkaonfhkkikfgjllcleb" = force; # Google Translate
+          "gjbnlmbnepomgkknbhclokdameangdan" = force; # Insta Content Blocker
+          "bcjindcccaagfpapjjmafapmmgkkhgoa" = force; # JSON Formatter
+          "chklaanhfefbnpoihckbnefhakgolnmc" = force; # JSONVue
+          "dijpdmknlincdehpemajfobhfcmjkhof" = force; # LinkedIn Feed Blocker
+          # "iepgempfdndmbciedjdladndpoeodepl" = force; # Lovable Project Downloader (off — uncomment to install+enable)
+          "nkbihfbeogaeaoehlefnkodbefgpgknn" = force; # MetaMask
+          "pobhoodpcipjmedfenaigbeloiidbflp" = force; # Minimal Theme for Twitter / X
+          "knheggckgoiihginacbkhaalnibhilkk" = force; # Notion Web Clipper
+          "bkhaagjahfmjljalopjnoealnfndnagc" = force; # Octotree
+          # "jlgojbammkhdbbohlihccohgbaccgpbm" = force; # Open Links in Tabs (off — uncomment to install+enable)
+          # "chhjbpecpncaggjpdakmflnfcopglcmi" = force; # Rakuten (off — uncomment to install+enable)
+          "fgacdjnoljjfikkadhogeofgjoglooma" = force; # Raycast Companion
+          "fmkadmapgofadopljbjfkapdkoienihi" = force; # React Developer Tools
+          "mmnhjecbajmgkapcinkhdnjabclcnfpg" = force; # Reddit Promoted Ad Blocker
+          "hlepfoohegkhhmjieoechaddaejaokhf" = force; # Refined GitHub
+          "gebbhagfogifgggkldgodflihgfeippi" = force; # Return YouTube Dislike
+          "bnhjfbjmbgmgllkojikabliaidpihfnp" = force; # Reverbify
+          "mpdajninpobndbfcldcmbpnnbhibjmch" = force; # SAML-tracer
+          "gmbmikajjgmnabiglmofipeabaddhgne" = force; # Save to Google Drive
+          # "pbanhockgagggenencehbnadejlgchfc" = force; # Simplify Copilot (off — uncomment to install+enable)
+          "mnjggcdmjocbbbhaepdhchncahnbgone" = force; # SponsorBlock for YouTube
+          # "bgehnoihoklmofgehcefiaicdcdgppck" = force; # Spotify Playback Speed (off — uncomment to install+enable)
+          "jcgpgjhaendighananonflfmjjefjjlp" = force; # Streak Email Tracking for Gmail
+          # "pdmhehfogekmpmdoemhabjpaiadagpgp" = force; # Student Beans (off — uncomment to install+enable)
+          "micdllihgoppmejpecmkilggmaagfdmb" = force; # Tab Copy
+          "dhdgffkkebhmkfjojejmpbldmpobfkfo" = force; # Tampermonkey
+          # "ddkjiahejlhfcafbddmgiahcphecmpfh" = force; # uBlock Origin Lite (off — uncomment to install+enable)
+          "pmbneaajfhcoecedlmkfkdnjemmebbcb" = force; # UnSponsored
+          "djflhoibgkdhkhhcedjiklpkjnoahfmg" = force; # User-Agent Switcher for Chrome
+          # "dbepggeogbaibhgnhhndojpepiihcmeb" = force; # Vimium (off — uncomment to install+enable)
+          "bfbameneiokkgbdmiekhjnmfkcnldhhm" = force; # Web Developer
+          "ppaojnbmmaigjmlpjaldnkgnklhicppk" = force; # Webtime Tracker
+          "jabopobgcpjmedljpbcaablpmlmfcogm" = force; # WhatFont
+          "jiaopdjbehhjgokpphdfgmapkobbnmjp" = force; # Youtube-shorts block
         };
 
         # PWAs, force-installed per profile at Chrome launch; the
