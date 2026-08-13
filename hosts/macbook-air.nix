@@ -154,7 +154,7 @@
           # "pdmhehfogekmpmdoemhabjpaiadagpgp" = normal; # Student Beans (off — uncomment to install)
           "micdllihgoppmejpecmkilggmaagfdmb" = normal; # Tab Copy
           "dhdgffkkebhmkfjojejmpbldmpobfkfo" = normal; # Tampermonkey
-          # "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal; # uBlock Origin Lite (off — uncomment to install)
+          "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal; # uBlock Origin Lite
           "pmbneaajfhcoecedlmkfkdnjemmebbcb" = normal; # UnSponsored
           "djflhoibgkdhkhhcedjiklpkjnoahfmg" = normal; # User-Agent Switcher for Chrome
           # "dbepggeogbaibhgnhhndojpepiihcmeb" = normal; # Vimium (off — uncomment to install)
