@@ -101,6 +101,10 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
   /bin/zsh (launchd/agent shell scripts)
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
 
+Path-keyed clients (nix-store yabai, brew's versioned node/claude-code paths)
+re-key on every version bump: yabai needs its Accessibility re-grant, the
+others just shed a dead row. Harmless — purge dead rows whenever auditing.
+
 ## yabai (SIP only — the rest is declared)
 
 The agent, scripting-addition loader, and sudoers entry are all declarative
