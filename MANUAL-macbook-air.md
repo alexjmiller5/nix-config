@@ -137,9 +137,6 @@ The agent, scripting-addition loader, and sudoers entry are all declarative
 * **Raycast**: clipboard history retention → 7 days; extensions → see
   "Raycast extensions" section below.
 * **Nightlight**: the activation script needs a display connected on first run.
-* **Fonts in `/Library/Fonts`**: MuseoSans (commercial), LG SmartHan, TI Uni,
-  Arial Unicode — licensed/niche, not in nixpkgs; reinstall by hand (Font
-  Book) on a fresh machine. Free fonts (Fira Code) are nix-managed instead.
 
 ## Raycast extensions (undeclarable — this list IS the declaration)
 

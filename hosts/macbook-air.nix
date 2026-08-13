@@ -55,15 +55,19 @@
   # mini's headless tailscaled.
 
   # yabai, fully declared: the org.nixos.yabai launchd agent runs the nix
-  # package bare (so it loads ~/.yabairc from home/macbook-air.nix), the
-  # yabai-sa daemon loads the scripting addition at boot, and the module
-  # generates /etc/sudoers.d/yabai against the store binary's sha256 — the
-  # hash and path move in lockstep on upgrades, no manual regen. Still
-  # manual: the SIP partial-disable and re-granting Accessibility when the
-  # store path changes (MANUAL-macbook-air.md).
+  # package with a module-generated config, the yabai-sa daemon loads the
+  # scripting addition at boot, and the module generates /etc/sudoers.d/yabai
+  # against the store binary's sha256 — the hash and path move in lockstep on
+  # upgrades, no manual regen. Still manual: the SIP partial-disable and
+  # re-granting Accessibility when the store path changes (MANUAL-macbook-air.md).
   services.yabai = {
     enable = true;
     enableScriptingAddition = true;
+    # The entire config: re-load the scripting addition whenever the Dock
+    # restarts (the yabai-sa daemon only covers boot).
+    extraConfig = ''
+      yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+    '';
   };
 
   # Disable auto display brightness (laptop-only; written to /Library/Preferences
