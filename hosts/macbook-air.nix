@@ -100,16 +100,25 @@
   # (a moved source dir mints a new ID — update the entry).
   system.activationScripts.postActivation.text =
     let
+      # AIRLOCK for unpacked extensions: Chrome cannot exempt Load-unpacked
+      # per-ID — with "*" blocked it is refused wholesale ("Extension
+      # installation is blocked by policy"); the per-ID allowed entries only
+      # keep ALREADY-LOADED unpacked extensions alive. Installing a new one:
+      #   1. lockdown = false → switch → restart Chrome
+      #   2. chrome://extensions → Load unpacked (and add the path-derived ID
+      #      as an `allowed` entry below so it survives re-lock)
+      #   3. lockdown = true → switch → restart Chrome
+      lockdown = false;
       webstore = "https://clients2.google.com/service/update2/crx";
       normal = { installation_mode = "normal_installed"; update_url = webstore; };
       allowed = { installation_mode = "allowed"; };
       chromePolicy = pkgs.writeText "com.google.Chrome.policy.plist" (lib.generators.toPlist { escape = true; } {
-        ExtensionSettings = {
+        ExtensionSettings = lib.optionalAttrs lockdown {
           "*" = {
             installation_mode = "blocked";
             blocked_install_message = "Not declared in nix-config — add it to hosts/macbook-air.nix ExtensionSettings.";
           };
-
+        } // {
           "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal; # 1Password – Password Manager
           # "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock (off — uncomment to install)
           # "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat (off — uncomment to install)
