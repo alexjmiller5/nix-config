@@ -124,9 +124,12 @@ The agent, scripting-addition loader, and sudoers entry are all declarative
   unpacked for each: bypass-paywalls et al from
   `~/Desktop/coding/built-from-source`, and own `chrome-extension`-template
   projects from their repo's `extension/` dir (upcoming: workspace-snapshot's
-  Chrome bridge, bookmark-extension-sync). Store extensions need NO manual
-  steps — force-installed by the `ExtensionInstallForcelist` block in
-  `hosts/macbook-air.nix`. Per-PWA "open links in Chrome".
+  Chrome bridge — everything else about it is declared by its flake's
+  home-manager module, this click is its ONE manual step — and
+  bookmark-extension-sync). Store extensions and PWAs need NO manual steps —
+  installed by the Chrome policy plist (`ExtensionSettings` +
+  `WebAppInstallForceList`, written to Managed Preferences by the activation
+  script in `hosts/macbook-air.nix`). Per-PWA "open links in Chrome".
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
 * **Raycast**: clipboard history retention → 7 days; extensions → see
