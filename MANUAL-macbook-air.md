@@ -159,7 +159,7 @@ Store extensions — install via Raycast Store or `https://raycast.com/<slug>`:
 `truex/whosampled` · `raycast/zoom`
 
 Custom-built (modified store forks, dev-imported, NOT from the store;
-private repos — clone to these paths):
+clone to these paths):
 
 * Git Repos — `~/Desktop/coding/active-projects/git-repos`
   (github.com/alexjmiller5/raycast-git-repos)
