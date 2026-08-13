@@ -33,8 +33,7 @@
     '';
 
     initContent = ''
-      # --- PATH stack (parity with the pre-nix setup) ---
-      export PATH="/opt/homebrew/bin:$PATH"
+      # --- PATH stack ---
       export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
 
       # Homebrew env + its zsh completions
@@ -42,6 +41,10 @@
         eval "$(/opt/homebrew/bin/brew shellenv)"
         fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
       fi
+      # Nix profiles ahead of brew shellenv's prepend: declared packages must
+      # shadow same-named brew formulae (e.g. node, riding in as a dep of
+      # `skills`, would otherwise win over pkgs.nodejs).
+      export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:$PATH"
 
       # ($EDITOR comes from programs.neovim.defaultEditor in cli-tools.nix)
 
@@ -112,9 +115,6 @@
 
       # Claude shell init script
       export CLAUDE_ENV_FILE="$HOME/.claude/shell-init.sh"
-
-      # bun completions
-      [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
       # Shell functions (plain zsh, edited in the repo)
       source ${./zsh/functions.zsh}
