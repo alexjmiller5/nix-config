@@ -129,12 +129,46 @@ The agent, scripting-addition loader, and sudoers entry are all declarative
   `hosts/macbook-air.nix`. Per-PWA "open links in Chrome".
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
-* **Raycast**: clipboard history retention → 7 days; custom extensions load
-  from their dev source directories.
+* **Raycast**: clipboard history retention → 7 days; extensions → see
+  "Raycast extensions" section below.
 * **Nightlight**: the activation script needs a display connected on first run.
 * **Fonts in `/Library/Fonts`**: MuseoSans (commercial), LG SmartHan, TI Uni,
   Arial Unicode — licensed/niche, not in nixpkgs; reinstall by hand (Font
   Book) on a fresh machine. Free fonts (Fira Code) are nix-managed instead.
+
+## Raycast extensions (undeclarable — this list IS the declaration)
+
+Raycast registers installed extensions in an encrypted local DB
+(`raycast-enc.sqlite`, SQLCipher) with no CLI/API/deeplink to install
+headlessly, so extensions can't be nix-managed. Keep this list current when
+installing/removing; regenerate it with the "Installed Extensions" store
+extension and diff against this section.
+
+Store extensions — install via Raycast Store or `https://raycast.com/<slug>`:
+
+`DanielSinclair/base64` · `mooxl/coffee` · `thomas/color-picker` ·
+`priithaamer/docker` · `ron-myers/facetime` · `hrishabhn/flighty` ·
+`josephschmitt/gif-search` · `destiner/iconify` ·
+`pernielsentikaer/installed-extensions` · `shldk/macosicons` ·
+`Melvynx/qrcode-generator` · `maantje/remove-background` ·
+`tegola/remove-paywall` · `benvp/audio-device` · `mattisssa/spotify-player` ·
+`1weiho/svgl` · `hossammourad/raycast-system-monitor` · `ThatNerd/timers` ·
+`iamyeizi/toggle-menu-bar` · `VladCuciureanu/toothpick` · `eggsy/unsplash` ·
+`truex/whosampled` · `raycast/zoom`
+
+Custom-built (modified store forks, dev-imported, NOT from the store):
+
+* Git Repos — `~/Desktop/coding/active-projects/git-repos`
+* Messages — `~/Desktop/coding/active-projects/messages`
+
+Restore: install each store extension from the Store; for the two custom
+ones run `npm ci && npx ray develop` in each dir, then Ctrl-C once loaded
+(the dev import persists without the watcher).
+
+Backup: Raycast → Settings → Advanced → Export → save the `.rayconfig` to
+`~/Documents/manual-backups/`; re-export after notable extension/settings
+changes. The export restores preferences; this section stays the source of
+truth for what's installed.
 
 ## Menu bar: what's declared vs manual
 
