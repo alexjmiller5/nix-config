@@ -54,6 +54,18 @@
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 
+  # yabai, fully declared: the org.nixos.yabai launchd agent runs the nix
+  # package bare (so it loads ~/.yabairc from home/macbook-air.nix), the
+  # yabai-sa daemon loads the scripting addition at boot, and the module
+  # generates /etc/sudoers.d/yabai against the store binary's sha256 — the
+  # hash and path move in lockstep on upgrades, no manual regen. Still
+  # manual: the SIP partial-disable and re-granting Accessibility when the
+  # store path changes (MANUAL-macbook-air.md).
+  services.yabai = {
+    enable = true;
+    enableScriptingAddition = true;
+  };
+
   # Disable auto display brightness (laptop-only; written to /Library/Preferences
   # as root — takes effect after a restart).
   system.defaults.CustomSystemPreferences = {
@@ -137,7 +149,9 @@
     # can't be uninstalled in the UI while listed here.
     WebAppInstallForceList = [
       { url = "https://secure.bankofamerica.com/myaccounts/signin/signIn.go"; default_launch_container = "window"; }
+      { url = "https://contacts.google.com/"; default_launch_container = "window"; }
       { url = "https://www.google.com/maps"; default_launch_container = "window"; }
+      { url = "https://translate.google.com/"; default_launch_container = "window"; }
       { url = "https://web.groupme.com/"; default_launch_container = "window"; }
       { url = "https://www.instagram.com/"; default_launch_container = "window"; }
       { url = "https://www.linkedin.com/feed/"; default_launch_container = "window"; }
@@ -145,6 +159,8 @@
       { url = "https://www.snapchat.com/web"; default_launch_container = "window"; }
       { url = "https://login.tailscale.com/admin"; default_launch_container = "window"; }
       { url = "https://account.venmo.com/"; default_launch_container = "window"; }
+      { url = "https://www.wordreference.com/enes/"; default_launch_container = "window"; }
+      { url = "https://x.com/"; default_launch_container = "window"; }
       { url = "https://www.youtube.com"; default_launch_container = "window"; }
     ];
   };
@@ -175,18 +191,11 @@
       # Alex's personal cask tap — apps released by their repos' CI
       # (gemini-desktop, receptor, ...).
       "alexjmiller5/tap"
-      # yabai's formula tap — was untapped at some point but the formula is
-      # still installed from it; nix-darwin re-taps it.
-      "koekeishiya/formulae"
       "smudge/smudge"
       "steipete/tap"
     ];
     brews = [
       "chrome-cli"
-      # window manager — runs via the custom com.asmvik.yabai launchd agent.
-      # TODO: try moving to pkgs.yabai someday — touches the SIP/sudoers +
-      # launchd arrangement, so it needs a careful switch, not a line swap.
-      "koekeishiya/formulae/yabai"
       "skills"
       "smudge/smudge/nightlight"
     ];

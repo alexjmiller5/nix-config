@@ -51,7 +51,7 @@ straight from the github: ref.
 7. Commit + push the step-3 changes (secrets.nix + the recreated .age) — push
    auth works now.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
-   otherwise): `for t in alexjmiller5/tap asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae koekeishiya/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
+   otherwise): `for t in alexjmiller5/tap asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
 
 ## Machine vaults (1P) — the secret architecture
 
@@ -87,15 +87,15 @@ leisure since the SA token was the only thing the disk could yield.
 * **Full Disk Access**: VS Code, Ghostty, Raycast
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
 
-## yabai (SIP + sudoers)
+## yabai (SIP only — the rest is declared)
+
+The agent, scripting-addition loader, and sudoers entry are all declarative
+(`services.yabai` in `hosts/macbook-air.nix`). What stays manual:
 
 1. Recovery mode: `csrutil enable --without fs --without debug --without nvram`,
    then `sudo nvram boot-args=-arm64e_preview_abi`.
-2. Sudoers entry for the scripting addition (hash changes on every yabai
-   update — regenerate then):
-   `echo "$(whoami) ALL=(root) NOPASSWD: sha256:$(shasum -a 256 $(which yabai) | cut -d' ' -f1) $(which yabai) --load-sa" | sudo tee /private/etc/sudoers.d/yabai`
-3. `yabai --start-service` (the custom `com.asmvik.yabai` launchd plist is a
-   deliberate imperative leftover).
+2. Accessibility grant (below) — and RE-grant after any yabai version bump:
+   the nix store path (and the binary TCC keys on) changes with each update.
 
 ## App sign-ins (after first switch; GUI-only, none scriptable)
 
@@ -161,7 +161,6 @@ Screen Mirroring, Weather, 1Password, AirDrop, RepoBar, CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
-* `com.asmvik.yabai.plist` — owned by the yabai setup, not this repo.
 * `/Applications/Raycast Beta.app` — manual download from raycast.com (no
   cask exists for the beta channel; it self-updates). Its login item IS
   declared (`home/agents.nix`); only the install itself is manual. Stable
