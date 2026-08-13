@@ -155,23 +155,32 @@
         # PWAs, force-installed per profile at Chrome launch; the
         # ~/Applications/Chrome Apps.localized/<Name>.app shims (dock
         # references Google Maps.app) are created on install and can't be
-        # uninstalled in the UI while listed here.
-        WebAppInstallForceList = [
-    { url = "https://secure.bankofamerica.com/myaccounts/signin/signIn.go"; default_launch_container = "window"; }
-    { url = "https://contacts.google.com/"; default_launch_container = "window"; }
-    { url = "https://www.google.com/maps"; default_launch_container = "window"; }
-    { url = "https://translate.google.com/"; default_launch_container = "window"; }
-    { url = "https://web.groupme.com/"; default_launch_container = "window"; }
-    { url = "https://www.instagram.com/"; default_launch_container = "window"; }
-    { url = "https://www.linkedin.com/feed/"; default_launch_container = "window"; }
-    { url = "https://settleup.app/"; default_launch_container = "window"; }
-    { url = "https://www.snapchat.com/web"; default_launch_container = "window"; }
-    { url = "https://login.tailscale.com/admin"; default_launch_container = "window"; }
-    { url = "https://account.venmo.com/"; default_launch_container = "window"; }
-    { url = "https://www.wordreference.com/enes/"; default_launch_container = "window"; }
-    { url = "https://x.com/"; default_launch_container = "window"; }
-    { url = "https://www.youtube.com"; default_launch_container = "window"; }
-        ];
+        # uninstalled in the UI while listed here. custom_name permanently
+        # overrides the site manifest's name — it IS the shim's .app name,
+        # so a fresh machine reproduces these exact names (and the dock's
+        # Google Maps.app path keeps resolving).
+        WebAppInstallForceList =
+          let
+            app = url: custom_name: {
+              inherit url custom_name;
+              default_launch_container = "window";
+            };
+          in [
+            (app "https://secure.bankofamerica.com/myaccounts/signin/signIn.go" "BofA")
+            (app "https://contacts.google.com/" "Google Contacts")
+            (app "https://www.google.com/maps" "Google Maps")
+            (app "https://translate.google.com/" "Google Translate")
+            (app "https://web.groupme.com/" "GroupMe")
+            (app "https://www.instagram.com/" "Instagram")
+            (app "https://www.linkedin.com/feed/" "LinkedIn")
+            (app "https://settleup.app/" "Settle Up")
+            (app "https://www.snapchat.com/web" "Snapchat")
+            (app "https://login.tailscale.com/admin" "Tailscale Admin Dashboard")
+            (app "https://account.venmo.com/" "Venmo")
+            (app "https://www.wordreference.com/enes/" "WordReference")
+            (app "https://x.com/" "X")
+            (app "https://www.youtube.com" "YouTube")
+          ];
       });
     in
     ''
