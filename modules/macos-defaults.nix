@@ -13,6 +13,10 @@
   documentation.doc.enable = false;
   programs.man.enable = lib.mkForce true;
 
+  # home-manager's zsh already runs compinit (dump in ~/.config/zsh); the
+  # system-level one in /etc/zshrc double-runs it and litters ~/.zcompdump.
+  programs.zsh.enableCompletion = false;
+
   system.defaults = {
     NSGlobalDomain = {
       "com.apple.trackpad.scaling" = 5.0;

@@ -302,6 +302,7 @@
       "notion-calendar"
       "notion-cli"
       # notunes comes from modules/notunes.nix
+      "pearcleaner"
       "processing"
       "raycast"
       # From alexjmiller5/tap — released + notarized by receptor's CI.
