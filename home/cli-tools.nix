@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 # Universal CLI toolbox — no personal coupling, no custom specialArgs, so it
 # is exportable via homeModules (work-laptop flake imports it as-is).
@@ -29,4 +29,10 @@
     withPython3 = false;
   };
   xdg.configFile."nvim/init.lua".source = ../dotfiles/nvim/init.lua;
+
+  # Export the XDG base-dir vars ($XDG_CONFIG_HOME etc.) so tools that honor
+  # them (swiftpm, less 598+, ...) stop littering $HOME with dotfiles.
+  xdg.enable = true;
+  # less pre-598 ignores XDG; the env var works on every version.
+  home.sessionVariables.LESSHISTFILE = "${config.xdg.stateHome}/lesshst";
 }
