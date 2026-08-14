@@ -333,8 +333,8 @@
 
     onActivation.cleanup = "zap";
 
-    # Install every cask without the quarantine xattr — no Gatekeeper
-    # first-open prompt for anything brew installs (Alex's call, 2026-08-10).
-    caskArgs.no_quarantine = true;
+    # No caskArgs.no_quarantine: Homebrew 6's brew bundle passes it malformed
+    # (--no_quarantine, fails every new cask install) and the flag is removed
+    # upstream on 2026-09-01. New casks get the one-time Gatekeeper prompt.
   };
 }
