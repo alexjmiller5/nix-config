@@ -170,7 +170,7 @@
           # "bgehnoihoklmofgehcefiaicdcdgppck" = normal; # Spotify Playback Speed (off — uncomment to install)
           "jcgpgjhaendighananonflfmjjefjjlp" = normal; # Streak Email Tracking for Gmail
           # "pdmhehfogekmpmdoemhabjpaiadagpgp" = normal; # Student Beans (off — uncomment to install)
-          "micdllihgoppmejpecmkilggmaagfdmb" = normal; # Tab Copy
+          "micdllihgoppmejpecmkilggmaagfdmb" = normal // pin; # Tab Copy
           "dhdgffkkebhmkfjojejmpbldmpobfkfo" = normal; # Tampermonkey
           "ddkjiahejlhfcafbddmgiahcphecmpfh" = normal // pin; # uBlock Origin Lite
           "pmbneaajfhcoecedlmkfkdnjemmebbcb" = normal; # UnSponsored
