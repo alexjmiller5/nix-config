@@ -76,7 +76,7 @@
       "com.google.Chrome".DisablePrintPreview = true;
       # Menu bar system-icon visibility lives in the ByHost controlcenter
       # domain on macOS 26 (the plain-domain "NSStatusItem Visible" keys are
-      # ignored post-migration) → declared in home/macos-tweaks.nix instead.
+      # ignored post-migration) → declared in home/macos/menu-bar.nix instead.
       "com.apple.menuextra.clock" = {
         IsAnalog = false;
         TimeAnnouncementsEnabled = false;

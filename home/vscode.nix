@@ -68,7 +68,6 @@ in
       james-yu.latex-workshop
       jamesmaj.easy-icons
       janisdd.vscode-edit-csv
-      jnbt.vscode-rufo
       jock.svg
       junstyle.vscode-django-support
       kaiwood.endwise

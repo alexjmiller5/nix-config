@@ -10,12 +10,10 @@
     jq
     act
     bat
-    d2
     git-filter-repo
     gitleaks
     _7zz
     shellcheck
-    sshpass
     tree
     yq-go
   ];

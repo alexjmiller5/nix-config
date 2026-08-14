@@ -14,7 +14,6 @@
     # alias/function source now lives in nix-config (rebuild to apply edits)
     valiases = "nvim /etc/nix-darwin/home/aliases";
     vfuncs = "nvim /etc/nix-darwin/home/zsh/functions.zsh";
-    aliases = "alias";
     cfuncs = "cat /etc/nix-darwin/home/zsh/functions.zsh";
   };
 }

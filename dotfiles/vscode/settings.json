@@ -1,5 +1,4 @@
 {
-	"synthwave84.brightness": 0.25,
 	// Autosave enabled
 	"files.autoSave": "afterDelay",
 	"files.autoSaveDelay": 1000,
@@ -12,9 +11,6 @@
 	"[python]": {
 		"editor.defaultFormatter": "ms-python.black-formatter",
 	},
-	// "[markdown]": {
-	// "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-	// },
 	"[sql]": {
 		"editor.defaultFormatter": "mtxr.sqltools"
 	},
@@ -39,14 +35,9 @@
 		// Open stl files in 3D Viewer
 		"*.stl": "3dviewer.viewer"
 	},
-	// Python file location
-	"python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
 	"code-runner.executorMap": {
 		"javascript": "node",
-		"php": "/usr/local/bin/php",
 		"python": "python3",
-		"perl": "/usr/bin/perl",
-		"ruby": "/usr/local/bin/ruby",
 		"go": "go run",
 		"html": "open -a \"Google Chrome\" $fileName",
 		"java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
@@ -182,15 +173,6 @@
 	],
 	// Change the default terminal to Ghostty
 	"terminal.external.osxExec": "Ghostty.app",
-	// Add the call history database to SQLTools
-	"sqltools.connections": [
-		{
-			"previewLimit": 50,
-			"driver": "SQLite",
-			"database": "/Users/alexmiller/Desktop/CallHistoryDB/CallHistory.storedata",
-			"name": "Call History"
-		}
-	],
 	// true: Enable the SQLTools extension to work with sqlite - switched to false as it was causing startup errors
 	"sqltools.useNodeRuntime": false,
 	// Associate all html files with the html language mode (instead of django-html)
@@ -221,18 +203,6 @@
 	"security.promptForRemoteFileProtocolHandling": false,
 	"vsicons.presets.yamlOfficial": true,
 	"docker.extension.enableComposeLanguageServer": false,
-	"[ruby]": {
-		"editor.defaultFormatter": "jnbt.vscode-rufo"
-	},
-	"powerClipper.alwaysExclude": [
-		"**/package-lock.json",
-		"**/tsconfig.json",
-		"**/.prettierrc",
-		"**/.gitignore",
-		"**/.eslintrc.json",
-		"**/.eslintignore",
-		"**/node_modules"
-	],
 	"claudeCode.preferredLocation": "panel",
 	"claudeCode.useTerminal": true,
 	"terminal.integrated.persistentSessionScrollback": 1000,
@@ -249,6 +219,5 @@
 		"**/.forgejo/workflows/*.yaml"
 	],
 	"workbench.colorTheme": "GitHub Dark Default",
-	"workbench.iconTheme": "vscode-great-icons",
-	// ⬆️ New settings (past the "workbench.secondarySideBar.defaultVisibility" suggestions) autonatically added by VSCode or an extension which need comments or removal
+	"workbench.iconTheme": "vscode-great-icons"
 }

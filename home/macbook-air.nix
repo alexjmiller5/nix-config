@@ -87,7 +87,6 @@ in
     pkgs.ffmpeg
     pkgs.gogcli
     pkgs.libimobiledevice
-    pkgs.lua5_4
     pkgs.mas
     pkgs.nodejs
     pkgs.oci-cli

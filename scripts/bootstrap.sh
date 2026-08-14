@@ -30,4 +30,4 @@ if [ -n "$TS_AUTHKEY" ] && ! $TS status >/dev/null 2>&1; then
   sudo $TS up --auth-key="$TS_AUTHKEY" --hostname="$TS_HOSTNAME" --advertise-exit-node
 fi
 
-echo "==> Done. Day-to-day: 'just switch' from a clone, or 'just switch-remote'."
+echo "==> Done. Day-to-day: run 'switch-mini' from the laptop (just deploy)."

@@ -1,7 +1,7 @@
 # MANUAL-macbook-air.md — MacBook steps nix cannot do
 
 Everything on the laptop that can't be declared, in bootstrap order. (The
-mini's equivalent lives in README.md §Manual setup steps.) Sources: blueprint's
+mini's equivalent is MANUAL-mac-mini.md.) Sources: blueprint's
 MANUAL\_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
 
 ## Fresh-machine bootstrap order
@@ -51,7 +51,7 @@ straight from the github: ref.
 7. Commit + push the step-3 changes (secrets.nix + the recreated .age) — push
    auth works now.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
-   otherwise): `for t in alexjmiller5/tap asmvik/formulae ddev/ddev electrikmilk/cherri jellycuts/formulae smudge/smudge steipete/tap supabase/tap; do brew trust "$t"; done`
+   otherwise): `for t in alexjmiller5/tap smudge/smudge steipete/tap; do brew trust "$t"; done`
 
 ## Machine vaults (1P) — the secret architecture
 
