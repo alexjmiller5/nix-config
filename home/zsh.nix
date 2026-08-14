@@ -7,9 +7,12 @@
 {
   programs.zsh = {
     enable = true;
-    # Left at default (zsh files generated in $HOME). Uncomment to restore the
-    # ZDOTDIR ~/.config/zsh layout; history + compdump stay there either way.
-    # dotDir = "${config.xdg.configHome}/zsh";
+    # Pinned to the legacy $HOME layout (home-manager's default flips to XDG
+    # at stateVersion 26.05; this pin silences that migration warning with
+    # zero behavior change). Moving to "${config.xdg.configHome}/zsh" later is
+    # a real migration — audit everything that sources ~/.zshrc first
+    # (agent-config's claude/shell-init.sh already handles both layouts).
+    dotDir = config.home.homeDirectory;
     # Typing a directory path as a command cd's into it: `..`, `../../..`,
     # `../some-folder/deeper`, bare subdir names — all work without `cd`.
     autocd = true;
