@@ -236,6 +236,21 @@
       cp -f ${chromePolicy} '/Library/Managed Preferences/${username}/com.google.Chrome.plist'
       chmod 644 '/Library/Managed Preferences/${username}/com.google.Chrome.plist'
       /usr/bin/killall cfprefsd 2>/dev/null || true
+
+      # De-quarantine declared casks — successor to brew's removed
+      # --no-quarantine (Homebrew/brew#20755). Runs after brew bundle
+      # (postActivation is last), so freshly installed casks are covered.
+      # Scoped to brew-managed apps via the Caskroom app symlinks on
+      # purpose: anything else in /Applications keeps its Gatekeeper
+      # prompt. Quarantine-flag check on the bundle root keeps re-runs
+      # cheap (no recursive walk unless there's something to strip).
+      for link in /opt/homebrew/Caskroom/*/*/*.app; do
+        app=$(/usr/bin/readlink "$link" || echo "$link")
+        if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
+          echo "de-quarantining $app" >&2
+          /usr/bin/xattr -dr com.apple.quarantine "$app"
+        fi
+      done
     '';
 
   # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
