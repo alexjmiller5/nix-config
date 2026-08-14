@@ -10,8 +10,7 @@
     # Pinned to the legacy $HOME layout (home-manager's default flips to XDG
     # at stateVersion 26.05; this pin silences that migration warning with
     # zero behavior change). Moving to "${config.xdg.configHome}/zsh" later is
-    # a real migration — audit everything that sources ~/.zshrc first
-    # (agent-config's claude/shell-init.sh already handles both layouts).
+    # a real migration — audit everything that sources ~/.zshrc first.
     dotDir = config.home.homeDirectory;
     # Typing a directory path as a command cd's into it: `..`, `../../..`,
     # `../some-folder/deeper`, bare subdir names — all work without `cd`.
@@ -101,11 +100,18 @@
           command op "$@"
       }
 
-      # Claude Code shells: headless op via the claude-code service account -> zero
-      # Touch ID prompts (1P sessions are per-tty, so every Claude Bash call would
-      # otherwise re-prompt). SA can't reach the Personal vault; use op-personal
-      # for that (one Touch ID via desktop app).
-      if [[ -n $CLAUDECODE ]]; then
+      # Agent-shell detection: AGENT_SHELL is the agent-agnostic seam - every
+      # per-agent env var maps to it here, and everything downstream gates on
+      # AGENT_SHELL only. Adding a new agent CLI = one more detection line.
+      if [[ -n $CLAUDECODE || -n $CLAUDE_CODE_ENTRYPOINT ]]; then
+          export AGENT_SHELL=claude
+      fi
+
+      # Agent shells: headless op via the claude-code service account -> zero
+      # Touch ID prompts (1P sessions are per-tty, so every agent Bash call
+      # would otherwise re-prompt). SA can't reach the Personal vault; use
+      # op-personal for that (one Touch ID via desktop app).
+      if [[ -n $AGENT_SHELL ]]; then
           if [[ -z $OP_SERVICE_ACCOUNT_TOKEN ]]; then
               export OP_SERVICE_ACCOUNT_TOKEN="$(security find-generic-password -s op-claude-sa -w 2>/dev/null)"
               [[ -z $OP_SERVICE_ACCOUNT_TOKEN ]] && unset OP_SERVICE_ACCOUNT_TOKEN
@@ -116,7 +122,9 @@
           }
       fi
 
-      # Claude shell init script
+      # Per-call agent env (Claude Code sources this before every Bash call;
+      # env vars don't survive between calls, functions/aliases do). The file
+      # lives in agent-config: claude/shell-init.sh - env exports ONLY.
       export CLAUDE_ENV_FILE="$HOME/.claude/shell-init.sh"
 
       # Shell functions (plain zsh, edited in the repo)
