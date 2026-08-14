@@ -225,6 +225,13 @@
       });
     in
     ''
+      # Rosetta 2, declared (needed by EGGNOGG+ in home/macbook-air.nix —
+      # x86_64-only). No nix-darwin option exists; activation runs as root,
+      # so install here, guarded by the oahd check to stay idempotent.
+      if ! /usr/bin/pgrep -q oahd; then
+        /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+      fi
+
       mkdir -p '/Library/Managed Preferences/${username}'
       cp -f ${chromePolicy} '/Library/Managed Preferences/${username}/com.google.Chrome.plist'
       chmod 644 '/Library/Managed Preferences/${username}/com.google.Chrome.plist'
