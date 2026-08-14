@@ -9,7 +9,7 @@
 	"editor.minimap.enabled": false,
 	// Default Formatters
 	"[python]": {
-		"editor.defaultFormatter": "ms-python.black-formatter",
+		"editor.defaultFormatter": "charliermarsh.ruff",
 	},
 	"[sql]": {
 		"editor.defaultFormatter": "mtxr.sqltools"
@@ -155,7 +155,6 @@
 	"editor.fontFamily": "'Fira Code', Menlo, Monaco, 'Courier New', monospace",
 	"editor.fontLigatures": true,
 	"terminal.integrated.fontLigatures.enabled": true,
-	"vsicons.dontShowNewVersionMessage": true,
 	// Open files in VSCode new window
 	"window.openFilesInNewWindow": "on",
 	// Make sure SVG files open as images in preview mode, similar to how markdown previews work
@@ -201,7 +200,6 @@
 	"remote.SSH.useLocalServer": true,
 	"security.promptForLocalFileProtocolHandling": false,
 	"security.promptForRemoteFileProtocolHandling": false,
-	"vsicons.presets.yamlOfficial": true,
 	"docker.extension.enableComposeLanguageServer": false,
 	"claudeCode.preferredLocation": "panel",
 	"claudeCode.useTerminal": true,
