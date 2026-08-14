@@ -8,7 +8,8 @@
 # agent-config is a real git clone (cloned at activation, refreshed by a
 # daily pull-only agent below) — no iCloud involved. The laptop stays the
 # ONLY pusher (its sync agent commits+pushes); the mini never writes, so
-# there's no push race. Clone/pull auth = `gh auth login` once (MANUAL §6).
+# there's no push race. Clone/pull auth = the machine-vault PAT credential
+# helper below — no gh login involved.
 let
   agentConfig = "${config.home.homeDirectory}/.config/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;

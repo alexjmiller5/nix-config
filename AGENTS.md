@@ -21,7 +21,7 @@ routing table and workflow; this file is the in-repo map.
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`
-* `modules/` — darwin modules shared across hosts (`macos-defaults.nix`, `notunes.nix`)
+* `modules/` — darwin modules: `macos-defaults.nix` (injected for every host by mkHost), `notunes.nix` (laptop-only import)
 * `dotfiles/` — file payloads (karabiner, nvim, vscode, ssh pubs, duti list)
 * `secrets/` — agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token); all other secrets live in the per-machine 1P vaults, fetched at
