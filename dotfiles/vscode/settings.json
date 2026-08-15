@@ -29,11 +29,8 @@
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
 	},
-	// Open mp4 files in the MP4 previewer extension
 	"workbench.editorAssociations": {
-		"*.md": "milkdown.editor",
-		// Open stl files in 3D Viewer
-		"*.stl": "3dviewer.viewer"
+		"*.md": "milkdown.editor"
 	},
 	"code-runner.executorMap": {
 		"javascript": "node",

@@ -1,15 +1,16 @@
 { pkgs, nix-vscode-extensions, ... }:
 
-# VS Code extensions, fully declared (pruned 2026-08-13: dropped unused
-# themes/icon packs — settings.json pins GitHub Dark Default + great-icons —
-# and retired stacks: Java, Django, Ruby, Go, Azure, Home Assistant,
-# Processing, plus superseded duplicates). The app itself stays the
-# visual-studio-code cask — package = null installs nothing — but
-# home-manager owns ~/.vscode/extensions as an immutable set: VS Code can no
-# longer install or update extensions itself. Add/remove = edit this list +
-# rebuild; versions ride the weekly nix-vscode-extensions input bump.
-# (workspace-snapshot-terminals joins this set via the workspace-snapshot
-# flake module — see programs.workspace-snapshot in macbook-air.nix.)
+# VS Code extensions, fully declared and grouped by function (audited
+# 2026-08-15: every entry either matches the current stack — Python/uv/ruff,
+# Bun/Svelte/Tailwind, Swift/iOS, nix, cherri, hammerspoon, just — or is
+# wired into settings.json; unused, deprecated, and superseded extensions
+# removed). The app itself stays the visual-studio-code cask — package = null
+# installs nothing — but home-manager owns ~/.vscode/extensions as an
+# immutable set: VS Code can no longer install or update extensions itself.
+# Add/remove = edit this list + rebuild; versions ride the weekly
+# nix-vscode-extensions input bump. (workspace-snapshot-terminals joins this
+# set via the workspace-snapshot flake module — see
+# programs.workspace-snapshot in macbook-air.nix.)
 let
   mkt = nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system}.vscode-marketplace;
 in
@@ -18,57 +19,37 @@ in
     enable = true;
     package = null; # app comes from the cask
     profiles.default.extensions = (with mkt; [
+      # --- Theme + icons (the pair settings.json pins) ---
+      github.github-vscode-theme
+      emmanuelbeziat.vscode-great-icons
+
+      # --- AI assistants (claude-code comes from nixpkgs below) ---
+      google.gemini-cli-vscode-ide-companion
+
+      # --- Editor QoL ---
       aaron-bond.better-comments
       albert.tabout
-      alefragnani.rtf
-      alexcvzz.vscode-sqlite
-      bbenoist.nix
-      bierner.github-markdown-preview
-      bierner.markdown-checkbox
-      bierner.markdown-emoji
-      bierner.markdown-footnotes
-      bierner.markdown-mermaid
-      bierner.markdown-preview-github-styles
-      bierner.markdown-yaml-preamble
-      bradlc.vscode-tailwindcss
-      charliermarsh.ruff
-      christian-kohler.npm-intellisense
-      davidanson.vscode-markdownlint
-      dbaeumer.vscode-eslint
-      dnicolson.binary-plist
-      docker.docker
-      donjayamanne.githistory
-      dorianmassoulier.repomix-runner
-      dsznajder.es7-react-js-snippets
+      formulahendry.code-runner # executorMap configured in settings.json
+      meganrogge.template-string-converter
+      oderwat.indent-rainbow
+      shardulm94.trailing-spaces
+      usernamehw.errorlens
+      tonybaloney.vscode-pets # fun
+
+      # --- Git + GitHub ---
       eamodio.gitlens
-      ecmel.vscode-html-css
-      electrikmilk.cherri-vscode-extension
-      emmanuelbeziat.vscode-great-icons
-      esbenp.prettier-vscode
-      formulahendry.code-runner
-      foxundermoon.shell-format
-      george-alisson.html-preview-vscode
-      github.github-vscode-theme
       github.remotehub
       github.vscode-github-actions
       github.vscode-pull-request-github
-      google.gemini-cli-vscode-ide-companion
-      hashicorp.terraform
-      humao.rest-client
-      idleberg.applescript
-      idleberg.jxa
-      james-yu.latex-workshop
-      janisdd.vscode-edit-csv
-      jock.svg
+      ms-vscode.remote-repositories
+
+      # --- Remote dev (remote-ssh family comes from nixpkgs below) ---
+      ms-vscode.remote-server
+      tailscale.vscode-tailscale
+
+      # --- Python (uv/ruff stack; pylance comes from nixpkgs below) ---
+      charliermarsh.ruff
       kevinrose.vsc-python-indent
-      llvm-vs-code-extensions.lldb-dap
-      mads-hartmann.bash-ide-vscode
-      mariusalchimavicius.json-to-ts
-      mechatroner.rainbow-csv
-      meganrogge.template-string-converter
-      mgesbert.python-path
-      mirone.milkdown
-      ms-azuretools.vscode-containers
       ms-python.debugpy
       ms-python.python
       ms-python.vscode-python-envs
@@ -77,46 +58,79 @@ in
       ms-toolsai.jupyter-renderers
       ms-toolsai.vscode-jupyter-cell-tags
       ms-toolsai.vscode-jupyter-slideshow
+
+      # --- Web: JS/TS, Svelte, Tailwind, CSS ---
+      bradlc.vscode-tailwindcss
+      christian-kohler.npm-intellisense
+      dbaeumer.vscode-eslint
+      ecmel.vscode-html-css
+      esbenp.prettier-vscode
+      ms-vscode.live-server
+      pflannery.vscode-versionlens # showOnStartup configured in settings.json
+      svelte.svelte-vscode
+
+      # --- Swift / iOS ---
+      sweetpad.sweetpad
+      swiftlang.swift-vscode
+      llvm-vs-code-extensions.lldb-dap # debugger for swift-vscode
+
+      # --- C/C++ + build systems (CTF + systems work; cpptools from nixpkgs below) ---
       ms-vscode.cmake-tools
       ms-vscode.cpp-devtools
       ms-vscode.cpptools-extension-pack
       ms-vscode.cpptools-themes
-      ms-vscode.extension-test-runner
-      ms-vscode.hexeditor
-      ms-vscode.live-server
       ms-vscode.makefile-tools
-      ms-vscode.remote-repositories
-      ms-vscode.remote-server
-      mtxr.sqltools
-      mtxr.sqltools-driver-pg
-      mtxr.sqltools-driver-sqlite
-      oderwat.indent-rainbow
-      pflannery.vscode-versionlens
-      pomdtr.excalidraw-editor
-      redhat.vscode-xml
-      redhat.vscode-yaml
-      repreng.csv
-      ryuta46.multi-command
-      shardulm94.trailing-spaces
-      simonsiefke.svg-preview
-      skellock.just
-      slevesque.vscode-3dviewer
-      sumneko.lua
-      svelte.svelte-vscode
-      sweetpad.sweetpad
-      swiftlang.swift-vscode
-      tailscale.vscode-tailscale
-      tamasfe.even-better-toml
-      timonwong.shellcheck
-      tonybaloney.vscode-pets
       twxs.cmake
-      usernamehw.errorlens
-      vadimcn.vscode-lldb
+      ms-vscode.hexeditor
+
+      # --- Shell ---
+      foxundermoon.shell-format
+      mads-hartmann.bash-ide-vscode
+      timonwong.shellcheck
+
+      # --- Nix ---
+      bbenoist.nix
+
+      # --- macOS automation: AppleScript/JXA, Hammerspoon, Shortcuts ---
+      idleberg.applescript
+      idleberg.jxa
       virgilsisoe.hammerspoon
       virgilsisoe.hammerspoon-snippets
-      xshrim.txt-syntax
+      sumneko.lua # hammerspoon configs
+      dnicolson.binary-plist
+      electrikmilk.cherri-vscode-extension
+
+      # --- Markdown ---
       yzhang.markdown-all-in-one
-      zignd.html-css-class-completion
+      davidanson.vscode-markdownlint
+      bierner.github-markdown-preview # pack: pulls the bierner set below
+      bierner.markdown-checkbox
+      bierner.markdown-emoji
+      bierner.markdown-footnotes
+      bierner.markdown-mermaid
+      bierner.markdown-preview-github-styles
+      bierner.markdown-yaml-preamble
+      mirone.milkdown # *.md editorAssociation in settings.json
+
+      # --- Data + file formats ---
+      janisdd.vscode-edit-csv
+      mechatroner.rainbow-csv
+      mtxr.sqltools
+      mtxr.sqltools-driver-sqlite
+      jock.svg # svg.preview.mode configured in settings.json
+      redhat.vscode-xml # *.plist association in settings.json
+      redhat.vscode-yaml
+      tamasfe.even-better-toml
+      humao.rest-client
+      pomdtr.excalidraw-editor
+
+      # --- Infra + tooling ---
+      docker.docker
+      ms-azuretools.vscode-containers # container tools, not Azure
+      hashicorp.terraform # OCI VM fleet
+      nefrob.vscode-just-syntax
+      james-yu.latex-workshop # resume is .tex
+      ms-vscode.extension-test-runner # workspace-snapshot extension dev
     ]) ++ (with pkgs.vscode-extensions; [
       # Platform-specific / licensed builds the marketplace mirror refuses to
       # serve on aarch64-darwin — nixpkgs packages these properly (all unfree;
