@@ -23,9 +23,6 @@ in
       github.github-vscode-theme
       emmanuelbeziat.vscode-great-icons
 
-      # --- AI assistants (claude-code comes from nixpkgs below) ---
-      google.gemini-cli-vscode-ide-companion
-
       # --- Editor QoL ---
       aaron-bond.better-comments
       albert.tabout
