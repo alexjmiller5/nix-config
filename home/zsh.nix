@@ -7,11 +7,10 @@
 {
   programs.zsh = {
     enable = true;
-    # Pinned to the legacy $HOME layout (home-manager's default flips to XDG
-    # at stateVersion 26.05; this pin silences that migration warning with
-    # zero behavior change). Moving to "${config.xdg.configHome}/zsh" later is
-    # a real migration — audit everything that sources ~/.zshrc first.
-    dotDir = config.home.homeDirectory;
+    # XDG layout (the original pre-nix ZDOTDIR setup, and home-manager's
+    # default from stateVersion 26.05): zsh dotfiles live in ~/.config/zsh,
+    # keeping $HOME clean. hm generates the ZDOTDIR bootstrap.
+    dotDir = "${config.xdg.configHome}/zsh";
     # Typing a directory path as a command cd's into it: `..`, `../../..`,
     # `../some-folder/deeper`, bare subdir names — all work without `cd`.
     autocd = true;
