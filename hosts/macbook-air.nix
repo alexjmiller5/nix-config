@@ -63,7 +63,15 @@
   # /etc/sudoers.d/yabai. Still manual: granting Accessibility when the store
   # path changes on upgrades (MANUAL-macbook-air.md). Revisit if yabai ships
   # real macOS 26.x injection support.
-  services.yabai.enable = true;
+  #
+  # config.layout is set purely so the module writes a yabairc and passes
+  # `-c` — without any config yabai warns "could not locate config file" on
+  # every start. `float` matches yabai's own default (no auto-tiling); switch
+  # to "bsp" here for automatic tiling.
+  services.yabai = {
+    enable = true;
+    config.layout = "float";
+  };
 
   # Disable auto display brightness (laptop-only; written to /Library/Preferences
   # as root — takes effect after a restart).
