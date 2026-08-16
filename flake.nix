@@ -94,6 +94,9 @@
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
         cli-tools = ./home/cli-tools.nix;
+        ghostty = ./home/ghostty.nix;
+        # vscode needs the consumer to pass nix-vscode-extensions via extraSpecialArgs
+        vscode = ./home/vscode.nix;
         aliases-dev = ./home/aliases/dev.nix;
         aliases-ai = ./home/aliases/ai.nix;
         aliases-infra = ./home/aliases/infra.nix;
