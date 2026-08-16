@@ -54,21 +54,16 @@
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 
-  # yabai, fully declared: the org.nixos.yabai launchd agent runs the nix
-  # package with a module-generated config, the yabai-sa daemon loads the
-  # scripting addition at boot, and the module generates /etc/sudoers.d/yabai
-  # against the store binary's sha256 — the hash and path move in lockstep on
-  # upgrades, no manual regen. Still manual: the SIP partial-disable and
-  # re-granting Accessibility when the store path changes (MANUAL-macbook-air.md).
-  services.yabai = {
-    enable = true;
-    enableScriptingAddition = true;
-    # The entire config: re-load the scripting addition whenever the Dock
-    # restarts (the yabai-sa daemon only covers boot).
-    extraConfig = ''
-      yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-    '';
-  };
+  # yabai: the org.nixos.yabai launchd agent runs the nix package for BSP
+  # tiling. The scripting addition is OFF — macOS 26.1's AMFI enforces library
+  # validation on Dock (a platform binary) and refuses to load yabai's
+  # third-party ad-hoc payload, so SA-only features (space create/destroy,
+  # cross-display space moves, opacity, sticky windows) don't work regardless
+  # of SIP state. With the SA off there's no yabai-sa daemon and no
+  # /etc/sudoers.d/yabai. Still manual: granting Accessibility when the store
+  # path changes on upgrades (MANUAL-macbook-air.md). Revisit if yabai ships
+  # real macOS 26.x injection support.
+  services.yabai.enable = true;
 
   # Disable auto display brightness (laptop-only; written to /Library/Preferences
   # as root — takes effect after a restart).

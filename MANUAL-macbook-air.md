@@ -119,15 +119,22 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
 sudo killall tccd
 ```
 
-## yabai (SIP only — the rest is declared)
+## yabai (Accessibility only — the rest is declared)
 
-The agent, scripting-addition loader, and sudoers entry are all declarative
-(`services.yabai` in `hosts/macbook-air.nix`). What stays manual:
+The launchd agent is declarative (`services.yabai` in `hosts/macbook-air.nix`),
+BSP tiling only. The scripting addition is OFF: macOS 26.1's AMFI enforces
+library validation on Dock and won't load yabai's third-party ad-hoc payload,
+so the SA can't inject regardless of SIP state (verified 2026-08-15). yabai
+therefore needs no SIP disable and no `arm64e_preview_abi` boot-arg.
 
-1. Recovery mode: `csrutil enable --without fs --without debug --without nvram`,
-   then `sudo nvram boot-args=-arm64e_preview_abi`.
-2. Accessibility grant (below) — and RE-grant after any yabai version bump:
+What stays manual:
+
+1. Accessibility grant (below) — and RE-grant after any yabai version bump:
    the nix store path (and the binary TCC keys on) changes with each update.
+
+SIP can be restored to full at your convenience in Recovery
+(`csrutil enable`) and the `-arm64e_preview_abi` boot-arg cleared
+(`sudo nvram -d boot-args`); nothing declared depends on either anymore.
 
 ## App sign-ins (after first switch; GUI-only, none scriptable)
 
