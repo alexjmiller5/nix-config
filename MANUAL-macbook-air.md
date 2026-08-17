@@ -171,6 +171,9 @@ SIP can be restored to full at your convenience in Recovery
   installed by the Chrome policy plist (`ExtensionSettings` +
   `WebAppInstallForceList`, written to Managed Preferences by the activation
   script in `hosts/macbook-air.nix`). Per-PWA "open links in Chrome".
+  A newly-declared PWA appears only after a full Chrome relaunch (policy is
+  read at launch; install lands a minute or two later), and Raycast may need
+  a restart to index the new .app — no way to automate either, so just wait.
 * **Chrome UI prefs** — app-owned profile `Preferences`, NO policy exists
   (Chrome rewrites the file constantly, so nix can't own it either) — this
   snapshot IS the declaration (2026-08-13):
