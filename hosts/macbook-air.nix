@@ -217,7 +217,7 @@
             (app "https://web.groupme.com/" "GroupMe")
             (app "https://www.instagram.com/" "Instagram")
             (app "https://www.linkedin.com/feed/" "LinkedIn")
-            (app "https://www.messenger.com/" "Messenger")
+            (app "https://www.facebook.com/messages" "Messenger")
             (app "https://settleup.app/" "Settle Up")
             (app "https://www.snapchat.com/web" "Snapchat")
             (app "https://login.tailscale.com/admin" "Tailscale Admin Dashboard")
