@@ -100,8 +100,9 @@ in
       text = ''
         export GOG_KEYRING_BACKEND="''${GOG_KEYRING_BACKEND:-file}"
         if [ -z "''${GOG_KEYRING_PASSWORD:-}" ]; then
-          # AGENT_SHELL = the agent-agnostic seam (zsh.nix).
-          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}" ]; then
+          # AGENT_SHELL = the agent-agnostic seam; raw claude vars cover
+          # agent-core spawns that skip shell init (see gh in scripts.nix).
+          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
             OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
             if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
               export OP_SERVICE_ACCOUNT_TOKEN
@@ -141,8 +142,9 @@ in
         if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
           exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
         fi
-        # AGENT_SHELL = the agent-agnostic seam (zsh.nix).
-        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}" ]; then
+        # AGENT_SHELL = the agent-agnostic seam; raw claude vars cover
+        # agent-core spawns that skip shell init (see gh in scripts.nix).
+        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
           OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
           if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
             export OP_SERVICE_ACCOUNT_TOKEN
