@@ -126,41 +126,56 @@ in
     pkgs.exiftool
     pkgs.fastlane
     pkgs.ffmpeg
-    # gog (Google CLI), wrapped with 1P-ONLY credential storage: no durable
-    # local token store. The default macOS keychain backend is structurally
-    # broken for nix binaries (adhoc-signed, store path changes every rebuild
-    # → keychain ACL invalidated → prompt flood), and Alex wants 1Password as
-    # the refresh token's only durable home — so every call rehydrates a
-    # throwaway GOG_HOME from the AI Agent vault ("AI Agent Gog OAuth
-    # Client" + "AI Agent Gog Token Export" items) and discards it on exit.
-    # Same self-auth paradigm as the gh/gcloud wrappers. Cost: ~2 op reads +
-    # a Google token refresh per invocation — accepted trade for zero local
-    # credential state. A caller-managed GOG_HOME bypasses everything (used
-    # by the one-time consent bootstrap; see the gog skill).
+    # gog (Google CLI), wrapped with 1P-ONLY credential storage: gog itself
+    # never sees a refresh token and nothing credential-shaped touches disk.
+    # The wrapper owns the OAuth refresh: the "AI Agent Gog Token Export"
+    # item holds the refresh token (credential field, `gog auth tokens
+    # export` JSON) plus a cached access_token/expires_at pair the wrapper
+    # writes back after each refresh; "AI Agent Gog OAuth Client" holds the
+    # client JSON. Fast path (access token still valid) = ONE op call, no
+    # Google round-trip; slow path (~hourly) = curl refresh + 1P writeback.
+    # gog runs in --access-token mode throughout (bypasses stored tokens).
+    # The macOS keychain backend stays banned: structurally broken for nix
+    # binaries (adhoc-signed, store path changes each rebuild → ACL prompt
+    # flood). Caller-set GOG_ACCESS_TOKEN or GOG_HOME bypasses everything
+    # (the consent bootstrap uses GOG_HOME; see the gog skill).
     (pkgs.writeShellApplication {
       name = "gog";
-      runtimeInputs = [ pkgs._1password-cli ];
+      runtimeInputs = [ pkgs._1password-cli pkgs.jq pkgs.curl ];
       text = ''
-        if [ -n "''${GOG_HOME:-}" ]; then
+        if [ -n "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ]; then
           exec ${gogcliPkg}/bin/gog "$@"
         fi
         ${builtins.readFile ./agent-op-env.sh}
-        GOG_HOME="$(mktemp -d "''${TMPDIR:-/tmp}/gog-home-XXXXXX")"
-        export GOG_HOME
-        trap 'rm -rf "$GOG_HOME"' EXIT
-        export GOG_KEYRING_BACKEND=file
-        # Ephemeral store → throwaway per-call passphrase.
-        GOG_KEYRING_PASSWORD="$(head -c 24 /dev/urandom | base64)"
-        export GOG_KEYRING_PASSWORD
-        mkdir -p "$GOG_HOME/data"
-        op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/4x66lrvreiljbmepa6esgkyu2e/credential' \
-          > "$GOG_HOME/data/credentials.json" 2>/dev/null || true
-        if op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/jjc6xu22cew46e6zpyfdsdjv3e/credential' \
-            > "$GOG_HOME/tokens.json" 2>/dev/null && [ -s "$GOG_HOME/tokens.json" ]; then
-          ${gogcliPkg}/bin/gog auth tokens import "$GOG_HOME/tokens.json" >/dev/null 2>&1 || true
-          rm -f "$GOG_HOME/tokens.json"
+        item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json 2>/dev/null || true)"
+        if [ -n "$item" ]; then
+          at="$(jq -r '[.fields[] | select(.label == "access_token")][0].value // empty' <<<"$item")"
+          exp="$(jq -r '[.fields[] | select(.label == "expires_at")][0].value // empty' <<<"$item")"
+          case "$exp" in ("" | *[!0-9]*) exp=0 ;; esac
+          now="$(date +%s)"
+          if [ -n "$at" ] && [ "$now" -lt "$((exp - 60))" ]; then
+            export GOG_ACCESS_TOKEN="$at"
+            exec ${gogcliPkg}/bin/gog "$@"
+          fi
+          # Access token missing/expired: refresh it ourselves and cache it
+          # back into the item. Secrets travel via stdin, never argv.
+          rt="$(jq -r '[.fields[] | select(.id == "credential")][0].value // empty' <<<"$item" | jq -r '.refresh_token // empty' 2>/dev/null || true)"
+          client="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/4x66lrvreiljbmepa6esgkyu2e/credential' 2>/dev/null || true)"
+          cid="$(jq -r '.installed.client_id // .web.client_id // empty' <<<"$client" 2>/dev/null || true)"
+          csec="$(jq -r '.installed.client_secret // .web.client_secret // empty' <<<"$client" 2>/dev/null || true)"
+          if [ -n "$rt" ] && [ -n "$cid" ]; then
+            resp="$(printf 'grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s' "$cid" "$csec" "$rt" \
+              | curl -s --max-time 30 --data @- https://oauth2.googleapis.com/token || true)"
+            at="$(jq -r '.access_token // empty' <<<"$resp" 2>/dev/null || true)"
+            expin="$(jq -r '.expires_in // 3600' <<<"$resp" 2>/dev/null || echo 3600)"
+            if [ -n "$at" ]; then
+              op item edit jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm \
+                "access_token[concealed]=$at" "expires_at[text]=$((now + expin))" >/dev/null 2>&1 || true
+              export GOG_ACCESS_TOKEN="$at"
+            fi
+          fi
         fi
-        ${gogcliPkg}/bin/gog "$@"
+        exec ${gogcliPkg}/bin/gog "$@"
       '';
     })
     pkgs.libimobiledevice
