@@ -172,6 +172,11 @@ in
               op item edit jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm \
                 "access_token[concealed]=$at" "expires_at[text]=$((now + expin))" >/dev/null 2>&1 || true
               export GOG_ACCESS_TOKEN="$at"
+            else
+              # invalid_grant = refresh token revoked (password change / 6mo
+              # idle / consent withdrawn) → human re-consent is the only fix.
+              err="$(jq -r '.error // empty' <<<"$resp" 2>/dev/null || true)"
+              echo "gog wrapper: token refresh failed (''${err:-no response from Google}) — refresh token likely revoked; re-run the consent bootstrap in the gog skill" >&2
             fi
           fi
         fi
