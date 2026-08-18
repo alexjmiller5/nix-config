@@ -28,12 +28,24 @@ in
     ./macos/spotlight-raycast.nix
     ./macos/nightlight.nix
     ./macos/duti.nix
+    ./macos/chrome-extension-shortcuts.nix
     ./ghostty.nix
     ./spotify-player.nix
     ./vscode.nix
     ./agents.nix
     ./ssh.nix
   ];
+
+  # Tab Copy's "Copy selected tabs" shortcut — extension reloads wipe it.
+  # command_name comes from the extension's manifest.json "commands" keys.
+  chrome.extensionShortcuts = {
+    profile = "Profile 1";
+    commands."mac:Command+Shift+C" = {
+      command_name = "1copy-highlighted-tabs";
+      extension = "micdllihgoppmejpecmkilggmaagfdmb";
+      global = false;
+    };
+  };
 
   # git-over-https auth, split by repo (2026-08-10; discovered when the
   # osxkeychain neutralization exposed that general pushes had been riding a
