@@ -28,22 +28,7 @@ in
       runtimeInputs = [ pkgs._1password-cli ];
       text = ''
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
-          # Agent contexts: SA token from the Keychain. AGENT_SHELL is the
-          # agent-agnostic seam (mapped from per-agent vars in zsh.nix), but
-          # it only exists where shell init ran — agent-core direct spawns
-          # (claude runs `gh auth token` at every interactive startup) skip
-          # zshrc AND shell-init, so the raw claude vars must stay as
-          # fallback or that call falls through to desktop auth and pops
-          # Touch ID. Alex's own terminal has none of these, so his gh
-          # calls keep desktop auth.
-          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
-            OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
-            if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
-              export OP_SERVICE_ACCOUNT_TOKEN
-            else
-              unset OP_SERVICE_ACCOUNT_TOKEN
-            fi
-          fi
+          ${builtins.readFile ./agent-op-env.sh}
           # SA token → headless; otherwise desktop-app auth (Touch ID).
           GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
           if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi

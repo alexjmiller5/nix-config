@@ -100,16 +100,7 @@ in
       text = ''
         export GOG_KEYRING_BACKEND="''${GOG_KEYRING_BACKEND:-file}"
         if [ -z "''${GOG_KEYRING_PASSWORD:-}" ]; then
-          # AGENT_SHELL = the agent-agnostic seam; raw claude vars cover
-          # agent-core spawns that skip shell init (see gh in scripts.nix).
-          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
-            OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
-            if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
-              export OP_SERVICE_ACCOUNT_TOKEN
-            else
-              unset OP_SERVICE_ACCOUNT_TOKEN
-            fi
-          fi
+          ${builtins.readFile ./agent-op-env.sh}
           GOG_KEYRING_PASSWORD="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/regrqjp4svxeiwvnkcugsiix5q/password' 2>/dev/null || true)"
           if [ -n "$GOG_KEYRING_PASSWORD" ]; then
             export GOG_KEYRING_PASSWORD
@@ -142,16 +133,7 @@ in
         if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
           exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
         fi
-        # AGENT_SHELL = the agent-agnostic seam; raw claude vars cover
-        # agent-core spawns that skip shell init (see gh in scripts.nix).
-        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
-          OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
-          if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
-            export OP_SERVICE_ACCOUNT_TOKEN
-          else
-            unset OP_SERVICE_ACCOUNT_TOKEN
-          fi
-        fi
+        ${builtins.readFile ./agent-op-env.sh}
         keyfile="$(mktemp "''${TMPDIR:-/tmp}/gcloud-key-XXXXXX")"
         trap 'rm -f "$keyfile"' EXIT
         if op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/iqywn6he6twhyonw3fhnqmot5i/credential' > "$keyfile" 2>/dev/null && [ -s "$keyfile" ]; then
