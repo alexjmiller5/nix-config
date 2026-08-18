@@ -1,4 +1,4 @@
-{ config, osConfig, pkgs, lib, username, cherri, ... }:
+{ config, osConfig, pkgs, lib, username, cherri, nix-openclaw-tools, ... }:
 
 # Laptop home profile: full shell + dotfiles + the agent-config fan-out.
 #
@@ -13,6 +13,9 @@ let
   nixConfig = "${config.home.homeDirectory}/.config/nix-config";
   agentConfig = "${config.home.homeDirectory}/.config/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
+  # gogcli from the openclaw flake — tracks upstream releases; nixpkgs' copy
+  # lags months behind at gog's weekly cadence.
+  gogcliPkg = nix-openclaw-tools.packages.${pkgs.stdenv.hostPlatform.system}.gogcli;
 in
 {
   imports = [
@@ -85,7 +88,37 @@ in
     pkgs.exiftool
     pkgs.fastlane
     pkgs.ffmpeg
-    pkgs.gogcli
+    # gog (Google CLI), wrapped: the macOS keychain backend is structurally
+    # broken for nix binaries (adhoc-signed, store path changes every rebuild
+    # → keychain ACL invalidated → prompt flood), so force the encrypted-file
+    # keyring and inject its passphrase from 1P ("AI Agent Gog Keyring
+    # Password" item) — same self-auth paradigm as the gh/gcloud wrappers, so
+    # agent shells, scripts, and launchd jobs all work headlessly.
+    (pkgs.writeShellApplication {
+      name = "gog";
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        export GOG_KEYRING_BACKEND="''${GOG_KEYRING_BACKEND:-file}"
+        if [ -z "''${GOG_KEYRING_PASSWORD:-}" ]; then
+          # AGENT_SHELL = the agent-agnostic seam (zsh.nix).
+          if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}" ]; then
+            OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
+            if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
+              export OP_SERVICE_ACCOUNT_TOKEN
+            else
+              unset OP_SERVICE_ACCOUNT_TOKEN
+            fi
+          fi
+          GOG_KEYRING_PASSWORD="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/regrqjp4svxeiwvnkcugsiix5q/password' 2>/dev/null || true)"
+          if [ -n "$GOG_KEYRING_PASSWORD" ]; then
+            export GOG_KEYRING_PASSWORD
+          else
+            unset GOG_KEYRING_PASSWORD
+          fi
+        fi
+        exec ${gogcliPkg}/bin/gog "$@"
+      '';
+    })
     pkgs.libimobiledevice
     pkgs.mas
     pkgs.nodejs
@@ -108,10 +141,8 @@ in
         if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
           exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
         fi
-        # Claude contexts that skipped zshrc: SA token from the Keychain
-        # (CLAUDECODE = Bash tool shells; CLAUDE_CODE_ENTRYPOINT = claude's
-        # own spawns — see the gh wrapper in scripts.nix).
-        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${CLAUDECODE:-}''${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
+        # AGENT_SHELL = the agent-agnostic seam (zsh.nix).
+        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "''${AGENT_SHELL:-}" ]; then
           OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
           if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
             export OP_SERVICE_ACCOUNT_TOKEN

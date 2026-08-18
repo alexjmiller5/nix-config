@@ -43,9 +43,15 @@
       url = "github:alexjmiller5/workspace-snapshot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # openclaw tool packages (gogcli et al.) at upstream release cadence —
+    # nixpkgs lags gogcli by months at its weekly release pace.
+    nix-openclaw-tools = {
+      url = "github:openclaw/nix-openclaw-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix, cherri, nix-vscode-extensions, workspace-snapshot }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix, cherri, nix-vscode-extensions, workspace-snapshot, nix-openclaw-tools }:
     let
       username = "alexmiller";
       mkHost = { host, home }: nix-darwin.lib.darwinSystem {
@@ -70,7 +76,7 @@
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
             home-manager.sharedModules = [ workspace-snapshot.homeModules.default ];
-            home-manager.extraSpecialArgs = { inherit username cherri nix-vscode-extensions; };
+            home-manager.extraSpecialArgs = { inherit username cherri nix-vscode-extensions nix-openclaw-tools; };
             home-manager.users.${username} = import home;
           }
         ];

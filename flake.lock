@@ -196,6 +196,26 @@
         "type": "github"
       }
     },
+    "nix-openclaw-tools": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786942561,
+        "narHash": "sha256-LHIv5LZlU5JJloI3gUOSYlUwx69GoivJiWkyQ1+cnmE=",
+        "owner": "openclaw",
+        "repo": "nix-openclaw-tools",
+        "rev": "68fc97c981022e5c159f27be31431d5d308f970b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "openclaw",
+        "repo": "nix-openclaw-tools",
+        "type": "github"
+      }
+    },
     "nix-vscode-extensions": {
       "inputs": {
         "nixpkgs": [
@@ -313,6 +333,7 @@
         "home-manager": "home-manager_2",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
+        "nix-openclaw-tools": "nix-openclaw-tools",
         "nix-vscode-extensions": "nix-vscode-extensions",
         "nixpkgs": "nixpkgs",
         "notion-finance-sync": "notion-finance-sync",
