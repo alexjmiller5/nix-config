@@ -15,8 +15,8 @@ routing table and workflow; this file is the in-repo map.
   `git.nix`, `scripts.nix`, and `cli-tools.nix`'s shared package list),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
-  `macos/{menu-bar,duti,nightlight,spotlight-raycast}.nix` (activation-script
-  defaults by concern, each exported via `homeModules`),
+  `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-shortcuts}.nix`
+  (activation-script defaults by concern, each exported via `homeModules`),
   `ssh.nix` (programs.ssh + private Include),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
