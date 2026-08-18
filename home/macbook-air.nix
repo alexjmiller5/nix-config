@@ -29,6 +29,7 @@ in
     ./macos/nightlight.nix
     ./macos/duti.nix
     ./macos/chrome-extension-shortcuts.nix
+    ./macos/chrome-extension-storage.nix
     ./ghostty.nix
     ./spotify-player.nix
     ./vscode.nix
@@ -44,6 +45,31 @@ in
       command_name = "1copy-highlighted-tabs";
       extension = "micdllihgoppmejpecmkilggmaagfdmb";
       global = false;
+    };
+  };
+
+  # Tab Copy's custom "URL Format" (urls only, newline-delimited) — lives in
+  # the extension's chrome.storage.local, wiped on reinstall. Captured from a
+  # live plyvel dump 2026-08-18; edit here (or re-dump) after UI changes,
+  # since these values are enforced over UI edits at every switch.
+  chrome.extensionStorage = {
+    profile = "Profile 1";
+    storage.micdllihgoppmejpecmkilggmaagfdmb = {
+      customFormatIds = [ "custom-9hVL4q" ];
+      orderedFormatIds = [ "custom-9hVL4q" ];
+      hiddenFormatIds = [ ];
+      formatOpts."custom-9hVL4q" = {
+        name = "URL Format";
+        template = {
+          start = "";
+          end = "";
+          tab = "[url]";
+          tabDelimiter = "[n]";
+          windowStart = "";
+          windowEnd = "";
+          windowDelimiter = "[n]";
+        };
+      };
     };
   };
 
