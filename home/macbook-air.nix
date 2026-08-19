@@ -176,7 +176,7 @@ in
               # invalid_grant = refresh token revoked (password change / 6mo
               # idle / consent withdrawn) → human re-consent is the only fix.
               err="$(jq -r '.error // empty' <<<"$resp" 2>/dev/null || true)"
-              echo "gog wrapper: token refresh failed (''${err:-no response from Google}) — refresh token likely revoked; re-run the consent bootstrap in the gog skill" >&2
+              echo "gog wrapper: token refresh failed (''${err:-no response from Google}) — refresh token likely revoked. Fix: Alex runs \`gog-auth-bootstrap\` in his own terminal (alias; script in the gog skill)." >&2
             fi
           fi
         fi
