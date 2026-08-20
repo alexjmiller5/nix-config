@@ -141,6 +141,9 @@ SIP can be restored to full at your convenience in Recovery
 * **1Password** — covered in bootstrap step 5 (app sign-in, `op signin`).
 * **Claude** — sign into the Claude desktop app and Claude Code (`claude` →
   `/login`); auth state lands in `~/.claude.json` (deliberate leftover).
+* **Claude in Chrome** — sign into the browser extension (toolbar icon →
+  sign in). Store-installed via the Chrome policy plist, but auth is per-
+  profile and GUI-only.
 * **Notion** — sign into the desktop app.
 * **VS Code** — sign into GitHub in-app (Copilot etc.). No Settings Sync —
   settings/keybindings are nix-managed.
