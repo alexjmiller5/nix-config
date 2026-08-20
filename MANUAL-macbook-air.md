@@ -219,7 +219,7 @@ Store extensions — install via Raycast Store or `https://raycast.com/<slug>`:
 
 `DanielSinclair/base64` · `mooxl/coffee` · `thomas/color-picker` ·
 `priithaamer/docker` · `ron-myers/facetime` · `hrishabhn/flighty` ·
-`josephschmitt/gif-search` · `destiner/iconify` ·
+`josephschmitt/gif-search` · `bjrmatos/hammerspoon` · `destiner/iconify` ·
 `pernielsentikaer/installed-extensions` · `shldk/macosicons` ·
 `Melvynx/qrcode-generator` · `maantje/remove-background` ·
 `tegola/remove-paywall` · `benvp/audio-device` · `mattisssa/spotify-player` ·
