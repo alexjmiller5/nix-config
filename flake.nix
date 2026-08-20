@@ -110,7 +110,6 @@
         macos-menu-bar = ./home/macos/menu-bar.nix;
         macos-spotlight-raycast = ./home/macos/spotlight-raycast.nix;
         macos-nightlight = ./home/macos/nightlight.nix;
-        macos-chrome-extension-shortcuts = ./home/macos/chrome-extension-shortcuts.nix;
         macos-chrome-extension-storage = ./home/macos/chrome-extension-storage.nix;
       };
     };

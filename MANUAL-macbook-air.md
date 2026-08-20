@@ -190,6 +190,14 @@ SIP can be restored to full at your convenience in Recovery
     REMOVED outright by the policy plist (`PasswordManagerEnabled` /
     `AutofillCreditCardEnabled` / `AutofillAddressEnabled` = false —
     1Password owns those), so they never appear in this panel.
+* **Chrome extension keyboard shortcuts** — app-owned, HMAC-signed in the
+  profile's `Secure Preferences` (`extensions.settings.<id>.commands`), so an
+  external write is ignored on startup (can't be codified without forging
+  Chrome's MAC + super_mac, which risks a protected-prefs reset). An extension
+  reload wipes them. Re-bind by hand at `chrome://extensions/shortcuts`:
+  - **Tab Copy → Copy selected tabs = ⇧⌘C** ("In Chrome" scope).
+  (Tab Copy's custom formats DO survive — they're in the extension's
+  unprotected LevelDB, restored by the `chrome-extension-storage` module.)
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
 * **Raycast**: clipboard history retention → 7 days; extensions → see

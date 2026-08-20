@@ -28,7 +28,6 @@ in
     ./macos/spotlight-raycast.nix
     ./macos/nightlight.nix
     ./macos/duti.nix
-    ./macos/chrome-extension-shortcuts.nix
     ./macos/chrome-extension-storage.nix
     ./ghostty.nix
     ./spotify-player.nix
@@ -37,16 +36,10 @@ in
     ./ssh.nix
   ];
 
-  # Tab Copy's "Copy selected tabs" shortcut — extension reloads wipe it.
-  # command_name comes from the extension's manifest.json "commands" keys.
-  chrome.extensionShortcuts = {
-    profile = "Profile 1";
-    commands."mac:Command+Shift+C" = {
-      command_name = "1copy-highlighted-tabs";
-      extension = "micdllihgoppmejpecmkilggmaagfdmb";
-      global = false;
-    };
-  };
+  # Tab Copy's ⇧⌘C shortcut is NOT codified: it lives in Chrome's HMAC-signed
+  # Secure Preferences (extensions.settings.<id>.commands), so an unsigned
+  # external write is ignored on startup. Re-bind it by hand after an
+  # extension reload — see MANUAL-macbook-air.md.
 
   # Tab Copy's custom "URL Format" (urls only, newline-delimited) — lives in
   # the extension's chrome.storage.local, wiped on reinstall. Captured from a
