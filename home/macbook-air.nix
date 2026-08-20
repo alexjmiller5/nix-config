@@ -29,6 +29,7 @@ in
     ./macos/nightlight.nix
     ./macos/duti.nix
     ./macos/chrome-extension-storage.nix
+    ./macos/chrome-remote-debugging.nix
     ./ghostty.nix
     ./spotify-player.nix
     ./vscode.nix
@@ -40,6 +41,10 @@ in
   # Secure Preferences (extensions.settings.<id>.commands), so an unsigned
   # external write is ignored on startup. Re-bind it by hand after an
   # extension reload — see MANUAL-macbook-air.md.
+
+  # Lets CDP clients attach to the real logged-in Chrome (the chrome-control
+  # skill's Tier 2); each connection still needs a manual "Allow" click.
+  chrome.remoteDebugging.enable = true;
 
   # Tab Copy's custom "URL Format" (urls only, newline-delimited) — lives in
   # the extension's chrome.storage.local, wiped on reinstall. Captured from a
