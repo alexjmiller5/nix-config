@@ -57,6 +57,42 @@ in
   # in the Keychain), so gh API calls are unauthenticated until a PAT lands in
   # the Mac Mini machine vault.
 
+  # Remote-control Claude Code sessions, started headless over ssh (iPhone
+  # "Claude on Mini" shortcut / laptop). Auth = long-lived `claude setup-token`
+  # from the machine vault via machine-sa — the keychain OAuth item is
+  # unreadable headless and its ACL breaks on every cask upgrade. The session
+  # lives in detached /usr/bin/screen from ~/Desktop (a trusted dir — trust
+  # for ~ itself never persists). Stop is pkill on claude, not `screen -X
+  # quit`: macOS screen orphans the child on quit.
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "claude-rc";
+      text = ''
+        pattern='claude --remote[-]control'
+        case "''${1:-}" in
+          start)
+            /usr/bin/screen -wipe >/dev/null 2>&1 || true
+            if /usr/bin/pgrep -f "$pattern" >/dev/null; then echo "already running"; exit 0; fi
+            # shellcheck disable=SC2016 # $HOME expands in the child zsh, not here
+            CLAUDE_CODE_OAUTH_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/Mac Mini Claude Code OAuth Token/credential')" \
+              /usr/bin/screen -dmS claude-rc /bin/zsh -c 'cd "$HOME/Desktop" && exec /opt/homebrew/bin/claude --remote-control'
+            echo "started - open Remote Control in the Claude app"
+            ;;
+          stop)
+            /usr/bin/pkill -f "$pattern" && echo "stopped" || echo "no session running"
+            ;;
+          status)
+            /usr/bin/pgrep -f "$pattern" >/dev/null && echo "running" || echo "not running"
+            ;;
+          *)
+            echo "usage: claude-rc start|stop|status" >&2
+            exit 1
+            ;;
+        esac
+      '';
+    })
+  ];
+
   # Clone-if-missing at activation (mini analog of the laptop's companion-repos).
   home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:$PATH"

@@ -30,8 +30,12 @@ in
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-op-env.sh}
           # SA token → headless; otherwise desktop-app auth (Touch ID).
-          GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
-          if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
+          # No auth source at all (the mini): skip — op read would prompt
+          # "add an account?" on /dev/tty and hang/garble headless callers.
+          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+            GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
+            if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
+          fi
         fi
         exec ${pkgs.gh}/bin/gh "$@"
       '';
