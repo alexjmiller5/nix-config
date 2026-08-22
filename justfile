@@ -27,6 +27,7 @@ switch-laptop:
 # Validate the flake
 check:
     nix flake check
+    bash tests/claude-memory.sh
 
 # Bump all inputs
 update:

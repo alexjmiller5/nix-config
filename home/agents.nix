@@ -13,6 +13,32 @@ let
     set -euo pipefail
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
     cd "$HOME/.config/agent-config"
+
+    # Claude auto-memory: adopt any new ~/.claude/projects/<slug>/memory dir
+    # into the repo, then (re)link every repo memory dir back out. Runs before
+    # the commit below, so new memories ride the same daily snapshot; RunAtLoad
+    # means a fresh machine gets its links at first login. Laptop-only — the
+    # mini pulls --ff-only, so memories written there stay machine-local.
+    # >>> claude-memory (extracted verbatim by tests/claude-memory.sh) >>>
+    for dir in "$HOME"/.claude/projects/*/memory; do
+      [ -d "$dir" ] && [ ! -L "$dir" ] && [ -n "$(ls -A "$dir")" ] || continue
+      slug=$(basename "$(dirname "$dir")")
+      if [ -e "memory/$slug" ]; then
+        echo "claude-memory: both $dir and memory/$slug exist — merge by hand" >&2
+      else
+        mv "$dir" "memory/$slug"
+      fi
+    done
+    for src in memory/*/; do
+      [ -d "$src" ] || continue
+      dst="$HOME/.claude/projects/$(basename "$src")/memory"
+      rmdir "$dst" 2>/dev/null || true   # empty local dir: safe to replace
+      if [ -e "$dst" ] && [ ! -L "$dst" ]; then continue; fi
+      mkdir -p "$(dirname "$dst")"
+      ln -sfn "$PWD/''${src%/}" "$dst"
+    done
+    # <<< claude-memory <<<
+
     git add -A
     git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
     if ! git pull --rebase origin main; then

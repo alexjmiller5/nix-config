@@ -319,27 +319,9 @@ in
   home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
   home.file.".claude/statusline.sh".source = mkLink "${agentConfig}/claude/statusline.sh";
 
-  # Claude auto-memory → agent-config (laptop-only: the mini pulls --ff-only
-  # and never pushes, so memories written there would strand as uncommitted
-  # changes; the mini's memories stay machine-local). One dir per cwd slug
-  # under agent-config/memory/. Memory dirs appear dynamically per working
-  # directory, so home.file can't enumerate them — this relinks whatever the
-  # repo has at each switch. New slug = move ~/.claude/projects/<slug>/memory
-  # into agent-config/memory/<slug>, then switch (a pre-existing real dir is
-  # skipped with a warning, never clobbered).
-  home.activation.claudeMemoryLinks = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    for src in "${agentConfig}"/memory/*/; do
-      [ -d "$src" ] || continue
-      slug=$(/usr/bin/basename "$src")
-      dst="$HOME/.claude/projects/$slug/memory"
-      if [ -e "$dst" ] && [ ! -L "$dst" ]; then
-        echo "claude-memory: $dst is a real dir — merge its files into $src and remove it, then re-switch" >&2
-      else
-        /bin/mkdir -p "$HOME/.claude/projects/$slug"
-        /bin/ln -sfn "''${src%/}" "$dst"
-      fi
-    done
-  '';
+  # Claude auto-memory lives in agent-config/memory/<cwd-slug>/, adopted and
+  # linked by the agent-config-sync agent (home/agents.nix) — not here, so
+  # adoption happens before that agent's commit rather than only at switch.
 
   # Hammerspoon profile selector — read by ~/.hammerspoon/init.lua at load.
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
