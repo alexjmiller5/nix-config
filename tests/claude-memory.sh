@@ -49,7 +49,21 @@ before=$(find memory "$HOME/.claude/projects" | sort)
 claude_memory
 [ "$(find memory "$HOME/.claude/projects" | sort)" = "$before" ] || fail "not idempotent"
 
-# --- scenario B: empty repo memory/ must not create a literal '*' dir ---
+# --- scenario B: a memory dir deleted from the repo leaves no dangling link ---
+# (writes through a dangling link fail silently, losing that project's memories)
+root=$(mktemp -d)
+export HOME="$root/home"
+mkdir -p "$HOME/.claude/projects/-gone" "$root/repo/memory"
+ln -s "$root/repo/memory/-gone" "$HOME/.claude/projects/-gone/memory"
+cd "$root/repo"
+claude_memory
+[ ! -L "$HOME/.claude/projects/-gone/memory" ] || fail "dangling link left behind"
+mkdir -p "$HOME/.claude/projects/-gone/memory"
+echo recovered > "$HOME/.claude/projects/-gone/memory/a.md" || fail "cannot recreate memory dir"
+claude_memory
+[ -f memory/-gone/a.md ]                     || fail "recreated dir not re-adopted"
+
+# --- scenario C: empty repo memory/ must not create a literal '*' dir ---
 root=$(mktemp -d)
 export HOME="$root/home"
 mkdir -p "$HOME/.claude/projects" "$root/repo/memory"

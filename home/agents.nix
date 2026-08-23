@@ -22,6 +22,9 @@ let
     # mini pulls --ff-only, so memories written there stay machine-local.
     # >>> claude-memory (extracted verbatim by tests/claude-memory.sh) >>>
     for dir in "$HOME"/.claude/projects/*/memory; do
+      # repo copy deleted (here or by a pull): drop the dangling link, else
+      # writes through it fail silently and that project loses its memories
+      if [ -L "$dir" ] && [ ! -e "$dir" ]; then rm "$dir"; fi
       [ -d "$dir" ] && [ ! -L "$dir" ] && [ -n "$(ls -A "$dir")" ] || continue
       slug=$(basename "$(dirname "$dir")")
       if [ -e "memory/$slug" ]; then
