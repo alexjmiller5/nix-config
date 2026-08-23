@@ -28,6 +28,7 @@ switch-laptop:
 check:
     nix flake check
     bash tests/claude-memory.sh
+    bash tests/wait-for-remote.sh
 
 # Bump all inputs
 update:

@@ -8,7 +8,8 @@ let
   # Robot commits are unsigned on purpose (no 1P dependency in launchd).
   # Conflicts abort loudly via notification and leave the repo pre-pull.
   # Daily + RunAtLoad; launchd runs missed calendar jobs on wake, so this
-  # effectively also fires when the lid opens after 10:00 passed asleep.
+  # effectively also fires when the lid opens after 10:00 passed asleep. Both
+  # of those beat the network up, so the run waits for it (see below).
   agentConfigSync = pkgs.writeShellScript "agent-config-sync" ''
     set -euo pipefail
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
@@ -41,6 +42,19 @@ let
 
     git add -A
     git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
+    # Login and wake both fire this before the network is up, and the op-backed
+    # credential helper then comes back empty, so every git op fails as "auth".
+    # Wait up to 15min for the remote to answer rather than skipping the run;
+    # give up silently (next login/calendar run retries) so the notification
+    # below means an actual conflict and nothing else.
+    # >>> wait-for-remote (extracted verbatim by tests/wait-for-remote.sh) >>>
+    online=
+    for _ in $(seq 60); do
+      git ls-remote origin >/dev/null 2>&1 && { online=1; break; }
+      sleep 15
+    done
+    [ -n "$online" ] || exit 0
+    # <<< wait-for-remote <<<
     if ! git pull --rebase origin main; then
       git rebase --abort 2>/dev/null || true
       /usr/bin/osascript -e 'display notification "sync conflict — resolve manually in agent-config" with title "agent-config sync"'
