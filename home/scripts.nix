@@ -2,8 +2,8 @@
 
 # Standalone commands, packaged (shellcheck at build, deps pinned, on PATH in
 # every context — launchd, Raycast, agent shells). Shell-state functions and
-# command shadows (just, code, modal) stay in zsh/functions.zsh; only real
-# tiny-programs live here. Shared by both hosts.
+# command shadows that need shell state (just, code) stay in zsh/functions.zsh;
+# only real tiny-programs live here. Shared by both hosts.
 let
   script = name: args: pkgs.writeShellApplication ({ inherit name; } // args);
 in
@@ -38,6 +38,39 @@ in
           fi
         fi
         exec ${pkgs.gh}/bin/gh "$@"
+      '';
+    })
+
+    # modal, ALWAYS authed via 1Password (AI Agent vault) — ~/.modal.toml is
+    # never written. PATH-level shadow, not a zsh function, so justfiles,
+    # scripts, launchd and agent shells get auth too (a function is invisible
+    # to all of them). Inside a uv project the project's pinned modal wins;
+    # the sentinel stops `uv run modal` re-entering this wrapper when the
+    # project has no modal dependency.
+    (script "modal" {
+      runtimeInputs = [ pkgs._1password-cli pkgs.uv ];
+      text = ''
+        if [ -z "''${MODAL_TOKEN_ID:-}" ]; then
+          ${builtins.readFile ./agent-op-env.sh}
+          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+            MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id' 2>/dev/null || true)"
+            MODAL_TOKEN_SECRET="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret' 2>/dev/null || true)"
+            if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
+              export MODAL_TOKEN_ID MODAL_TOKEN_SECRET
+            fi
+          fi
+        fi
+        in_uv_project=0
+        d=$PWD
+        while [ "$d" != "/" ]; do
+          if [ -f "$d/pyproject.toml" ]; then in_uv_project=1; break; fi
+          d=$(dirname "$d")
+        done
+        if [ "$in_uv_project" = 0 ] || [ -n "''${_MODAL_WRAPPED:-}" ]; then
+          exec uvx modal "$@"
+        fi
+        export _MODAL_WRAPPED=1
+        exec uv run modal "$@"
       '';
     })
 
