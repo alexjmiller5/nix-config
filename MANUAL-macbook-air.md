@@ -86,20 +86,29 @@ Snapshot verified against the system TCC db 2026-08-13. Audit anytime with:
 sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
   "SELECT service, client FROM access WHERE auth_value > 0 AND service IN
    ('kTCCServiceAccessibility','kTCCServiceListenEvent',
-    'kTCCServiceScreenCapture','kTCCServiceSystemPolicyAllFiles')
+    'kTCCServiceScreenCapture','kTCCServiceSystemPolicyAllFiles',
+    'kTCCServiceCalendar','kTCCServiceAddressBook','kTCCServiceMicrophone')
    ORDER BY service, client;"
 ```
 
 * **Accessibility**: Hammerspoon, Karabiner-Elements, yabai (the nix store
-  binary — re-grant on version bumps), AltTab, Raycast, Raycast Beta,
+  binary — re-grant on version bumps), AltTab, Raycast,
   BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
 * **Input Monitoring**: Karabiner-Elements (grants land on its helper
   binaries), Dolphin
 * **Screen Recording**: AltTab, 1Password, Notion, Claude, Chrome,
-  VS Code, Ghostty, Telegram, Zoom
-* **Full Disk Access**: VS Code, Ghostty, Raycast, Raycast Beta,
+  VS Code, Ghostty, Telegram, Zoom, Raycast
+* **Full Disk Access**: VS Code, Ghostty, Raycast,
   /bin/zsh (launchd/agent shell scripts)
+* **Calendar / Contacts**: Raycast
+* **Microphone**: Raycast
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
+
+Raycast asks for five at onboarding — Accessibility (window management,
+snippet expansion), Files and Folders, Calendar and Contacts, Microphone
+(dictation), Screen Recording (screenshots for AI screen awareness). Grant
+Full Disk Access instead of the per-folder "Files and Folders" rows; it
+supersedes them and is what the search-files extension needs.
 
 Path-keyed clients (nix-store yabai, brew's versioned node/claude-code paths)
 re-key on every version bump: yabai needs its Accessibility re-grant, the
@@ -215,6 +224,13 @@ headlessly, so extensions can't be nix-managed. Keep this list current when
 installing/removing; regenerate it with the "Installed Extensions" store
 extension and diff against this section.
 
+Faster restore path: Raycast's own **Export Settings & Data** command writes a
+passphrase-encrypted `.rayconfig` covering store extensions, settings, aliases,
+hotkeys, snippets, quicklinks and clipboard history — import it on the new Mac
+and this list is only the fallback. Scheduling that export (Settings → Advanced
+→ Export, pointed at iCloud Drive) needs Raycast Pro; the one-off export is
+free.
+
 Store extensions — install via Raycast Store or `https://raycast.com/<slug>`:
 
 `DanielSinclair/base64` · `mooxl/coffee` · `thomas/color-picker` ·
@@ -264,10 +280,6 @@ Screen Mirroring, Weather, 1Password, AirDrop, RepoBar, CodexBar.
 
 ## Known imperative leftovers (deliberate)
 
-* `/Applications/Raycast Beta.app` — manual download from raycast.com (no
-  cask exists for the beta channel; it self-updates). Its login item IS
-  declared (`home/agents.nix`); only the install itself is manual. Stable
-  Raycast stays alongside it as the declared `raycast` cask.
 * `gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
   declared. git's GitHub auth is NOT in this list anymore: it's the agenix PAT.
 

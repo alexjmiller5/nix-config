@@ -179,7 +179,6 @@ in
       "Notion"
       "Notion Calendar"
       "Raycast"
-      "Raycast Beta"
       "Receptor"
       "RepoBar"
       "Spotify"
