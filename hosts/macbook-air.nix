@@ -1,4 +1,4 @@
-{ pkgs, lib, username, ... }:
+{ config, pkgs, lib, username, ... }:
 
 # MacBook Air — LIVE since 2026-07-28 (generation 1). Mirrors the mini minus
 # its headless-server bits (never-sleep power settings, headless tailscaled)
@@ -255,6 +255,20 @@
           /usr/bin/xattr -dr com.apple.quarantine "$app"
         fi
       done
+
+      # yabai TCC reminder: Accessibility grants key on the nix store path,
+      # which changes on version bumps — the old grant dies and the keepalive
+      # agent spams Accessibility prompts (MANUAL-macbook-air.md). Compare
+      # against the last-switched path and print re-grant instructions.
+      yabaiBin='${config.services.yabai.package}/bin/yabai'
+      if [ "$(cat /var/db/yabai-tcc-path 2>/dev/null)" != "$yabaiBin" ]; then
+        printf '\n\033[1;33myabai store path changed — re-grant Accessibility or the prompt spam returns:\033[0m\n'
+        echo "  System Settings > Privacy & Security > Accessibility:"
+        echo "    1. remove the stale yabai row (minus button)"
+        echo "    2. + > Cmd+Shift+G > paste: $yabaiBin"
+        echo "    3. toggle it ON"
+        echo "$yabaiBin" > /var/db/yabai-tcc-path
+      fi
     '';
 
   # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:

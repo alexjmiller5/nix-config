@@ -140,6 +140,8 @@ What stays manual:
 
 1. Accessibility grant (below) — and RE-grant after any yabai version bump:
    the nix store path (and the binary TCC keys on) changes with each update.
+   `switch-macbook` detects the path change (state in /var/db/yabai-tcc-path)
+   and prints the new path + re-grant steps at the end of activation.
 
 SIP can be restored to full at your convenience in Recovery
 (`csrutil enable`) and the `-arm64e_preview_abi` boot-arg cleared
