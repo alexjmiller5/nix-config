@@ -71,7 +71,8 @@ let
   # upgrade brew formulae, then notify — switching stays a human decision.
   weeklyUpdates = pkgs.writeShellScript "weekly-updates" ''
     set -uo pipefail
-    export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/opt/homebrew/bin:/usr/bin:/bin"
+    # /nix/var/nix/profiles/default/bin: nix lives ONLY here with nix.enable=false (Determinate)
+    export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/opt/homebrew/bin:/usr/bin:/bin"
     cd "$HOME/.config/nix-config"
     nix flake update
     if nix build .#darwinConfigurations.macbook-air.system; then
