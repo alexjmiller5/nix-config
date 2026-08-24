@@ -212,8 +212,9 @@ SIP can be restored to full at your convenience in Recovery
   unprotected LevelDB, restored by the `chrome-extension-storage` module.)
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
-* **Raycast**: clipboard history retention → 7 days; extensions → see
-  "Raycast extensions" section below.
+* **Raycast**: clipboard history retention → 7 days; Advanced → Interface Size
+  → middle of the three (medium); extensions → see "Raycast extensions"
+  section below.
 * **Nightlight**: the activation script needs a display connected on first run.
 
 ## Raycast extensions (undeclarable — this list IS the declaration)
