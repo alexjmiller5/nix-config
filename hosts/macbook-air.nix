@@ -293,12 +293,14 @@
   # unused ruby managers dropped outright; brew auto-keeps real deps).
   homebrew = {
     enable = true;
+    # trusted = true feeds Homebrew's tap-trust store at activation — without
+    # it brew ignores the tap's formulae/casks entirely.
     taps = [
       # Alex's personal cask tap — apps released by their repos' CI
       # (gemini-desktop, receptor, ...).
-      "alexjmiller5/tap"
-      "smudge/smudge"
-      "steipete/tap"
+      { name = "alexjmiller5/tap"; trusted = true; }
+      { name = "smudge/smudge"; trusted = true; }
+      { name = "steipete/tap"; trusted = true; }
     ];
     brews = [
       "chrome-cli"
