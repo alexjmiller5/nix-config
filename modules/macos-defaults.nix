@@ -77,6 +77,11 @@
         DSDontWriteUSBStores = true;
       };
       "com.apple.TimeMachine".DoNotOfferNewDisksForBackup = true;
+      # Built-in dictation on (hammerspoon hyper+d triggers Edit > Start
+      # Dictation); first use on a fresh machine still downloads the
+      # on-device speech model itself
+      "com.apple.HIToolbox".AppleDictationAutoEnable = 1;
+      "com.apple.assistant.support"."Dictation Enabled" = true;
       "com.google.Chrome".DisablePrintPreview = true;
       # Menu bar system-icon visibility lives in the ByHost controlcenter
       # domain on macOS 26 (the plain-domain "NSStatusItem Visible" keys are
