@@ -3,6 +3,7 @@
 {
   programs.zsh.shellAliases = {
     claude = "claude --model fable";
+    cc = "claude"; # expands recursively, so it inherits the fable flag
     claude-max = "claude --model claude-fable --effort max";
     op-temp-sa = "~/.claude/skills/1password/scripts/op-temp-sa";
     # Load the temp-SA token minted by op-temp-sa into this shell (aliases run
