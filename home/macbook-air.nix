@@ -328,11 +328,14 @@ in
   home.file.".config/hammerspoon-profile".text = "personal";
 
   # Workspace Snapshot — its flake's home-manager module (imported via
-  # sharedModules in flake.nix) installs the Spoon (the hammerspoon repo
-  # gitignores that path), the Application Support scripts dir the Claude
-  # SessionStart hook references, and the VS Code terminals extension.
-  # Replaces the repo's install.sh; updates ride the weekly flake input bump.
+  # sharedModules in flake.nix) installs the Application Support scripts dir
+  # the Claude SessionStart hook references and the VS Code terminals
+  # extension. Replaces the repo's install.sh; updates ride the weekly flake
+  # input bump. The Spoon itself is NOT symlinked anymore: the hammerspoon
+  # repo vendors all spoons in-tree (real dir at the same path), so the
+  # module's spoon file is disabled here.
   programs.workspace-snapshot.enable = true;
+  home.file.".hammerspoon/Spoons/WorkspaceSnapshot.spoon".enable = false;
 
   # Companion working clones — clone-if-missing at activation. Makes the
   # MANUAL clone steps self-healing: a fresh machine bootstraps from a local
