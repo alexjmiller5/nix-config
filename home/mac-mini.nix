@@ -42,16 +42,19 @@ in
   # default would otherwise point at a socket that never exists.
   programs.ssh.settings."*".IdentityAgent = lib.mkForce "SSH_AUTH_SOCK";
 
-  # Commit signing, same key as the laptop: the pub-key literal makes git
-  # sign via ssh-keygen against the agent — which is the laptop's 1P agent,
+  # Commit signing, mirroring the laptop: the op-ssh-sign-auto router (in
+  # agent-config, via the skills symlink) signs headless with the claude-code
+  # key in agent shells (SA token → op read → ephemeral ssh-agent) and falls
+  # back to plain ssh-keygen otherwise — which uses the laptop's 1P agent,
   # forwarded (ForwardAgent yes on the mac-mini host blocks in nix-secrets;
-  # Touch ID prompts land on the laptop). gpgsign stays OFF: detached
-  # sessions (claude-rc, launchd) have no forwarded agent and auto-sign
-  # would make their commits fail. Sign with `git commit -S` (or per-repo
-  # `git config commit.gpgsign true`) when ssh'ed in.
+  # Touch ID prompts land on the laptop). Both contexts can sign, so gpgsign
+  # is ON like the laptop. Escape hatch if ever agent-less:
+  # `git -c commit.gpgsign=false commit`.
   programs.git.settings = {
     user.signingkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKWqJ5X61r/CFl99qjU/rZyIB4DCQpVI+cF0y33WSSMC";
     gpg.format = "ssh";
+    gpg.ssh.program = "${config.home.homeDirectory}/.claude/skills/1password/scripts/op-ssh-sign-auto";
+    commit.gpgsign = true;
   };
 
   # Inbound ssh from the laptop: public half of "Mac Mini SSH Key" (private
