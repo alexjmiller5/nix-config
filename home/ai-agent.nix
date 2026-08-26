@@ -20,4 +20,18 @@
   config.home.packages =
     [ pkgs.nodejs ] # agent-config hooks exec `node`; nix's shadows brew's (see zsh.nix)
     ++ lib.optional config.aiAgent.withOp pkgs._1password-cli;
+
+  # Claude Code never persists home-dir trust acceptance to disk (session-only
+  # by design), so launching `claude` from ~ re-prompts on every start. Seed
+  # the flag at each switch; everything else in ~/.claude.json stays app-owned
+  # runtime state we never manage. A claude session running during the switch
+  # may clobber the write on exit - it converges at the next switch.
+  config.home.activation.claudeTrustHomeDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    claudeJson="$HOME/.claude.json"
+    [ -s "$claudeJson" ] || echo '{}' > "$claudeJson"
+    if [ "$(${pkgs.jq}/bin/jq -r --arg d "$HOME" '.projects[$d].hasTrustDialogAccepted' "$claudeJson")" != "true" ]; then
+      ${pkgs.jq}/bin/jq --arg d "$HOME" '.projects[$d].hasTrustDialogAccepted = true' "$claudeJson" \
+        > "$claudeJson.tmp" && mv "$claudeJson.tmp" "$claudeJson" && chmod 600 "$claudeJson"
+    fi
+  '';
 }

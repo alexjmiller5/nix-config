@@ -43,7 +43,10 @@ routing table and workflow; this file is the in-repo map.
   from `dotfiles/` (configs apps never write and no module covers) >
   `mkOutOfStoreSymlink` into a companion working clone (files apps DO write:
   VS Code settings, Claude config/skills). Never manage runtime auth state
-  (`~/.claude.json`, `gh hosts.yml`).
+  (`~/.claude.json`, `gh hosts.yml`) — sole exception: `ai-agent.nix`'s
+  activation script seeds the home-dir trust flag into `~/.claude.json`
+  (Claude Code won't persist it itself); it merges that one key and owns
+  nothing else in the file.
 * **Privacy split**: this repo is PUBLIC. Personal context → `agent-config`
   repo; runtime values with hostnames/IPs → `nix-secrets` repo (ssh Include).
 * nixpkgs first for CLI tools (verify attr names — brew names differ:
