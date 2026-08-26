@@ -65,6 +65,19 @@
   # real macOS 26.x injection support.
   #
   # config.layout is set purely so the module writes a yabairc and passes
+  # Screen Time backup ALSO on the laptop (mini keeps running its own): only a
+  # macOS ≤26.2 machine can read the ScreenTimeAgent store, and its
+  # DeviceActivity/Cloud segments carry the cross-device per-app AND per-site
+  # usage (incl. iPhone web domains) that the mini (26.3, vaulted) cannot
+  # capture. dirSuffix keeps same-day runs from colliding in the shared
+  # iCloud folder. One manual step after first rebuild: grant
+  # /Applications/ScreenTimeBackup.app Full Disk Access (MANUAL-macbook-air.md).
+  services.screentime-backup = {
+    enable = true;
+    user = username;
+    dirSuffix = "-macbook";
+  };
+
   # `-c` — without any config yabai warns "could not locate config file" on
   # every start. `float` matches yabai's own default (no auto-tiling); switch
   # to "bsp" here for automatic tiling.

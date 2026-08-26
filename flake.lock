@@ -343,11 +343,11 @@
     },
     "screentime-backup": {
       "locked": {
-        "lastModified": 1783918298,
-        "narHash": "sha256-iTfG9qZzcvyKRzb1II9lv5FLraFiXbgteCGbX8wnzBI=",
+        "lastModified": 1787765672,
+        "narHash": "sha256-829QKhvJF1I6TtGNt7AqLPXBwi2dtQE6knU/1fEzrpU=",
         "owner": "alexjmiller5",
         "repo": "screentime-backup",
-        "rev": "7d091b89aa1a2a7f27f5165976568b2739f5a611",
+        "rev": "85a0e5b00c1d02a8dc9a0134e2e25f1780cc13b0",
         "type": "github"
       },
       "original": {

@@ -99,7 +99,10 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
 * **Screen Recording**: AltTab, 1Password, Notion, Claude, Chrome,
   VS Code, Ghostty, Telegram, Zoom, Raycast
 * **Full Disk Access**: VS Code, Ghostty, Raycast,
-  /bin/zsh (launchd/agent shell scripts)
+  /bin/zsh (launchd/agent shell scripts),
+  /Applications/ScreenTimeBackup.app (the weekly Screen Time backup agent —
+  grant ONCE after the enabling rebuild; the stable self-signed cert keeps
+  the grant valid across rebuilds)
 * **Calendar / Contacts**: Raycast
 * **Microphone**: Raycast
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
