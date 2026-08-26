@@ -23,7 +23,7 @@ in
 {
   imports = [
     ./common.nix
-    ./op-claude-sa.nix
+    ./ai-agent.nix
     ./zsh.nix
     ./aliases/dev.nix
     ./aliases/ai.nix

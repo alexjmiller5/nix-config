@@ -100,6 +100,7 @@
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
         op-claude-sa = ./home/op-claude-sa.nix;
+        ai-agent = ./home/ai-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         ghostty = ./home/ghostty.nix;
         # vscode needs the consumer to pass nix-vscode-extensions via extraSpecialArgs

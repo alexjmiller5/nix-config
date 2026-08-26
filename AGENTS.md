@@ -15,6 +15,10 @@ routing table and workflow; this file is the in-repo map.
   `git.nix`, `scripts.nix`, and `cli-tools.nix`'s shared package list),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
+  `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
+  PATH, and `op-claude-sa.nix` — login-time Keychain load of the claude-code
+  SA token from the machine vault; host-layer sibling = `claude-code` +
+  `notion-cli` casks),
   `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),
   `ssh.nix` (programs.ssh + private Include),

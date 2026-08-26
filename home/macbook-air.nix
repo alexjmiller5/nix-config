@@ -20,7 +20,7 @@ in
 {
   imports = [
     ./common.nix
-    ./op-claude-sa.nix
+    ./ai-agent.nix
     ./zsh.nix
     ./aliases/dev.nix
     ./aliases/ai.nix
@@ -37,6 +37,10 @@ in
     ./agents.nix
     ./ssh.nix
   ];
+
+  # ai-agent.nix: op stays the 1password-cli brew cask here (desktop-app
+  # integration — see the TODO next to the cask in hosts/macbook-air.nix).
+  aiAgent.withOp = false;
 
   # Keychain claude-code SA token ("op-claude-sa"), refreshed at every login
   # from the machine vault via the machine SA — see home/op-claude-sa.nix.
@@ -191,7 +195,6 @@ in
     })
     pkgs.libimobiledevice
     pkgs.mas
-    pkgs.nodejs
     pkgs.oci-cli
     pkgs.pnpm
     pkgs.terraform # unfree (BSL) — allowed in hosts/macbook-air.nix predicate

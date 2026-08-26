@@ -5,7 +5,8 @@
   system.primaryUser = username;
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # The 1Password CLI (op) — used by the notion-finance-sync sync — is unfree.
+  # The 1Password CLI (op) — agent shells (home/ai-agent.nix) and the
+  # notion-finance-sync sync — is unfree.
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "1password-cli" ];
 
   # Determinate Nix manages the nix daemon itself; nix-darwin must not.
@@ -38,6 +39,8 @@
     enable = true;
     casks = [
       "claude-code"
+      # ntn — home/ai-agent.nix's host-layer sibling (not in nixpkgs).
+      "notion-cli"
       # Normally declared by the notion-finance-sync module — pinned here while
       # the sync is paused so zap doesn't uninstall Chrome (bank session
       # profiles keep their browser). Drop when the sync is re-enabled.
