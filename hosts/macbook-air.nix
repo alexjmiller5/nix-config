@@ -54,17 +54,6 @@
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 
-  # yabai: the org.nixos.yabai launchd agent runs the nix package for BSP
-  # tiling. The scripting addition is OFF — macOS 26.1's AMFI enforces library
-  # validation on Dock (a platform binary) and refuses to load yabai's
-  # third-party ad-hoc payload, so SA-only features (space create/destroy,
-  # cross-display space moves, opacity, sticky windows) don't work regardless
-  # of SIP state. With the SA off there's no yabai-sa daemon and no
-  # /etc/sudoers.d/yabai. Still manual: granting Accessibility when the store
-  # path changes on upgrades (MANUAL-macbook-air.md). Revisit if yabai ships
-  # real macOS 26.x injection support.
-  #
-  # config.layout is set purely so the module writes a yabairc and passes
   # Screen Time backup ALSO on the laptop (mini keeps running its own): only a
   # macOS ≤26.2 machine can read the ScreenTimeAgent store, and its
   # DeviceActivity/Cloud segments carry the cross-device per-app AND per-site
@@ -78,6 +67,17 @@
     dirSuffix = "-macbook";
   };
 
+  # yabai: the org.nixos.yabai launchd agent runs the nix package for BSP
+  # tiling. The scripting addition is OFF — macOS 26.1's AMFI enforces library
+  # validation on Dock (a platform binary) and refuses to load yabai's
+  # third-party ad-hoc payload, so SA-only features (space create/destroy,
+  # cross-display space moves, opacity, sticky windows) don't work regardless
+  # of SIP state. With the SA off there's no yabai-sa daemon and no
+  # /etc/sudoers.d/yabai. Still manual: granting Accessibility when the store
+  # path changes on upgrades (MANUAL-macbook-air.md). Revisit if yabai ships
+  # real macOS 26.x injection support.
+  #
+  # config.layout is set purely so the module writes a yabairc and passes
   # `-c` — without any config yabai warns "could not locate config file" on
   # every start. `float` matches yabai's own default (no auto-tiling); switch
   # to "bsp" here for automatic tiling.
