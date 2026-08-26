@@ -8,10 +8,12 @@
 # karabiner, VS Code) and the Apple build chain.
 #
 # agent-config is a real git clone (cloned at activation, refreshed by a
-# daily pull-only agent below) — no iCloud involved. The laptop stays the
-# ONLY pusher (its sync agent commits+pushes); the mini never writes, so
-# there's no push race. Clone/pull auth = the machine-vault PAT credential
-# helper below — no gh login involved.
+# daily pull-only agent below) — no iCloud involved. For the agent-config
+# SYNC, the laptop stays the only pusher (its sync agent commits+pushes;
+# the mini's sync never writes, so there's no push race) — but the mini is
+# otherwise a full dev machine: general git pushes work and auth via the
+# AI Agent vault PAT (gh wrapper), same as the laptop. Sync clone/pull auth
+# = the repo-scoped machine-vault PAT credential helper below.
 let
   agentConfig = "${config.home.homeDirectory}/.config/agent-config";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
@@ -64,21 +66,27 @@ in
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
-  # git-over-https auth (overrides git.nix's gh mkDefault): the read-only
-  # fine-grained PAT is read from the "Mac Mini" 1P vault at credential time,
-  # authenticated by the agenix-decrypted machine SA token. IDs, not names.
-  # No gh auth involved — nothing to log in at bootstrap.
-  programs.git.settings.credential."https://github.com".helper =
-    "!${pkgs.writeShellScript "git-credential-machine-vault" ''
-      [ "$1" = get ] || exit 0
-      printf 'username=alexjmiller5\n'
-      printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential')"
-    ''}";
-
-  # gh (for interactive CLI use — no longer the git credential source) comes
-  # from the scripts.nix op-authed wrapper; no bare pkgs.gh here. Agent-context
-  # gh calls auth via the agent SA token file (refreshed below); calls in
-  # Alex's own ssh shells have no op auth source and stay unauthenticated.
+  # git-over-https auth, split by repo (mirrors macbook-air.nix):
+  #  - agent-config: the machine-vault read-only fine-grained PAT, read at
+  #    credential time via the agenix-decrypted machine SA. Bootstrap-only
+  #    auth — it exists so the activation clone and daily pull work on a
+  #    fresh machine before any login/agent state does. IDs, not names.
+  #  - everything else: git.nix's `gh auth git-credential` default = the
+  #    scripts.nix op-authed gh PATH wrapper — AI Agent vault PAT in agent
+  #    shells (the agent's creds come from the AI Agent vault, never the
+  #    machine vault); Alex's own ssh shells have no op auth source and
+  #    stay unauthenticated.
+  # useHttpPath makes git consult the repo-scoped helper key; the .git
+  # suffix is REQUIRED — path matching is exact and the remote carries it.
+  programs.git.settings.credential = {
+    "https://github.com".useHttpPath = true;
+    "https://github.com/alexjmiller5/agent-config.git".helper =
+      "!${pkgs.writeShellScript "git-credential-machine-vault" ''
+        [ "$1" = get ] || exit 0
+        printf 'username=alexjmiller5\n'
+        printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential')"
+      ''}";
+  };
 
   # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
   # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
