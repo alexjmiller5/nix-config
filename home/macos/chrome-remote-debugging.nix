@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 # Chrome's remote-debugging opt-in (chrome://inspect/#remote-debugging), the
 # toggle that lets CDP clients attach to the REAL logged-in profile. Since
@@ -17,8 +22,7 @@ let
   cfg = config.chrome.remoteDebugging;
 in
 {
-  options.chrome.remoteDebugging.enable = lib.mkEnableOption
-    "Chrome's chrome://inspect remote-debugging opt-in";
+  options.chrome.remoteDebugging.enable = lib.mkEnableOption "Chrome's chrome://inspect remote-debugging opt-in";
 
   config = lib.mkIf cfg.enable {
     home.activation.chromeRemoteDebugging = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

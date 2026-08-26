@@ -1,4 +1,10 @@
-{ config, osConfig, lib, pkgs, ... }:
+{
+  config,
+  osConfig,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Mini home profile: full dev parity with the laptop at the shell level —
 # shared base + dev toolbox + the laptop's shell (zsh/starship/all alias
@@ -74,7 +80,10 @@ in
   machineVaultGit = {
     patOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential";
     patAuthFile = osConfig.age.secrets.machine-sa.path;
-    patRepos = [ "alexjmiller5/agent-config" "alexjmiller5/nix-secrets" ];
+    patRepos = [
+      "alexjmiller5/agent-config"
+      "alexjmiller5/nix-secrets"
+    ];
     companionRepos = {
       "alexjmiller5/agent-config" = "${config.home.homeDirectory}/.config/agent-config";
       "alexjmiller5/nix-config" = "${config.home.homeDirectory}/.config/nix-config";
@@ -128,7 +137,6 @@ in
     })
   ];
 
-
   # Daily pull, 30min after the laptop's 10:00 push window; RunAtLoad catches
   # up after downtime.
   launchd.agents.agent-config-pull = {
@@ -137,7 +145,12 @@ in
       Label = "com.alexmiller.agent-config-pull";
       ProgramArguments = [ "${agentConfigPull}" ];
       RunAtLoad = true;
-      StartCalendarInterval = [ { Hour = 10; Minute = 30; } ];
+      StartCalendarInterval = [
+        {
+          Hour = 10;
+          Minute = 30;
+        }
+      ];
       StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-config-pull.log";
       StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-pull.log";
     };

@@ -1,4 +1,9 @@
-{ pkgs, lib, username, ... }:
+{
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 
 # Shared darwin host base — everything identical on every machine, injected
 # for each host by mkHost (flake.nix). Host files carry only their diffs.
@@ -11,8 +16,12 @@
   # toolbox. vscode-extension- prefix: licensed/platform-specific extensions
   # from pkgs.vscode-extensions (laptop's home/vscode.nix; a no-op on hosts
   # that don't import it).
-  nixpkgs.config.allowUnfreePredicate = pkg:
-    builtins.elem (lib.getName pkg) [ "1password-cli" "terraform" ]
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "1password-cli"
+      "terraform"
+    ]
     || lib.hasPrefix "vscode-extension-" (lib.getName pkg);
 
   # Both machines' nix installs (standalone installer on the laptop,
@@ -25,7 +34,10 @@
     home = "/Users/${username}";
   };
 
-  environment.systemPackages = [ pkgs.git pkgs.just ];
+  environment.systemPackages = [
+    pkgs.git
+    pkgs.just
+  ];
 
   # Canonical flake location: darwin-rebuild and the infra aliases
   # (switch-*, valiases, …) resolve /etc/nix-darwin on either machine. A

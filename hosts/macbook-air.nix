@@ -1,4 +1,10 @@
-{ config, pkgs, lib, username, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 
 # MacBook Air — the GUI-full host. The mini matches it at the shell/dev
 # level (see home/dev-tools.nix + home/mac-mini.nix); this host adds the GUI
@@ -72,43 +78,42 @@
   # chrome-policy.nix contributes its own postActivation entry — the
   # option is types.lines, so the definitions merge.
   system.activationScripts.postActivation.text = ''
-      # Rosetta 2, declared (needed by EGGNOGG+ in home/macbook-air.nix —
-      # x86_64-only). No nix-darwin option exists; activation runs as root,
-      # so install here, guarded by the oahd check to stay idempotent.
-      if ! /usr/bin/pgrep -q oahd; then
-        /usr/sbin/softwareupdate --install-rosetta --agree-to-license
-      fi
+    # Rosetta 2, declared (needed by EGGNOGG+ in home/macbook-air.nix —
+    # x86_64-only). No nix-darwin option exists; activation runs as root,
+    # so install here, guarded by the oahd check to stay idempotent.
+    if ! /usr/bin/pgrep -q oahd; then
+      /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+    fi
 
-      # De-quarantine declared casks — successor to brew's removed
-      # --no-quarantine (Homebrew/brew#20755). Runs after brew bundle
-      # (postActivation is last), so freshly installed casks are covered.
-      # Scoped to brew-managed apps via the Caskroom app symlinks on
-      # purpose: anything else in /Applications keeps its Gatekeeper
-      # prompt. Quarantine-flag check on the bundle root keeps re-runs
-      # cheap (no recursive walk unless there's something to strip).
-      for link in /opt/homebrew/Caskroom/*/*/*.app; do
-        app=$(/usr/bin/readlink "$link" || echo "$link")
-        if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
-          echo "de-quarantining $app" >&2
-          /usr/bin/xattr -dr com.apple.quarantine "$app"
-        fi
-      done
-
-      # yabai TCC reminder: Accessibility grants key on the nix store path,
-      # which changes on version bumps — the old grant dies and the keepalive
-      # agent spams Accessibility prompts (MANUAL-macbook-air.md). Compare
-      # against the last-switched path and print re-grant instructions.
-      yabaiBin='${config.services.yabai.package}/bin/yabai'
-      if [ "$(cat /var/db/yabai-tcc-path 2>/dev/null)" != "$yabaiBin" ]; then
-        printf '\n\033[1;33myabai store path changed — re-grant Accessibility or the prompt spam returns:\033[0m\n'
-        echo "  System Settings > Privacy & Security > Accessibility:"
-        echo "    1. remove the stale yabai row (minus button)"
-        echo "    2. + > Cmd+Shift+G > paste: $yabaiBin"
-        echo "    3. toggle it ON"
-        echo "$yabaiBin" > /var/db/yabai-tcc-path
+    # De-quarantine declared casks — successor to brew's removed
+    # --no-quarantine (Homebrew/brew#20755). Runs after brew bundle
+    # (postActivation is last), so freshly installed casks are covered.
+    # Scoped to brew-managed apps via the Caskroom app symlinks on
+    # purpose: anything else in /Applications keeps its Gatekeeper
+    # prompt. Quarantine-flag check on the bundle root keeps re-runs
+    # cheap (no recursive walk unless there's something to strip).
+    for link in /opt/homebrew/Caskroom/*/*/*.app; do
+      app=$(/usr/bin/readlink "$link" || echo "$link")
+      if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
+        echo "de-quarantining $app" >&2
+        /usr/bin/xattr -dr com.apple.quarantine "$app"
       fi
+    done
+
+    # yabai TCC reminder: Accessibility grants key on the nix store path,
+    # which changes on version bumps — the old grant dies and the keepalive
+    # agent spams Accessibility prompts (MANUAL-macbook-air.md). Compare
+    # against the last-switched path and print re-grant instructions.
+    yabaiBin='${config.services.yabai.package}/bin/yabai'
+    if [ "$(cat /var/db/yabai-tcc-path 2>/dev/null)" != "$yabaiBin" ]; then
+      printf '\n\033[1;33myabai store path changed — re-grant Accessibility or the prompt spam returns:\033[0m\n'
+      echo "  System Settings > Privacy & Security > Accessibility:"
+      echo "    1. remove the stale yabai row (minus button)"
+      echo "    2. + > Cmd+Shift+G > paste: $yabaiBin"
+      echo "    3. toggle it ON"
+      echo "$yabaiBin" > /var/db/yabai-tcc-path
+    fi
   '';
-
 
   # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
   # nix rewrites it on switch, so manual drag-ins don't survive.
@@ -136,9 +141,18 @@
     taps = [
       # Alex's personal cask tap — apps released by their repos' CI
       # (gemini-desktop, receptor, ...).
-      { name = "alexjmiller5/tap"; trusted = true; }
-      { name = "smudge/smudge"; trusted = true; }
-      { name = "steipete/tap"; trusted = true; }
+      {
+        name = "alexjmiller5/tap";
+        trusted = true;
+      }
+      {
+        name = "smudge/smudge";
+        trusted = true;
+      }
+      {
+        name = "steipete/tap";
+        trusted = true;
+      }
     ];
     brews = [
       "chrome-cli"

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 # Machine-vault git bootstrap, shared by both hosts (options set per host).
 # Two pieces that exist for the same reason — a fresh machine must be able
@@ -45,19 +50,21 @@ in
   };
 
   config = {
-    programs.git.settings.credential =
-      { "https://github.com".useHttpPath = true; }
-      // lib.listToAttrs (map
-        (repo: lib.nameValuePair "https://github.com/${repo}.git" { inherit helper; })
-        cfg.patRepos);
+    programs.git.settings.credential = {
+      "https://github.com".useHttpPath = true;
+    }
+    // lib.listToAttrs (
+      map (repo: lib.nameValuePair "https://github.com/${repo}.git" { inherit helper; }) cfg.patRepos
+    );
 
     home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       companionClone() {
         [ -d "$2" ] || /usr/bin/git clone --quiet "https://github.com/$1.git" "$2" \
           || echo "companion-repos: clone of $1 failed — machine-sa decrypted? PAT scoped to it? re-run switch" >&2
       }
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList
-        (repo: dest: ''companionClone ${repo} "${dest}"'') cfg.companionRepos)}
+      ${lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (repo: dest: ''companionClone ${repo} "${dest}"'') cfg.companionRepos
+      )}
     '';
   };
 }

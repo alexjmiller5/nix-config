@@ -5,11 +5,19 @@
 # since 2015 (upload 138870); x86_64-only, needs Rosetta (installed by
 # hosts/macbook-air.nix postActivation). Lands in
 # ~/Applications/Home Manager Apps.
-{ stdenvNoCC, curl, cacert, unzip }:
+{
+  stdenvNoCC,
+  curl,
+  cacert,
+  unzip,
+}:
 let
   zip = stdenvNoCC.mkDerivation {
     name = "eggnoggplus-osx.zip";
-    nativeBuildInputs = [ curl cacert ];
+    nativeBuildInputs = [
+      curl
+      cacert
+    ];
     SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
     buildCommand = ''
       csrf=$(curl -s -c cookies.txt https://madgarden.itch.io/eggnogg \

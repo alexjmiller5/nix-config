@@ -46,7 +46,10 @@ in
 
     # Download a video and convert it to a palette-optimized GIF in cwd.
     (script "ytdlp-gif" {
-      runtimeInputs = [ pkgs.yt-dlp pkgs.ffmpeg ];
+      runtimeInputs = [
+        pkgs.yt-dlp
+        pkgs.ffmpeg
+      ];
       text = ''
         [ $# -eq 1 ] || { echo "Usage: ytdlp-gif <url>"; exit 1; }
         url="$1"

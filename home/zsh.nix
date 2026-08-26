@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 # Zsh, fully nix-managed. Ported 1:1 from the pre-nix ~/.config/zsh setup
 # (ZDOTDIR layout preserved via dotDir). Aliases live in home/aliases/*.nix

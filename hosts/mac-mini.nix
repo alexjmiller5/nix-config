@@ -1,4 +1,10 @@
-{ config, pkgs, lib, username, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 
 # Shared base (stateVersion, unfree predicate, /etc/nix-darwin, brew zap, …)
 # comes from modules/darwin-base.nix via mkHost.

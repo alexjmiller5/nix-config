@@ -7,7 +7,12 @@
 # HOST-LAYER SIBLING (home-manager can't declare casks): the host's
 # homebrew.casks needs `claude-code` and `notion-cli` (ntn — not in
 # nixpkgs), and its allowUnfreePredicate must include "1password-cli".
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [ ./op-agent-sa.nix ];
 
@@ -17,9 +22,10 @@
     description = "Install op (pkgs._1password-cli) on PATH. Disable where op is already provided some other way (e.g. a host's 1password-cli brew cask).";
   };
 
-  config.home.packages =
-    [ pkgs.nodejs ] # agent-config hooks exec `node`; nix's shadows brew's (see zsh.nix)
-    ++ lib.optional config.aiAgent.withOp pkgs._1password-cli;
+  config.home.packages = [
+    pkgs.nodejs
+  ] # agent-config hooks exec `node`; nix's shadows brew's (see zsh.nix)
+  ++ lib.optional config.aiAgent.withOp pkgs._1password-cli;
 
   # Claude Code never persists home-dir trust acceptance to disk (session-only
   # by design), so launching `claude` from ~ re-prompts on every start. Seed

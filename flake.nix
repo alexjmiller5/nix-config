@@ -50,41 +50,49 @@
     };
   };
 
-  outputs = inputs@{ nixpkgs, nix-darwin, home-manager, ... }:
+  outputs =
+    inputs@{
+      nixpkgs,
+      nix-darwin,
+      home-manager,
+      ...
+    }:
     let
       username = "alexmiller";
-      mkHost = { host, home }: nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit username; };
-        modules = [
-          host
-          ./modules/darwin-base.nix
-          ./modules/macos-defaults.nix
-          inputs.agenix.darwinModules.default
-          inputs.screentime-backup.darwinModules.default
-          inputs.callhistory-backup.darwinModules.default
-          inputs.nix-homebrew.darwinModules.nix-homebrew
-          {
-            nix-homebrew = {
-              enable = true;
-              user = username;
-            };
-          }
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "backup";
-            home-manager.sharedModules = [ inputs.workspace-snapshot.homeModules.default ];
-            # Explicit per-input args (not `inherit inputs`) on purpose: each
-            # exported homeModule documents exactly what a consumer must pass.
-            home-manager.extraSpecialArgs = {
-              inherit username;
-              inherit (inputs) cherri nix-vscode-extensions nix-openclaw-tools;
-            };
-            home-manager.users.${username} = import home;
-          }
-        ];
-      };
+      mkHost =
+        { host, home }:
+        nix-darwin.lib.darwinSystem {
+          specialArgs = { inherit username; };
+          modules = [
+            host
+            ./modules/darwin-base.nix
+            ./modules/macos-defaults.nix
+            inputs.agenix.darwinModules.default
+            inputs.screentime-backup.darwinModules.default
+            inputs.callhistory-backup.darwinModules.default
+            inputs.nix-homebrew.darwinModules.nix-homebrew
+            {
+              nix-homebrew = {
+                enable = true;
+                user = username;
+              };
+            }
+            home-manager.darwinModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "backup";
+              home-manager.sharedModules = [ inputs.workspace-snapshot.homeModules.default ];
+              # Explicit per-input args (not `inherit inputs`) on purpose: each
+              # exported homeModule documents exactly what a consumer must pass.
+              home-manager.extraSpecialArgs = {
+                inherit username;
+                inherit (inputs) cherri nix-vscode-extensions nix-openclaw-tools;
+              };
+              home-manager.users.${username} = import home;
+            }
+          ];
+        };
     in
     {
       # RFC 166 formatting: `nix fmt` (also `just fmt`).

@@ -7,7 +7,12 @@
 # secret. A file rather than the login Keychain: macOS locks the Keychain per
 # login session, so ssh-descended shells (every agent shell on the headless
 # mini) can never read a Keychain entry.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.opAgentSa;
   loadToken = pkgs.writeShellScript "op-agent-sa-load" ''

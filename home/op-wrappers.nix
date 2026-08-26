@@ -49,7 +49,10 @@ in
     # has no modal dependency.
     (pkgs.writeShellApplication {
       name = "modal";
-      runtimeInputs = [ pkgs._1password-cli pkgs.uv ];
+      runtimeInputs = [
+        pkgs._1password-cli
+        pkgs.uv
+      ];
       text = ''
         if [ -z "''${MODAL_TOKEN_ID:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
@@ -91,7 +94,11 @@ in
     # consent bootstrap uses GOG_HOME; see the gog skill).
     (pkgs.writeShellApplication {
       name = "gog";
-      runtimeInputs = [ pkgs._1password-cli pkgs.jq pkgs.curl ];
+      runtimeInputs = [
+        pkgs._1password-cli
+        pkgs.jq
+        pkgs.curl
+      ];
       text = ''
         if [ -n "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ]; then
           exec ${gogcliPkg}/bin/gog "$@"

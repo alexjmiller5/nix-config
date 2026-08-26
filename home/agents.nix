@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 # User launchd agents (laptop): agent-config sync, claude-code updater, and
 # login items as RunAtLoad agents (no TCC prompts, fully declarative — the
@@ -15,58 +20,58 @@ let
   agentConfigSync = pkgs.writeShellApplication {
     name = "agent-config-sync";
     text = ''
-    export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
-    cd "$HOME/.config/agent-config"
+      export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
+      cd "$HOME/.config/agent-config"
 
-    # Claude auto-memory: adopt any new ~/.claude/projects/<slug>/memory dir
-    # into the repo, then (re)link every repo memory dir back out. Runs before
-    # the commit below, so new memories ride the same daily snapshot; RunAtLoad
-    # means a fresh machine gets its links at first login. Laptop-only — the
-    # mini pulls --ff-only, so memories written there stay machine-local.
-    # >>> claude-memory (extracted verbatim by tests/claude-memory.sh) >>>
-    for dir in "$HOME"/.claude/projects/*/memory; do
-      # repo copy deleted (here or by a pull): drop the dangling link, else
-      # writes through it fail silently and that project loses its memories
-      if [ -L "$dir" ] && [ ! -e "$dir" ]; then rm "$dir"; fi
-      [ -d "$dir" ] && [ ! -L "$dir" ] && [ -n "$(ls -A "$dir")" ] || continue
-      slug=$(basename "$(dirname "$dir")")
-      if [ -e "memory/$slug" ]; then
-        echo "claude-memory: both $dir and memory/$slug exist — merge by hand" >&2
-      else
-        mv "$dir" "memory/$slug"
+      # Claude auto-memory: adopt any new ~/.claude/projects/<slug>/memory dir
+      # into the repo, then (re)link every repo memory dir back out. Runs before
+      # the commit below, so new memories ride the same daily snapshot; RunAtLoad
+      # means a fresh machine gets its links at first login. Laptop-only — the
+      # mini pulls --ff-only, so memories written there stay machine-local.
+      # >>> claude-memory (extracted verbatim by tests/claude-memory.sh) >>>
+      for dir in "$HOME"/.claude/projects/*/memory; do
+        # repo copy deleted (here or by a pull): drop the dangling link, else
+        # writes through it fail silently and that project loses its memories
+        if [ -L "$dir" ] && [ ! -e "$dir" ]; then rm "$dir"; fi
+        [ -d "$dir" ] && [ ! -L "$dir" ] && [ -n "$(ls -A "$dir")" ] || continue
+        slug=$(basename "$(dirname "$dir")")
+        if [ -e "memory/$slug" ]; then
+          echo "claude-memory: both $dir and memory/$slug exist — merge by hand" >&2
+        else
+          mv "$dir" "memory/$slug"
+        fi
+      done
+      for src in memory/*/; do
+        [ -d "$src" ] || continue
+        dst="$HOME/.claude/projects/$(basename "$src")/memory"
+        rmdir "$dst" 2>/dev/null || true   # empty local dir: safe to replace
+        if [ -e "$dst" ] && [ ! -L "$dst" ]; then continue; fi
+        mkdir -p "$(dirname "$dst")"
+        ln -sfn "$PWD/''${src%/}" "$dst"
+      done
+      # <<< claude-memory <<<
+
+      git add -A
+      git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
+      # Login and wake both fire this before the network is up, and the op-backed
+      # credential helper then comes back empty, so every git op fails as "auth".
+      # Wait up to 15min for the remote to answer rather than skipping the run;
+      # give up silently (next login/calendar run retries) so the notification
+      # below means an actual conflict and nothing else.
+      # >>> wait-for-remote (extracted verbatim by tests/wait-for-remote.sh) >>>
+      online=
+      for _ in $(seq 60); do
+        git ls-remote origin >/dev/null 2>&1 && { online=1; break; }
+        sleep 15
+      done
+      [ -n "$online" ] || exit 0
+      # <<< wait-for-remote <<<
+      if ! git pull --rebase origin main; then
+        git rebase --abort 2>/dev/null || true
+        /usr/bin/osascript -e 'display notification "sync conflict — resolve manually in agent-config" with title "agent-config sync"'
+        exit 1
       fi
-    done
-    for src in memory/*/; do
-      [ -d "$src" ] || continue
-      dst="$HOME/.claude/projects/$(basename "$src")/memory"
-      rmdir "$dst" 2>/dev/null || true   # empty local dir: safe to replace
-      if [ -e "$dst" ] && [ ! -L "$dst" ]; then continue; fi
-      mkdir -p "$(dirname "$dst")"
-      ln -sfn "$PWD/''${src%/}" "$dst"
-    done
-    # <<< claude-memory <<<
-
-    git add -A
-    git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
-    # Login and wake both fire this before the network is up, and the op-backed
-    # credential helper then comes back empty, so every git op fails as "auth".
-    # Wait up to 15min for the remote to answer rather than skipping the run;
-    # give up silently (next login/calendar run retries) so the notification
-    # below means an actual conflict and nothing else.
-    # >>> wait-for-remote (extracted verbatim by tests/wait-for-remote.sh) >>>
-    online=
-    for _ in $(seq 60); do
-      git ls-remote origin >/dev/null 2>&1 && { online=1; break; }
-      sleep 15
-    done
-    [ -n "$online" ] || exit 0
-    # <<< wait-for-remote <<<
-    if ! git pull --rebase origin main; then
-      git rebase --abort 2>/dev/null || true
-      /usr/bin/osascript -e 'display notification "sync conflict — resolve manually in agent-config" with title "agent-config sync"'
-      exit 1
-    fi
-    git push origin main
+      git push origin main
     '';
   };
 
@@ -107,7 +112,13 @@ let
     enable = true;
     config = {
       Label = "com.alexmiller.login.${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] app)}";
-      ProgramArguments = [ "/usr/bin/open" "-g" "-j" "-a" app ];
+      ProgramArguments = [
+        "/usr/bin/open"
+        "-g"
+        "-j"
+        "-a"
+        app
+      ];
       RunAtLoad = true;
     };
   };
@@ -120,7 +131,12 @@ in
         Label = "com.alexmiller.agent-config-sync";
         ProgramArguments = [ (lib.getExe agentConfigSync) ];
         RunAtLoad = true;
-        StartCalendarInterval = [ { Hour = 10; Minute = 0; } ];
+        StartCalendarInterval = [
+          {
+            Hour = 10;
+            Minute = 0;
+          }
+        ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";
       };
@@ -131,7 +147,13 @@ in
       config = {
         Label = "com.alexmiller.weekly-updates";
         ProgramArguments = [ "${weeklyUpdates}" ];
-        StartCalendarInterval = [ { Weekday = 1; Hour = 9; Minute = 30; } ];
+        StartCalendarInterval = [
+          {
+            Weekday = 1;
+            Hour = 9;
+            Minute = 30;
+          }
+        ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/weekly-updates.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/weekly-updates.log";
       };
@@ -146,7 +168,10 @@ in
       enable = true;
       config = {
         Label = "com.alexmiller.login.gemini";
-        ProgramArguments = [ "/Applications/Gemini.app/Contents/MacOS/Gemini" "--background" ];
+        ProgramArguments = [
+          "/Applications/Gemini.app/Contents/MacOS/Gemini"
+          "--background"
+        ];
         RunAtLoad = true;
         ProcessType = "Interactive";
       };
@@ -157,7 +182,13 @@ in
       config = {
         Label = "com.alexmiller.simulator-prune";
         ProgramArguments = [ "${simulatorPrune}" ];
-        StartCalendarInterval = [ { Day = 1; Hour = 9; Minute = 45; } ];
+        StartCalendarInterval = [
+          {
+            Day = 1;
+            Hour = 9;
+            Minute = 45;
+          }
+        ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/simulator-prune.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/simulator-prune.log";
       };
@@ -168,30 +199,44 @@ in
       enable = true;
       config = {
         Label = "com.alexmiller.brew-upgrade-claude-code";
-        ProgramArguments = [ "/opt/homebrew/bin/brew" "upgrade" "claude-code" ];
-        StartCalendarInterval = [ { Hour = 9; Minute = 0; } ];
+        ProgramArguments = [
+          "/opt/homebrew/bin/brew"
+          "upgrade"
+          "claude-code"
+        ];
+        StartCalendarInterval = [
+          {
+            Hour = 9;
+            Minute = 0;
+          }
+        ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/brew-upgrade-claude-code.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/brew-upgrade-claude-code.log";
       };
     };
   }
-  // lib.listToAttrs (map
-    (app: lib.nameValuePair "login-${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] app)}" (loginItem app))
-    # Current Open-at-Login list (2026-08-01 screenshot), minus:
-    #  - FigmaAgent: Figma's self-registered helper — Figma owns it, leave it.
-    #  - Gemini: needs --background, so it has its own login-gemini agent above.
-    [
-      "1Password"
-      "AltTab"
-      "BetterDisplay"
-      "CodexBar"
-      "Google Chrome"
-      "Hammerspoon"
-      "Notion"
-      "Notion Calendar"
-      "Raycast"
-      "Receptor"
-      "RepoBar"
-      "Spotify"
-    ]);
+  // lib.listToAttrs (
+    map
+      (
+        app:
+        lib.nameValuePair "login-${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] app)}" (loginItem app)
+      )
+      # Current Open-at-Login list (2026-08-01 screenshot), minus:
+      #  - FigmaAgent: Figma's self-registered helper — Figma owns it, leave it.
+      #  - Gemini: needs --background, so it has its own login-gemini agent above.
+      [
+        "1Password"
+        "AltTab"
+        "BetterDisplay"
+        "CodexBar"
+        "Google Chrome"
+        "Hammerspoon"
+        "Notion"
+        "Notion Calendar"
+        "Raycast"
+        "Receptor"
+        "RepoBar"
+        "Spotify"
+      ]
+  );
 }

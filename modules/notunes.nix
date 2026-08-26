@@ -11,7 +11,11 @@
 
   launchd.user.agents.notunes = {
     serviceConfig = {
-      ProgramArguments = [ "/usr/bin/open" "-a" "noTunes" ];
+      ProgramArguments = [
+        "/usr/bin/open"
+        "-a"
+        "noTunes"
+      ];
       RunAtLoad = true;
     };
   };

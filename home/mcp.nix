@@ -8,7 +8,11 @@
     enable = true;
     servers.nixos = {
       command = "nix";
-      args = [ "run" "github:utensils/mcp-nixos" "--" ];
+      args = [
+        "run"
+        "github:utensils/mcp-nixos"
+        "--"
+      ];
     };
   };
 }

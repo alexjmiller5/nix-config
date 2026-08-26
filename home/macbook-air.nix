@@ -1,4 +1,11 @@
-{ config, osConfig, pkgs, lib, username, ... }:
+{
+  config,
+  osConfig,
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 
 # Laptop home profile: full shell + dotfiles + the agent-config fan-out.
 #
@@ -86,7 +93,10 @@ in
   machineVaultGit = {
     patOpRef = "op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential";
     patAuthFile = osConfig.age.secrets.machine-sa.path;
-    patRepos = [ "alexjmiller5/agent-config" "alexjmiller5/nix-secrets" ];
+    patRepos = [
+      "alexjmiller5/agent-config"
+      "alexjmiller5/nix-secrets"
+    ];
     companionRepos = {
       "alexjmiller5/nix-config" = nixConfig;
       "alexjmiller5/nix-secrets" = "${config.home.homeDirectory}/.config/nix-secrets";

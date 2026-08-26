@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 # chrome.storage.local values for extensions (settings with no export/sync -
 # e.g. Tab Copy's custom formats - live only in the profile's per-extension
