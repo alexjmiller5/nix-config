@@ -156,6 +156,7 @@ in
         if [ -n "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ]; then
           exec ${gogcliPkg}/bin/gog "$@"
         fi
+        ${builtins.readFile ./agent-detect.sh}
         ${builtins.readFile ./agent-op-env.sh}
         item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json 2>/dev/null || true)"
         if [ -n "$item" ]; then
@@ -214,6 +215,7 @@ in
         if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
           exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
         fi
+        ${builtins.readFile ./agent-detect.sh}
         ${builtins.readFile ./agent-op-env.sh}
         keyfile="$(mktemp "''${TMPDIR:-/tmp}/gcloud-key-XXXXXX")"
         trap 'rm -f "$keyfile"' EXIT

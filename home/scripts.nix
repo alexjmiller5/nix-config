@@ -28,6 +28,7 @@ in
       runtimeInputs = [ pkgs._1password-cli ];
       text = ''
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
+          ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
           # SA token → headless; otherwise desktop-app auth (Touch ID).
           # No auth source at all (the mini): skip — op read would prompt
@@ -51,6 +52,7 @@ in
       runtimeInputs = [ pkgs._1password-cli pkgs.uv ];
       text = ''
         if [ -z "''${MODAL_TOKEN_ID:-}" ]; then
+          ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
           if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
             MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id' 2>/dev/null || true)"

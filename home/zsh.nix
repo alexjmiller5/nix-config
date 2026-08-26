@@ -78,19 +78,20 @@
       # inject tokens via op read in EVERY context — the old interactive-only
       # `op plugin run` aliases (~/.config/op/plugins.sh) are retired.
 
-      # Agent-shell detection: AGENT_SHELL is the agent-agnostic seam - every
-      # per-agent env var maps to it here, and everything downstream gates on
-      # AGENT_SHELL only. Adding a new agent CLI = one more detection line.
-      # (Headless op auth lives elsewhere: shell-init.sh exports the SA token
-      # before every Claude Bash call, and the gh/gcloud/gog/modal PATH
-      # wrappers self-inject via agent-op-env.sh - a zshrc export can't do it,
-      # since env vars set here never survive into agent Bash calls.)
-      if [[ -n $CLAUDECODE || -n $CLAUDE_CODE_ENTRYPOINT ]]; then
-          export AGENT_SHELL=claude
-      fi
+      # Agent-shell detection: agent-detect.sh is the ONE place that maps
+      # per-agent raw vars -> AGENT_SHELL (the agent-agnostic seam everything
+      # downstream gates on). The gh/gcloud/gog/modal PATH wrappers
+      # interpolate the same file, so their callers that skip zshrc
+      # (agent-core direct spawns, launchd) are covered too. Adding a new
+      # agent CLI = one line in that file. (Headless op auth lives elsewhere:
+      # shell-init.sh per Bash call, agent-op-env.sh in the wrappers.)
+      source ${./agent-detect.sh}
 
       # Agent shells: SA-authed op can't reach the Personal vault; op-personal
-      # strips the token and uses desktop auth (one Touch ID per call).
+      # strips the token so op falls back to desktop-app auth. Agents RUN this
+      # themselves for Personal-vault reads - each call pops Touch ID for Alex
+      # to approve, so it needs him at the machine, but it beats pasting
+      # commands (paste only deny-listed writes: op * delete/edit).
       if [[ -n $AGENT_SHELL ]]; then
           op-personal() {
               env -u OP_SERVICE_ACCOUNT_TOKEN sh -c \
