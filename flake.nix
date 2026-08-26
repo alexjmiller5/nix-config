@@ -99,7 +99,7 @@
         git = ./home/git.nix;
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
-        op-claude-sa = ./home/op-claude-sa.nix;
+        op-agent-sa = ./home/op-agent-sa.nix;
         ai-agent = ./home/ai-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         ghostty = ./home/ghostty.nix;

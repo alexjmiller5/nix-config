@@ -16,8 +16,10 @@ routing table and workflow; this file is the in-repo map.
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
   `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
-  PATH, and `op-claude-sa.nix` — login-time Keychain load of the claude-code
-  SA token from the machine vault; host-layer sibling = `claude-code` +
+  PATH, and `op-agent-sa.nix` — login-time refresh of the agent SA token
+  from the machine vault into a 0600 file, `~/.local/state/op/agent-sa-token`;
+  a file, not the Keychain, since ssh-descended shells can't read the
+  per-session-locked Keychain; host-layer sibling = `claude-code` +
   `notion-cli` casks),
   `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),

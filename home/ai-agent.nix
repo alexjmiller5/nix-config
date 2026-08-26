@@ -1,15 +1,15 @@
 # AI-agent readiness as ONE check-off: import this module (plus set the
-# opClaudeSa refs it re-exports) and a machine's agent shells are fully
-# capable — node for the agent-config hooks, `op` on PATH, and the Keychain
-# claude-code SA token refreshed at login. The shared base (common.nix)
-# already carries the op-authed gh/modal wrappers and cli-tools.
+# opAgentSa refs it re-exports) and a machine's agent shells are fully
+# capable — node for the agent-config hooks, `op` on PATH, and the agent SA
+# token file refreshed at login. The shared base (common.nix) already
+# carries the op-authed gh/modal wrappers and cli-tools.
 #
 # HOST-LAYER SIBLING (home-manager can't declare casks): the host's
 # homebrew.casks needs `claude-code` and `notion-cli` (ntn — not in
 # nixpkgs), and its allowUnfreePredicate must include "1password-cli".
 { config, lib, pkgs, ... }:
 {
-  imports = [ ./op-claude-sa.nix ];
+  imports = [ ./op-agent-sa.nix ];
 
   options.aiAgent.withOp = lib.mkOption {
     type = lib.types.bool;

@@ -54,14 +54,14 @@ in
 
   # gh (for interactive CLI use — no longer the git credential source) comes
   # from the scripts.nix op-authed wrapper; no bare pkgs.gh here. Agent-context
-  # gh calls auth via the op-claude-sa Keychain entry (loaded below); calls in
+  # gh calls auth via the agent SA token file (refreshed below); calls in
   # Alex's own ssh shells have no op auth source and stay unauthenticated.
 
-  # Keychain claude-code SA token ("op-claude-sa"), refreshed at every login
-  # from the machine vault via the machine SA — see home/op-claude-sa.nix.
+  # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
+  # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
   # This gives agent shells on the mini the same 1P access as on the laptop
   # (AI Agent vault + project vaults).
-  opClaudeSa = {
+  opAgentSa = {
     tokenOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/qyi6fxsxyrog3mfpcbjzkjqvzi/credential";
     tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
   };

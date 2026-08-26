@@ -9,7 +9,9 @@
 # Adding a new agent CLI: one detection line in zsh.nix covers shells; add
 # its raw var here only if its core spawns also call a wrapper.
 if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "${AGENT_SHELL:-}${CLAUDECODE:-}${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
-  OP_SERVICE_ACCOUNT_TOKEN="$(/usr/bin/security find-generic-password -s op-claude-sa -w 2>/dev/null || true)"
+  # 0600 token file refreshed at login by op-agent-sa.nix (a file, not the
+  # Keychain — ssh-descended shells can't read the per-session-locked Keychain).
+  OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat "$HOME/.local/state/op/agent-sa-token" 2>/dev/null || true)"
   if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
     export OP_SERVICE_ACCOUNT_TOKEN
   else

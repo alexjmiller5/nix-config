@@ -42,9 +42,9 @@ in
   # integration — see the TODO next to the cask in hosts/macbook-air.nix).
   aiAgent.withOp = false;
 
-  # Keychain claude-code SA token ("op-claude-sa"), refreshed at every login
-  # from the machine vault via the machine SA — see home/op-claude-sa.nix.
-  opClaudeSa = {
+  # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
+  # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
+  opAgentSa = {
     tokenOpRef = "op://a4gdaq4rjdpewl4uppphpjqewm/qol7eck3fumtefiwyrw4w5m3pm/credential";
     tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
   };

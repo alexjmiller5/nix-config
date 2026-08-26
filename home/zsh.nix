@@ -106,13 +106,16 @@
           export AGENT_SHELL=claude
       fi
 
-      # Agent shells: headless op via the claude-code service account -> zero
+      # Agent shells: headless op via the agent service account -> zero
       # Touch ID prompts (1P sessions are per-tty, so every agent Bash call
       # would otherwise re-prompt). SA can't reach the Personal vault; use
       # op-personal for that (one Touch ID via desktop app).
       if [[ -n $AGENT_SHELL ]]; then
           if [[ -z $OP_SERVICE_ACCOUNT_TOKEN ]]; then
-              export OP_SERVICE_ACCOUNT_TOKEN="$(security find-generic-password -s op-claude-sa -w 2>/dev/null)"
+              # 0600 token file refreshed at login by home/op-agent-sa.nix (a
+              # file, not the Keychain — ssh-descended shells can't read the
+              # per-session-locked login Keychain).
+              export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$HOME/.local/state/op/agent-sa-token" 2>/dev/null)"
               [[ -z $OP_SERVICE_ACCOUNT_TOKEN ]] && unset OP_SERVICE_ACCOUNT_TOKEN
           fi
           op-personal() {
