@@ -39,6 +39,14 @@ routing table and workflow; this file is the in-repo map.
 
 ## Conventions
 
+* **Two-machine parity rule**: every change to a host file or per-host home
+  profile must explicitly consider the OTHER machine — does this belong on
+  both (→ a shared module: `dev-tools`, `cli-tools`, `ai-agent`, ...), or on
+  one only, and why? State the answer when making the change, and when it
+  isn't obvious, ASK Alex before committing. Never let a capability land on
+  one machine just because that's where it was developed — that's how the
+  configs drifted apart before.
+
 * **File-management modes, chosen per file**: native HM module
   (`programs.*` — check it exists via mcp-nixos before falling back; zsh,
   git, ssh, neovim, fzf, ghostty, spotify-player, vscode) > store symlink
