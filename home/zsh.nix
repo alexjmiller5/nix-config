@@ -78,46 +78,20 @@
       # inject tokens via op read in EVERY context — the old interactive-only
       # `op plugin run` aliases (~/.config/op/plugins.sh) are retired.
 
-      # 1Password CLI: desktop-app session delegation is scoped per shell process,
-      # so every fresh shell (incl. each Claude Code Bash call) needs its own signin.
-      # Lazy wrapper: signs in on first `op` use instead of taxing every shell startup.
-      # Mutex around signin: parallel op calls (Claude Code fires several at once)
-      # otherwise each race to pop their own Touch ID prompt while the CLI is locked.
-      op() {
-          # Service-account auth (Claude Code shells): headless, no signin needed.
-          if [[ -n $OP_SERVICE_ACCOUNT_TOKEN ]]; then
-              command op "$@"
-              return
-          fi
-          local _lock="''${TMPDIR:-/tmp}/op-signin-$UID.lock" _i=0
-          until mkdir "$_lock" 2>/dev/null; do
-              (( ++_i > 300 )) && break  # ponytail: 30s stale-lock escape, no PID tracking
-              sleep 0.1
-          done
-          command op whoami >/dev/null 2>&1 || command op signin --account my.1password.com >/dev/null 2>&1
-          rmdir "$_lock" 2>/dev/null
-          command op "$@"
-      }
-
       # Agent-shell detection: AGENT_SHELL is the agent-agnostic seam - every
       # per-agent env var maps to it here, and everything downstream gates on
       # AGENT_SHELL only. Adding a new agent CLI = one more detection line.
+      # (Headless op auth lives elsewhere: shell-init.sh exports the SA token
+      # before every Claude Bash call, and the gh/gcloud/gog/modal PATH
+      # wrappers self-inject via agent-op-env.sh - a zshrc export can't do it,
+      # since env vars set here never survive into agent Bash calls.)
       if [[ -n $CLAUDECODE || -n $CLAUDE_CODE_ENTRYPOINT ]]; then
           export AGENT_SHELL=claude
       fi
 
-      # Agent shells: headless op via the agent service account -> zero
-      # Touch ID prompts (1P sessions are per-tty, so every agent Bash call
-      # would otherwise re-prompt). SA can't reach the Personal vault; use
-      # op-personal for that (one Touch ID via desktop app).
+      # Agent shells: SA-authed op can't reach the Personal vault; op-personal
+      # strips the token and uses desktop auth (one Touch ID per call).
       if [[ -n $AGENT_SHELL ]]; then
-          if [[ -z $OP_SERVICE_ACCOUNT_TOKEN ]]; then
-              # 0600 token file refreshed at login by home/op-agent-sa.nix (a
-              # file, not the Keychain — ssh-descended shells can't read the
-              # per-session-locked login Keychain).
-              export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$HOME/.local/state/op/agent-sa-token" 2>/dev/null)"
-              [[ -z $OP_SERVICE_ACCOUNT_TOKEN ]] && unset OP_SERVICE_ACCOUNT_TOKEN
-          fi
           op-personal() {
               env -u OP_SERVICE_ACCOUNT_TOKEN sh -c \
                   'op signin --account my.1password.com >/dev/null 2>&1; exec op "$@"' sh "$@"

@@ -1,8 +1,8 @@
 # Writes the agent 1P service-account token (currently the claude-code SA —
 # any future agent CLI shares it) to a 0600 file at every login, fetched from
 # this machine's vault via the machine SA. Everything that auths agent shells
-# reads that file (zsh.nix $AGENT_SHELL block, agent-op-env.sh, agent-config's
-# claude/shell-init.sh), so this module is what makes a machine agent-authed
+# reads that file (agent-op-env.sh, agent-config's claude/shell-init.sh), so
+# this module is what makes a machine agent-authed
 # declaratively — the only imperative state left is the machine-sa agenix
 # secret. A file rather than the login Keychain: macOS locks the Keychain per
 # login session, so ssh-descended shells (every agent shell on the headless
