@@ -1,10 +1,10 @@
 { config, pkgs, lib, username, ... }:
 
-# MacBook Air — LIVE since 2026-07-28 (generation 1). Mirrors the mini minus
-# its headless-server bits (never-sleep power settings, headless tailscaled)
-# and its data-collection services (screentime/callhistory/finance-sync — the
-# flake imports those modules for every host, but only mac-mini.nix enables
-# them). Home profile: home/macbook-air.nix.
+# MacBook Air — the GUI-full host. The mini matches it at the shell/dev
+# level (see home/dev-tools.nix + home/mac-mini.nix); this host adds the GUI
+# layer (casks, dock, Chrome policy, yabai) and the Apple build chain, and
+# lacks the mini's headless-server bits (never-sleep power, headless
+# tailscaled, callhistory backup). Home profile: home/macbook-air.nix.
 {
   imports = [ ../modules/notunes.nix ];
 
@@ -97,8 +97,8 @@
   # Chrome policy, declared. macOS Chrome reads enterprise policy ONLY from
   # /Library/Managed Preferences (root-owned) — policy keys in the normal user
   # defaults domain are silently ignored, so this is written by a root
-  # activation script, not system.defaults. Laptop-only: the mini's Chrome
-  # (finance scrapers) must stay bare. Chrome reloads policy on restart
+  # activation script, not system.defaults. Laptop-only: extensions/PWAs
+  # are pointless on a headless box. Chrome reloads policy on restart
   # (chrome://policy → Reload policies to force it).
   #
   # ExtensionSettings + default-deny — the Chrome analog of brew's zap: the

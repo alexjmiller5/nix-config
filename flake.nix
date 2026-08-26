@@ -13,11 +13,6 @@
     };
     # Installs and pins Homebrew itself declaratively (no curl|bash installer).
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    # Daily bank -> Notion sync (provides a nix-darwin module).
-    notion-finance-sync = {
-      url = "github:alexjmiller5/notion-finance-sync";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # Weekly Screen Time + call history snapshots (each provides a nix-darwin module).
     screentime-backup.url = "github:alexjmiller5/screentime-backup";
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
@@ -51,7 +46,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, notion-finance-sync, screentime-backup, callhistory-backup, agenix, cherri, nix-vscode-extensions, workspace-snapshot, nix-openclaw-tools }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, screentime-backup, callhistory-backup, agenix, cherri, nix-vscode-extensions, workspace-snapshot, nix-openclaw-tools }:
     let
       username = "alexmiller";
       mkHost = { host, home }: nix-darwin.lib.darwinSystem {
@@ -60,7 +55,6 @@
           host
           ./modules/macos-defaults.nix
           agenix.darwinModules.default
-          notion-finance-sync.darwinModules.default
           screentime-backup.darwinModules.default
           callhistory-backup.darwinModules.default
           nix-homebrew.darwinModules.nix-homebrew
@@ -102,6 +96,8 @@
         op-agent-sa = ./home/op-agent-sa.nix;
         ai-agent = ./home/ai-agent.nix;
         cli-tools = ./home/cli-tools.nix;
+        # dev-tools needs the consumer to pass cherri + nix-openclaw-tools via extraSpecialArgs
+        dev-tools = ./home/dev-tools.nix;
         ghostty = ./home/ghostty.nix;
         # vscode needs the consumer to pass nix-vscode-extensions via extraSpecialArgs
         vscode = ./home/vscode.nix;

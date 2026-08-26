@@ -1,9 +1,11 @@
 { config, osConfig, lib, pkgs, ... }:
 
-# Mini home profile: shared base + the laptop's shell (zsh/starship/aliases,
-# minus personal-infra aliases — those reference laptop-only workflows) + the
-# agent-config fan-out so Claude Code on the mini gets the same skills,
-# settings, AGENTS.md, and hooks.
+# Mini home profile: full dev parity with the laptop at the shell level —
+# shared base + dev toolbox + the laptop's shell (zsh/starship/all alias
+# categories) + ssh config + the agent-config fan-out so Claude Code on the
+# mini gets the same skills, settings, AGENTS.md, and hooks. What stays
+# laptop-only is the GUI layer (casks, dock, Chrome policy, hammerspoon,
+# karabiner, VS Code) and the Apple build chain.
 #
 # agent-config is a real git clone (cloned at activation, refreshed by a
 # daily pull-only agent below) — no iCloud involved. The laptop stays the
@@ -24,10 +26,31 @@ in
   imports = [
     ./common.nix
     ./ai-agent.nix
+    ./dev-tools.nix
     ./zsh.nix
     ./aliases/dev.nix
     ./aliases/ai.nix
+    ./aliases/infra.nix
+    ./ssh.nix
   ];
+
+  # No 1P desktop app here — outbound ssh uses the default agent socket
+  # (SSH_AUTH_SOCK), so a laptop agent forwarded over `ssh -A` serves the
+  # keys the nix-secrets host blocks select. ssh.nix's 1P IdentityAgent
+  # default would otherwise point at a socket that never exists.
+  programs.ssh.settings."*".IdentityAgent = lib.mkForce "SSH_AUTH_SOCK";
+
+  # Commit signing, same key as the laptop: the pub-key literal makes git
+  # sign via ssh-keygen against the agent — which is the laptop's 1P agent,
+  # forwarded (ForwardAgent yes on the mac-mini host blocks in nix-secrets;
+  # Touch ID prompts land on the laptop). gpgsign stays OFF: detached
+  # sessions (claude-rc, launchd) have no forwarded agent and auto-sign
+  # would make their commits fail. Sign with `git commit -S` (or per-repo
+  # `git config commit.gpgsign true`) when ssh'ed in.
+  programs.git.settings = {
+    user.signingkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKWqJ5X61r/CFl99qjU/rZyIB4DCQpVI+cF0y33WSSMC";
+    gpg.format = "ssh";
+  };
 
   # Inbound ssh from the laptop: public half of "Mac Mini SSH Key" (private
   # half in the 1Password Personal vault). Mini-only — nothing sshs into the
@@ -104,10 +127,18 @@ in
   ];
 
   # Clone-if-missing at activation (mini analog of the laptop's companion-repos).
+  # nix-config (public) + nix-secrets (private, via the machine-vault PAT —
+  # the PAT must have read on it) make the mini self-sufficient for dev:
+  # /etc/nix-darwin resolves (infra aliases), ssh host blocks resolve.
   home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:$PATH"
-    [ -d "${agentConfig}" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/agent-config.git" "${agentConfig}" \
-      || echo "companion-repos: agent-config clone failed — machine-sa secret decrypted? op read reachable? redeploy" >&2
+    companionClone() {
+      [ -d "$2" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/$1.git" "$2" \
+        || echo "companion-repos: clone of $1 failed — machine-sa decrypted? PAT scoped to it? redeploy" >&2
+    }
+    companionClone agent-config "${agentConfig}"
+    companionClone nix-config "${config.home.homeDirectory}/.config/nix-config"
+    companionClone nix-secrets "${config.home.homeDirectory}/.config/nix-secrets"
   '';
 
   # Daily pull, 30min after the laptop's 10:00 push window; RunAtLoad catches

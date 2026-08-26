@@ -7,7 +7,7 @@
 #
 # Design: agenix holds exactly ONE secret per machine — that machine's 1P
 # service-account token (read-only on its machine vault). Everything else
-# (git PATs, the finance SA token, future secrets) lives in the machine vault
+# (git PATs, future secrets) lives in the machine vault
 # and is fetched at runtime via `op read`, so new/rotated secrets never touch
 # this repo.
 let

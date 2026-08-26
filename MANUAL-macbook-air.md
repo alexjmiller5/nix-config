@@ -68,8 +68,7 @@ In the vaults today:
   `agent-config`/`nix-secrets`/`hammerspoon`, Contents **read/write** (the
   sync agent pushes agent-config). Feeds the git credential helper.
 * **Mac Mini**: `GitHub PAT nix-config-git-mini` — same repos, Contents
-  **read-only** (the mini is pull-only by design); plus the finance-project
-  SA token (read at run time by notion-finance-sync).
+  **read-only** (the mini is pull-only by design).
 
 PATs are minted by hand (GitHub has no token-creation API): github.com →
 Settings → Developer settings → Fine-grained tokens; they cap at 1-year

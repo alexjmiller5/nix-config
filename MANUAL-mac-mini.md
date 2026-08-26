@@ -96,8 +96,6 @@ the tailnet ACL so tagged devices are approved automatically:
   → scan the QR on the mini's screen. The keep-alive agent keeps it running
   afterward; no re-linking needed as long as the phone comes online every
   14 days and the app keeps running.
-* **notion-finance-sync**: FDA for `/Applications/NotionFinanceSync.app` + the
-  rest of its runbook — see that repo's `docs/DEPLOY.md`.
 
 ### 7. Exit exam
 

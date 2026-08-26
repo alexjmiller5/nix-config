@@ -14,6 +14,8 @@ routing table and workflow; this file is the in-repo map.
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
   `git.nix`, `scripts.nix`, and `cli-tools.nix`'s shared package list),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
+  `dev-tools.nix` (portable dev toolbox + gog/gcloud/memo wrappers, shared
+  by BOTH hosts — laptop-only tooling stays in `macbook-air.nix`),
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
   `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
   PATH, and `op-agent-sa.nix` — login-time refresh of the agent SA token
