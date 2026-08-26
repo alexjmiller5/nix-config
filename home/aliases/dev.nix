@@ -11,8 +11,9 @@
     commit = "git commit";
     add = "git add -A";
     push = "git push";
+    pull = "git pull";
     branch = "git branch";
-    gl = "git log";
+    log = "git log";
     gundo = "git reset --mixed HEAD~1";
 
     # gh
