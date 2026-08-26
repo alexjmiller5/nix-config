@@ -20,6 +20,7 @@ in
 {
   imports = [
     ./common.nix
+    ./op-claude-sa.nix
     ./zsh.nix
     ./aliases/dev.nix
     ./aliases/ai.nix
@@ -36,6 +37,13 @@ in
     ./agents.nix
     ./ssh.nix
   ];
+
+  # Keychain claude-code SA token ("op-claude-sa"), refreshed at every login
+  # from the machine vault via the machine SA — see home/op-claude-sa.nix.
+  opClaudeSa = {
+    tokenOpRef = "op://a4gdaq4rjdpewl4uppphpjqewm/qol7eck3fumtefiwyrw4w5m3pm/credential";
+    tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
+  };
 
   # Tab Copy's ⇧⌘C shortcut is NOT codified: it lives in Chrome's HMAC-signed
   # Secure Preferences (extensions.settings.<id>.commands), so an unsigned

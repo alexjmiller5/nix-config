@@ -23,6 +23,7 @@ in
 {
   imports = [
     ./common.nix
+    ./op-claude-sa.nix
     ./zsh.nix
     ./aliases/dev.nix
     ./aliases/ai.nix
@@ -52,10 +53,18 @@ in
     ''}";
 
   # gh (for interactive CLI use — no longer the git credential source) comes
-  # from the scripts.nix op-authed wrapper; no bare pkgs.gh here. NOTE: on the
-  # mini the wrapper has no op auth source (no desktop app, no claude-code SA
-  # in the Keychain), so gh API calls are unauthenticated until a PAT lands in
-  # the Mac Mini machine vault.
+  # from the scripts.nix op-authed wrapper; no bare pkgs.gh here. Agent-context
+  # gh calls auth via the op-claude-sa Keychain entry (loaded below); calls in
+  # Alex's own ssh shells have no op auth source and stay unauthenticated.
+
+  # Keychain claude-code SA token ("op-claude-sa"), refreshed at every login
+  # from the machine vault via the machine SA — see home/op-claude-sa.nix.
+  # This gives agent shells on the mini the same 1P access as on the laptop
+  # (AI Agent vault + project vaults).
+  opClaudeSa = {
+    tokenOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/qyi6fxsxyrog3mfpcbjzkjqvzi/credential";
+    tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
+  };
 
   # Remote-control Claude Code sessions, managed from an ssh shell (phone
   # terminal app / laptop). The session lives in detached /usr/bin/screen
