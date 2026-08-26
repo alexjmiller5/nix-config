@@ -67,10 +67,11 @@ in
   '';
 
   # git-over-https auth, split by repo (mirrors macbook-air.nix):
-  #  - agent-config: the machine-vault read-only fine-grained PAT, read at
-  #    credential time via the agenix-decrypted machine SA. Bootstrap-only
-  #    auth — it exists so the activation clone and daily pull work on a
-  #    fresh machine before any login/agent state does. IDs, not names.
+  #  - agent-config + nix-secrets: the machine-vault read-only fine-grained
+  #    PAT, read at credential time via the agenix-decrypted machine SA.
+  #    Bootstrap-only auth — it exists so the activation clones and daily
+  #    pull work on a fresh machine before any login/agent state does.
+  #    IDs, not names.
   #  - everything else: git.nix's `gh auth git-credential` default = the
   #    scripts.nix op-authed gh PATH wrapper — AI Agent vault PAT in agent
   #    shells (the agent's creds come from the AI Agent vault, never the
@@ -78,15 +79,18 @@ in
   #    stay unauthenticated.
   # useHttpPath makes git consult the repo-scoped helper key; the .git
   # suffix is REQUIRED — path matching is exact and the remote carries it.
-  programs.git.settings.credential = {
-    "https://github.com".useHttpPath = true;
-    "https://github.com/alexjmiller5/agent-config.git".helper =
-      "!${pkgs.writeShellScript "git-credential-machine-vault" ''
+  programs.git.settings.credential =
+    let
+      machineVault = "!${pkgs.writeShellScript "git-credential-machine-vault" ''
         [ "$1" = get ] || exit 0
         printf 'username=alexjmiller5\n'
         printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential')"
       ''}";
-  };
+    in {
+      "https://github.com".useHttpPath = true;
+      "https://github.com/alexjmiller5/agent-config.git".helper = machineVault;
+      "https://github.com/alexjmiller5/nix-secrets.git".helper = machineVault;
+    };
 
   # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
   # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
