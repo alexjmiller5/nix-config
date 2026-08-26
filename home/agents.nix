@@ -10,8 +10,11 @@ let
   # Daily + RunAtLoad; launchd runs missed calendar jobs on wake, so this
   # effectively also fires when the lid opens after 10:00 passed asleep. Both
   # of those beat the network up, so the run waits for it (see below).
-  agentConfigSync = pkgs.writeShellScript "agent-config-sync" ''
-    set -euo pipefail
+  # writeShellApplication (not writeShellScript): the most complex bash in
+  # the repo gets shellcheck at build time; strict mode comes with it.
+  agentConfigSync = pkgs.writeShellApplication {
+    name = "agent-config-sync";
+    text = ''
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
     cd "$HOME/.config/agent-config"
 
@@ -64,11 +67,15 @@ let
       exit 1
     fi
     git push origin main
-  '';
+    '';
+  };
 
   # Weekly update pass (Mon 09:30; launchd catches up after wake if asleep):
   # bump flake inputs, prove the system still builds (revert the lock if not),
   # upgrade brew formulae, then notify — switching stays a human decision.
+  # Stays writeShellScript ON PURPOSE: it runs `set -uo pipefail` WITHOUT -e
+  # so a failed step still reaches the notification at the end
+  # (writeShellApplication would force -e and exit silently instead).
   weeklyUpdates = pkgs.writeShellScript "weekly-updates" ''
     set -uo pipefail
     # /nix/var/nix/profiles/default/bin: nix lives ONLY here with nix.enable=false (Determinate)
@@ -111,7 +118,7 @@ in
       enable = true;
       config = {
         Label = "com.alexmiller.agent-config-sync";
-        ProgramArguments = [ "${agentConfigSync}" ];
+        ProgramArguments = [ (lib.getExe agentConfigSync) ];
         RunAtLoad = true;
         StartCalendarInterval = [ { Hour = 10; Minute = 0; } ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";

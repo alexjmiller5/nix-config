@@ -74,7 +74,7 @@
           return 0
       }
 
-      # gh/gcloud op auth: PATH-level wrappers (scripts.nix / macbook-air.nix)
+      # gh/gcloud/gog/modal op auth: PATH-level wrappers (op-wrappers.nix)
       # inject tokens via op read in EVERY context — the old interactive-only
       # `op plugin run` aliases (~/.config/op/plugins.sh) are retired.
 

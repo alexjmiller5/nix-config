@@ -17,9 +17,13 @@
     screentime-backup.url = "github:alexjmiller5/screentime-backup";
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
     # age-encrypted secrets, decrypted at activation via the host SSH key.
+    # darwin + home-manager follows: without them agenix pins its own copies
+    # (they showed up in flake.lock as darwin / home-manager_2).
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.darwin.follows = "nix-darwin";
+      inputs.home-manager.follows = "home-manager";
     };
     # Cherri language compiler (iOS Shortcuts) — not in nixpkgs; upstream ships a flake.
     cherri = {
@@ -46,18 +50,19 @@
     };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, screentime-backup, callhistory-backup, agenix, cherri, nix-vscode-extensions, workspace-snapshot, nix-openclaw-tools }:
+  outputs = inputs@{ nixpkgs, nix-darwin, home-manager, ... }:
     let
       username = "alexmiller";
       mkHost = { host, home }: nix-darwin.lib.darwinSystem {
         specialArgs = { inherit username; };
         modules = [
           host
+          ./modules/darwin-base.nix
           ./modules/macos-defaults.nix
-          agenix.darwinModules.default
-          screentime-backup.darwinModules.default
-          callhistory-backup.darwinModules.default
-          nix-homebrew.darwinModules.nix-homebrew
+          inputs.agenix.darwinModules.default
+          inputs.screentime-backup.darwinModules.default
+          inputs.callhistory-backup.darwinModules.default
+          inputs.nix-homebrew.darwinModules.nix-homebrew
           {
             nix-homebrew = {
               enable = true;
@@ -69,14 +74,22 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.sharedModules = [ workspace-snapshot.homeModules.default ];
-            home-manager.extraSpecialArgs = { inherit username cherri nix-vscode-extensions nix-openclaw-tools; };
+            home-manager.sharedModules = [ inputs.workspace-snapshot.homeModules.default ];
+            # Explicit per-input args (not `inherit inputs`) on purpose: each
+            # exported homeModule documents exactly what a consumer must pass.
+            home-manager.extraSpecialArgs = {
+              inherit username;
+              inherit (inputs) cherri nix-vscode-extensions nix-openclaw-tools;
+            };
             home-manager.users.${username} = import home;
           }
         ];
       };
     in
     {
+      # RFC 166 formatting: `nix fmt` (also `just fmt`).
+      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt;
+
       darwinConfigurations."mac-mini" = mkHost {
         host = ./hosts/mac-mini.nix;
         home = ./home/mac-mini.nix;
@@ -96,7 +109,11 @@
         op-agent-sa = ./home/op-agent-sa.nix;
         ai-agent = ./home/ai-agent.nix;
         cli-tools = ./home/cli-tools.nix;
-        # dev-tools needs the consumer to pass cherri + nix-openclaw-tools via extraSpecialArgs
+        agent-config-links = ./home/agent-config-links.nix;
+        machine-vault-git = ./home/machine-vault-git.nix;
+        # op-wrappers needs the consumer to pass nix-openclaw-tools via extraSpecialArgs
+        op-wrappers = ./home/op-wrappers.nix;
+        # dev-tools needs the consumer to pass cherri via extraSpecialArgs
         dev-tools = ./home/dev-tools.nix;
         ghostty = ./home/ghostty.nix;
         # vscode needs the consumer to pass nix-vscode-extensions via extraSpecialArgs

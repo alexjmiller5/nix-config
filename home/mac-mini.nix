@@ -15,12 +15,10 @@
 # AI Agent vault PAT (gh wrapper), same as the laptop. Sync clone/pull auth
 # = the repo-scoped machine-vault PAT credential helper below.
 let
-  agentConfig = "${config.home.homeDirectory}/.config/agent-config";
-  mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
   agentConfigPull = pkgs.writeShellScript "agent-config-pull" ''
     set -euo pipefail
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
-    cd "${agentConfig}"
+    cd "$HOME/.config/agent-config"
     git pull --ff-only --quiet origin main
   '';
 in
@@ -69,31 +67,20 @@ in
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
-  # git-over-https auth, split by repo (mirrors macbook-air.nix):
-  #  - agent-config + nix-secrets: the machine-vault read-only fine-grained
-  #    PAT, read at credential time via the agenix-decrypted machine SA.
-  #    Bootstrap-only auth — it exists so the activation clones and daily
-  #    pull work on a fresh machine before any login/agent state does.
-  #    IDs, not names.
-  #  - everything else: git.nix's `gh auth git-credential` default = the
-  #    scripts.nix op-authed gh PATH wrapper — AI Agent vault PAT in agent
-  #    shells (the agent's creds come from the AI Agent vault, never the
-  #    machine vault); Alex's own ssh shells have no op auth source and
-  #    stay unauthenticated.
-  # useHttpPath makes git consult the repo-scoped helper key; the .git
-  # suffix is REQUIRED — path matching is exact and the remote carries it.
-  programs.git.settings.credential =
-    let
-      machineVault = "!${pkgs.writeShellScript "git-credential-machine-vault" ''
-        [ "$1" = get ] || exit 0
-        printf 'username=alexjmiller5\n'
-        printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential')"
-      ''}";
-    in {
-      "https://github.com".useHttpPath = true;
-      "https://github.com/alexjmiller5/agent-config.git".helper = machineVault;
-      "https://github.com/alexjmiller5/nix-secrets.git".helper = machineVault;
+  # Machine-vault git bootstrap (home/machine-vault-git.nix): the mini's PAT
+  # is read-only on these repos — its sync only pulls. nix-config (public) +
+  # nix-secrets make the mini self-sufficient for dev: /etc/nix-darwin
+  # resolves (infra aliases), ssh host blocks resolve.
+  machineVaultGit = {
+    patOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/k55oo3omg6yvrjmj7akdjakrwm/credential";
+    patAuthFile = osConfig.age.secrets.machine-sa.path;
+    patRepos = [ "alexjmiller5/agent-config" "alexjmiller5/nix-secrets" ];
+    companionRepos = {
+      "alexjmiller5/agent-config" = "${config.home.homeDirectory}/.config/agent-config";
+      "alexjmiller5/nix-config" = "${config.home.homeDirectory}/.config/nix-config";
+      "alexjmiller5/nix-secrets" = "${config.home.homeDirectory}/.config/nix-secrets";
     };
+  };
 
   # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
   # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
@@ -141,20 +128,6 @@ in
     })
   ];
 
-  # Clone-if-missing at activation (mini analog of the laptop's companion-repos).
-  # nix-config (public) + nix-secrets (private, via the machine-vault PAT —
-  # the PAT must have read on it) make the mini self-sufficient for dev:
-  # /etc/nix-darwin resolves (infra aliases), ssh host blocks resolve.
-  home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    export PATH="/etc/profiles/per-user/${config.home.username}/bin:$PATH"
-    companionClone() {
-      [ -d "$2" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/$1.git" "$2" \
-        || echo "companion-repos: clone of $1 failed — machine-sa decrypted? PAT scoped to it? redeploy" >&2
-    }
-    companionClone agent-config "${agentConfig}"
-    companionClone nix-config "${config.home.homeDirectory}/.config/nix-config"
-    companionClone nix-secrets "${config.home.homeDirectory}/.config/nix-secrets"
-  '';
 
   # Daily pull, 30min after the laptop's 10:00 push window; RunAtLoad catches
   # up after downtime.
@@ -169,12 +142,4 @@ in
       StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-pull.log";
     };
   };
-
-  home.file.".agents/skills".source = mkLink "${agentConfig}/skills";
-  home.file.".claude/skills".source = mkLink "${agentConfig}/skills";
-  home.file.".claude/settings.json".source = mkLink "${agentConfig}/claude/settings.json";
-  home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
-  home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
-  home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
-  home.file.".claude/statusline.sh".source = mkLink "${agentConfig}/claude/statusline.sh";
 }

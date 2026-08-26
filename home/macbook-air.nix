@@ -77,31 +77,23 @@ in
     };
   };
 
-  # git-over-https auth, split by repo (2026-08-10; discovered when the
-  # osxkeychain neutralization exposed that general pushes had been riding a
-  # cached keychain token):
-  #  - agent-config + nix-secrets: the machine-vault fine-grained PAT
-  #    (contents:write on exactly those two repos), read at credential time
-  #    via the agenix-decrypted machine SA — headless, so the launchd sync
-  #    agents keep working. IDs, not names.
-  #  - everything else: git.nix's `gh auth git-credential` default, which is
-  #    the op-authed gh PATH wrapper — desktop-app auth in Alex's terminals,
-  #    SA token in agent shells. The machine PAT is deliberately NOT write-
-  #    broadened; general pushes belong to the gh PAT.
-  # useHttpPath makes git consult the repo-scoped helper keys; the .git
-  # suffix is REQUIRED — path matching is exact and the remotes carry it.
-  programs.git.settings.credential =
-    let
-      machineVault = "!${pkgs.writeShellScript "git-credential-machine-vault" ''
-        [ "$1" = get ] || exit 0
-        printf 'username=alexjmiller5\n'
-        printf 'password=%s\n' "$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${osConfig.age.secrets.machine-sa.path})" ${pkgs._1password-cli}/bin/op read 'op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential')"
-      ''}";
-    in {
-      "https://github.com".useHttpPath = true;
-      "https://github.com/alexjmiller5/agent-config.git".helper = machineVault;
-      "https://github.com/alexjmiller5/nix-secrets.git".helper = machineVault;
+  # Machine-vault git bootstrap (home/machine-vault-git.nix): the laptop's
+  # PAT is contents:write on exactly these repos — headless, so the launchd
+  # sync agents keep pushing. Deliberately NOT write-broadened; general
+  # pushes belong to the gh-wrapper PAT. hammerspoon (private) is cloned via
+  # the gh default helper instead — switches run in Alex's desktop-authed
+  # terminal, where that resolves.
+  machineVaultGit = {
+    patOpRef = "op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential";
+    patAuthFile = osConfig.age.secrets.machine-sa.path;
+    patRepos = [ "alexjmiller5/agent-config" "alexjmiller5/nix-secrets" ];
+    companionRepos = {
+      "alexjmiller5/nix-config" = nixConfig;
+      "alexjmiller5/nix-secrets" = "${config.home.homeDirectory}/.config/nix-secrets";
+      "alexjmiller5/agent-config" = agentConfig;
+      "alexjmiller5/hammerspoon" = "${config.home.homeDirectory}/.hammerspoon";
     };
+  };
 
   # Keep ~/Desktop materialized (never iCloud-evicted) — symlink targets and
   # working clones live under it. Laptop-personal, so not a home/macos module.
@@ -139,41 +131,9 @@ in
         exec "/Applications/Tailscale.app/Contents/MacOS/Tailscale" "$@"
       '';
     })
-    # EGGNOGG+ (madgarden.itch.io/eggnogg) — itch.io-only, served via signed
-    # expiring URLs, so no cask/plain-fetchurl is possible. The fixed-output
-    # src derivation replays itch's anonymous download dance (csrf → POST →
-    # signed URL) at fetch time; the pinned hash keeps it reproducible. Build
-    # unchanged since 2015 (upload 138870); x86_64-only, needs Rosetta.
-    # Lands in ~/Applications/Home Manager Apps.
-    (let
-      zip = pkgs.stdenvNoCC.mkDerivation {
-        name = "eggnoggplus-osx.zip";
-        nativeBuildInputs = [ pkgs.curl pkgs.cacert ];
-        SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
-        buildCommand = ''
-          csrf=$(curl -s -c cookies.txt https://madgarden.itch.io/eggnogg \
-            | grep -oE 'csrf_token" value="[^"]+' | cut -d'"' -f3)
-          url=$(curl -s -b cookies.txt -X POST \
-            "https://madgarden.itch.io/eggnogg/file/138870?source=game_download" \
-            --data-urlencode "csrf_token=$csrf" \
-            | grep -oE '"url":"[^"]+' | cut -d'"' -f4 | sed 's|\\/|/|g')
-          curl -sL "$url" -o "$out"
-        '';
-        outputHashAlgo = "sha256";
-        outputHashMode = "flat";
-        outputHash = "sha256-u3/eKr4/jG44DUV9UMK5kcfm/98Fnhh2obt/Wwl341U=";
-      };
-    in pkgs.stdenvNoCC.mkDerivation {
-      pname = "eggnoggplus";
-      version = "1.0";
-      src = zip;
-      nativeBuildInputs = [ pkgs.unzip ];
-      unpackPhase = "unzip -q $src";
-      installPhase = ''
-        mkdir -p $out/Applications
-        cp -R eggnoggplus.app $out/Applications/
-      '';
-    })
+    # EGGNOGG+ — full derivation in pkgs/eggnoggplus.nix (itch.io download
+    # dance; x86_64-only, needs the Rosetta postActivation in the host file).
+    (pkgs.callPackage ../pkgs/eggnoggplus.nix { })
     (pkgs.writeShellApplication {
       name = "menubar-layout";
       text = ''
@@ -214,15 +174,7 @@ in
   home.file."Library/Application Support/Code/User/keybindings.json".source =
     mkLink "${nixConfig}/dotfiles/vscode/keybindings.json";
 
-  # --- agent-config fan-out (private repo; app-writable working copy) ---
-  # skills served to BOTH the cross-agent standard location and Claude Code's.
-  home.file.".agents/skills".source = mkLink "${agentConfig}/skills";
-  home.file.".claude/skills".source = mkLink "${agentConfig}/skills";
-  home.file.".claude/settings.json".source = mkLink "${agentConfig}/claude/settings.json";
-  home.file.".claude/shell-init.sh".source = mkLink "${agentConfig}/claude/shell-init.sh";
-  home.file.".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
-  home.file.".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
-  home.file.".claude/statusline.sh".source = mkLink "${agentConfig}/claude/statusline.sh";
+  # (agent-config fan-out symlinks come from home/agent-config-links.nix.)
 
   # Claude auto-memory lives in agent-config/memory/<cwd-slug>/, adopted and
   # linked by the agent-config-sync agent (home/agents.nix) — not here, so
@@ -242,21 +194,4 @@ in
   programs.workspace-snapshot.enable = true;
   home.file.".hammerspoon/Spoons/WorkspaceSnapshot.spoon".enable = false;
 
-  # Companion working clones — clone-if-missing at activation. Makes the
-  # MANUAL clone steps self-healing: a fresh machine bootstraps from a local
-  # clone (MANUAL §3 — the machine-sa secret must be recreated first), and
-  # the first switch materializes the rest. Private clones auth via the
-  # machine-vault credential helper; on failure they warn and skip —
-  # re-run switch once the machine-sa secret decrypts.
-  home.activation.companionRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    export PATH="/opt/homebrew/bin:/etc/profiles/per-user/${config.home.username}/bin:$PATH"
-    companionClone() {
-      [ -d "$2" ] || /usr/bin/git clone --quiet "https://github.com/alexjmiller5/$1.git" "$2" \
-        || echo "companion-repos: clone of $1 failed — machine-sa decrypted? op reachable? re-run switch" >&2
-    }
-    companionClone nix-config "${nixConfig}"
-    companionClone nix-secrets "${config.home.homeDirectory}/.config/nix-secrets"
-    companionClone agent-config "${agentConfig}"
-    companionClone hammerspoon "${config.home.homeDirectory}/.hammerspoon"
-  '';
 }

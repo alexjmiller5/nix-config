@@ -33,3 +33,7 @@ check:
 # Bump all inputs
 update:
     nix flake update
+
+# Format all nix files (RFC 166 style via the flake's formatter)
+fmt:
+    nix fmt .

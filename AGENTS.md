@@ -8,14 +8,23 @@ routing table and workflow; this file is the in-repo map.
 ## Layout
 
 * `flake.nix` — `mkHost { host, home }`; exports `homeModules.*` for external
-  flakes (planned work-laptop config pins this repo)
-* `hosts/*.nix` — system layer: brew taps/brews/casks/masApps (zap cleanup:
-  the lists ARE the machine), power, per-host defaults
+  flakes (planned work-laptop config pins this repo); `formatter` = nixfmt
+  (RFC 166 — `just fmt`)
+* `hosts/*.nix` — system layer DIFFS from `modules/darwin-base.nix`: brew
+  taps/brews/casks/masApps (zap cleanup: the lists ARE the machine), power,
+  per-host defaults
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
-  `git.nix`, `scripts.nix`, and `cli-tools.nix`'s shared package list),
+  `git.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
+  `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
-  `dev-tools.nix` (portable dev toolbox + gog/gcloud/memo wrappers, shared
-  by BOTH hosts — laptop-only tooling stays in `macbook-air.nix`),
+  `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog,
+  gcloud — AI Agent vault creds in every context),
+  `agent-config-links.nix` (the agent-config fan-out symlinks, one list for
+  both machines),
+  `machine-vault-git.nix` (per-host options: repo-scoped machine-vault PAT
+  credential helper + companion clone-if-missing),
+  `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
+  hosts — laptop-only tooling stays in `macbook-air.nix`),
   `agents.nix` (launchd: private-repo sync, weekly updates, login items),
   `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
   PATH, and `op-agent-sa.nix` — login-time refresh of the agent SA token
@@ -29,7 +38,10 @@ routing table and workflow; this file is the in-repo map.
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`
-* `modules/` — darwin modules: `macos-defaults.nix` (injected for every host by mkHost), `notunes.nix` (laptop-only import)
+* `modules/` — darwin modules: `darwin-base.nix` + `macos-defaults.nix`
+  (both injected for every host by mkHost), `chrome-policy.nix` (declared
+  extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import)
+* `pkgs/` — custom package derivations (`callPackage`d from home files)
 * `dotfiles/` — file payloads (karabiner, nvim, vscode, ssh pubs, duti list)
 * `secrets/` — agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token); all other secrets live in the per-machine 1P vaults, fetched at

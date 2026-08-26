@@ -1,9 +1,10 @@
 { pkgs, ... }:
 
-# Standalone commands, packaged (shellcheck at build, deps pinned, on PATH in
-# every context — launchd, Raycast, agent shells). Shell-state functions and
-# command shadows that need shell state (just, code) stay in zsh/functions.zsh;
-# only real tiny-programs live here. Shared by both hosts.
+# Standalone utility commands, packaged (shellcheck at build, deps pinned, on
+# PATH in every context — launchd, Raycast, agent shells). Shell-state
+# functions and command shadows that need shell state (just, code) stay in
+# zsh/functions.zsh; op-authed CLI shadows (gh, modal, gog, gcloud) live in
+# op-wrappers.nix. Shared by both hosts.
 let
   script = name: args: pkgs.writeShellApplication ({ inherit name; } // args);
 in
@@ -17,62 +18,6 @@ in
         curl -s "https://api.notion.com/v1/data_sources/$1" \
           -H "Authorization: Bearer $(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/nhsh73sfidj4cdowvbaayaq7tq/credential')" \
           -H "Notion-Version: 2026-03-11"
-      '';
-    })
-
-    # gh, ALWAYS authed via 1Password (PAT item in the AI Agent vault) — the
-    # keyring is not used. PATH-level shadow (not an alias/function) so
-    # scripts, launchd, and agent shells get auth too.
-    # gh must not be installed anywhere else (brew/nix) or PATH order decides.
-    (script "gh" {
-      runtimeInputs = [ pkgs._1password-cli ];
-      text = ''
-        if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
-          ${builtins.readFile ./agent-detect.sh}
-          ${builtins.readFile ./agent-op-env.sh}
-          # SA token → headless; otherwise desktop-app auth (Touch ID).
-          # No auth source at all (the mini): skip — op read would prompt
-          # "add an account?" on /dev/tty and hang/garble headless callers.
-          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
-            GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
-            if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
-          fi
-        fi
-        exec ${pkgs.gh}/bin/gh "$@"
-      '';
-    })
-
-    # modal, ALWAYS authed via 1Password (AI Agent vault) — ~/.modal.toml is
-    # never written. PATH-level shadow, not a zsh function, so justfiles,
-    # scripts, launchd and agent shells get auth too (a function is invisible
-    # to all of them). Inside a uv project the project's pinned modal wins;
-    # the sentinel stops `uv run modal` re-entering this wrapper when the
-    # project has no modal dependency.
-    (script "modal" {
-      runtimeInputs = [ pkgs._1password-cli pkgs.uv ];
-      text = ''
-        if [ -z "''${MODAL_TOKEN_ID:-}" ]; then
-          ${builtins.readFile ./agent-detect.sh}
-          ${builtins.readFile ./agent-op-env.sh}
-          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
-            MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id' 2>/dev/null || true)"
-            MODAL_TOKEN_SECRET="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret' 2>/dev/null || true)"
-            if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
-              export MODAL_TOKEN_ID MODAL_TOKEN_SECRET
-            fi
-          fi
-        fi
-        in_uv_project=0
-        d=$PWD
-        while [ "$d" != "/" ]; do
-          if [ -f "$d/pyproject.toml" ]; then in_uv_project=1; break; fi
-          d=$(dirname "$d")
-        done
-        if [ "$in_uv_project" = 0 ] || [ -n "''${_MODAL_WRAPPED:-}" ]; then
-          exec uvx modal "$@"
-        fi
-        export _MODAL_WRAPPED=1
-        exec uv run modal "$@"
       '';
     })
 
