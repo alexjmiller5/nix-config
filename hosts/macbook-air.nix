@@ -322,10 +322,8 @@
     ];
     casks = [
       "1password"
-      # TODO: try moving to pkgs._1password-cli someday (already in the closure
-      # via the gh/gcloud wrappers) — verify desktop-app integration (Touch ID
-      # in Alex's terminals) still accepts the nix-built op before zapping this.
-      "1password-cli"
+      # op comes from pkgs._1password-cli (ai-agent.nix) — the desktop app
+      # accepts the nix-built binary (Touch ID verified 2026-08-26).
       "alt-tab"
       "betterdisplay"
       "binary-ninja-free"

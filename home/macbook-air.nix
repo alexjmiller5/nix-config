@@ -36,10 +36,6 @@ in
     ./ssh.nix
   ];
 
-  # ai-agent.nix: op stays the 1password-cli brew cask here (desktop-app
-  # integration — see the TODO next to the cask in hosts/macbook-air.nix).
-  aiAgent.withOp = false;
-
   # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
   # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
   opAgentSa = {

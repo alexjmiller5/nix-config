@@ -14,7 +14,7 @@
   options.aiAgent.withOp = lib.mkOption {
     type = lib.types.bool;
     default = true;
-    description = "Install op (pkgs._1password-cli) on PATH. Disable where the 1password-cli brew cask provides op with desktop-app integration (the laptop, until its TODO to test the nix op is done).";
+    description = "Install op (pkgs._1password-cli) on PATH. Disable where op is already provided some other way (e.g. a host's 1password-cli brew cask).";
   };
 
   config.home.packages =
