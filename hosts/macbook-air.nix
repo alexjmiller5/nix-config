@@ -74,9 +74,10 @@
     };
   };
 
-  # Root activation steps (Rosetta, cask de-quarantine, yabai TCC nudge).
-  # chrome-policy.nix contributes its own postActivation entry — the
-  # option is types.lines, so the definitions merge.
+  # Laptop-only root activation steps (Rosetta, yabai TCC nudge). The cask
+  # de-quarantine lives in darwin-base.nix (both machines); chrome-policy.nix
+  # contributes its own entry too — the option is types.lines, so all the
+  # definitions merge.
   system.activationScripts.postActivation.text = ''
     # Rosetta 2, declared (needed by EGGNOGG+ in home/macbook-air.nix —
     # x86_64-only). No nix-darwin option exists; activation runs as root,
@@ -84,21 +85,6 @@
     if ! /usr/bin/pgrep -q oahd; then
       /usr/sbin/softwareupdate --install-rosetta --agree-to-license
     fi
-
-    # De-quarantine declared casks — successor to brew's removed
-    # --no-quarantine (Homebrew/brew#20755). Runs after brew bundle
-    # (postActivation is last), so freshly installed casks are covered.
-    # Scoped to brew-managed apps via the Caskroom app symlinks on
-    # purpose: anything else in /Applications keeps its Gatekeeper
-    # prompt. Quarantine-flag check on the bundle root keeps re-runs
-    # cheap (no recursive walk unless there's something to strip).
-    for link in /opt/homebrew/Caskroom/*/*/*.app; do
-      app=$(/usr/bin/readlink "$link" || echo "$link")
-      if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
-        echo "de-quarantining $app" >&2
-        /usr/bin/xattr -dr com.apple.quarantine "$app"
-      fi
-    done
 
     # yabai TCC reminder: Accessibility grants key on the nix store path,
     # which changes on version bumps — the old grant dies and the keepalive

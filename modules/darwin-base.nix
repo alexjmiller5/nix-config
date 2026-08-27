@@ -45,6 +45,24 @@
   # the machine's own working clone (companionRepos, machine-vault-git.nix).
   environment.etc."nix-darwin".source = "/Users/${username}/.config/nix-config";
 
+  # De-quarantine declared casks — successor to brew's removed
+  # --no-quarantine (Homebrew/brew#20755). Runs after brew bundle
+  # (postActivation is last), so freshly installed casks are covered. Both
+  # machines: the mini's agent-launched Chrome hits the same Gatekeeper
+  # prompt a GUI login would. Scoped to brew-managed apps via the Caskroom
+  # app symlinks on purpose: anything else in /Applications keeps its
+  # Gatekeeper prompt. Quarantine-flag check on the bundle root keeps
+  # re-runs cheap (no recursive walk unless there's something to strip).
+  system.activationScripts.postActivation.text = ''
+    for link in /opt/homebrew/Caskroom/*/*/*.app; do
+      app=$(/usr/bin/readlink "$link" || echo "$link")
+      if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
+        echo "de-quarantining $app" >&2
+        /usr/bin/xattr -dr com.apple.quarantine "$app"
+      fi
+    done
+  '';
+
   # Homebrew itself is installed/pinned by nix-homebrew (flake.nix). zap:
   # anything not in a host's declared lists is uninstalled at switch — the
   # lists ARE the machine.
