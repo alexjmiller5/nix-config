@@ -144,6 +144,9 @@
       "chrome-cli"
       "skills"
       "smudge/smudge/nightlight"
+      # iMessage CLI for agents (read chat.db, send via Messages.app) — not in
+      # nixpkgs. Needs TCC grants, see MANUAL-macbook-air.md.
+      "steipete/tap/imsg"
     ];
     casks = [
       "1password"

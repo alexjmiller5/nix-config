@@ -104,7 +104,9 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
   the grant valid across rebuilds)
 * **Calendar / Contacts**: Raycast
 * **Microphone**: Raycast
-* **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker
+* **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker;
+  Ghostty → Messages (for `imsg send` — macOS prompts on first send; reads
+  need only Ghostty's existing Full Disk Access)
 
 Raycast asks for five at onboarding — Accessibility (window management,
 snippet expansion), Files and Folders, Calendar and Contacts, Microphone
