@@ -442,12 +442,6 @@ in
     fi
   '';
 
-  # Menu bar system-module ORDER (right → left below). ControlCenter honors
-  # relative "Preferred Position" plain-domain values at launch (macOS 26,
-  # verified 2026-08-04). On-demand command, not activation: ControlCenter
-  # renormalizes the numbers after layout, so enforcing exact values every
-  # switch would flap. Third-party icon order stays manual (⌘-drag) — see
-  # MANUAL-macbook-air.md.
   home.packages = [
     # Laptop-only leftovers — the portable dev toolbox lives in
     # home/dev-tools.nix (shared with the mini). What stays here: the Apple
@@ -473,6 +467,12 @@ in
     # EGGNOGG+ — full derivation in pkgs/eggnoggplus.nix (itch.io download
     # dance; x86_64-only, needs the Rosetta postActivation in the host file).
     (pkgs.callPackage ../pkgs/eggnoggplus.nix { })
+    # Menu bar system-module ORDER (right → left, as listed below).
+    # ControlCenter honors relative "Preferred Position" plain-domain values
+    # at launch (macOS 26, verified 2026-08-04). An on-demand command, not an
+    # activation step: ControlCenter renormalizes the numbers after layout, so
+    # enforcing exact values every switch would flap. Third-party icon order
+    # stays manual (⌘-drag) — see MANUAL-macbook-air.md.
     (pkgs.writeShellApplication {
       name = "menubar-layout";
       text = ''
