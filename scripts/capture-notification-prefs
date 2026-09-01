@@ -2,35 +2,55 @@
 """Print the current per-app notification settings as a nix block.
 
 Emits `macos.notificationPrefs.apps` for home/macbook-air.nix (module:
-home/macos/notification-prefs.nix). Only apps that are still installed are
-included, so uninstalled leftovers drop out on every re-capture.
+home/macos/notification-prefs.nix). Reads usernoted's group container, which
+is the live store - ~/Library/Preferences/com.apple.ncprefs.plist is a stale
+copy that still lists long-uninstalled apps.
 
-The `_SYSTEM_CENTER_:` pseudo-entries (Software Update, Bluetooth, Wi-Fi,
-...) are excluded: they are OS-owned notification sources, not apps, and
-their values churn with OS updates.
+Only apps that are still installed are included, so leftovers drop out on
+every re-capture. The `_SYSTEM_CENTER_:` pseudo-entries (Software Update,
+Bluetooth, Wi-Fi, ...) are excluded: they are OS-owned notification sources,
+not apps, and their values churn with OS updates, as are the notification
+bundles under /System/Library/UserNotifications/.
 
 Usage: scripts/capture-notification-prefs [--all]
        --all also emits apps whose bundle no longer resolves.
 """
 
+import os
 import plistlib
 import subprocess
 import sys
 
+DOMAIN = os.path.expanduser(
+    "~/Library/Group Containers/group.com.apple.usernoted"
+    "/Library/Preferences/group.com.apple.usernoted")
+
 KEYS = ("flags", "content_visibility", "grouping")
 
+# OS-owned notification sources (Wi-Fi, Bluetooth, Software Update, tccd, ...)
+# rather than apps: they churn with OS updates, so they stay undeclared.
+SYSTEM_SOURCES = "/System/Library/UserNotifications/Bundles/"
 
-def installed(bundle_id: str) -> bool:
-    hits = subprocess.run(
-        ["/usr/bin/mdfind", f"kMDItemCFBundleIdentifier == '{bundle_id}'"],
-        capture_output=True, text=True).stdout.split()
-    return any(p.endswith(".app") for p in hits)
+
+def installed(app: dict) -> bool:
+    """Each entry records the bundle it came from; a missing path means gone.
+
+    Beats matching on bundle id: helper and wrapper bundles (Docker's Electron
+    app, Chrome's alert helper) carry ids no installed .app advertises.
+    """
+    path = app.get("path")
+    return bool(path) and os.path.exists(path)
+
+
+def allowed(flags: int) -> bool:
+    """macOS encodes the Allow-notifications switch in two flags bits."""
+    return not flags >> 23 & 1 or bool(flags >> 25 & 1)
 
 
 def main() -> int:
     keep_all = "--all" in sys.argv[1:]
     prefs = plistlib.loads(subprocess.run(
-        ["/usr/bin/defaults", "export", "com.apple.ncprefs", "-"],
+        ["/usr/bin/defaults", "export", DOMAIN, "-"],
         capture_output=True, check=True).stdout)
 
     print("  macos.notificationPrefs.apps = {")
@@ -38,9 +58,13 @@ def main() -> int:
         bid = app.get("bundle-id", "")
         if not bid or bid.startswith("_SYSTEM_CENTER_:"):
             continue
-        if not keep_all and not installed(bid):
+        if app.get("path", "").startswith(SYSTEM_SOURCES):
+            continue
+        if not keep_all and not installed(app):
             continue
         print(f'    "{bid}" = {{')
+        if "flags" in app:
+            print(f"      enable = {str(allowed(app['flags'])).lower()};")
         for key in KEYS:
             if key in app:
                 print(f"      {key} = {app[key]};")

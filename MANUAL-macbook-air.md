@@ -189,16 +189,6 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 
 ## One-time app/setting setup
 
-* **Notifications → "Allow notifications" per app**: GUI-only. The per-app
-  presentation settings (alert style, badge, sound, previews, grouping) ARE
-  declared — `home/macos/notification-prefs.nix`, re-captured with
-  `scripts/capture-notification-prefs` — but the master allow/deny switch is
-  not in `com.apple.ncprefs`; it lives in usernoted's authorization store and
-  is only writable by the user clicking the toggle (or by an MDM
-  `com.apple.notificationsettings` payload, which this machine has no MDM for).
-  Verified 2026-09-01: an app given byte-identical ncprefs values to a muted
-  app stayed enabled across a usernoted + System Settings restart. Turning an
-  app's notifications on or off is a manual step, like a TCC grant.
 * **Accessibility → Zoom**: enable scroll-gesture-with-modifier zoom (ctrl) —
   `com.apple.universalaccess` is FDA-gated, not worth automating.
 * **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →
@@ -368,6 +358,31 @@ research: Notion note "Menu bar / dock in nix — findings" (2026-08-02).
 Reference layout, right → left (snapshotted 2026-08-04): clock,
 Control Center, Sound, WiFi, BetterDisplay, Tailscale, Battery, Bluetooth,
 Screen Mirroring, Weather, 1Password, AirDrop, RepoBar, CodexBar.
+
+## Notifications: what's declared vs manual
+
+Declared, `home/macos/notification-prefs.nix` + the block in
+`home/macbook-air.nix`: per-app "Allow notifications" (`enable`), plus alert
+style / venues / badge / sound / summarize (`flags`), Show previews
+(`content_visibility`) and Notification grouping (`grouping`). Re-capture with
+`scripts/capture-notification-prefs` after changing anything in the UI —
+uninstalled apps drop out on every capture, so the list stays honest.
+
+The live store is usernoted's group container, NOT
+`~/Library/Preferences/com.apple.ncprefs.plist`. That path looks like the
+right one and is what every guide online names, but on this machine it is a
+stale copy: it still listed apps uninstalled months ago, was missing every
+recently-installed one, and writes to it changed nothing in the UI.
+
+`enable` maps onto two `flags` bits rather than a field of its own: an app is
+allowed iff bit 23 is clear OR bit 25 is set (bit 23 records that a choice was
+made, bit 25 carries allow/deny). Verified 2026-09-01 end to end by flipping
+one app in nix and watching System Settings switch it from Off to on.
+
+Manual: the OS's own notification sources (Wi-Fi, Bluetooth, Software Update,
+tccd — the `_SYSTEM_CENTER_:` entries and the bundles under
+`/System/Library/UserNotifications/`) are deliberately left undeclared; their
+values churn with OS updates.
 
 ## Known imperative leftovers (deliberate)
 

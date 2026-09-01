@@ -5,41 +5,96 @@
   ...
 }:
 
-# Per-app notification settings (System Settings > Notifications). Each app is
-# one entry in the com.apple.ncprefs `apps` array, keyed by bundle id, holding
-# `flags` (an opaque presentation bitmask), `content_visibility` (Show
-# previews) and `grouping` (Notification grouping). Declare whichever of those
-# keys should be enforced; everything else in the entry is left untouched.
+# Per-app notification settings, including whether an app may notify at all
+# (System Settings > Notifications).
 #
-# NOT covered: the master "Allow notifications" switch. That state lives in
-# usernoted's authorization store, not in ncprefs - verified 2026-09-01 by
-# giving Ghostty byte-identical ncprefs values to a muted app and watching it
-# stay enabled across a usernoted + System Settings restart. Allowing or
-# denying an app stays a manual step, like TCC (see MANUAL-macbook-air.md).
+# The live store is usernoted's group container, NOT
+# ~/Library/Preferences/com.apple.ncprefs.plist - that path is a stale copy
+# (verified 2026-09-01: it still listed apps uninstalled months ago and was
+# missing every recently-installed one, and writes to it changed nothing in
+# the UI). Each app is one entry in the `apps` array keyed by bundle id:
+#
+#   flags               opaque presentation bitmask, see `enable` below
+#   content_visibility  Show previews (0 default, 2 when unlocked, 3 always)
+#   grouping            Notification grouping (0 automatic, 1 by app, 2 off)
+#
+# `enable` is the "Allow notifications" master switch, which macOS encodes in
+# two flags bits rather than a field of its own: an app is allowed iff bit 23
+# is clear OR bit 25 is set. Setting `enable` rewrites those two bits on top
+# of the captured `flags` (bit 23 marks the choice as made, bit 25 carries
+# allow/deny), so the intent stays readable instead of hiding in an int.
+# Verified end to end by flipping a muted app's bit 25 and watching System
+# Settings switch it from Off to on.
 #
 # Reads and writes go through `defaults export/import` (i.e. cfprefsd), never
 # the raw plist file, and usernoted is restarted only when something actually
-# changed. Apps that haven't registered with Notification Center yet are
+# changed. Apps that have not registered with Notification Center yet are
 # skipped and converge on a later switch. Declared values are authoritative:
 # a change made in System Settings reverts at the next switch unless mirrored
-# here. Re-capture the current state with `scripts/capture-notification-prefs`
-# and paste its output - the ints are not meant to be written by hand.
+# here. Re-capture with `scripts/capture-notification-prefs` and paste its
+# output; the ints are not meant to be written by hand.
 let
   cfg = config.macos.notificationPrefs;
-  wantJson = builtins.toJSON cfg.apps;
+
+  # Resolve `enable` into the flags value actually written.
+  resolve =
+    app:
+    let
+      # bit 23 clear means no choice was ever recorded, which already reads as
+      # allowed - leave those untouched so enabling is a no-op, not a rewrite.
+      decided = builtins.bitAnd app.flags 8388608 != 0;
+      allowed = if decided then builtins.bitOr app.flags 33554432 else app.flags;
+      denied = builtins.bitAnd (builtins.bitOr app.flags 8388608) (builtins.bitXor 33554432 (-1));
+    in
+    lib.filterAttrs (_: v: v != null) {
+      flags =
+        if app.flags == null || app.enable == null then
+          app.flags
+        else if app.enable then
+          allowed
+        else
+          denied;
+      inherit (app) content_visibility grouping;
+    };
+
+  wantJson = builtins.toJSON (lib.mapAttrs (_: resolve) cfg.apps);
 in
 {
   options.macos.notificationPrefs.apps = lib.mkOption {
-    type = lib.types.attrsOf (lib.types.attrsOf lib.types.int);
     default = { };
+    description = "Bundle id -> notification settings to enforce.";
     example = {
       "com.hnc.Discord" = {
+        enable = false;
         flags = 276832270;
-        content_visibility = 0;
-        grouping = 0;
       };
     };
-    description = "Bundle id -> com.apple.ncprefs entry keys to enforce.";
+    type = lib.types.attrsOf (
+      lib.types.submodule {
+        options = {
+          enable = lib.mkOption {
+            type = lib.types.nullOr lib.types.bool;
+            default = null;
+            description = "Allow notifications. Null leaves the captured flags bits alone.";
+          };
+          flags = lib.mkOption {
+            type = lib.types.nullOr lib.types.int;
+            default = null;
+            description = "Presentation bitmask (venues, alert style, badge, sound, summarize).";
+          };
+          content_visibility = lib.mkOption {
+            type = lib.types.nullOr lib.types.int;
+            default = null;
+            description = "Show previews: 0 default, 2 when unlocked, 3 always.";
+          };
+          grouping = lib.mkOption {
+            type = lib.types.nullOr lib.types.int;
+            default = null;
+            description = "Notification grouping: 0 automatic, 1 by app, 2 off.";
+          };
+        };
+      }
+    );
   };
 
   config = lib.mkIf (cfg.apps != { }) {
@@ -48,10 +103,13 @@ in
       ${pkgs.python3}/bin/python3 - <<'PYEOF'
       import json, os, plistlib, subprocess, sys
 
+      DOMAIN = os.path.expanduser(
+          "~/Library/Group Containers/group.com.apple.usernoted"
+          "/Library/Preferences/group.com.apple.usernoted")
+
       want = json.loads(os.environ["NCPREFS_WANT"])
-      exp = subprocess.run(
-          ["/usr/bin/defaults", "export", "com.apple.ncprefs", "-"],
-          capture_output=True, check=True)
+      exp = subprocess.run(["/usr/bin/defaults", "export", DOMAIN, "-"],
+                           capture_output=True, check=True)
       prefs = plistlib.loads(exp.stdout)
       by_id = {a.get("bundle-id"): a for a in prefs.get("apps", [])}
       changed = []
@@ -66,7 +124,7 @@ in
                   entry[key] = value
                   changed.append(bid + "." + key)
       if changed:
-          subprocess.run(["/usr/bin/defaults", "import", "com.apple.ncprefs", "-"],
+          subprocess.run(["/usr/bin/defaults", "import", DOMAIN, "-"],
                          input=plistlib.dumps(prefs), check=True)
           subprocess.run(["/usr/bin/killall", "usernoted"], capture_output=True)
           print("notificationPrefs: updated " + ", ".join(changed))

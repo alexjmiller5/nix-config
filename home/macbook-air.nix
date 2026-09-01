@@ -85,220 +85,328 @@ in
     };
   };
 
-  # Per-app notification settings (home/macos/notification-prefs.nix).
+  # Per-app notification settings, `enable` included (the "Allow
+  # notifications" switch) - see home/macos/notification-prefs.nix.
   # Captured 2026-09-01 with `scripts/capture-notification-prefs`, which emits
-  # this whole block for every still-installed app - re-run it and paste the
-  # output after changing anything in System Settings; the ints are opaque
-  # macOS bitmasks, not values to edit by hand. UI-only edits revert at the
-  # next switch. The master "Allow notifications" switch is NOT here (it lives
-  # in usernoted, outside ncprefs) - see MANUAL-macbook-air.md.
+  # this whole block for every still-installed app. Flip `enable` here to mute
+  # or unmute an app declaratively; for anything else change it in System
+  # Settings and re-run the script, since the ints are opaque macOS bitmasks.
+  # UI-only edits revert at the next switch.
   macos.notificationPrefs.apps = {
-    "com.apple.AppStore" = {
-      flags = 9404162070;
-      content_visibility = 3;
+    "com.alexmiller.receptor" = {
+      enable = true;
+      flags = 310386702;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.anthropic.claudefordesktop" = {
+      enable = true;
+      flags = 310386702;
+      content_visibility = 0;
       grouping = 0;
     };
     "com.apple.FaceTime" = {
-      flags = 8396814;
+      enable = false;
+      flags = 278929422;
       content_visibility = 3;
       grouping = 0;
     };
     "com.apple.Family" = {
+      enable = false;
       flags = 8396814;
       content_visibility = 3;
       grouping = 0;
     };
-    "com.apple.Home" = {
-      flags = 833097742;
+    "com.apple.FindMySafetyAlertsNotifications" = {
+      enable = true;
+      flags = 807403534;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.Maps" = {
+      enable = true;
       flags = 271056910;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.MobileSMS" = {
+      enable = false;
       flags = 9490137174;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.Music" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 3;
       grouping = 0;
     };
     "com.apple.Notes" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 3;
       grouping = 0;
     };
     "com.apple.Passwords" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.Photos" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 3;
       grouping = 0;
     };
     "com.apple.Safari" = {
+      enable = false;
       flags = 8396814;
       content_visibility = 3;
       grouping = 0;
     };
+    "com.apple.Safari.WebApp" = {
+      enable = true;
+      flags = 268443662;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.ScriptEditor2" = {
+      enable = true;
+      flags = 41951246;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.apple.Siri" = {
+      enable = true;
       flags = 310386830;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.TV" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 3;
       grouping = 0;
     };
+    "com.apple.TelephonyUtilities" = {
+      enable = true;
+      flags = 17221820430;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.apple.appleseed.FeedbackAssistant" = {
+      enable = true;
       flags = 268443662;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.clock" = {
+      enable = true;
       flags = 8919720086;
       content_visibility = 3;
       grouping = 0;
     };
     "com.apple.dt.Xcode" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.findmy" = {
+      enable = false;
       flags = 1889533966;
       content_visibility = 0;
       grouping = 0;
     };
     "com.apple.freeform" = {
+      enable = true;
       flags = 176168974;
       content_visibility = 0;
       grouping = 0;
     };
-    "com.apple.gamecenter" = {
-      flags = 5109194766;
-      content_visibility = 3;
-      grouping = 0;
-    };
     "com.apple.iBooksX" = {
+      enable = false;
       flags = 816324622;
       content_visibility = 3;
       grouping = 0;
     };
-    "com.apple.iCal" = {
-      flags = 814227478;
-      content_visibility = 3;
+    "com.apple.iChat" = {
+      enable = true;
+      flags = 41943054;
+      content_visibility = 0;
       grouping = 0;
     };
     "com.apple.mail" = {
+      enable = false;
       flags = 276824078;
       content_visibility = 0;
       grouping = 0;
     };
+    "com.apple.mobilephone" = {
+      enable = false;
+      flags = 278929422;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.apple.news" = {
+      enable = false;
       flags = 815800334;
       content_visibility = 3;
       grouping = 0;
     };
     "com.apple.podcasts" = {
+      enable = false;
       flags = 832573454;
       content_visibility = 0;
       grouping = 0;
     };
-    "com.apple.reminders" = {
-      flags = 9404162070;
-      content_visibility = 3;
-      grouping = 0;
-    };
     "com.apple.shortcuts" = {
+      enable = true;
       flags = 327680142;
       content_visibility = 0;
       grouping = 0;
     };
-    "com.apple.tips" = {
-      flags = 294125590;
-      content_visibility = 0;
-      grouping = 0;
-    };
     "com.apple.weather" = {
+      enable = false;
       flags = 832577550;
       content_visibility = 0;
       grouping = 0;
     };
+    "com.asmvik.yabai" = {
+      enable = true;
+      flags = 41951246;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.cron.electron" = {
+      enable = false;
       flags = 8396822;
       content_visibility = 0;
       grouping = 0;
     };
+    "com.electron.dockerdesktop" = {
+      enable = false;
+      flags = 8396814;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.flightyapp.flighty" = {
-      flags = 807411726;
+      enable = false;
+      flags = 815800334;
       content_visibility = 0;
       grouping = 0;
     };
     "com.google.Chrome" = {
+      enable = false;
       flags = 8396814;
       content_visibility = 3;
       grouping = 0;
     };
+    "com.google.Chrome.framework.AlertNotificationService" = {
+      enable = false;
+      flags = 17188266006;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.google.chrome.for.testing" = {
+      enable = true;
+      flags = 41951246;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.google.chrome.for.testing.framework.AlertNotificationService" = {
+      enable = true;
+      flags = 41951246;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.hnc.Discord" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
+    "com.microsoft.VSCode" = {
+      enable = true;
+      flags = 310386702;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.mitchellh.ghostty" = {
+      enable = true;
+      flags = 310386702;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.raycast.macos" = {
+      enable = true;
       flags = 268443662;
       content_visibility = 0;
       grouping = 0;
     };
     "com.spotify.client" = {
-      flags = 8396814;
+      enable = false;
+      flags = 276832270;
       content_visibility = 3;
       grouping = 0;
     };
+    "com.steipete.codexbar" = {
+      enable = true;
+      flags = 310386702;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.steipete.repobar" = {
+      enable = true;
+      flags = 268443662;
+      content_visibility = 0;
+      grouping = 0;
+    };
     "com.tinyspeck.slackmacgap" = {
+      enable = false;
       flags = 8396814;
       content_visibility = 0;
       grouping = 0;
     };
     "io.tailscale.ipn.macsys" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
     "net.whatsapp.WhatsApp" = {
+      enable = false;
       flags = 278929422;
       content_visibility = 0;
       grouping = 0;
     };
     "notion.id" = {
-      flags = 8396814;
+      enable = false;
+      flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
     "org.hammerspoon.Hammerspoon" = {
+      enable = false;
       flags = 8396822;
       content_visibility = 0;
       grouping = 0;
     };
     "pro.betterdisplay.BetterDisplay" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
     "ru.keepcoder.Telegram" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 0;
       grouping = 0;
     };
     "us.zoom.xos" = {
+      enable = false;
       flags = 276832270;
       content_visibility = 3;
       grouping = 0;
