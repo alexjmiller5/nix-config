@@ -29,8 +29,18 @@
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
 	},
+	// Milkdown is a ProseMirror editor: it parses markdown to an AST and
+	// writes it back on OPEN, and remark has no YAML frontmatter support, so
+	// the `---` fences come back as `***` + a setext underline and the file's
+	// frontmatter is silently destroyed. Every frontmatter-bearing markdown
+	// file therefore opens in the plain text editor instead. Read those in
+	// nvim, which renders markdown in-buffer without rewriting it.
 	"workbench.editorAssociations": {
-		"*.md": "milkdown.editor"
+		"*.md": "milkdown.editor",
+		"**/SKILL.md": "default",
+		"**/AGENTS.md": "default",
+		"**/memory/*.md": "default",
+		"**/.claude/**/*.md": "default"
 	},
 	"code-runner.executorMap": {
 		"javascript": "node",

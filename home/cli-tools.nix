@@ -27,6 +27,11 @@
     # New 26.05 defaults, made explicit: no plugins need the providers
     withRuby = false;
     withPython3 = false;
+    # In-buffer markdown rendering, for the frontmatter-bearing files VS Code
+    # must not open (SKILL.md, AGENTS.md, memories - see dotfiles/vscode
+    # settings.json). It only draws extmark decorations over the buffer and
+    # never rewrites it, which is exactly what a WYSIWYG editor gets wrong.
+    plugins = [ pkgs.vimPlugins.render-markdown-nvim ];
   };
   xdg.configFile."nvim/init.lua".source = ../dotfiles/nvim/init.lua;
 

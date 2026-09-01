@@ -16,6 +16,12 @@ vim.keymap.set('i', '<M-Down>', '<C-o>}')
 vim.keymap.set('i', '<M-BS>', '<C-w>')        -- opt+delete: delete word back
 vim.keymap.set('i', '<M-Del>', '<C-o>dw')     -- opt+fn+delete: delete word forward
 
+-- markdown rendered in the buffer (plugin from nix, see home/cli-tools.nix).
+-- Decorations only: it never rewrites the file, which is why frontmatter
+-- files (SKILL.md, AGENTS.md, memories) are read here and not in VS Code.
+-- nvim ships the markdown + markdown_inline treesitter parsers it needs.
+require('render-markdown').setup({})
+
 -- treesitter syntax highlighting
 vim.pack.add({ 'https://github.com/nvim-treesitter/nvim-treesitter' })
 vim.api.nvim_create_autocmd('FileType', {
