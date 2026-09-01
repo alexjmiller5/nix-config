@@ -18,15 +18,18 @@ routing table and workflow; this file is the in-repo map.
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog,
-  gcloud — AI Agent vault creds in every context; gh/modal read through
+  gcloud - AI Agent vault creds in every context; gh/modal read through
   `op-cache.sh`'s TTL cache because 1Password meters service accounts at
-  1000 requests/24h **per 1Password account**, shared across every SA — a
-  per-call `op read` in a hot wrapper exhausts the day, and minting another
-  SA does not help),
+  1000 requests/24h **per 1Password account**, shared across every SA, so a
+  per-call `op read` in a hot wrapper exhausts the day and minting another
+  SA does not help. The cache holds REAL secrets at 0600, so its 12h TTL is
+  a hard disk-residency limit, not just a freshness check: `op_cached`
+  deletes an expired entry on sight and `op_cache_sweep` purges idle ones
+  hourly. Never add a stale-secret fallback to it),
   `agent-config-links.nix` (the agent-config fan-out symlinks, one list for
   both machines),
   `claude-plugins.nix` (Claude Code plugins as pinned flake inputs, linked
-  into the agent-config skills dir and loaded in place via `@skills-dir` —
+  into the agent-config skills dir and loaded in place via `@skills-dir`:
   `claude plugin install` is imperative and `enabledPlugins` never fetches
   anything, so a restored machine got none; git-ignored on the agent-config
   side),
@@ -41,7 +44,9 @@ routing table and workflow; this file is the in-repo map.
   PATH, and `op-agent-sa.nix` — login-time refresh of the agent SA token
   from the machine vault into a 0600 file, `~/.local/state/op/agent-sa-token`;
   a file, not the Keychain, since ssh-descended shells can't read the
-  per-session-locked Keychain; host-layer sibling = `claude-code` +
+  per-session-locked Keychain; also owns the hourly `op-cache-sweep` agent
+  that expires `op-cache.sh`'s cached secrets, since both are
+  `~/.local/state/op/` lifecycle; host-layer sibling = `claude-code` +
   `notion-cli` casks),
   `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),
