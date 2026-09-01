@@ -115,9 +115,12 @@ in
     (script "codef" {
       text = ''
         [ $# -eq 1 ] || { echo "Usage: codef <path>"; exit 1; }
-        abs="$(cd "$(dirname "$1")" 2>/dev/null && pwd)/$(basename "$1")" \
+        # dir resolved on its own line: as part of the "$(...)/$(basename ...)"
+        # string the assignment took basename's (always-0) status, so the
+        # not-found branch never fired and a bad path opened a bogus URL.
+        dir="$(cd "$(dirname "$1")" 2>/dev/null && pwd)" \
           || { echo "Path not found: $1"; exit 1; }
-        /usr/bin/open "vscode://file$abs"
+        /usr/bin/open "vscode://file$dir/$(basename "$1")"
       '';
     })
   ];

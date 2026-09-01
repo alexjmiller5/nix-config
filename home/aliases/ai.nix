@@ -4,7 +4,11 @@
   programs.zsh.shellAliases = {
     claude = "claude --model fable";
     cc = "claude"; # expands recursively, so it inherits the fable flag
-    claude-max = "claude --model claude-fable --effort max";
+    # `command` keeps the claude alias from expanding here too — without it
+    # this recursively picks up `--model fable` and passes --model twice.
+    # Model name must match the `claude` alias: "claude-fable" is rejected as
+    # unrecognized (Claude Code then assumes a 200k window).
+    claude-max = "command claude --model fable --effort max";
     op-temp-sa = "~/.claude/skills/1password/scripts/op-temp-sa";
     # Load the temp-SA token minted by op-temp-sa into this shell (aliases run
     # in-shell, so the export sticks; token value never appears in transcripts)
