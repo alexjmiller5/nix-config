@@ -18,14 +18,25 @@ routing table and workflow; this file is the in-repo map.
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog,
-  gcloud — AI Agent vault creds in every context),
+  gcloud — AI Agent vault creds in every context; gh/modal read through
+  `op-cache.sh`'s TTL cache because 1Password meters service accounts at
+  1000 requests/24h **per 1Password account**, shared across every SA — a
+  per-call `op read` in a hot wrapper exhausts the day, and minting another
+  SA does not help),
   `agent-config-links.nix` (the agent-config fan-out symlinks, one list for
   both machines),
+  `claude-plugins.nix` (Claude Code plugins as pinned flake inputs, linked
+  into the agent-config skills dir and loaded in place via `@skills-dir` —
+  `claude plugin install` is imperative and `enabledPlugins` never fetches
+  anything, so a restored machine got none; git-ignored on the agent-config
+  side),
   `machine-vault-git.nix` (per-host options: repo-scoped machine-vault PAT
   credential helper + companion clone-if-missing),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
-  `agents.nix` (launchd: private-repo sync, weekly updates, login items),
+  `agents.nix` (launchd: private-repo sync, weekly updates, login items; the
+  sync repairs mangled SKILL.md frontmatter before staging, since that damage
+  silently disables a skill and has twice ridden a snapshot into history),
   `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
   PATH, and `op-agent-sa.nix` — login-time refresh of the agent SA token
   from the machine vault into a 0600 file, `~/.local/state/op/agent-sa-token`;

@@ -54,6 +54,22 @@
       url = "github:alexjmiller5/life-data";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Claude Code plugins, pinned and loaded in place (see home/claude-plugins.nix).
+    # `claude plugin install` is an imperative install that leaves a fresh
+    # machine with nothing, so the sources are inputs and ride the weekly bump.
+    # Not flakes: these are plugin repos, consumed as plain source trees.
+    claude-plugins-official = {
+      url = "github:anthropics/claude-plugins-official";
+      flake = false;
+    };
+    claude-plugin-superpowers = {
+      url = "github:obra/superpowers";
+      flake = false;
+    };
+    claude-plugin-ponytail = {
+      url = "github:DietrichGebert/ponytail";
+      flake = false;
+    };
   };
 
   outputs =
@@ -98,6 +114,9 @@
                   nix-vscode-extensions
                   nix-openclaw-tools
                   life-data
+                  claude-plugins-official
+                  claude-plugin-superpowers
+                  claude-plugin-ponytail
                   ;
               };
               home-manager.users.${username} = import home;
@@ -129,6 +148,9 @@
         ai-agent = ./home/ai-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         agent-config-links = ./home/agent-config-links.nix;
+        # claude-plugins needs the consumer to pass claude-plugins-official,
+        # claude-plugin-superpowers and claude-plugin-ponytail via extraSpecialArgs
+        claude-plugins = ./home/claude-plugins.nix;
         machine-vault-git = ./home/machine-vault-git.nix;
         # op-wrappers needs the consumer to pass nix-openclaw-tools via extraSpecialArgs
         op-wrappers = ./home/op-wrappers.nix;

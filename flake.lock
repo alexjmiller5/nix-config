@@ -80,6 +80,54 @@
         "type": "github"
       }
     },
+    "claude-plugin-ponytail": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786139041,
+        "narHash": "sha256-bGdXvzhWPwGdz3T2Yh2h6lf+3PBRFAfdBxP5pESmCHI=",
+        "owner": "DietrichGebert",
+        "repo": "ponytail",
+        "rev": "2ed6c52c9d7e5e56942508591085fd45dea277d3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DietrichGebert",
+        "repo": "ponytail",
+        "type": "github"
+      }
+    },
+    "claude-plugin-superpowers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786553601,
+        "narHash": "sha256-EsGNO0dULWf5Bx6bGrCv2kI2Z8aKH0kRvGiuN23wChQ=",
+        "owner": "obra",
+        "repo": "superpowers",
+        "rev": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+        "type": "github"
+      },
+      "original": {
+        "owner": "obra",
+        "repo": "superpowers",
+        "type": "github"
+      }
+    },
+    "claude-plugins-official": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788277461,
+        "narHash": "sha256-aZgFtUQbJmgEnUFEcm++pvvXe08bgxnUWP2xDqP8jrM=",
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "rev": "4b909c3492b350cdc42160ffe4b135e6f5c1db12",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "claude-plugins-official",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems_2"
@@ -238,6 +286,9 @@
         "agenix": "agenix",
         "callhistory-backup": "callhistory-backup",
         "cherri": "cherri",
+        "claude-plugin-ponytail": "claude-plugin-ponytail",
+        "claude-plugin-superpowers": "claude-plugin-superpowers",
+        "claude-plugins-official": "claude-plugins-official",
         "home-manager": "home-manager",
         "life-data": "life-data",
         "nix-darwin": "nix-darwin",

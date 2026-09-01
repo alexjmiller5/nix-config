@@ -51,6 +51,12 @@ let
       done
       # <<< claude-memory <<<
 
+      # A markdown round-trip occasionally rewrites a SKILL.md's YAML
+      # frontmatter fences (--- becomes *** plus a setext underline), which
+      # silently stops that skill triggering. Repair before staging so the
+      # damage can never ride a snapshot into history the way it has twice.
+      ${pkgs.python3}/bin/python3 scripts/fix-skill-frontmatter || true
+
       git add -A
       git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
       # Login and wake both fire this before the network is up, and the op-backed
