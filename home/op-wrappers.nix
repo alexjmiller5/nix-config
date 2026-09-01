@@ -4,19 +4,13 @@
 # shadows (not aliases/functions, so scripts, launchd, justfiles, and agent
 # shells all get auth; the real binary must not be installed anywhere else
 # or PATH order decides) that inject credentials from the AI Agent vault via
-# `op read` at call time.
+# `op read` at call time — nothing credential-shaped ever touches disk.
 #
 # Shared shape: caller-set env vars win → agent-detect.sh maps agent CLIs to
-# AGENT_SHELL → agent-op-env.sh arms the SA token in agent contexts →
-# op-cache.sh's op_cached (TTL-cached op read — the account-wide SA budget is
-# only 1000 requests/24h, so per-call reads are not affordable in the
-# wrappers agents call in loops) → exec the real binary. All three seams are
-# interpolated (builtins.readFile) because wrapper callers may skip zshrc
-# entirely.
-#
-# gcloud and gog still read per call: gcloud is laptop-only and rare, and
-# gog already caches its access token in 1P by design. Cache them the same
-# way if either ever shows up as a budget burner.
+# AGENT_SHELL → agent-op-env.sh arms the SA token in agent contexts → op
+# read (desktop-app auth, Touch ID, in Alex's own terminals) → exec the real
+# binary. Both seams are interpolated (builtins.readFile) because wrapper
+# callers may skip zshrc entirely.
 #
 # Exported via homeModules; consumers must pass `nix-openclaw-tools` through
 # extraSpecialArgs (for gog).
@@ -36,16 +30,12 @@ in
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
-          ${builtins.readFile ./op-cache.sh}
           # SA token → headless; otherwise desktop-app auth (Touch ID).
           # No auth source at all (Alex's own ssh shells on the mini): skip —
           # op read would prompt "add an account?" on /dev/tty and
           # hang/garble headless callers.
-          # Cached: gh is the most-called wrapper by far (every push, every
-          # gh api), and one op request per call exhausts the account-wide
-          # 1000/24h budget in a single busy agent session.
           if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
-            GH_TOKEN="$(op_cached gh-token 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token')"
+            GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
             if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
           fi
         fi
@@ -67,10 +57,9 @@ in
         if [ -z "''${MODAL_TOKEN_ID:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
-          ${builtins.readFile ./op-cache.sh}
           if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
-            MODAL_TOKEN_ID="$(op_cached modal-token-id 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id')"
-            MODAL_TOKEN_SECRET="$(op_cached modal-token-secret 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret')"
+            MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id' 2>/dev/null || true)"
+            MODAL_TOKEN_SECRET="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret' 2>/dev/null || true)"
             if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
               export MODAL_TOKEN_ID MODAL_TOKEN_SECRET
             fi

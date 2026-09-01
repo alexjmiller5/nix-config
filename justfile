@@ -29,7 +29,6 @@ check:
     nix flake check
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
-    bash tests/op-cache.sh
 
 # Bump all inputs
 update:

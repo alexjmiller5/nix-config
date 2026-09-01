@@ -6,18 +6,21 @@
   ...
 }:
 
-# life-data — schema-agnostic personal data store (local-first SQLite +
-# `life` CLI). Exported via homeModules; consumers must pass `life-data`
-# through extraSpecialArgs and set the lifeData.* options. The module
-# installs the CLI, declares the hub/backup config (non-secret IDs; the
-# token stays in 1Password, fetched by token_cmd at runtime), and runs a
-# weekly sync+backup launchd agent authed via the op-agent-sa token file.
-# The data itself lives in ~/.local/share/life-data — never in the store.
+# life-data — schema-agnostic personal data store (local-first SQLite + `life`
+# CLI). Exported via homeModules; consumers pass `life-data` through
+# extraSpecialArgs and set lifeData.tokenOpRef.
+#
+# This module knows only what a USER of the app knows: where to get the
+# credential, and (optionally) which hub to talk to. No account ids, no
+# database ids, no bucket names — the service owns all of that. Backups run
+# server-side on the hub's own cron; the only client-side job is continuous
+# sync. The database itself lives in ~/.local/share/life-data, never in the
+# store and never in a repo.
 let
   cfg = config.lifeData;
   pkg = life-data.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  weekly = pkgs.writeShellApplication {
-    name = "life-weekly";
+  watch = pkgs.writeShellApplication {
+    name = "life-watch";
     runtimeInputs = [
       pkg
       pkgs._1password-cli
@@ -26,61 +29,45 @@ let
       OP_SERVICE_ACCOUNT_TOKEN="$(cat "$HOME/.local/state/op/agent-sa-token")"
       export OP_SERVICE_ACCOUNT_TOKEN
       life init >/dev/null
-      life sync
-      life backup
+      exec life watch
     '';
   };
 in
 {
   options.lifeData = {
-    hubAccountId = lib.mkOption {
-      type = lib.types.str;
-      description = "Cloudflare account id hosting the D1 hub.";
-    };
-    hubDatabaseId = lib.mkOption {
-      type = lib.types.str;
-      description = "D1 database id of the hub.";
-    };
     tokenOpRef = lib.mkOption {
       type = lib.types.str;
-      description = "op:// reference (IDs, not names) to the Cloudflare API token.";
+      description = "op:// reference (IDs, not names) to the hub API token.";
     };
-    backupBucket = lib.mkOption {
-      type = lib.types.str;
-      default = "life-data-backups";
-      description = "R2 bucket receiving `life backup` SQL dumps.";
+    hubUrl = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Hub to sync with. Null uses the CLI's built-in default (the hosted service); set it to self-host.";
     };
   };
 
   config = {
     home.packages = [ pkg ];
 
-    xdg.dataFile."life-data/config.json".text = builtins.toJSON {
-      hub = {
-        account_id = cfg.hubAccountId;
-        database_id = cfg.hubDatabaseId;
-        token_cmd = "op read '${cfg.tokenOpRef}'";
-      };
-      backup = {
-        bucket = cfg.backupBucket;
-        prefix = "backups/";
-      };
-    };
+    # Read-only by design: this file is machine config, and the app keeps all
+    # of its mutable state in the database (_sync_state), never here.
+    xdg.dataFile."life-data/config.json".text = builtins.toJSON (
+      { token_cmd = "op read '${cfg.tokenOpRef}'"; }
+      // lib.optionalAttrs (cfg.hubUrl != null) { hub_url = cfg.hubUrl; }
+    );
 
-    launchd.agents.life-weekly = {
+    # Continuous sync: pushes local writes within ~1s, polls for remote
+    # changes. KeepAlive restarts it if it ever dies.
+    launchd.agents.life-watch = {
       enable = true;
       config = {
-        Label = "com.alexmiller.life-weekly";
-        ProgramArguments = [ "${weekly}/bin/life-weekly" ];
-        StartCalendarInterval = [
-          {
-            Weekday = 1;
-            Hour = 10;
-            Minute = 30;
-          }
-        ];
-        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/life-weekly.log";
-        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/life-weekly.log";
+        Label = "com.alexmiller.life-watch";
+        ProgramArguments = [ "${watch}/bin/life-watch" ];
+        RunAtLoad = true;
+        KeepAlive = true;
+        ThrottleInterval = 30;
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/life-watch.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/life-watch.log";
       };
     };
   };
