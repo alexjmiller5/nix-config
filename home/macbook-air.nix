@@ -85,41 +85,224 @@ in
     };
   };
 
-  # Third-party app notification permissions (home/macos/notification-prefs.nix).
-  # Snapshot of a live ncprefs dump 2026-09-01; the flags int is the whole
-  # per-app state (allow + style + lock-screen bits). To change a setting:
-  # change it in System Settings, re-capture (command in the module header),
-  # paste the new int here - UI-only edits revert at the next switch. Apple
-  # system entries are deliberately not pinned (they churn with OS updates).
+  # Per-app notification settings (home/macos/notification-prefs.nix).
+  # Captured 2026-09-01 with `scripts/capture-notification-prefs`, which emits
+  # this whole block for every still-installed app - re-run it and paste the
+  # output after changing anything in System Settings; the ints are opaque
+  # macOS bitmasks, not values to edit by hand. UI-only edits revert at the
+  # next switch. The master "Allow notifications" switch is NOT here (it lives
+  # in usernoted, outside ncprefs) - see MANUAL-macbook-air.md.
   macos.notificationPrefs.apps = {
-    "app.legcord.Legcord" = 8396814;
-    "com.cron.electron" = 8396822;
-    "com.dmitrynikolaev.numi" = 8396814;
-    "com.eventur.Hide.me" = 8396814;
-    "com.facebook.archon.developerID" = 278929422;
-    "com.figma.Desktop" = 8396814;
-    "com.flightyapp.flighty" = 807411726;
-    "com.google.Chrome" = 8396814;
-    "com.google.Chrome.framework.AlertNotificationService" = 8396822;
-    "com.haystacksoftware.ArqMonitor" = 276832270;
-    "com.hnc.Discord" = 276832270;
-    "com.kishanbagaria.jack" = 276832262;
-    "com.mitchellh.ghostty" = 268443662;
-    "com.openai.chat" = 276832262;
-    "com.spotify.client" = 8396814;
-    "com.tinyspeck.slackmacgap" = 8396814;
-    "io.ipfs.desktop" = 8396814;
-    "io.robbie.HomeAssistant" = 270540814;
-    "io.tailscale.ipn.macsys" = 276832270;
-    "net.whatsapp.WhatsApp" = 278929422;
-    "notion.id" = 8396814;
-    "notion.mail.id" = 8396814;
-    "org.chromium.Chromium" = 8396814;
-    "org.hammerspoon.Hammerspoon" = 8396822;
-    "org.qbittorrent.qBittorrent" = 8396814;
-    "pro.betterdisplay.BetterDisplay" = 276832270;
-    "ru.keepcoder.Telegram" = 276832270;
-    "us.zoom.xos" = 276832270;
+    "com.apple.AppStore" = {
+      flags = 9404162070;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.FaceTime" = {
+      flags = 8396814;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.Family" = {
+      flags = 8396814;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.Home" = {
+      flags = 833097742;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.Maps" = {
+      flags = 271056910;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.MobileSMS" = {
+      flags = 9490137174;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.Music" = {
+      flags = 276832270;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.Notes" = {
+      flags = 276832270;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.Passwords" = {
+      flags = 276832270;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.Photos" = {
+      flags = 276832270;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.Safari" = {
+      flags = 8396814;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.Siri" = {
+      flags = 310386830;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.TV" = {
+      flags = 276832270;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.appleseed.FeedbackAssistant" = {
+      flags = 268443662;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.clock" = {
+      flags = 8919720086;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.dt.Xcode" = {
+      flags = 276832270;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.findmy" = {
+      flags = 1889533966;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.freeform" = {
+      flags = 176168974;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.gamecenter" = {
+      flags = 5109194766;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.iBooksX" = {
+      flags = 816324622;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.iCal" = {
+      flags = 814227478;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.mail" = {
+      flags = 276824078;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.news" = {
+      flags = 815800334;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.podcasts" = {
+      flags = 832573454;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.reminders" = {
+      flags = 9404162070;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.apple.shortcuts" = {
+      flags = 327680142;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.tips" = {
+      flags = 294125590;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.apple.weather" = {
+      flags = 832577550;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.cron.electron" = {
+      flags = 8396822;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.flightyapp.flighty" = {
+      flags = 807411726;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.google.Chrome" = {
+      flags = 8396814;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.hnc.Discord" = {
+      flags = 276832270;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.mitchellh.ghostty" = {
+      flags = 268443662;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "com.spotify.client" = {
+      flags = 8396814;
+      content_visibility = 3;
+      grouping = 0;
+    };
+    "com.tinyspeck.slackmacgap" = {
+      flags = 8396814;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "io.tailscale.ipn.macsys" = {
+      flags = 276832270;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "net.whatsapp.WhatsApp" = {
+      flags = 278929422;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "notion.id" = {
+      flags = 8396814;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "org.hammerspoon.Hammerspoon" = {
+      flags = 8396822;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "pro.betterdisplay.BetterDisplay" = {
+      flags = 276832270;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "ru.keepcoder.Telegram" = {
+      flags = 276832270;
+      content_visibility = 0;
+      grouping = 0;
+    };
+    "us.zoom.xos" = {
+      flags = 276832270;
+      content_visibility = 3;
+      grouping = 0;
+    };
   };
 
   # Machine-vault git bootstrap (home/machine-vault-git.nix): the laptop's

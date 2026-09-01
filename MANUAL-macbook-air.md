@@ -189,6 +189,16 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 
 ## One-time app/setting setup
 
+* **Notifications → "Allow notifications" per app**: GUI-only. The per-app
+  presentation settings (alert style, badge, sound, previews, grouping) ARE
+  declared — `home/macos/notification-prefs.nix`, re-captured with
+  `scripts/capture-notification-prefs` — but the master allow/deny switch is
+  not in `com.apple.ncprefs`; it lives in usernoted's authorization store and
+  is only writable by the user clicking the toggle (or by an MDM
+  `com.apple.notificationsettings` payload, which this machine has no MDM for).
+  Verified 2026-09-01: an app given byte-identical ncprefs values to a muted
+  app stayed enabled across a usernoted + System Settings restart. Turning an
+  app's notifications on or off is a manual step, like a TCC grant.
 * **Accessibility → Zoom**: enable scroll-gesture-with-modifier zoom (ctrl) —
   `com.apple.universalaccess` is FDA-gated, not worth automating.
 * **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →

@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""Print the current per-app notification settings as a nix block.
+
+Emits `macos.notificationPrefs.apps` for home/macbook-air.nix (module:
+home/macos/notification-prefs.nix). Only apps that are still installed are
+included, so uninstalled leftovers drop out on every re-capture.
+
+The `_SYSTEM_CENTER_:` pseudo-entries (Software Update, Bluetooth, Wi-Fi,
+...) are excluded: they are OS-owned notification sources, not apps, and
+their values churn with OS updates.
+
+Usage: scripts/capture-notification-prefs [--all]
+       --all also emits apps whose bundle no longer resolves.
+"""
+
+import plistlib
+import subprocess
+import sys
+
+KEYS = ("flags", "content_visibility", "grouping")
+
+
+def installed(bundle_id: str) -> bool:
+    hits = subprocess.run(
+        ["/usr/bin/mdfind", f"kMDItemCFBundleIdentifier == '{bundle_id}'"],
+        capture_output=True, text=True).stdout.split()
+    return any(p.endswith(".app") for p in hits)
+
+
+def main() -> int:
+    keep_all = "--all" in sys.argv[1:]
+    prefs = plistlib.loads(subprocess.run(
+        ["/usr/bin/defaults", "export", "com.apple.ncprefs", "-"],
+        capture_output=True, check=True).stdout)
+
+    print("  macos.notificationPrefs.apps = {")
+    for app in sorted(prefs.get("apps", []), key=lambda a: a.get("bundle-id", "")):
+        bid = app.get("bundle-id", "")
+        if not bid or bid.startswith("_SYSTEM_CENTER_:"):
+            continue
+        if not keep_all and not installed(bid):
+            continue
+        print(f'    "{bid}" = {{')
+        for key in KEYS:
+            if key in app:
+                print(f"      {key} = {app[key]};")
+        print("    };")
+    print("  };")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
