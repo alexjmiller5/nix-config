@@ -118,6 +118,26 @@
         "type": "github"
       }
     },
+    "life-data": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788240367,
+        "narHash": "sha256-0EFhjOAf+oDpnVqvhZYocKLMNVwAFEREDp+bSJYTfFs=",
+        "owner": "alexjmiller5",
+        "repo": "life-data",
+        "rev": "e64b458e74df68074169f39f2b52e27b32e4053e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "life-data",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -219,6 +239,7 @@
         "callhistory-backup": "callhistory-backup",
         "cherri": "cherri",
         "home-manager": "home-manager",
+        "life-data": "life-data",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nix-openclaw-tools": "nix-openclaw-tools",
