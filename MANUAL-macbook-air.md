@@ -278,6 +278,64 @@ Restore: install each store extension from the Store; for the two custom
 ones run `npm ci && npx ray develop` in each dir, then Ctrl-C once loaded
 (the dev import persists without the watcher).
 
+## Raycast aliases (undeclarable — this list IS the declaration)
+
+Aliases live in the same encrypted DB as extensions — no CLI/deeplink to set
+them, so they can't be nix-managed. Set each one manually in Raycast
+(Settings → Extensions → select the command → Alias field), or restore them
+wholesale via `.rayconfig` import. Keep this list current when adding/removing
+one. To regenerate: Export Settings & Data (any password), then the RAYCFG3
+export is AES-256-GCM with an scrypt(N=16384) key — read `settings.commands[]`,
+each `alias` maps to its command `id`.
+
+**App launchers:**
+
+| Alias | Opens | Alias | Opens |
+|---|---|---|---|
+| `find` | FindMy | `nc` | Notion Calendar |
+| `gem` | Gemini | `passwords` | 1Password |
+| `gmaps` | Google Maps | `sptfy` | Spotify |
+| `gpt` | ChatGPT | `ss` | Screenshot |
+| `in` | LinkedIn | `sys` | System Settings |
+| `insta` | Instagram | `terminal` | Ghostty |
+| `messanger` | Messenger | `vscode` | Visual Studio Code |
+| `msgs` | Messages | `yt` | YouTube |
+| | | `zoom` | zoom.us |
+
+**Quicklinks:**
+
+| Alias | Target |
+|---|---|
+| `apps` | `/Applications` |
+| `desk` | `~/Desktop` |
+| `docs` | `~/Documents` |
+| `down` | `~/Downloads` |
+| `sg` | `https://google.com/search?q={Query}` (Search Google) |
+| `tasks` | Notion Tasks DB (notion:// deep link) |
+
+**Apple Shortcuts:** `qn` and `task` (run shortcuts by UUID — set from the
+Apple Shortcuts extension's command list).
+
+**Extension commands** (extension → command):
+
+| Alias | Extension → command |
+|---|---|
+| `blue` | toothpick → manage-bluetooth-connections |
+| `calc` | calculator → history |
+| `cam` | raycast-core → open camera |
+| `ch` | clipboard-history → history |
+| `f` | file-search → search files |
+| `lr` | git-repos → list |
+| `pp` | spotify-player → toggle play/pause |
+| `sc` | contacts → search |
+| `sd` | spotify-player → devices |
+| `ses` | emoji-picker → search emoji |
+| `sm` | zoom → start meeting |
+| `sod` | audio-device → set output device |
+| `sw` | navigation → switch windows |
+| `tmb` | toggle-menu-bar → toggle |
+| `yl` | spotify-player → your library |
+
 ## Menu bar: what's declared vs manual
 
 Declared: dock order (`hosts/macbook-air.nix` dock block), system icon
