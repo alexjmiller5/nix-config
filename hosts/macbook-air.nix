@@ -132,18 +132,13 @@
         trusted = true;
       }
       {
-        name = "smudge/smudge";
-        trusted = true;
-      }
-      {
         name = "steipete/tap";
         trusted = true;
       }
     ];
     brews = [
+      # Not in nixpkgs (checked 2026-09-01); skills + nightlight migrated out.
       "chrome-cli"
-      "skills"
-      "smudge/smudge/nightlight"
       # iMessage CLI for agents (read chat.db, send via Messages.app) — not in
       # nixpkgs. Needs TCC grants, see MANUAL-macbook-air.md.
       "steipete/tap/imsg"

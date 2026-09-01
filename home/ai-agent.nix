@@ -23,8 +23,9 @@
   };
 
   config.home.packages = [
-    pkgs.nodejs
-  ] # agent-config hooks exec `node`; nix's shadows brew's (see zsh.nix)
+    pkgs.nodejs # agent-config hooks exec `node`; nix's shadows brew's (see zsh.nix)
+    pkgs.skills # skills.sh agent-skills manager (was a laptop brew formula)
+  ]
   ++ lib.optional config.aiAgent.withOp pkgs._1password-cli;
 
   # Claude Code never persists home-dir trust acceptance to disk (session-only

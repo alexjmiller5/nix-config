@@ -118,8 +118,10 @@ in
           start)
             /usr/bin/screen -wipe >/dev/null 2>&1 || true
             if /usr/bin/pgrep -f "$pattern" >/dev/null; then echo "already running"; exit 0; fi
-            # shellcheck disable=SC2016 # $HOME expands in the child zsh, not here
-            /usr/bin/screen -dmS claude-rc /bin/zsh -c 'cd "$HOME/Desktop" && exec /opt/homebrew/bin/claude --remote-control'
+            # shellcheck disable=SC2016 # $HOME/$USER expand in the child zsh, not here
+            # claude resolved from PATH (nix profiles first, then brew) so this
+            # survives the install method changing — today it's the brew cask.
+            /usr/bin/screen -dmS claude-rc /bin/zsh -c 'export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:/opt/homebrew/bin:$PATH"; cd "$HOME/Desktop" && exec claude --remote-control'
             echo "started - open Remote Control in the Claude app"
             ;;
           stop)

@@ -48,8 +48,7 @@
         fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
       fi
       # Nix profiles ahead of brew shellenv's prepend: declared packages must
-      # shadow same-named brew formulae (e.g. node, riding in as a dep of
-      # `skills`, would otherwise win over pkgs.nodejs).
+      # shadow same-named binaries a brew formula drags in as deps.
       export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:$PATH"
 
       # ($EDITOR comes from programs.neovim.defaultEditor in cli-tools.nix)
