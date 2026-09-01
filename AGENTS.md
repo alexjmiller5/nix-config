@@ -32,7 +32,7 @@ routing table and workflow; this file is the in-repo map.
   a file, not the Keychain, since ssh-descended shells can't read the
   per-session-locked Keychain; host-layer sibling = `claude-code` +
   `notion-cli` casks),
-  `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging}.nix`
+  `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),
   `ssh.nix` (programs.ssh + private Include),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
