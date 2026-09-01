@@ -29,7 +29,14 @@
 # Reads and writes go through `defaults export/import` (i.e. cfprefsd), never
 # the raw plist file, and usernoted is restarted only when something actually
 # changed. Apps that have not registered with Notification Center yet are
-# skipped and converge on a later switch. Declared values are authoritative:
+# skipped and converge on a later switch.
+#
+# System Settings caches this list at launch and never notices an external
+# write, so a switch made while it is open leaves its Notifications pane
+# showing the OLD values - quit and reopen it (not just navigate away) to see
+# what actually applied. Display only: verified 2026-09-01 that the written
+# value survives with the app open and is still there after quitting, so
+# nothing is lost and there is no need to quit before switching. Declared values are authoritative:
 # a change made in System Settings reverts at the next switch unless mirrored
 # here. Re-capture with `scripts/capture-notification-prefs` and paste its
 # output; the ints are not meant to be written by hand.

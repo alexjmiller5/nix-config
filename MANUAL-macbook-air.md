@@ -379,6 +379,14 @@ allowed iff bit 23 is clear OR bit 25 is set (bit 23 records that a choice was
 made, bit 25 carries allow/deny). Verified 2026-09-01 end to end by flipping
 one app in nix and watching System Settings switch it from Off to on.
 
+**Quit System Settings to SEE a switch's changes.** It caches the app list at
+launch and never notices an external write, so switching with it open leaves
+the Notifications pane showing the old values — quit and reopen it (navigating
+away and back is not enough). This is display-only: the write itself lands and
+survives, and System Settings does not clobber it on quit, so there is no need
+to quit *before* switching. Same for checking state from the shell, which
+always reads live: `scripts/capture-notification-prefs | grep -A1 '"<bundle>"'`.
+
 Manual: the OS's own notification sources (Wi-Fi, Bluetooth, Software Update,
 tccd — the `_SYSTEM_CENTER_:` entries and the bundles under
 `/System/Library/UserNotifications/`) are deliberately left undeclared; their
