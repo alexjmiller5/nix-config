@@ -11,7 +11,6 @@
     ./git.nix
     ./scripts.nix
     ./cli-tools.nix
-    ./life-data.nix
     ./mcp.nix
     ./op-wrappers.nix
     ./agent-config-links.nix
@@ -19,12 +18,21 @@
     ./machine-vault-git.nix
   ];
 
-  # life-data: the admin hub token IS the agent estate's daily credential
-  # (Alex's call 2026-09-02: agents are the sole CLI users, and any Mac
-  # compromise reaches this item via the SA anyway - a separate scoped Macs
-  # token added no real isolation). Scoped tokens exist for OTHER clients
-  # (OwnTracks, notion-automations, future read-only consumers).
-  lifeData.tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/3qq7d6cltvwh3yzken2b46einm/credential";
+  # life-data (module shipped by the app's flake). The admin hub token IS
+  # the agent estate's daily credential (Alex's call 2026-09-02: agents are
+  # the sole CLI users; a separate machine token added no real isolation -
+  # the SA on these machines can read this item regardless). Scoped tokens
+  # exist for OTHER clients (OwnTracks, notion-automations, ...).
+  lifeData = {
+    enable = true;
+    tokenCommand = "op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/3qq7d6cltvwh3yzken2b46einm/credential'";
+    # launchd agents start with no shell env: source the agent SA token the
+    # op-agent-sa module maintains, so tokenCommand's `op read` works there
+    watch.setup = ''
+      OP_SERVICE_ACCOUNT_TOKEN="$(cat "$HOME/.local/state/op/agent-sa-token")"
+      export OP_SERVICE_ACCOUNT_TOKEN
+    '';
+  };
 
   home.stateVersion = "25.05";
   home.username = username;

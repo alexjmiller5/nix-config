@@ -50,8 +50,8 @@
       url = "github:openclaw/nix-openclaw-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # life-data — schema-agnostic personal data store (`life` CLI); installed
-    # on both machines, enabled in home/common.nix.
+    # life-data — schema-agnostic personal data store; ships its own
+    # home-manager module (wired via sharedModules), enabled in home/common.nix.
     life-data = {
       url = "github:alexjmiller5/life-data";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -107,7 +107,10 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "backup";
-              home-manager.sharedModules = [ inputs.workspace-snapshot.homeModules.default ];
+              home-manager.sharedModules = [
+                inputs.workspace-snapshot.homeModules.default
+                inputs.life-data.homeModules.default
+              ];
               # Explicit per-input args (not `inherit inputs`) on purpose: each
               # exported homeModule documents exactly what a consumer must pass.
               home-manager.extraSpecialArgs = {
@@ -157,8 +160,6 @@
         machine-vault-git = ./home/machine-vault-git.nix;
         # op-wrappers needs the consumer to pass nix-openclaw-tools via extraSpecialArgs
         op-wrappers = ./home/op-wrappers.nix;
-        # life-data needs the consumer to pass life-data via extraSpecialArgs
-        life-data = ./home/life-data.nix;
         # dev-tools needs the consumer to pass cherri via extraSpecialArgs
         dev-tools = ./home/dev-tools.nix;
         ghostty = ./home/ghostty.nix;
