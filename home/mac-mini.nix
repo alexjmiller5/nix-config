@@ -26,6 +26,10 @@ let
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
     cd "$HOME/.config/agent-config"
     git pull --ff-only --quiet origin main
+    # PUBLIC sibling clone (generic skills reached via committed symlinks
+    # in agent-config/skills) — same pull-only refresh, anonymous auth.
+    cd "$HOME/.config/agent-config-public"
+    git pull --ff-only --quiet origin main
   '';
 in
 {
@@ -86,6 +90,8 @@ in
     ];
     companionRepos = {
       "alexjmiller5/agent-config" = "${config.home.homeDirectory}/.config/agent-config";
+      # PUBLIC sibling of agent-config (generic skills); anonymous clone/pull.
+      "alexjmiller5/agent-config-public" = "${config.home.homeDirectory}/.config/agent-config-public";
       "alexjmiller5/nix-config" = "${config.home.homeDirectory}/.config/nix-config";
       "alexjmiller5/nix-secrets" = "${config.home.homeDirectory}/.config/nix-secrets";
     };

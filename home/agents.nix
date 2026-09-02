@@ -78,6 +78,21 @@ let
         exit 1
       fi
       git push origin main
+
+      # agent-config-public: the sibling PUBLIC clone (generic skills, reached
+      # from agent-config/skills via committed relative symlinks). Same
+      # snapshot flow; no memory pass of its own, and the frontmatter repair
+      # above already writes through the skills symlinks into this clone.
+      # Network is known up here (wait-for-remote gated the private push).
+      cd "$HOME/.config/agent-config-public"
+      git add -A
+      git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
+      if ! git pull --rebase origin main; then
+        git rebase --abort 2>/dev/null || true
+        /usr/bin/osascript -e 'display notification "sync conflict — resolve manually in agent-config-public" with title "agent-config sync"'
+        exit 1
+      fi
+      git push origin main
     '';
   };
 

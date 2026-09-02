@@ -34,7 +34,7 @@ routing table and workflow; this file is the in-repo map.
   credential helper + companion clone-if-missing),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
-  `agents.nix` (launchd: private-repo sync, weekly updates, login items; the
+  `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),
   `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
