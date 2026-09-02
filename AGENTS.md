@@ -18,7 +18,7 @@ routing table and workflow; this file is the in-repo map.
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog,
-  gcloud - AI Agent vault creds in every context, read per call so nothing
+  gcloud, wrangler - AI Agent vault creds in every context, read per call so nothing
   credential-shaped touches disk. Deliberately NOT cached: 1Password's
   1000-requests/24h cap is per-1Password-account, and the answer to hitting
   it is switching to desktop auth, not persisting secrets locally - see the

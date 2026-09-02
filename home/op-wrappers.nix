@@ -142,6 +142,26 @@ in
       '';
     })
 
+    # wrangler, ALWAYS authed via 1Password (AI Agent Cloudflare API Key) —
+    # CLOUDFLARE_API_TOKEN takes precedence over wrangler's cached OAuth
+    # config, so ~/.wrangler/config/default.toml is never written or read.
+    # The token is account-scoped, so wrangler infers the account ID itself.
+    (pkgs.writeShellApplication {
+      name = "wrangler";
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        if [ -z "''${CLOUDFLARE_API_TOKEN:-}" ]; then
+          ${builtins.readFile ./agent-detect.sh}
+          ${builtins.readFile ./agent-op-env.sh}
+          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+            CLOUDFLARE_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/mxxpo6neiz3grdyrjj7rv7nume/credential' 2>/dev/null || true)"
+            if [ -n "$CLOUDFLARE_API_TOKEN" ]; then export CLOUDFLARE_API_TOKEN; fi
+          fi
+        fi
+        exec ${pkgs.wrangler}/bin/wrangler "$@"
+      '';
+    })
+
     # gcloud, ALWAYS authed via 1Password (GCP SA key item in the AI Agent
     # vault). Replaces the brew gcloud-cli cask and the interactive-only op
     # plugin alias. The key JSON transits a 0600 mktemp file removed on exit
