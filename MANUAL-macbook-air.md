@@ -101,7 +101,9 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
   /bin/zsh (launchd/agent shell scripts),
   /Applications/ScreenTimeBackup.app (the weekly Screen Time backup agent —
   grant ONCE after the enabling rebuild; the stable self-signed cert keeps
-  the grant valid across rebuilds)
+  the grant valid across rebuilds),
+  /Applications/StickerSync.app (the weekly iMessage sticker sync — same
+  one-time grant, same stable-cert pattern)
 * **Calendar / Contacts**: Raycast
 * **Microphone**: Raycast
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker;

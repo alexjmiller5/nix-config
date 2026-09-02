@@ -47,6 +47,15 @@
     dirSuffix = "-macbook";
   };
 
+  # iMessage sticker sync: MacBook only (the mini has no Messages sign-in).
+  # Weekly copy of the sticker drawer + chat sticker attachments into
+  # ~/Documents/ios-stickers/synced. One manual step after first rebuild:
+  # grant /Applications/StickerSync.app Full Disk Access (MANUAL-macbook-air.md).
+  services.sticker-sync = {
+    enable = true;
+    user = username;
+  };
+
   # yabai: the org.nixos.yabai launchd agent runs the nix package for BSP
   # tiling. The scripting addition is OFF — macOS 26.1's AMFI enforces library
   # validation on Dock (a platform binary) and refuses to load yabai's
