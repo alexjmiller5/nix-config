@@ -19,8 +19,9 @@
     ./machine-vault-git.nix
   ];
 
-  # life-data: the API token for the hub. Everything else is the service's.
-  lifeData.tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/3qq7d6cltvwh3yzken2b46einm/credential";
+  # life-data: the Macs' scoped hub token (scope: full). The ADMIN token
+  # (mints/revokes tokens) stays in 1P only - item 3qq7d6cltvwh3yzken2b46einm.
+  lifeData.tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/c3p5fucbr72czishuveaa3zsqi/credential";
 
   home.stateVersion = "25.05";
   home.username = username;
