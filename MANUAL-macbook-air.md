@@ -64,10 +64,10 @@ machines don't change.
 
 In the vaults today:
 
-* **MacBook Air**: `GitHub PAT nix-config-git-laptop` — fine-grained, repos
+* **MacBook Air**: `MacBook Air GitHub PAT nix-config-git` — fine-grained, repos
   `agent-config`/`nix-secrets`/`hammerspoon`, Contents **read/write** (the
   sync agent pushes agent-config). Feeds the git credential helper.
-* **Mac Mini**: `GitHub PAT nix-config-git-mini` — same repos, Contents
+* **Mac Mini**: `Mac Mini GitHub PAT nix-config-git` — same repos, Contents
   **read-only** (the mini is pull-only by design).
 
 PATs are minted by hand (GitHub has no token-creation API): github.com →
