@@ -19,9 +19,12 @@
     ./machine-vault-git.nix
   ];
 
-  # life-data: the Macs' scoped hub token (scope: full). The ADMIN token
-  # (mints/revokes tokens) stays in 1P only - item 3qq7d6cltvwh3yzken2b46einm.
-  lifeData.tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/c3p5fucbr72czishuveaa3zsqi/credential";
+  # life-data: the admin hub token IS the agent estate's daily credential
+  # (Alex's call 2026-09-02: agents are the sole CLI users, and any Mac
+  # compromise reaches this item via the SA anyway - a separate scoped Macs
+  # token added no real isolation). Scoped tokens exist for OTHER clients
+  # (OwnTracks, notion-automations, future read-only consumers).
+  lifeData.tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/3qq7d6cltvwh3yzken2b46einm/credential";
 
   home.stateVersion = "25.05";
   home.username = username;
