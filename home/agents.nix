@@ -89,7 +89,7 @@ let
       git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
       if ! git pull --rebase origin main; then
         git rebase --abort 2>/dev/null || true
-        /usr/bin/osascript -e 'display notification "sync conflict — resolve manually in agent-config-public" with title "agent-config sync"'
+        /usr/bin/osascript -e 'display notification "sync conflict - resolve manually in agent-config-public" with title "agent-config sync"'
         exit 1
       fi
       git push origin main

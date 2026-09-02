@@ -431,7 +431,7 @@ in
       "alexjmiller5/nix-secrets" = "${config.home.homeDirectory}/.config/nix-secrets";
       "alexjmiller5/agent-config" = agentConfig;
       # PUBLIC sibling of agent-config (generic skills); anonymous clone,
-      # pushes ride the gh-wrapper default helper — not the machine PAT.
+      # pushes ride the gh-wrapper default helper - not the machine PAT.
       "alexjmiller5/agent-config-public" = "${config.home.homeDirectory}/.config/agent-config-public";
       "alexjmiller5/hammerspoon" = "${config.home.homeDirectory}/.hammerspoon";
     };

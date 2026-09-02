@@ -27,7 +27,7 @@ let
     cd "$HOME/.config/agent-config"
     git pull --ff-only --quiet origin main
     # PUBLIC sibling clone (generic skills reached via committed symlinks
-    # in agent-config/skills) — same pull-only refresh, anonymous auth.
+    # in agent-config/skills) - same pull-only refresh, anonymous auth.
     cd "$HOME/.config/agent-config-public"
     git pull --ff-only --quiet origin main
   '';
