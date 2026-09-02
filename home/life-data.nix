@@ -47,7 +47,12 @@ in
   };
 
   config = {
-    home.packages = [ pkg ];
+    # duckdb: `life archive query --raw` shells out to it for analytical
+    # queries over the raw stream objects
+    home.packages = [
+      pkg
+      pkgs.duckdb
+    ];
 
     # Read-only by design: this file is machine config, and the app keeps all
     # of its mutable state in the database (_sync_state), never here.
