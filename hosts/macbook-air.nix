@@ -161,7 +161,8 @@
       "binary-ninja-free"
       "burp-suite"
       "claude"
-      "claude-code"
+      # @latest tracks releases faster than the plain cask; fable-5-1 needs >= 2.1.251
+      "claude-code@latest"
       "codexbar"
       "discord"
       "docker-desktop"

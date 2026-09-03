@@ -20,7 +20,8 @@
 
   # GUI apps that aren't packaged well in nixpkgs on macOS.
   homebrew.casks = [
-    "claude-code"
+    # @latest tracks releases faster than the plain cask; fable-5-1 needs >= 2.1.251
+    "claude-code@latest"
     # ntn — home/ai-agent.nix's host-layer sibling (not in nixpkgs).
     "notion-cli"
     # Browser for agent-driven web work (chrome-control / web-recon).

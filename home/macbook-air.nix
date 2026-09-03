@@ -83,6 +83,39 @@ in
         };
       };
     };
+
+    # Claude in Chrome: the per-site grants behind the extension's own
+    # "Allow / Always allow actions on this site" popup. That popup is a
+    # focused chrome.windows.create — it is the ONLY thing that steals focus
+    # during agent browsing, so a seeded grant here buys both no-prompt and
+    # no-focus-steal. Claude Code's own terminal prompt is separate and is
+    # handled in agent-config/claude/settings.json (the whole-tool
+    # mcp__claude-in-chrome allow rule + CLAUDE_CHROME_CLASSIFIER_FLOOR=false).
+    #
+    # Matching: `netloc` is compared with `www.` and any port stripped, and a
+    # leading `*.` also matches every subdomain. `surface` MUST stay
+    # "mcp_popup" — grants with any other surface are ignored on this path.
+    # Adding a site = one more entry; this list is enforced over UI edits at
+    # every switch, so a site allowed by clicking the popup must be added
+    # here too or it gets reverted.
+    storage.fcoeoabgfenejglbffodgkkbkcdhcgfn.permissionStorage.permissions =
+      map
+        (netloc: {
+          id = "nix-${builtins.replaceStrings [ "*" "." ] [ "star" "-" ] netloc}";
+          action = "allow";
+          duration = "always";
+          surface = "mcp_popup";
+          scope = {
+            type = "netloc";
+            inherit netloc;
+          };
+        })
+        [
+        "localhost"
+        "127.0.0.1"
+        "example.com"
+        "iana.org"
+      ];
   };
 
   # Per-app notification settings, `enable` included (the "Allow

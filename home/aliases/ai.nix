@@ -3,7 +3,7 @@
 {
   programs.zsh.shellAliases = {
     # claude-fable-5-1 needs Claude Code >= 2.1.251 (older versions 400 on it);
-    # don't switch until the claude-code cask carries at least that version.
+    # the hosts declare claude-code@latest, which satisfies that.
     claude = "claude --model claude-fable-5-1";
     cc = "claude"; # expands recursively, so it inherits the model flag
     # `command` keeps the claude alias from expanding here too — without it
