@@ -2,13 +2,14 @@
 # ~/.claude/skills (a symlink into the agent-config repo).
 {
   programs.zsh.shellAliases = {
-    claude = "claude --model fable";
-    cc = "claude"; # expands recursively, so it inherits the fable flag
+    # claude-fable-5-1 needs Claude Code >= 2.1.251 (older versions 400 on it);
+    # don't switch until the claude-code cask carries at least that version.
+    claude = "claude --model claude-fable-5-1";
+    cc = "claude"; # expands recursively, so it inherits the model flag
     # `command` keeps the claude alias from expanding here too — without it
-    # this recursively picks up `--model fable` and passes --model twice.
-    # Model name must match the `claude` alias: "claude-fable" is rejected as
-    # unrecognized (Claude Code then assumes a 200k window).
-    claude-max = "command claude --model fable --effort max";
+    # this recursively picks up the model flag and passes --model twice.
+    # Model name must match the `claude` alias exactly.
+    claude-max = "command claude --model claude-fable-5-1 --effort max";
     op-temp-sa = "~/.claude/skills/1password/scripts/op-temp-sa";
     # Load the temp-SA token minted by op-temp-sa into this shell (aliases run
     # in-shell, so the export sticks; token value never appears in transcripts)
