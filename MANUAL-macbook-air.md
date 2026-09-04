@@ -205,8 +205,10 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
   `allowed` entry to stay alive once re-locked (both documented at the flag).
   Store extensions and PWAs need NO manual steps —
   installed by the Chrome policy plist (`ExtensionSettings` +
-  `WebAppInstallForceList`, written to Managed Preferences by the activation
-  script in `hosts/macbook-air.nix`). ONE manual per-PWA setting: chrome →
+  `WebAppInstallForceList`, written to Managed Preferences by
+  `modules/chrome-policy.nix` — on switch AND by its root LaunchDaemon at
+  every boot, because macOS wipes that directory ~30s after login). ONE
+  manual per-PWA setting: chrome →
   app details → "Opening supported links" must stay **Open in Chrome
   browser** (the default) — no policy field exists for it
   (`WebAppSettings`/`WebAppInstallForceList` have none) and the choice lives
