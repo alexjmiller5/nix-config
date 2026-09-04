@@ -97,7 +97,8 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
   binaries), Dolphin
 * **Screen Recording**: AltTab, 1Password, Notion, Claude, Chrome,
   VS Code, Ghostty, Telegram, Zoom, Raycast
-* **Full Disk Access**: VS Code, Ghostty, Raycast,
+* **Full Disk Access**: VS Code, Ghostty, Raycast, Hammerspoon (reads
+  Messages chat.db for the paste-OTP hotkey),
   /bin/zsh (launchd/agent shell scripts),
   /Applications/ScreenTimeBackup.app (the weekly Screen Time backup agent —
   grant ONCE after the enabling rebuild; the stable self-signed cert keeps
