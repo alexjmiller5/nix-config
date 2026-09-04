@@ -62,7 +62,7 @@
               };
             }
             // {
-              "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal; # 1Password – Password Manager
+              "aeblfdkhhhdcdjpifhhbdiojplfjncoa" = normal // pin; # 1Password – Password Manager
               # "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock (off — uncomment to install)
               # "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat (off — uncomment to install)
               "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor
