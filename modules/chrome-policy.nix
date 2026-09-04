@@ -76,7 +76,7 @@ let
           # "cbhilkcodigmigfbnphipnnmamjfkipp" = normal; # Calendly (off — uncomment to install)
           # "nenlahapcbofgnanklpelkaejcehkggg" = normal; # Capital One Shopping (off — uncomment to install)
           # "ejcfepkfckglbgocfkanmcdngdijcgld" = normal; # ChatGPT search (off — uncomment to install)
-          "fcoeoabgfenejglbffodgkkbkcdhcgfn" = normal; # Claude
+          "fcoeoabgfenejglbffodgkkbkcdhcgfn" = normal // pin; # Claude
           "fcalilbnpkfikdppppppchmkdipibalb" = normal; # Cloaq
           # "ifjhcahbhkfojdmkndpkmkffbjnefido" = normal; # Cookie Guard (off — uncomment to install)
           # "jlmpjdjjbgclbocgajdjefcidcncaied" = normal; # daily.dev | Where developers discover what's next (off — uncomment to install)
