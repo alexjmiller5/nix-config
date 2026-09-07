@@ -196,6 +196,10 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
   `com.apple.universalaccess` is FDA-gated, not worth automating.
 * **Hammerspoon**: console → `hs.ipc.cliInstall("/opt/homebrew")`; preferences →
   hide dock icon.
+* **wacli** (WhatsApp linked device for agent group sends): `wacli auth` in a
+  terminal, scan the QR from the phone (WhatsApp → Linked devices → Link a
+  device), let the bootstrap sync idle out. Store is `~/.wacli`. The phone
+  must come online every 14 days or WhatsApp unlinks it → re-run `wacli auth`.
 * **Chrome**: load-unpacked extensions — Developer mode ON, then Load
   unpacked for each: bypass-paywalls et al from
   `~/Desktop/coding/built-from-source`, and own `chrome-extension`-template
