@@ -94,5 +94,7 @@ nix build .#darwinConfigurations.macbook-air.system   # proof-build (laptop)
 nix build .#darwinConfigurations.mac-mini.system      # proof-build (mini)
 ```
 
-Agents never activate: `just switch-laptop` (laptop) and `just deploy` (mini)
-need Alex's sudo — ask him. Never activate a host you're not on.
+Activate with `just switch-laptop` (laptop) or `just deploy` (mini) - both
+passwordless via the NOPASSWD sudoers rule in `modules/darwin-base.nix`, so
+agents run them directly after a green proof-build. Never activate a host
+you're not on.

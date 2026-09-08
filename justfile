@@ -1,7 +1,7 @@
 # Deploy the mac-mini config from THIS laptop — no clone on the Mini.
 # Copies this flake + its inputs into the Mini's nix store (via ssh://, so it uses
 # your ~/.ssh/config + 1Password agent), then runs the Mini's OWN darwin-rebuild for
-# a correct activation. Prompts once for the Mini's sudo password. Deploys COMMITTED
+# a correct activation (passwordless via the NOPASSWD rule in darwin-base.nix). Deploys COMMITTED
 # state (commit + push first if you want the change on GitHub too).
 deploy host="mac-mini-tailscale":
     #!/usr/bin/env bash
@@ -9,7 +9,7 @@ deploy host="mac-mini-tailscale":
     echo "→ copying flake + inputs to {{host}} …"
     flake="$(nix flake archive --to "ssh://{{host}}" --json \
       | /usr/bin/python3 -c 'import json,sys;print(json.load(sys.stdin)["path"])')"
-    echo "→ activating on {{host}} — enter the Mini's sudo password when prompted:"
+    echo "→ activating on {{host}} …"
     ssh -t "{{host}}" "sudo /run/current-system/sw/bin/darwin-rebuild switch --flake '$flake#mac-mini'"
 
 # Apply locally — only if you're actually ON the Mini with a checkout (you shouldn't need this).
@@ -22,7 +22,11 @@ switch-laptop:
     #!/usr/bin/env bash
     set -euo pipefail
     nix build .#darwinConfigurations.macbook-air.system
-    sudo ./result/sw/bin/darwin-rebuild switch --flake .#macbook-air
+    # /run/current-system path matches the NOPASSWD sudoers rule (darwin-base.nix);
+    # the ./result fallback is bootstrap-only (first activation, password prompt).
+    dr=/run/current-system/sw/bin/darwin-rebuild
+    [ -x "$dr" ] || dr=./result/sw/bin/darwin-rebuild
+    sudo "$dr" switch --flake .#macbook-air
 
 # Validate the flake
 check:

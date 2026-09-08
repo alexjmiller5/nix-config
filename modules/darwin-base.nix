@@ -39,6 +39,14 @@
     pkgs.just
   ];
 
+  # Passwordless rebuilds: switch-macbook / switch-mini (justfile) and any
+  # agent shell can activate without a sudo prompt. Root-equivalent for
+  # ${username} by construction (the flake IS the system), so the rule is
+  # scoped to the one stable binary path rather than a blanket NOPASSWD.
+  security.sudo.extraConfig = ''
+    ${username} ALL=(root) NOPASSWD: /run/current-system/sw/bin/darwin-rebuild
+  '';
+
   # Canonical flake location: darwin-rebuild and the infra aliases
   # (switch-*, valiases, …) resolve /etc/nix-darwin on either machine. A
   # string (not a path literal) keeps the symlink out-of-store; it points at
