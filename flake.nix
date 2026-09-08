@@ -88,7 +88,7 @@
       mkHost =
         { host, home }:
         nix-darwin.lib.darwinSystem {
-          specialArgs = { inherit username; };
+          specialArgs = { inherit username inputs; };
           modules = [
             host
             ./modules/darwin-base.nix
@@ -98,7 +98,6 @@
             inputs.screentime-backup.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
-            inputs.people-sync.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {

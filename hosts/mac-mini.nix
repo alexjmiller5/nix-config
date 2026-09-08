@@ -3,12 +3,14 @@
   pkgs,
   lib,
   username,
+  inputs,
   ...
 }:
 
 # Shared base (stateVersion, unfree predicate, /etc/nix-darwin, brew zap, …)
 # comes from modules/darwin-base.nix via mkHost.
 let
+  peopleSync = inputs.people-sync.packages.${pkgs.stdenv.hostPlatform.system}.default;
   op = "${pkgs._1password-cli}/bin/op";
   jq = "${pkgs.jq}/bin/jq";
   # People Sync: the scrape job signs into each site with a login copy held
@@ -142,33 +144,24 @@ in
     user = username;
   };
 
-  # Daily social-profile scraping into life-data (the people-sync flake's
-  # module), attached to the shared Chrome above, human-paced, logins
-  # automated through the three commands above. Nothing here is the app's
-  # business beyond "run this command" - see the people-sync README.
-  services.people-sync-scrape = {
-    # Never scheduled: people-sync is an ad-hoc, agent-driven tool (the
-    # people-review skill runs `login`/`scrape` against the shared Chrome
-    # with Alex in the loop). The module stays only for its credential/code
-    # command wiring until that moves to a plain env for the agent shell.
-    enable = false;
-    user = username;
-    endpoint = "127.0.0.1:${toString config.services.agent-chrome.port}";
-    platforms = [
-      "facebook"
-      "instagram"
-      "linkedin"
-      "venmo"
-      "spotify"
-      "partiful"
-    ];
-    # The commands run as `sh -c "<command>" people-sync-login <platform>`,
-    # so the platform is `$1` of the command STRING - a bare script path
-    # would receive nothing; pass it through explicitly.
-    credentialCommand = "${peopleSyncCredential} \"$1\"";
-    smsCodeCommand = "${peopleSyncSmsCode} \"$1\"";
-    emailCodeCommand = "${peopleSyncEmailCode} \"$1\"";
-  };
+  # people-sync on this Mac: an ad-hoc tool an agent drives with Alex in the
+  # loop (the people-review skill), never a schedule. `people-sync-mini`
+  # wraps the CLI with this machine's wiring - the shared Chrome endpoint
+  # and the three commands above (run as `sh -c "<cmd>" people-sync-login
+  # <platform>`, so the platform is `$1` of the command string).
+  environment.systemPackages = [
+    peopleSync
+    (pkgs.writeShellScriptBin "people-sync-mini" ''
+      export PEOPLE_SYNC_ENDPOINT="127.0.0.1:${toString config.services.agent-chrome.port}"
+      export PEOPLE_SYNC_CREDENTIAL_COMMAND='${peopleSyncCredential} "$1"'
+      export PEOPLE_SYNC_SMS_CODE_COMMAND='${peopleSyncSmsCode} "$1"'
+      export PEOPLE_SYNC_EMAIL_CODE_COMMAND='${peopleSyncEmailCode} "$1"'
+      state="$HOME/.local/state/people-sync"
+      mkdir -p "$state"
+      cd "$state"
+      exec ${peopleSync}/bin/people-sync "$@"
+    '')
+  ];
 
   # The mini's ONE agenix secret: the mac-mini-machine 1P service-account
   # token (read-only on the "Mac Mini" vault). Every other secret — e.g. the
