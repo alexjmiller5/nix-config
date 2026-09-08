@@ -80,7 +80,7 @@ in
           "chklaanhfefbnpoihckbnefhakgolnmc" = normal; # JSONVue
           "dijpdmknlincdehpemajfobhfcmjkhof" = normal; # LinkedIn Feed Blocker
           # "iepgempfdndmbciedjdladndpoeodepl" = normal; # Lovable Project Downloader (off — uncomment to install)
-          "nkbihfbeogaeaoehlefnkodbefgpgknn" = normal; # MetaMask
+          # "nkbihfbeogaeaoehlefnkodbefgpgknn" = normal; # MetaMask (off — uncomment to install)
           "pobhoodpcipjmedfenaigbeloiidbflp" = normal; # Minimal Theme for Twitter / X
           "knheggckgoiihginacbkhaalnibhilkk" = normal; # Notion Web Clipper
           "bkhaagjahfmjljalopjnoealnfndnagc" = normal; # Octotree

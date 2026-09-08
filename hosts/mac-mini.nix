@@ -141,7 +141,9 @@ in
     user = username;
     # After every snapshot (weekly, or kicked by a dashboard refresh) rebuild
     # and push the dashboard's series - inside the FDA-holding backup process.
+    # A dashboard "rebuild" sets the flag so the agent skips the snapshot.
     postRun = config.services.screentime-ingest.syncCommand;
+    skipDumpFlag = config.services.screentime-ingest.skipDumpFlag;
   };
   services.screentime-ingest = {
     enable = true;
