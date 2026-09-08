@@ -152,9 +152,12 @@ in
       "spotify"
       "partiful"
     ];
-    credentialCommand = "${peopleSyncCredential}";
-    smsCodeCommand = "${peopleSyncSmsCode}";
-    emailCodeCommand = "${peopleSyncEmailCode}";
+    # The commands run as `sh -c "<command>" people-sync-login <platform>`,
+    # so the platform is `$1` of the command STRING - a bare script path
+    # would receive nothing; pass it through explicitly.
+    credentialCommand = "${peopleSyncCredential} \"$1\"";
+    smsCodeCommand = "${peopleSyncSmsCode} \"$1\"";
+    emailCodeCommand = "${peopleSyncEmailCode} \"$1\"";
   };
 
   # The mini's ONE agenix secret: the mac-mini-machine 1P service-account
