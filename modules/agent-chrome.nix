@@ -7,6 +7,14 @@
 # it on the default profile) and what keeps the per-connection Allow sheet
 # away. Per-site profiles are the alternative only when isolation between
 # sites is actually wanted.
+#
+# Extensions the agent browser needs (Claude in Chrome, whose tabGroups
+# permission chrome-control's cdp-group.mjs borrows) are installed ONCE by
+# a human from the Web Store in this browser's window - see the host's
+# MANUAL file. No declarative route exists: a user-level
+# ExtensionInstallForcelist (CustomUserPreferences) lands as a Recommended
+# policy, which Chrome ignores for force-installs; only a configuration
+# profile makes it mandatory, and that needs a GUI approval anyway.
 {
   config,
   lib,
@@ -49,25 +57,9 @@ in
       description = "Additional Chrome command-line flags.";
     };
 
-    extensions = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      example = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
-      description = ''
-        Chrome Web Store extension ids force-installed through the
-        ExtensionInstallForcelist policy (browser-wide: every Chrome profile
-        on this machine, the agent one included). Chrome 137+ dropped
-        --load-extension, so this is the declarative way to give the agent
-        browser an extension - e.g. one holding the tabGroups permission,
-        which CDP lacks (chrome-control's cdp-group.mjs borrows it).
-      '';
-    };
   };
 
   config = lib.mkIf cfg.enable {
-    system.defaults.CustomUserPreferences."com.google.Chrome".ExtensionInstallForcelist =
-      lib.mkIf (cfg.extensions != [ ]) (map (id: "${id};https://clients2.google.com/service/update2/crx") cfg.extensions);
-
     system.activationScripts.postActivation.text = lib.mkAfter ''
       /bin/mkdir -p ${lib.escapeShellArg cfg.dataDir}
       /usr/sbin/chown ${lib.escapeShellArg cfg.user} ${lib.escapeShellArg cfg.dataDir}
