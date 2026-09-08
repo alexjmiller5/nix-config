@@ -105,13 +105,20 @@ the tailnet ACL so tagged devices are approved automatically:
   `screencapture`, click/type with System Events, and can dismiss later
   dialogs themselves; only these grants and anything asking for the admin
   password stay human.
-* **moshi-hook (Moshi phone-terminal agent daemon)**: the brew formula and
-  its launchd service are declared; pairing is a secret handshake done once
-  over ssh: Moshi app → Settings → Hooks → copy the pairing token, then
-  `moshi-hook pair --token <token>`. Do NOT run `moshi-hook install` as-is:
-  `~/.claude/settings.json` is a read-only nix symlink here, so instead run
-  `HOME=$(mktemp -d) moshi-hook install` and port the hook entries it writes
-  into agent-config `claude/settings.json` (an agent can do this step).
+* **moshi-hook (Moshi phone-terminal agent daemon)**: the brew formula, its
+  launchd service, and the Claude Code hooks (agent-config
+  `claude/settings.json`) are all declared; the pairing state is restored at
+  login from the 1P item "Mac Mini Moshi Host Secret" (`home/moshi-hook.nix`).
+  Pairing itself is a one-time secret handshake you do over ssh, only when the
+  1P item does not exist yet (first setup, or after un-pairing the host in the
+  app): Moshi app → Settings → Hooks → copy the token, then
+  `moshi-hook pair --store file --token <token>` (`--store file`: the login
+  Keychain is locked for ssh shells), then put the resulting
+  `~/.config/moshi/secrets.json` and `config.json` contents into that item's
+  `secrets_json` / `config_json` fields (an agent does this with one
+  desktop-auth `op item create`). Never run `moshi-hook install` here -
+  `~/.claude/settings.json` is a read-only nix symlink; the hooks it would
+  write are already in agent-config.
 * **1Password CLI account (for `op-unlock`)**: once, over ssh, register the
   account on this machine so `op signin` works headlessly (no desktop app on
   the mini): `op account add --address my.1password.com --email <1P email>`

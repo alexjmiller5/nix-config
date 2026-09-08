@@ -36,6 +36,7 @@ in
   imports = [
     ./common.nix
     ./ai-agent.nix
+    ./moshi-hook.nix
     ./dev-tools.nix
     ./zsh.nix
     ./aliases/dev.nix
@@ -103,6 +104,13 @@ in
   # (AI Agent vault + project vaults).
   opAgentSa = {
     tokenOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/qyi6fxsxyrog3mfpcbjzkjqvzi/credential";
+    tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
+  };
+
+  # moshi-hook pairing state (host id + secret) restored from the machine
+  # vault at login - see home/moshi-hook.nix. Item: "Mac Mini Moshi Host Secret".
+  moshiHook = {
+    itemOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/guamxzzrlh46slq7xqfkbrl4by";
     tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
   };
 

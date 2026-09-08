@@ -160,6 +160,7 @@
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
         op-agent-sa = ./home/op-agent-sa.nix;
+        moshi-hook = ./home/moshi-hook.nix;
         ai-agent = ./home/ai-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         agent-config-links = ./home/agent-config-links.nix;
