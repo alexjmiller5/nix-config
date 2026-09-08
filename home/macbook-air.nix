@@ -42,7 +42,17 @@ in
     ./vscode.nix
     ./agents.nix
     ./ssh.nix
+    ./agent-ssh-agent.nix
   ];
+
+  # Dedicated ssh-agent for agent shells, loaded at login from the AI Agent
+  # vault via the agent SA token file - lets unattended agent sessions ssh to
+  # the mini with no 1Password approval dialog (see home/agent-ssh-agent.nix).
+  # Item: "AI Agent Mac Mini SSH Key".
+  agentSshAgent = {
+    keyOpRefs = [ "op://4eeyrkqibibn7k4j6rz2fbzvxm/im7srzb2x7sy2d3kj3mpy7svai/private key" ];
+    tokenFile = "${config.home.homeDirectory}/.local/state/op/agent-sa-token";
+  };
 
   # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
   # login from the machine vault via the machine SA — see home/op-agent-sa.nix.

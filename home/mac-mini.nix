@@ -66,15 +66,20 @@ in
     commit.gpgsign = true;
   };
 
-  # Inbound ssh from the laptop: public half of "Mac Mini SSH Key" (private
-  # half in the 1Password Personal vault). Mini-only — nothing sshs into the
-  # laptop. Written as a real file, not home.file — macOS sshd rejects an
-  # authorized_keys symlinked into /nix/store.
+  # Inbound ssh from the laptop: public halves of "Mac Mini SSH Key" (Alex's
+  # terminals, private half in the 1Password Personal vault) and "AI Agent
+  # Mac Mini SSH Key" (laptop agent shells, private half in the AI Agent
+  # vault, served by home/agent-ssh-agent.nix). Mini-only — nothing sshs
+  # into the laptop. Written as a real file, not home.file — macOS sshd
+  # rejects an authorized_keys symlinked into /nix/store.
   home.activation.installAuthorizedKeys = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     rm -f "$HOME/.ssh/authorized_keys"
-    echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGVySz6jbVH+sW9q4+ru4CjHZjqmlMJ3p//0sLH1j8vH mac-mini' > "$HOME/.ssh/authorized_keys"
+    {
+      echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGVySz6jbVH+sW9q4+ru4CjHZjqmlMJ3p//0sLH1j8vH mac-mini'
+      echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKVhSzQV7atZiw0i4o51bUPL3BzzZB2DLreuQoS+/Nz0 ai-agent-mac-mini'
+    } > "$HOME/.ssh/authorized_keys"
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
