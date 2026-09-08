@@ -41,7 +41,7 @@ let
       totp: ([.fields[] | select(.type == "OTP") | .totp] | first)
     }'
   '';
-  # Newest 4-8 digit code texted to this Mac in the last 10 minutes whose
+  # Newest 6-8 digit code texted to this Mac in the last 10 minutes whose
   # message names the platform ($1); prints nothing when none has arrived.
   peopleSyncSmsCode = pkgs.writeShellScript "people-sync-sms-code" ''
     set -euo pipefail
@@ -49,18 +49,18 @@ let
     /opt/homebrew/bin/imsg search --query code --limit 30 --json \
       | ${jq} -r --arg since "$since" --arg p "$1" \
           'select(.is_from_me == false and .created_at > $since and ((.text // "") | ascii_downcase | contains($p)))
-           | (.text | capture("(?<c>\\b[0-9]{4,8}\\b)") | .c)' \
+           | (.text | [match("\\b[0-9]{6,8}\\b")] | .[0].string // empty)' \
       | head -n 1
   '';
   # Same for email: newest thread from the last 15 minutes mentioning the
-  # platform, first 4-8 digit run in its body or snippet.
+  # platform, first 6-8 digit run in its body or snippet.
   peopleSyncEmailCode = pkgs.writeShellScript "people-sync-email-code" ''
     set -euo pipefail
     gog=/etc/profiles/per-user/${username}/bin/gog
     id="$("$gog" gmail search "newer_than:15m $1" --max 1 -j 2>/dev/null | ${jq} -r '.threads[0].id // empty')"
     [ -n "$id" ] || exit 0
     "$gog" gmail get "$id" -j 2>/dev/null \
-      | ${jq} -r '((.body // "") + " " + (.message.snippet // "")) | capture("(?<c>\\b[0-9]{4,8}\\b)") | .c' \
+      | ${jq} -r '((.body // "") + " " + (.message.snippet // "")) | [match("\\b[0-9]{6,8}\\b")] | .[0].string // empty' \
       | head -n 1
   '';
 in
