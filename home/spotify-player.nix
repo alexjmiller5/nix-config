@@ -7,19 +7,22 @@
 #
 # The binary on PATH is an op-authed wrapper (same family as op-wrappers.nix;
 # the raw package stays out of home.packages so PATH order can't bypass it).
-# spotify_player's whole auth state is one file, credentials.json (a librespot
-# reusable-credentials blob, account-bound, not machine-bound), so the wrapper
-# keeps it in the "AI Agent Spotify Player Credentials" item and hands it to
-# the binary via a per-invocation mktemp cache folder (-C) that is removed on
-# exit - nothing credential-shaped persists, and every machine is authed the
-# moment the item is. If the run changes the blob (a first
-# `spotify_player authenticate`, or librespot rotating it) the wrapper writes
-# it back, so `authenticate` through the wrapper IS the one-time bootstrap -
-# no per-machine step. The persistent cache dir bought nothing here
-# (cover_img_length = 0, audio_cache = false). Caller-set -C/--cache-folder
-# bypasses the round-trip.
-# ponytail: -d (daemon) would lose the tmp cache when the parent exits; no
-# daemon is declared today - give it a persistent -C if one ever is.
+# spotify_player's whole auth state is two cache files, both account-bound
+# (not machine-bound): credentials.json (librespot reusable credentials,
+# written only when the app connects a session - TUI or -d, never by
+# `authenticate`) and user_client_token.json (Web API OAuth token +
+# refresh token, rewritten on each ~hourly refresh). Every CLI command needs
+# both. The wrapper keeps them in the "AI Agent Spotify Player Credentials"
+# item (fields `credential` / `token`) and hands them to the binary via a
+# per-invocation mktemp cache folder (-C) removed on exit - nothing
+# credential-shaped persists, and every machine is authed the moment the
+# item is. Whatever the run changes (a token refresh, a first login through
+# the TUI minting both files) is written back, so a TUI launch through the
+# wrapper IS the bootstrap - no per-machine step. The persistent cache dir
+# bought nothing here (cover_img_length = 0, audio_cache = false).
+# Caller-set -C/--cache-folder bypasses the round-trip.
+# ponytail: -d (daemon) forks and would lose the tmp cache when the parent
+# exits; no daemon is declared today - give it a persistent -C if one ever is.
 let
   vault = "4eeyrkqibibn7k4j6rz2fbzvxm"; # AI Agent
   item = "et2pkys6ffiobdbjshnz3xenpy"; # AI Agent Spotify Player Credentials
@@ -27,6 +30,7 @@ let
     name = "spotify_player";
     runtimeInputs = [
       pkgs._1password-cli
+      pkgs.jq
       pkgs.coreutils
     ];
     text = ''
@@ -40,20 +44,29 @@ let
       cache="$(mktemp -d "''${TMPDIR:-/tmp}/spotify-player-XXXXXX")"
       trap 'rm -rf "$cache"' EXIT
       creds="$cache/credentials.json"
+      token="$cache/user_client_token.json"
       if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
-        op read 'op://${vault}/${item}/credential' > "$creds" 2>/dev/null || true
+        item="$(op item get ${item} --vault ${vault} --format json 2>/dev/null || true)"
+        jq -r '[.fields[] | select(.label == "credential")][0].value // empty' <<<"$item" > "$creds"
+        jq -r '[.fields[] | select(.label == "token")][0].value // empty' <<<"$item" > "$token"
       fi
-      # Placeholder (CHANGEME) or unreadable → start unauthenticated; the
-      # binary then says so, or `authenticate` mints a blob we write back.
-      if ! grep -q auth_data "$creds" 2>/dev/null; then rm -f "$creds"; fi
-      before="$( { [ -f "$creds" ] && sha256sum "$creds"; } | cut -d' ' -f1 || true)"
+      # Placeholder (CHANGEME) or unreadable → start without that file; the
+      # binary then errors (CLI) or logs in interactively (TUI) and we write
+      # back whatever it minted.
+      grep -q auth_data "$creds" 2>/dev/null || rm -f "$creds"
+      grep -q refresh_token "$token" 2>/dev/null || rm -f "$token"
+      sum() { { [ -f "$1" ] && sha256sum "$1"; } | cut -d' ' -f1 || true; }
+      before="$(sum "$creds")|$(sum "$token")"
       set +e
       ${pkgs.spotify-player}/bin/spotify_player -C "$cache" "$@"
       rc=$?
       set -e
-      if [ -s "$creds" ] && [ "$(sha256sum "$creds" | cut -d' ' -f1)" != "$before" ]; then
-        if ! op item edit ${item} --vault ${vault} "credential[concealed]=$(cat "$creds")" >/dev/null 2>&1; then
-          echo "spotify_player wrapper: WARNING - credentials changed but could not be written back to 1Password (op unauthenticated or rate-limited?); this machine will be unauthenticated again next run" >&2
+      if [ "$(sum "$creds")|$(sum "$token")" != "$before" ]; then
+        edits=()
+        [ -s "$creds" ] && edits+=("credential[concealed]=$(cat "$creds")")
+        [ -s "$token" ] && edits+=("token[concealed]=$(cat "$token")")
+        if [ "''${#edits[@]}" -gt 0 ] && ! op item edit ${item} --vault ${vault} "''${edits[@]}" >/dev/null 2>&1; then
+          echo "spotify_player wrapper: WARNING - credentials changed but could not be written back to 1Password (op unauthenticated or rate-limited?); the change is lost with this run's cache" >&2
         fi
       fi
       exit "$rc"

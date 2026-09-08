@@ -182,10 +182,9 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 * **VS Code** — sign into GitHub in-app (Copilot etc.). No Settings Sync —
   settings/keybindings are nix-managed.
 * **WhatsApp** — pair from the phone (Settings → Linked Devices → QR).
-* **Spotify** — sign into the desktop app. Separately, run
-  `spotify_player authenticate` once (interactive browser OAuth; needs
-  Premium) — tokens then self-refresh from `~/.cache/spotify-player/`.
-  Agents can't do this step (see `spotify` skill).
+* **Spotify** — sign into the desktop app. `spotify_player` needs nothing:
+  its auth lives in 1Password and the wrapper injects it per call (see
+  `home/spotify-player.nix` / the `spotify` skill).
 * **Google accounts** — System Settings → Internet Accounts: account list,
   addresses, and per-service toggles live in nix-secrets
   `manual/google-accounts.md` (public-repo privacy rule).
