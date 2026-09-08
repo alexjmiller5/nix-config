@@ -43,23 +43,29 @@ let
       totp: ([.fields[] | select(.type == "OTP") | .totp] | first)
     }'
   '';
-  # Newest 6-8 digit code texted to this Mac in the last 10 minutes whose
-  # message names the platform ($1); prints nothing when none has arrived.
+  # Newest 6-8 digit code texted to this Mac after the request time (or
+  # within 10 minutes) whose message names the platform ($1); prints
+  # nothing when none has arrived.
   peopleSyncSmsCode = pkgs.writeShellScript "people-sync-sms-code" ''
     set -euo pipefail
-    since="$(/bin/date -u -v-10M +%Y-%m-%dT%H:%M:%SZ)"
+    # people-sync hands over the moment it asked for the code; fall back to a
+    # short window for other callers.
+    since="''${PEOPLE_SYNC_CODE_AFTER:-$(/bin/date -u -v-10M +%Y-%m-%dT%H:%M:%SZ)}"
     /opt/homebrew/bin/imsg search --query code --limit 30 --json \
       | ${jq} -r --arg since "$since" --arg p "$1" \
           'select(.is_from_me == false and .created_at > $since and ((.text // "") | ascii_downcase | contains($p)))
            | (.text | [match("\\b[0-9]{6,8}\\b")] | .[0].string // empty)' \
       | head -n 1
   '';
-  # Same for email: newest thread from the last 15 minutes mentioning the
-  # platform, first 6-8 digit run in its body or snippet.
+  # Same for email: newest thread after the request time (or within 15
+  # minutes) mentioning the platform, first 6-8 digit run in its body or
+  # snippet.
   peopleSyncEmailCode = pkgs.writeShellScript "people-sync-email-code" ''
     set -euo pipefail
     gog=/etc/profiles/per-user/${username}/bin/gog
-    id="$("$gog" gmail search "newer_than:15m $1" --max 1 -j 2>/dev/null | ${jq} -r '.threads[0].id // empty')"
+    since="''${PEOPLE_SYNC_CODE_AFTER:-$(/bin/date -u -v-15M +%Y-%m-%dT%H:%M:%SZ)}"
+    id="$("$gog" gmail search "newer_than:1h $1" --max 5 -j 2>/dev/null \
+      | ${jq} -r --arg since "$since" '[.threads[] | select(.internalDateIso > $since)][0].id // empty')"
     [ -n "$id" ] || exit 0
     "$gog" gmail get "$id" -j 2>/dev/null \
       | ${jq} -r '((.body // "") + " " + (.message.snippet // "")) | [match("\\b[0-9]{6,8}\\b")] | .[0].string // empty' \
