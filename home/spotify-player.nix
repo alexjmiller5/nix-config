@@ -5,27 +5,56 @@
 # Laptop-personal: a music player has no place in the work-exportable list.
 # Option docs: https://github.com/aome510/spotify-player/blob/master/docs/config.md
 #
+# Built from upstream master (nixpkgs' release lacks the custom-client
+# fallback): the Web API uses Alex's own dev app ("AI Agent Spotify OAuth
+# Client" item, redirect URI http://127.0.0.1:8989/login registered in the
+# Spotify developer dashboard), passed as `-o client_id=`; requests that app
+# can't serve (4xx, or the ncspot_only_get_endpoints list) fall back to the
+# binary's default ncspot client. ncspot alone is Spotify-throttled for hours
+# at a time (429 on every call), a fresh dev app alone loses fields that
+# newer apps don't get - master's fallback is what makes either usable.
+#
 # The binary on PATH is an op-authed wrapper (same family as op-wrappers.nix;
 # the raw package stays out of home.packages so PATH order can't bypass it).
-# spotify_player's whole auth state is two cache files, both account-bound
+# spotify_player's whole auth state is a few cache files, all account-bound
 # (not machine-bound): credentials.json (librespot reusable credentials,
-# written only when the app connects a session - TUI or -d, never by
-# `authenticate`) and user_client_token.json (Web API OAuth token +
-# refresh token, rewritten on each ~hourly refresh). Every CLI command needs
-# both. The wrapper keeps them in the "AI Agent Spotify Player Credentials"
-# item (fields `credential` / `token`) and hands them to the binary via a
-# per-invocation mktemp cache folder (-C) removed on exit - nothing
-# credential-shaped persists, and every machine is authed the moment the
-# item is. Whatever the run changes (a token refresh, a first login through
-# the TUI minting both files) is written back, so a TUI launch through the
-# wrapper IS the bootstrap - no per-machine step. The persistent cache dir
-# bought nothing here (cover_img_length = 0, audio_cache = false).
-# Caller-set -C/--cache-folder bypasses the round-trip.
+# written only when the app connects a session - TUI, never `authenticate`)
+# and one <client_id>_token.json per Web API client (OAuth token + refresh
+# token, rewritten on each ~hourly refresh). The wrapper keeps them in the
+# "AI Agent Spotify Player Credentials" item (field `credential` =
+# credentials.json, field `token` = JSON map of token filename → content),
+# hands them to the binary via a per-invocation mktemp cache folder (-C)
+# removed on exit - nothing credential-shaped persists, every machine is
+# authed the moment the item is - and writes back whatever the run changed
+# (a token refresh, a login), so `spotify_player authenticate` / a TUI login
+# through the wrapper IS the bootstrap. The persistent cache dir bought
+# nothing here (cover_img_length = 0, audio_cache = false). Caller-set
+# -C/--cache-folder bypasses the round-trip.
 # ponytail: -d (daemon) forks and would lose the tmp cache when the parent
 # exits; no daemon is declared today - give it a persistent -C if one ever is.
 let
   vault = "4eeyrkqibibn7k4j6rz2fbzvxm"; # AI Agent
   item = "et2pkys6ffiobdbjshnz3xenpy"; # AI Agent Spotify Player Credentials
+  clientItem = "2gtd2wehp4iqhzhcswyvjiwlvu"; # AI Agent Spotify OAuth Client
+  spotify-player = pkgs.spotify-player.overrideAttrs (
+    old:
+    let
+      src = pkgs.fetchFromGitHub {
+        owner = "aome510";
+        repo = "spotify-player";
+        rev = "37a3d8629b4afc864a878412d9c0b9b0bd509a5f";
+        hash = "sha256-GfvqNgQmlIohsTkmuxoDQMg0Tz9/tnGb7n0D9liI1ZM=";
+      };
+    in
+    {
+      version = "0.24.1-unstable-2026-09-08";
+      inherit src;
+      cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+        inherit src;
+        hash = "sha256-N93J3Z7AAnDSjJBoaKU73rcDZX44Q+BDGiTBuWefwl8=";
+      };
+    }
+  );
   wrapped = pkgs.writeShellApplication {
     name = "spotify_player";
     runtimeInputs = [
@@ -36,7 +65,7 @@ let
     text = ''
       for a in "$@"; do
         case "$a" in
-          -C | --cache-folder | --cache-folder=*) exec ${pkgs.spotify-player}/bin/spotify_player "$@" ;;
+          -C | --cache-folder | --cache-folder=*) exec ${spotify-player}/bin/spotify_player "$@" ;;
         esac
       done
       ${builtins.readFile ./agent-detect.sh}
@@ -44,27 +73,42 @@ let
       cache="$(mktemp -d "''${TMPDIR:-/tmp}/spotify-player-XXXXXX")"
       trap 'rm -rf "$cache"' EXIT
       creds="$cache/credentials.json"
-      token="$cache/user_client_token.json"
+      cid=""
       if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
         item="$(op item get ${item} --vault ${vault} --format json 2>/dev/null || true)"
+        cid="$(op read 'op://${vault}/${clientItem}/client_id' 2>/dev/null || true)"
         jq -r '[.fields[] | select(.label == "credential")][0].value // empty' <<<"$item" > "$creds"
-        jq -r '[.fields[] | select(.label == "token")][0].value // empty' <<<"$item" > "$token"
+        tokens="$(jq -r '[.fields[] | select(.label == "token")][0].value // empty' <<<"$item")"
+        if jq -e 'type == "object" and (to_entries | all(.value | type == "string"))' <<<"$tokens" >/dev/null 2>&1; then
+          for f in $(jq -r 'keys[]' <<<"$tokens"); do
+            case "$f" in *_token.json) jq -r --arg k "$f" '.[$k]' <<<"$tokens" > "$cache/$f" ;; esac
+          done
+        fi
       fi
       # Placeholder (CHANGEME) or unreadable → start without that file; the
-      # binary then errors (CLI) or logs in interactively (TUI) and we write
-      # back whatever it minted.
+      # binary then errors (CLI) or logs in interactively (TUI/authenticate)
+      # and we write back whatever it minted.
       grep -q auth_data "$creds" 2>/dev/null || rm -f "$creds"
-      grep -q refresh_token "$token" 2>/dev/null || rm -f "$token"
-      sum() { { [ -f "$1" ] && sha256sum "$1"; } | cut -d' ' -f1 || true; }
-      before="$(sum "$creds")|$(sum "$token")"
+      state() {
+        (cd "$cache" && for f in credentials.json *_token.json; do
+          if [ -f "$f" ]; then printf '%s\n' "$f"; cat "$f"; fi
+        done 2>/dev/null) | sha256sum | cut -d' ' -f1
+      }
+      before="$(state)"
+      opts=()
+      if [ -n "$cid" ]; then opts+=(-o "client_id=$cid"); fi
       set +e
-      ${pkgs.spotify-player}/bin/spotify_player -C "$cache" "$@"
+      ${spotify-player}/bin/spotify_player -C "$cache" "''${opts[@]}" "$@"
       rc=$?
       set -e
-      if [ "$(sum "$creds")|$(sum "$token")" != "$before" ]; then
+      if [ "$(state)" != "$before" ]; then
         edits=()
-        [ -s "$creds" ] && edits+=("credential[concealed]=$(cat "$creds")")
-        [ -s "$token" ] && edits+=("token[concealed]=$(cat "$token")")
+        if [ -s "$creds" ]; then edits+=("credential[concealed]=$(cat "$creds")"); fi
+        map='{}'
+        for f in "$cache"/*_token.json; do
+          if [ -s "$f" ]; then map="$(jq --arg k "$(basename "$f")" --rawfile v "$f" '.[$k] = $v' <<<"$map")"; fi
+        done
+        if [ "$map" != '{}' ]; then edits+=("token[concealed]=$map"); fi
         if [ "''${#edits[@]}" -gt 0 ] && ! op item edit ${item} --vault ${vault} "''${edits[@]}" >/dev/null 2>&1; then
           echo "spotify_player wrapper: WARNING - credentials changed but could not be written back to 1Password (op unauthenticated or rate-limited?); the change is lost with this run's cache" >&2
         fi
