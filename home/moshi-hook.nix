@@ -29,7 +29,11 @@ let
     mkdir -p "$HOME/.config/moshi"
     printf '%s' "$secrets" > "$HOME/.config/moshi/secrets.json"
     [ -n "$store" ] && printf '%s' "$store" > "$HOME/.config/moshi/config.json"
-    /bin/launchctl kickstart -k "gui/$(id -u)/${cfg.serviceLabel}" 2>/dev/null || true
+    # The brew service lands in the gui domain when started from a console
+    # session and in the user domain when activation ran over ssh - try both.
+    for d in gui user; do
+      /bin/launchctl kickstart -k "$d/$(id -u)/${cfg.serviceLabel}" 2>/dev/null && break
+    done
   '';
 in
 {
