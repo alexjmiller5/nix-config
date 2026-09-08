@@ -147,7 +147,11 @@ in
   # automated through the three commands above. Nothing here is the app's
   # business beyond "run this command" - see the people-sync README.
   services.people-sync-scrape = {
-    enable = true;
+    # Never scheduled: people-sync is an ad-hoc, agent-driven tool (the
+    # people-review skill runs `login`/`scrape` against the shared Chrome
+    # with Alex in the loop). The module stays only for its credential/code
+    # command wiring until that moves to a plain env for the agent shell.
+    enable = false;
     user = username;
     endpoint = "127.0.0.1:${toString config.services.agent-chrome.port}";
     platforms = [
