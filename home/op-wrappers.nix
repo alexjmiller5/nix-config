@@ -18,6 +18,24 @@ let
   # gogcli from the openclaw flake — tracks upstream releases; nixpkgs' copy
   # lags months behind at gog's weekly cadence.
   gogcliPkg = nix-openclaw-tools.packages.${pkgs.stdenv.hostPlatform.system}.gogcli;
+  # wacli (WhatsApp linked-device CLI) from its GitHub release — not in
+  # nixpkgs or nix-openclaw-tools. Installed under libexec on purpose: the
+  # `wacli` on PATH must be the wrapper below, never the raw binary.
+  wacliBin = pkgs.stdenvNoCC.mkDerivation rec {
+    pname = "wacli";
+    version = "0.18.0";
+    src = pkgs.fetchurl {
+      url = "https://github.com/openclaw/wacli/releases/download/v${version}/wacli_${version}_universal_darwin_all.tar.gz";
+      hash = "sha256-oKrqBuApgmsrYZAwc2sFXZMETovnjWJUl5jKGkU5QR0=";
+    };
+    sourceRoot = ".";
+    dontStrip = true;
+    installPhase = ''
+      mkdir -p $out/libexec/wacli
+      install -m755 wacli $out/libexec/wacli/wacli
+    '';
+    meta.platforms = [ "aarch64-darwin" "x86_64-darwin" ];
+  };
 in
 {
   home.packages = [
@@ -139,6 +157,82 @@ in
           fi
         fi
         exec ${gogcliPkg}/bin/gog "$@"
+      '';
+    })
+
+    # wacli (WhatsApp CLI, tier 2 of the whatsapp skill) with the linked-device
+    # SESSION in 1Password, so one pairing serves every machine. A WhatsApp
+    # linked device is Signal ratchet state that advances on every message —
+    # it must have exactly ONE live copy, so the wrapper round-trips it:
+    # fetch session.db from the "AI Agent WhatsApp Linked Device Session"
+    # document → run wacli against a local store → write session.db back iff
+    # it changed. Only session.db travels; wacli.db (its message mirror) stays
+    # per machine. A failed write-back leaves an .unsynced marker and the
+    # next run pushes before pulling, so a newer local session is never
+    # clobbered by the stale 1P copy. NEVER run wacli on two machines at the
+    # same time — nothing here serializes writers (ponytail: discipline, not
+    # a lock; add a 1P lock field if it ever bites). Caller-set
+    # WACLI_STORE_DIR bypasses the round-trip (local/manual store).
+    (pkgs.writeShellApplication {
+      name = "wacli";
+      runtimeInputs = [
+        pkgs._1password-cli
+        pkgs.sqlite
+        pkgs.coreutils
+      ];
+      text = ''
+        if [ -n "''${WACLI_STORE_DIR:-}" ]; then
+          exec ${wacliBin}/libexec/wacli/wacli "$@"
+        fi
+        ${builtins.readFile ./agent-detect.sh}
+        ${builtins.readFile ./agent-op-env.sh}
+        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -z "$(op account list 2>/dev/null)" ]; then
+          echo "wacli wrapper: no 1Password auth in this shell - the linked-device session lives in 1Password, refusing to run without it" >&2
+          exit 1
+        fi
+        item=rnq2u2njglpcgtgbaw3ijdcuau   # AI Agent WhatsApp Linked Device Session (document)
+        vault=4eeyrkqibibn7k4j6rz2fbzvxm  # AI Agent
+        store="''${XDG_STATE_HOME:-$HOME/.local/state}/wacli"
+        mkdir -p "$store"
+        chmod 700 "$store"
+        if [ -f "$store/session.db.unsynced" ]; then
+          if op document edit "$item" "$store/session.db" --vault "$vault" >/dev/null 2>&1; then
+            rm -f "$store/session.db.unsynced"
+          else
+            echo "wacli wrapper: a previous run changed the session but could not write it back to 1Password, and this retry failed too - not running (op rate-limited or unauthenticated?)" >&2
+            exit 1
+          fi
+        fi
+        tmp="$(mktemp "$store/.session.XXXXXX")"
+        if ! op document get "$item" --vault "$vault" --out-file "$tmp" --force >/dev/null 2>&1; then
+          rm -f "$tmp"
+          echo "wacli wrapper: could not fetch the linked-device session from 1Password - refusing to run against a possibly stale local copy" >&2
+          exit 1
+        fi
+        rm -f "$store/session.db-wal" "$store/session.db-shm"
+        if [ -s "$tmp" ]; then
+          mv "$tmp" "$store/session.db"
+        else
+          rm -f "$tmp" "$store/session.db"   # empty document = not paired yet
+        fi
+        before="$( { [ -f "$store/session.db" ] && sha256sum "$store/session.db"; } | cut -d' ' -f1 || true)"
+        set +e
+        WACLI_STORE_DIR="$store" ${wacliBin}/libexec/wacli/wacli "$@"
+        rc=$?
+        set -e
+        if [ -f "$store/session.db" ]; then
+          if [ -s "$store/session.db-wal" ]; then
+            sqlite3 "$store/session.db" 'PRAGMA wal_checkpoint(TRUNCATE);' >/dev/null 2>&1 || true
+          fi
+          after="$(sha256sum "$store/session.db" | cut -d' ' -f1)"
+          if [ "$after" != "$before" ]; then
+            if ! op document edit "$item" "$store/session.db" --vault "$vault" >/dev/null 2>&1; then
+              touch "$store/session.db.unsynced"
+              echo "wacli wrapper: WARNING - the session changed but could not be written back to 1Password; it will be pushed on the next run from THIS machine. Do not run wacli elsewhere until then." >&2
+            fi
+          fi
+        fi
+        exit "$rc"
       '';
     })
 

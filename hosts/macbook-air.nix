@@ -144,10 +144,6 @@
         name = "steipete/tap";
         trusted = true;
       }
-      {
-        name = "openclaw/tap";
-        trusted = true;
-      }
     ];
     brews = [
       # Not in nixpkgs (checked 2026-09-01); skills + nightlight migrated out.
@@ -155,11 +151,6 @@
       # iMessage CLI for agents (read chat.db, send via Messages.app) — not in
       # nixpkgs. Needs TCC grants, see MANUAL-macbook-air.md.
       "steipete/tap/imsg"
-      # WhatsApp CLI for agents (whatsmeow linked device) — group sends and
-      # headless use; 1:1 sends + all reads go through the desktop app instead
-      # (whatsapp skill). Not in nixpkgs. Pairing is a one-time QR scan, see
-      # MANUAL-macbook-air.md. MacBook-only: the mini has no paired session.
-      "openclaw/tap/wacli"
     ];
     casks = [
       "1password"
