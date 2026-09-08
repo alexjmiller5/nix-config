@@ -9,12 +9,11 @@
 # sites is actually wanted.
 #
 # Extensions the agent browser needs (Claude in Chrome, whose tabGroups
-# permission chrome-control's cdp-group.mjs borrows) are installed ONCE by
-# a human from the Web Store in this browser's window - see the host's
-# MANUAL file. No declarative route exists: a user-level
-# ExtensionInstallForcelist (CustomUserPreferences) lands as a Recommended
-# policy, which Chrome ignores for force-installs; only a configuration
-# profile makes it mandatory, and that needs a GUI approval anyway.
+# permission chrome-control's cdp-group.mjs borrows) come in through
+# `extensions`: store ids force-installed by the machine's Chrome policy
+# (modules/chrome-policy.nix, mandatory via Managed Preferences - a
+# user-level ExtensionInstallForcelist is only Recommended and ignored).
+# Signing into them is per profile and GUI-only (the host's MANUAL file).
 {
   config,
   lib,
@@ -57,9 +56,24 @@ in
       description = "Additional Chrome command-line flags.";
     };
 
+    extensions = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
+      description = "Chrome Web Store extension ids force-installed (and toolbar-pinned) through the machine's Chrome policy - browser-wide, so every profile on the machine gets them.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    chrome.policy = lib.mkIf (cfg.extensions != [ ]) {
+      enable = true;
+      settings.ExtensionSettings = lib.genAttrs cfg.extensions (_: {
+        installation_mode = "normal_installed";
+        update_url = "https://clients2.google.com/service/update2/crx";
+        toolbar_pin = "force_pinned";
+      });
+    };
+
     system.activationScripts.postActivation.text = lib.mkAfter ''
       /bin/mkdir -p ${lib.escapeShellArg cfg.dataDir}
       /usr/sbin/chown ${lib.escapeShellArg cfg.user} ${lib.escapeShellArg cfg.dataDir}

@@ -16,7 +16,7 @@
 {
   imports = [
     ../modules/notunes.nix
-    ../modules/chrome-policy.nix
+    ./macbook-air-chrome-policy.nix
   ];
 
   # The laptop's ONE agenix secret: the macbook-air-machine 1P service-account
@@ -84,7 +84,7 @@
   };
 
   # Laptop-only root activation steps (Rosetta, yabai TCC nudge). The cask
-  # de-quarantine lives in darwin-base.nix (both machines); chrome-policy.nix
+  # de-quarantine lives in darwin-base.nix (both machines); modules/chrome-policy.nix
   # contributes its own entry too — the option is types.lines, so all the
   # definitions merge.
   system.activationScripts.postActivation.text = ''

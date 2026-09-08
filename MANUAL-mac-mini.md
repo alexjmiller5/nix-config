@@ -140,15 +140,17 @@ the tailnet ACL so tagged devices are approved automatically:
   afterward; no re-linking needed as long as the phone comes online every
   14 days and the app keeps running.
 
-#### agent-chrome: Claude in Chrome extension (Web Store, one click)
+#### agent-chrome: sign into Claude in Chrome (GUI-only)
 
-Over Screen Sharing, in the agent Chrome's own window (the one on port 9222,
-NOT the default profile), open
-`https://chromewebstore.google.com/detail/fcoeoabgfenejglbffodgkkbkcdhcgfn`,
-sign in to Google if the store asks, and click **Add to Chrome → Add
-extension**. That extension's `tabGroups` permission is what chrome-control's
-`cdp-group.mjs` borrows to give every agent session its own window + tab
-group. It persists with the profile. Verify from the laptop:
+The extension itself is policy-installed (`services.agent-chrome.extensions`
+→ `chrome.policy`, mandatory via Managed Preferences; it appears a minute or
+two after the first switch + Chrome relaunch). Its sign-in is per profile and
+manual: over Screen Sharing, in the **agent Chrome's** window (the one on
+port 9222, not the default profile), click the Claude toolbar icon → sign in.
+Also sign that browser into Google (Chrome profile menu) - the Web Store and
+Google-backed sites ask for it. Its `tabGroups` permission is what
+chrome-control's `cdp-group.mjs` borrows to give every agent session its own
+window + tab group; verify from the laptop:
 `ssh -N -L 9223:127.0.0.1:9222 mac-mini-tailscale &` then
 `node ~/.claude/skills/chrome-control/scripts/cdp-group.mjs test https://example.com --port 9223`
 (prints `window=… group=…`), then the same with `--close`.

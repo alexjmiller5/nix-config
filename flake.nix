@@ -16,6 +16,12 @@
     # Weekly Screen Time + call history snapshots (each provides a nix-darwin module).
     screentime-backup.url = "github:alexjmiller5/screentime-backup";
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
+    # Screentime Dashboard's ingest job: rebuilds the dashboard's series from
+    # the mini's snapshots on request (nix-darwin module + screentime-ingest).
+    screentime-dashboard = {
+      url = "github:alexjmiller5/screentime-dashboard";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Weekly iMessage sticker sync into Documents (nix-darwin module).
     sticker-sync.url = "github:alexjmiller5/sticker-sync";
     # Daily social-profile scraping into life-data on the mini (nix-darwin module).
@@ -94,8 +100,10 @@
             ./modules/darwin-base.nix
             ./modules/macos-defaults.nix
             ./modules/agent-chrome.nix
+            ./modules/chrome-policy.nix
             inputs.agenix.darwinModules.default
             inputs.screentime-backup.darwinModules.default
+            inputs.screentime-dashboard.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
@@ -149,6 +157,7 @@
       # Reusable nix-darwin modules, same audience.
       darwinModules = {
         agent-chrome = ./modules/agent-chrome.nix;
+        chrome-policy = ./modules/chrome-policy.nix;
       };
 
       # Reusable home-manager modules, for consumption by other flakes

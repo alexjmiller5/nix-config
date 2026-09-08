@@ -29,6 +29,19 @@ let
   };
   # $1 = platform. Prints {"username","password","totp"} (totp = current code
   # or null) - the contract in the people-sync README.
+  # Screentime Dashboard: the mini pushes rebuilt Screen Time series to the
+  # dashboard Worker through Cloudflare Access with a service token that
+  # lives in this machine's vault - one hop via the machine SA, read only
+  # when a sync actually runs (never by the 60s poll).
+  screentimeDashboardCredential = pkgs.writeShellScript "screentime-dashboard-credential" ''
+    set -euo pipefail
+    OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \
+      ${op} item get oeet73ymsgiwoozsfsvu2rprku --vault g532a3e4zyqqrc7b2v3lhv4zmy --format json \
+      | ${jq} -c '{
+          clientId: ([.fields[] | select(.label == "client_id") | .value] | first),
+          clientSecret: ([.fields[] | select(.label == "client_secret") | .value] | first)
+        }'
+  '';
   peopleSyncCredential = pkgs.writeShellScript "people-sync-credential" ''
     set -euo pipefail
     case "$1" in
@@ -126,6 +139,15 @@ in
   services.screentime-backup = {
     enable = true;
     user = username;
+    # After every snapshot (weekly, or kicked by a dashboard refresh) rebuild
+    # and push the dashboard's series - inside the FDA-holding backup process.
+    postRun = config.services.screentime-ingest.syncCommand;
+  };
+  services.screentime-ingest = {
+    enable = true;
+    user = username;
+    url = "https://screentime-dashboard.nqipomyrjb.workers.dev";
+    credentialCommand = "${screentimeDashboardCredential}";
   };
   services.callhistory-backup = {
     enable = true;
@@ -142,6 +164,10 @@ in
   services.agent-chrome = {
     enable = true;
     user = username;
+    # Claude in Chrome: its tabGroups permission is what chrome-control's
+    # cdp-group.mjs borrows to give every agent session its own tab group.
+    # Sign-in is manual (MANUAL-mac-mini.md).
+    extensions = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
   };
 
   # people-sync on this Mac: an ad-hoc tool an agent drives with Alex in the

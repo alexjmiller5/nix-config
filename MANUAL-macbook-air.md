@@ -178,6 +178,11 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 * **Claude in Chrome** — sign into the browser extension (toolbar icon →
   sign in). Store-installed via the Chrome policy plist, but auth is per-
   profile and GUI-only.
+* **1Password in Chrome** — the browser extension (policy-installed and
+  pinned) has its own sign-in: click its toolbar icon → unlock; it pairs
+  with the desktop app when 1Password → Settings → Browser → "Connect with
+  1Password in the browser" is on (then Touch ID unlocks it), otherwise
+  sign in with the account password. Per profile, GUI-only.
 * **Notion** — sign into the desktop app.
 * **VS Code** — sign into GitHub in-app (Copilot etc.). No Settings Sync —
   settings/keybindings are nix-managed.
