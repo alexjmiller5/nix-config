@@ -91,6 +91,19 @@ the tailnet ACL so tagged devices are approved automatically:
   `launchctl kickstart -k gui/$(id -u)/com.alexmiller.screentime-backup` (and
   `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
   `backup OK` lines (a `cannot read` line means the grant is missing).
+* **1Password CLI account (for `op-unlock`)**: once, over ssh, register the
+  account on this machine so `op signin` works headlessly (no desktop app on
+  the mini): `op account add --address my.1password.com --email <1P email>`
+  — it prompts for the Secret Key and account password (both in the
+  "1Password Account" item, Personal vault). Afterwards `op-unlock [hours]`
+  from any ssh shell (phone terminal included) gives agent sessions
+  time-boxed Personal-vault reads via `op-personal`; `op-unlock lock` ends
+  it, `op-unlock status` checks.
+* **Messages (SMS 2FA codes reach agents)**: via Screen Sharing sign Messages
+  into iMessage, then on the iPhone Settings → Messages → **Text Message
+  Forwarding** → enable this mini. Verify with
+  `sqlite3 ~/Library/Messages/chat.db "select count(*) from message where service='SMS'"`
+  (non-zero = forwarding works; `imsg`/sqlite readers need Full Disk Access).
 * **whatsapp (companion device for callhistory-backup)**: via Screen Sharing,
   open WhatsApp once → Settings on the iPhone → Linked Devices → Link a Device
   → scan the QR on the mini's screen. The keep-alive agent keeps it running

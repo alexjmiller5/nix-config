@@ -96,10 +96,18 @@
       # themselves for Personal-vault reads - each call pops Touch ID for Alex
       # to approve, so it needs him at the machine, but it beats pasting
       # commands (paste only deny-listed writes: op * delete/edit).
+      # Headless machines have no desktop app: there `op-unlock` (mac-mini.nix)
+      # writes a time-boxed CLI session token to ~/.local/state/op/personal-session
+      # and op-personal uses it while the file exists.
       if [[ -n $AGENT_SHELL ]]; then
           op-personal() {
-              env -u OP_SERVICE_ACCOUNT_TOKEN sh -c \
-                  'op signin --account my.1password.com >/dev/null 2>&1; exec op "$@"' sh "$@"
+              local f="$HOME/.local/state/op/personal-session"
+              if [[ -r $f ]]; then
+                  env -u OP_SERVICE_ACCOUNT_TOKEN op --session "$(<"$f")" "$@"
+              else
+                  env -u OP_SERVICE_ACCOUNT_TOKEN sh -c \
+                      'op signin --account my.1password.com >/dev/null 2>&1; exec op "$@"' sh "$@"
+              fi
           }
       fi
 

@@ -111,11 +111,11 @@ in
           };
         })
         [
-        "localhost"
-        "127.0.0.1"
-        "example.com"
-        "iana.org"
-      ];
+          "localhost"
+          "127.0.0.1"
+          "example.com"
+          "iana.org"
+        ];
   };
 
   # Per-app notification settings, `enable` included (the "Allow

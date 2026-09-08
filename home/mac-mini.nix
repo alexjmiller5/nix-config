@@ -143,6 +143,67 @@ in
         esac
       '';
     })
+    # Time-boxed Personal-vault access for agents on the headless mini. No
+    # desktop app here, so Touch ID isn't an option: Alex runs `op-unlock`
+    # from an ssh shell (phone terminal), types his 1Password account password,
+    # and the resulting CLI session token is written to
+    # ~/.local/state/op/personal-session (0600). The op-personal shell
+    # function (home/zsh.nix) uses that token when the file exists, so agent
+    # sessions read Personal exactly as they do on the laptop. A detached
+    # screen keepalive touches the session every 20 min (op sessions die
+    # after 30 idle minutes) and after N hours (default 6) signs out
+    # server-side and deletes the file. No secrets ever touch disk - only the
+    # session token, which the sign-out invalidates. One-time prerequisite:
+    # `op account add` on this machine (MANUAL-mac-mini.md §6).
+    (pkgs.writeShellApplication {
+      name = "op-unlock";
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        state="$HOME/.local/state/op"
+        f="$state/personal-session"
+        case "''${1:-}" in
+          keepalive) # internal: op-unlock keepalive <hours>
+            end=$(( $(date +%s) + ''${2:-6} * 3600 ))
+            while [ "$(date +%s)" -lt "$end" ] && [ -r "$f" ]; do
+              sleep 1200
+              op --session "$(cat "$f")" whoami >/dev/null 2>&1 || break
+            done
+            if [ -r "$f" ]; then op --session "$(cat "$f")" signout >/dev/null 2>&1 || true; fi
+            rm -f "$f"
+            ;;
+          lock)
+            /usr/bin/screen -S op-unlock -X quit >/dev/null 2>&1 || true
+            if [ -r "$f" ]; then
+              op --session "$(cat "$f")" signout >/dev/null 2>&1 || true
+              rm -f "$f"; echo "locked"
+            else
+              echo "already locked"
+            fi
+            ;;
+          status)
+            if [ -r "$f" ] && op --session "$(cat "$f")" whoami >/dev/null 2>&1; then
+              echo "unlocked (session file $(stat -f %Sm "$f"))"
+            else
+              rm -f "$f"; echo "locked"
+            fi
+            ;;
+          ""|[0-9]*)
+            hours="''${1:-6}"
+            umask 077; mkdir -p "$state"
+            /usr/bin/screen -S op-unlock -X quit >/dev/null 2>&1 || true
+            # Prompts for the account password on this tty; --raw prints the token.
+            env -u OP_SERVICE_ACCOUNT_TOKEN op signin --raw > "$f.tmp"
+            mv "$f.tmp" "$f"
+            /usr/bin/screen -dmS op-unlock "$0" keepalive "$hours"
+            echo "unlocked for ''${hours}h - agents can read Personal via op-personal; op-unlock lock to end early"
+            ;;
+          *)
+            echo "usage: op-unlock [hours=6] | lock | status" >&2
+            exit 1
+            ;;
+        esac
+      '';
+    })
   ];
 
   # Daily pull, 30min after the laptop's 10:00 push window; RunAtLoad catches
