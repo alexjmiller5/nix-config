@@ -152,7 +152,7 @@ in
   environment.systemPackages = [
     peopleSync
     (pkgs.writeShellScriptBin "people-sync-mini" ''
-      export PEOPLE_SYNC_ENDPOINT="127.0.0.1:${toString config.services.agent-chrome.port}"
+      export PEOPLE_SYNC_CDP_ENDPOINT="127.0.0.1:${toString config.services.agent-chrome.port}"
       export PEOPLE_SYNC_CREDENTIAL_COMMAND='${peopleSyncCredential} "$1"'
       export PEOPLE_SYNC_SMS_CODE_COMMAND='${peopleSyncSmsCode} "$1"'
       export PEOPLE_SYNC_EMAIL_CODE_COMMAND='${peopleSyncEmailCode} "$1"'
