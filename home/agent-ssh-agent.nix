@@ -24,11 +24,15 @@ let
     set -u
     for _ in $(seq 1 30); do [ -S "${sock}" ] && break; sleep 2; done
     [ -S "${sock}" ] || { echo "agent socket never appeared" >&2; exit 1; }
+    # Idempotent: runs at load and hourly (StartInterval) so a read that
+    # failed at login - network down, 1Password account rate-limited - is
+    # retried later without hammering the shared request budget.
+    if SSH_AUTH_SOCK="${sock}" /usr/bin/ssh-add -l >/dev/null 2>&1; then exit 0; fi
     rc=0
     ${lib.concatMapStringsSep "\n" (ref: ''
-      for _ in 1 2 3 4 5; do
+      for _ in 1 2 3; do
         key="$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${cfg.tokenFile})" \
-          ${pkgs._1password-cli}/bin/op read '${ref}?ssh-format=openssh' 2>/dev/null)" && [ -n "$key" ] && break
+          ${pkgs._1password-cli}/bin/op read '${ref}?ssh-format=openssh')" && [ -n "$key" ] && break
         sleep 15
       done
       if [ -n "''${key:-}" ]; then
@@ -76,6 +80,7 @@ in
         Label = "com.alexmiller.agent-ssh-agent-load";
         ProgramArguments = [ "${load}" ];
         RunAtLoad = true;
+        StartInterval = 3600;
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-ssh-agent.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-ssh-agent.log";
       };
