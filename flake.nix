@@ -93,6 +93,7 @@
             host
             ./modules/darwin-base.nix
             ./modules/macos-defaults.nix
+            ./modules/agent-chrome.nix
             inputs.agenix.darwinModules.default
             inputs.screentime-backup.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
@@ -144,6 +145,11 @@
       darwinConfigurations."macbook-air" = mkHost {
         host = ./hosts/macbook-air.nix;
         home = ./home/macbook-air.nix;
+      };
+
+      # Reusable nix-darwin modules, same audience.
+      darwinModules = {
+        agent-chrome = ./modules/agent-chrome.nix;
       };
 
       # Reusable home-manager modules, for consumption by other flakes

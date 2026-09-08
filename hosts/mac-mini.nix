@@ -30,7 +30,9 @@ let
   peopleSyncCredential = pkgs.writeShellScript "people-sync-credential" ''
     set -euo pipefail
     case "$1" in
-      ${lib.concatStringsSep "\n      " (lib.mapAttrsToList (platform: id: "${platform}) item=${id} ;;") peopleSyncLogins)}
+      ${lib.concatStringsSep "\n      " (
+        lib.mapAttrsToList (platform: id: "${platform}) item=${id} ;;") peopleSyncLogins
+      )}
       *) echo "no login item for platform $1" >&2; exit 1 ;;
     esac
     export OP_SERVICE_ACCOUNT_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \
@@ -110,13 +112,23 @@ in
     installWhatsApp = true;
   };
 
+  # The one browser every agent job on this Mac drives (modules/agent-chrome.nix):
+  # a headed Chrome on its own data dir, remote debugging on 9222, started at
+  # login. Logins done in its window - by a job or by Alex over Screen
+  # Sharing - persist for everything that attaches later.
+  services.agent-chrome = {
+    enable = true;
+    user = username;
+  };
+
   # Daily social-profile scraping into life-data (the people-sync flake's
-  # module): one dedicated Chrome profile per site, human-paced, logins
+  # module), attached to the shared Chrome above, human-paced, logins
   # automated through the three commands above. Nothing here is the app's
   # business beyond "run this command" - see the people-sync README.
   services.people-sync-scrape = {
     enable = true;
     user = username;
+    endpoint = "127.0.0.1:${toString config.services.agent-chrome.port}";
     platforms = [
       "facebook"
       "instagram"
