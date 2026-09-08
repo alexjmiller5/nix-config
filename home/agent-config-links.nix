@@ -19,5 +19,10 @@ in
     ".claude/hooks".source = mkLink "${agentConfig}/claude/hooks";
     ".claude/CLAUDE.md".source = mkLink "${agentConfig}/AGENTS.md";
     ".claude/statusline.sh".source = mkLink "${agentConfig}/claude/statusline.sh";
+    # Codex: AGENTS.md is the native instructions file, so it links straight
+    # to the canonical one (no CLAUDE.md-style rename). hooks/ carries the
+    # deny-list guard that home/codex.nix registers.
+    ".codex/AGENTS.md".source = mkLink "${agentConfig}/AGENTS.md";
+    ".codex/hooks".source = mkLink "${agentConfig}/codex/hooks";
   };
 }

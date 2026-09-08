@@ -15,6 +15,7 @@
     ./op-wrappers.nix
     ./agent-config-links.nix
     ./claude-plugins.nix
+    ./codex.nix
     ./machine-vault-git.nix
   ];
 

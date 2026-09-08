@@ -30,6 +30,10 @@ routing table and workflow; this file is the in-repo map.
   `claude plugin install` is imperative and `enabledPlugins` never fetches
   anything, so a restored machine got none; git-ignored on the agent-config
   side),
+  `codex.nix` (Codex CLI - the ChatGPT-subscription seat; skills and
+  AGENTS.md are left to `agent-config-links.nix` so both stay editable
+  without a rebuild, and `programs.codex.context` stays at its "" default
+  so the module writes no competing AGENTS.md),
   `machine-vault-git.nix` (per-host options: repo-scoped machine-vault PAT
   credential helper + companion clone-if-missing),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
