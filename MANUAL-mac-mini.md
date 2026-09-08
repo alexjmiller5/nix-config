@@ -105,6 +105,13 @@ the tailnet ACL so tagged devices are approved automatically:
   `screencapture`, click/type with System Events, and can dismiss later
   dialogs themselves; only these grants and anything asking for the admin
   password stay human.
+* **moshi-hook (Moshi phone-terminal agent daemon)**: the brew formula and
+  its launchd service are declared; pairing is a secret handshake done once
+  over ssh: Moshi app → Settings → Hooks → copy the pairing token, then
+  `moshi-hook pair --token <token>`. Do NOT run `moshi-hook install` as-is:
+  `~/.claude/settings.json` is a read-only nix symlink here, so instead run
+  `HOME=$(mktemp -d) moshi-hook install` and port the hook entries it writes
+  into agent-config `claude/settings.json` (an agent can do this step).
 * **1Password CLI account (for `op-unlock`)**: once, over ssh, register the
   account on this machine so `op signin` works headlessly (no desktop app on
   the mini): `op account add --address my.1password.com --email <1P email>`

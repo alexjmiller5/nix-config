@@ -82,10 +82,25 @@ in
       name = "steipete/tap";
       trusted = true;
     }
+    {
+      name = "rjyo/moshi";
+      trusted = true;
+    }
   ];
-  # iMessage CLI - the people-sync SMS-code command reads texted 2FA codes
-  # from this Mac's Messages (it is signed in). Not in nixpkgs.
-  homebrew.brews = [ "steipete/tap/imsg" ];
+  homebrew.brews = [
+    # iMessage CLI - the people-sync SMS-code command reads texted 2FA codes
+    # from this Mac's Messages (it is signed in). Not in nixpkgs.
+    "steipete/tap/imsg"
+    # Moshi (phone terminal) agent daemon: surfaces Claude Code sessions on
+    # this Mac in the Moshi app (inbox, waiting-state pushes, diffs). Runs as
+    # a brew launchd service. One-time pairing + hook install in
+    # MANUAL-mac-mini.md §6; the Claude Code hooks it wants live in
+    # agent-config's settings.json (nix-managed, read-only here).
+    {
+      name = "rjyo/moshi/moshi-hook";
+      start_service = true;
+    }
+  ];
 
   # GUI apps that aren't packaged well in nixpkgs on macOS.
   homebrew.casks = [

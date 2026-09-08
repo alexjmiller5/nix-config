@@ -34,7 +34,10 @@ let
       mkdir -p $out/libexec/wacli
       install -m755 wacli $out/libexec/wacli/wacli
     '';
-    meta.platforms = [ "aarch64-darwin" "x86_64-darwin" ];
+    meta.platforms = [
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
   };
 in
 {
