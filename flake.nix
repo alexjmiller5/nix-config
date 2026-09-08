@@ -18,6 +18,8 @@
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
     # Weekly iMessage sticker sync into Documents (nix-darwin module).
     sticker-sync.url = "github:alexjmiller5/sticker-sync";
+    # Daily social-profile scraping into life-data on the mini (nix-darwin module).
+    people-sync.url = "github:alexjmiller5/people-sync";
     # age-encrypted secrets, decrypted at activation via the host SSH key.
     # darwin + home-manager follows: without them agenix pins its own copies
     # (they showed up in flake.lock as darwin / home-manager_2).
@@ -95,6 +97,7 @@
             inputs.screentime-backup.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
+            inputs.people-sync.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {

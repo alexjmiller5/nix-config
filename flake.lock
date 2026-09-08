@@ -283,6 +283,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1788746152,
+        "narHash": "sha256-RaKngusl5I8pNi8RfrVvsHq3NZe7eFWzDlb01+hEVqY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "42f17a57f4f6e33b3de3dca0a2a5ea5233169d02",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1784115452,
         "narHash": "sha256-BoYPdqk6jlKXy+DyUzyGV/CtRGfAhk2MmIgBhsemTGI=",
         "owner": "NixOS",
@@ -294,6 +310,24 @@
         "owner": "NixOS",
         "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "people-sync": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1788828714,
+        "narHash": "sha256-/QmKsDnusZE5CIqB7ONVBtUthWR2sK0gaOmJ1aALnBg=",
+        "owner": "alexjmiller5",
+        "repo": "people-sync",
+        "rev": "9e5b9f2bac6ec6fa8383ad5da56410f7d4af18b6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "people-sync",
         "type": "github"
       }
     },
@@ -362,6 +396,7 @@
         "nix-openclaw-tools": "nix-openclaw-tools",
         "nix-vscode-extensions": "nix-vscode-extensions",
         "nixpkgs": "nixpkgs",
+        "people-sync": "people-sync",
         "screentime-backup": "screentime-backup",
         "sticker-sync": "sticker-sync",
         "workspace-snapshot": "workspace-snapshot"
@@ -384,7 +419,7 @@
     },
     "sticker-sync": {
       "inputs": {
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "pyproject-build-systems": "pyproject-build-systems",
         "pyproject-nix": "pyproject-nix",
         "uv2nix": "uv2nix"
