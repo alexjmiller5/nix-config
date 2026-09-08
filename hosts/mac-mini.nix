@@ -156,6 +156,11 @@ in
       export PEOPLE_SYNC_CREDENTIAL_COMMAND='${peopleSyncCredential} "$1"'
       export PEOPLE_SYNC_SMS_CODE_COMMAND='${peopleSyncSmsCode} "$1"'
       export PEOPLE_SYNC_EMAIL_CODE_COMMAND='${peopleSyncEmailCode} "$1"'
+      # R2 photo uploads: the project ENV item, read with the same CI token.
+      ci="$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \
+        ${op} read '${peopleSyncCiTokenRef}')"
+      export CF_API_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/CF_API_TOKEN')"
+      unset ci
       state="$HOME/.local/state/people-sync"
       mkdir -p "$state"
       cd "$state"
