@@ -173,11 +173,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788822855,
-        "narHash": "sha256-Ra+eOa/b+vbkDH0z+G9FMEbW2wI8HeoC8WVv+4u0sv8=",
+        "lastModified": 1788843288,
+        "narHash": "sha256-BZrjux/h5s+HtTGFswno/Z/CY3BZFnIqDjPSHxat/qc=",
         "owner": "alexjmiller5",
         "repo": "life-data",
-        "rev": "2ce2aea40a7b4b11bf4c3ab57a5fc43979513e19",
+        "rev": "cfaceb6bcf48ee36caa3ebd241a793198e9f0127",
         "type": "github"
       },
       "original": {
