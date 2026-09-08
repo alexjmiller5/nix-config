@@ -122,8 +122,10 @@ the tailnet ACL so tagged devices are approved automatically:
 * **1Password CLI account (for `op-unlock`)**: once, over ssh, register the
   account on this machine so `op signin` works headlessly (no desktop app on
   the mini): `op account add --address my.1password.com --email <1P email>`
-  — it prompts for the Secret Key and account password (both in the
-  "1Password Account" item, Personal vault). Afterwards `op-unlock [hours]`
+  — it prompts for the Secret Key and account password (password: the
+  "1Password Account" item, Personal vault; Secret Key: 1Password app →
+  account name in the sidebar → Manage Accounts → the account → Set Up
+  Another Device, or the Emergency Kit PDF). Afterwards `op-unlock [hours]`
   from any ssh shell (phone terminal included) gives agent sessions
   time-boxed Personal-vault reads via `op-personal`; `op-unlock lock` ends
   it, `op-unlock status` checks.
