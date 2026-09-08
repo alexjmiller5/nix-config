@@ -398,22 +398,43 @@
         "nixpkgs": "nixpkgs",
         "people-sync": "people-sync",
         "screentime-backup": "screentime-backup",
+        "screentime-dashboard": "screentime-dashboard",
         "sticker-sync": "sticker-sync",
         "workspace-snapshot": "workspace-snapshot"
       }
     },
     "screentime-backup": {
       "locked": {
-        "lastModified": 1787765672,
-        "narHash": "sha256-829QKhvJF1I6TtGNt7AqLPXBwi2dtQE6knU/1fEzrpU=",
+        "lastModified": 1788849821,
+        "narHash": "sha256-4sYSzZ7Lkyi0RL5VqjA82c80Tj1ZGZ14FdSnI7aV8fc=",
         "owner": "alexjmiller5",
         "repo": "screentime-backup",
-        "rev": "85a0e5b00c1d02a8dc9a0134e2e25f1780cc13b0",
+        "rev": "c6128b1c9c2f0aea9f529ef5f568a66a7719b7bb",
         "type": "github"
       },
       "original": {
         "owner": "alexjmiller5",
         "repo": "screentime-backup",
+        "type": "github"
+      }
+    },
+    "screentime-dashboard": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788852348,
+        "narHash": "sha256-VaZdlNAJ7Yw4NOamrept4TtUXLThMyUmX26+HdadMPU=",
+        "owner": "alexjmiller5",
+        "repo": "screentime-dashboard",
+        "rev": "fd06e23d0861e084d585ce752871f8f3b8b474b1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "screentime-dashboard",
         "type": "github"
       }
     },
