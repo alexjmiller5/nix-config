@@ -91,6 +91,20 @@ the tailnet ACL so tagged devices are approved automatically:
   `launchctl kickstart -k gui/$(id -u)/com.alexmiller.screentime-backup` (and
   `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
   `backup OK` lines (a `cannot read` line means the grant is missing).
+* **See + click the screen from ssh (agents)**: every ssh-spawned process is
+  attributed by TCC to `/usr/libexec/sshd-keygen-wrapper`, so grant that ONE
+  binary, via Screen Sharing: System Settings → Privacy & Security →
+  **Screen Recording** → \[+] → ⌘⇧G → `/usr/libexec/sshd-keygen-wrapper`,
+  toggle on; same under **Accessibility**. Then from an ssh shell run
+  `osascript -e 'tell application "System Events" to get name of every process'`
+  once and click **Allow** on the "sshd-keygen-wrapper wants to control
+  System Events" dialog that appears on the mini's display. Verify:
+  `screencapture -x /tmp/s.png && file /tmp/s.png` (a real PNG, not black)
+  and `osascript -e 'tell application "System Events" to click at {10, 10}'`
+  (no -1719/-1743 error). After this, agents screenshot with
+  `screencapture`, click/type with System Events, and can dismiss later
+  dialogs themselves; only these grants and anything asking for the admin
+  password stay human.
 * **1Password CLI account (for `op-unlock`)**: once, over ssh, register the
   account on this machine so `op signin` works headlessly (no desktop app on
   the mini): `op account add --address my.1password.com --email <1P email>`
