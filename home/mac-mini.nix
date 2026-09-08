@@ -119,43 +119,7 @@ in
     tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
   };
 
-  # Remote-control Claude Code sessions, managed from an ssh shell (phone
-  # terminal app / laptop). The session lives in detached /usr/bin/screen
-  # from ~/Desktop (a trusted dir — trust for ~ itself never persists), so it
-  # survives the ssh connection ending; interact via Remote Control in the
-  # Claude app. Auth = claude's own login state; if a session comes up logged
-  # out (keychain ACL breaks on cask upgrades), run claude over ssh and
-  # /login once — creds then land in ~/.claude/.credentials.json. Stop is
-  # pkill on claude, not `screen -X quit`: macOS screen orphans the child on
-  # quit.
   home.packages = [
-    (pkgs.writeShellApplication {
-      name = "claude-rc";
-      text = ''
-        pattern='claude --remote[-]control'
-        case "''${1:-}" in
-          start)
-            /usr/bin/screen -wipe >/dev/null 2>&1 || true
-            if /usr/bin/pgrep -f "$pattern" >/dev/null; then echo "already running"; exit 0; fi
-            # shellcheck disable=SC2016 # $HOME/$USER expand in the child zsh, not here
-            # claude resolved from PATH (nix profiles first, then brew) so this
-            # survives the install method changing — today it's the brew cask.
-            /usr/bin/screen -dmS claude-rc /bin/zsh -c 'export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:/opt/homebrew/bin:$PATH"; cd "$HOME/Desktop" && exec claude --remote-control'
-            echo "started - open Remote Control in the Claude app"
-            ;;
-          stop)
-            /usr/bin/pkill -f "$pattern" && echo "stopped" || echo "no session running"
-            ;;
-          status)
-            /usr/bin/pgrep -f "$pattern" >/dev/null && echo "running" || echo "not running"
-            ;;
-          *)
-            echo "usage: claude-rc start|stop|status" >&2
-            exit 1
-            ;;
-        esac
-      '';
-    })
     # Time-boxed Personal-vault access for agents on the headless mini. No
     # desktop app here, so Touch ID isn't an option: Alex runs `op-unlock`
     # from an ssh shell (phone terminal), types his 1Password account password,
