@@ -157,8 +157,8 @@ in
     # and the resulting CLI session token is written to
     # ~/.local/state/op/personal-session (0600). The op-personal shell
     # function (home/zsh.nix) uses that token when the file exists, so agent
-    # sessions read Personal exactly as they do on the laptop. A detached
-    # screen keepalive touches the session every 20 min (op sessions die
+    # sessions read Personal exactly as they do on the laptop. A transient
+    # launchd keepalive touches the session every 20 min (op sessions die
     # after 30 idle minutes) and after N hours (default 6) signs out
     # server-side and deletes the file. No secrets ever touch disk - only the
     # session token, which the sign-out invalidates. One-time prerequisite:
@@ -180,7 +180,7 @@ in
             rm -f "$f"
             ;;
           lock)
-            /usr/bin/screen -S op-unlock -X quit >/dev/null 2>&1 || true
+            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
             if [ -r "$f" ]; then
               op --session "$(cat "$f")" signout >/dev/null 2>&1 || true
               rm -f "$f"; echo "locked"
@@ -198,11 +198,13 @@ in
           ""|[0-9]*)
             hours="''${1:-6}"
             umask 077; mkdir -p "$state"
-            /usr/bin/screen -S op-unlock -X quit >/dev/null 2>&1 || true
+            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
             # Prompts for the account password on this tty; --raw prints the token.
             env -u OP_SERVICE_ACCOUNT_TOKEN op signin --raw > "$f.tmp"
             mv "$f.tmp" "$f"
-            /usr/bin/screen -dmS op-unlock "$0" keepalive "$hours"
+            # Transient launchd job, not screen/nohup: macOS kills those with
+            # the ssh session that started them (the phone terminal closing).
+            /bin/launchctl submit -l com.alexmiller.op-unlock -- "$0" keepalive "$hours"
             echo "unlocked for ''${hours}h - agents can read Personal via op-personal; op-unlock lock to end early"
             ;;
           *)
