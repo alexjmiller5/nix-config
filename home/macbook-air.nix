@@ -70,6 +70,11 @@ in
   # skill's Tier 2); each connection still needs a manual "Allow" click.
   chrome.remoteDebugging.enable = true;
 
+  # Where agents run their browser: the mini's shared agent Chrome
+  # (hosts/mac-mini.nix services.agent-chrome), never this laptop's - the
+  # chrome-control skill reads this and drives it over an ssh port-forward.
+  home.sessionVariables.CHROME_CONTROL_HOST = "mac-mini-tailscale";
+
   # Tab Copy's custom "URL Format" (urls only, newline-delimited) — lives in
   # the extension's chrome.storage.local, wiped on reinstall. Captured from a
   # live plyvel dump 2026-08-18; edit here (or re-dump) after UI changes,

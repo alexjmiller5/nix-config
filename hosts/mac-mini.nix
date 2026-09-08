@@ -142,6 +142,9 @@ in
   services.agent-chrome = {
     enable = true;
     user = username;
+    # Claude in Chrome: the tabGroups-capable extension chrome-control's
+    # cdp-group.mjs drives to put each agent session in its own tab group.
+    extensions = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
   };
 
   # people-sync on this Mac: an ad-hoc tool an agent drives with Alex in the

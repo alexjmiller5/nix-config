@@ -48,9 +48,26 @@ in
       default = [ ];
       description = "Additional Chrome command-line flags.";
     };
+
+    extensions = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
+      description = ''
+        Chrome Web Store extension ids force-installed through the
+        ExtensionInstallForcelist policy (browser-wide: every Chrome profile
+        on this machine, the agent one included). Chrome 137+ dropped
+        --load-extension, so this is the declarative way to give the agent
+        browser an extension - e.g. one holding the tabGroups permission,
+        which CDP lacks (chrome-control's cdp-group.mjs borrows it).
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    system.defaults.CustomUserPreferences."com.google.Chrome".ExtensionInstallForcelist =
+      lib.mkIf (cfg.extensions != [ ]) (map (id: "${id};https://clients2.google.com/service/update2/crx") cfg.extensions);
+
     system.activationScripts.postActivation.text = lib.mkAfter ''
       /bin/mkdir -p ${lib.escapeShellArg cfg.dataDir}
       /usr/sbin/chown ${lib.escapeShellArg cfg.user} ${lib.escapeShellArg cfg.dataDir}
