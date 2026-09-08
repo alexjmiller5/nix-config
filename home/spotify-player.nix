@@ -1,18 +1,73 @@
-{ ... }:
+{ pkgs, ... }:
 
 # spotify-player (TUI + scripting CLI, binary: spotify_player) via the native
-# HM module — package + ~/.config/spotify-player/app.toml in one place.
+# HM module - package + ~/.config/spotify-player/app.toml in one place.
 # Laptop-personal: a music player has no place in the work-exportable list.
 # Option docs: https://github.com/aome510/spotify-player/blob/master/docs/config.md
+#
+# The binary on PATH is an op-authed wrapper (same family as op-wrappers.nix;
+# the raw package stays out of home.packages so PATH order can't bypass it).
+# spotify_player's whole auth state is one file, credentials.json (a librespot
+# reusable-credentials blob, account-bound, not machine-bound), so the wrapper
+# keeps it in the "AI Agent Spotify Player Credentials" item and hands it to
+# the binary via a per-invocation mktemp cache folder (-C) that is removed on
+# exit - nothing credential-shaped persists, and every machine is authed the
+# moment the item is. If the run changes the blob (a first
+# `spotify_player authenticate`, or librespot rotating it) the wrapper writes
+# it back, so `authenticate` through the wrapper IS the one-time bootstrap -
+# no per-machine step. The persistent cache dir bought nothing here
+# (cover_img_length = 0, audio_cache = false). Caller-set -C/--cache-folder
+# bypasses the round-trip.
+# ponytail: -d (daemon) would lose the tmp cache when the parent exits; no
+# daemon is declared today - give it a persistent -C if one ever is.
+let
+  vault = "4eeyrkqibibn7k4j6rz2fbzvxm"; # AI Agent
+  item = "et2pkys6ffiobdbjshnz3xenpy"; # AI Agent Spotify Player Credentials
+  wrapped = pkgs.writeShellApplication {
+    name = "spotify_player";
+    runtimeInputs = [
+      pkgs._1password-cli
+      pkgs.coreutils
+    ];
+    text = ''
+      for a in "$@"; do
+        case "$a" in
+          -C | --cache-folder | --cache-folder=*) exec ${pkgs.spotify-player}/bin/spotify_player "$@" ;;
+        esac
+      done
+      ${builtins.readFile ./agent-detect.sh}
+      ${builtins.readFile ./agent-op-env.sh}
+      cache="$(mktemp -d "''${TMPDIR:-/tmp}/spotify-player-XXXXXX")"
+      trap 'rm -rf "$cache"' EXIT
+      creds="$cache/credentials.json"
+      if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+        op read 'op://${vault}/${item}/credential' > "$creds" 2>/dev/null || true
+      fi
+      # Placeholder (CHANGEME) or unreadable → start unauthenticated; the
+      # binary then says so, or `authenticate` mints a blob we write back.
+      if ! grep -q auth_data "$creds" 2>/dev/null; then rm -f "$creds"; fi
+      before="$( { [ -f "$creds" ] && sha256sum "$creds"; } | cut -d' ' -f1 || true)"
+      set +e
+      ${pkgs.spotify-player}/bin/spotify_player -C "$cache" "$@"
+      rc=$?
+      set -e
+      if [ -s "$creds" ] && [ "$(sha256sum "$creds" | cut -d' ' -f1)" != "$before" ]; then
+        if ! op item edit ${item} --vault ${vault} "credential[concealed]=$(cat "$creds")" >/dev/null 2>&1; then
+          echo "spotify_player wrapper: WARNING - credentials changed but could not be written back to 1Password (op unauthenticated or rate-limited?); this machine will be unauthenticated again next run" >&2
+        fi
+      fi
+      exit "$rc"
+    '';
+  };
+in
 {
   programs.spotify-player = {
     enable = true;
+    package = wrapped;
 
     settings = {
       theme = "dracula";
-      client_id = "d420a117a32841c2b3474932e49fb54b";
       client_port = 8080;
-      login_redirect_uri = "http://127.0.0.1:8989/login";
       playback_format = ''
         {status} {track} • {artists} {liked}
         {album} • {genres}
