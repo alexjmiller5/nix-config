@@ -127,6 +127,8 @@ in
   homebrew.casks = [
     # @latest tracks releases faster than the plain cask; fable-5-1 needs >= 2.1.251
     "claude-code@latest"
+    # nixpkgs lags upstream by several releases; see home/codex.nix.
+    "codex"
     # ntn — home/ai-agent.nix's host-layer sibling (not in nixpkgs).
     "notion-cli"
     # Browser for agent-driven web work (chrome-control / web-recon).

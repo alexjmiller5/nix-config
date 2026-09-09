@@ -1,4 +1,9 @@
-{ config, ... }:
+{
+  claude-plugin-ponytail,
+  claude-plugin-superpowers,
+  config,
+  ...
+}:
 
 # Codex CLI - the ChatGPT-subscription seat. Claude Code keeps the Claude
 # seat: Anthropic prohibits third-party tools from using Free/Pro/Max OAuth
@@ -20,11 +25,27 @@ in
   programs.codex = {
     enable = true;
 
+    # The MODULE only, not the binary: nixpkgs lags upstream badly (0.149.0 vs
+    # 0.153.4 at the time of writing, and hooks only ship enabled by default
+    # from 0.150.1). The cask tracks upstream, so codex comes from homebrew on
+    # both hosts and `package = null` keeps this module doing what it is
+    # actually here for - generating ~/.codex/hooks.json. Same reasoning as
+    # claude-code@latest.
+    package = null;
+
     # OFF deliberately: it would inject mcp_servers into `settings`, which
     # makes the module write ~/.codex/config.toml back into the store. Codex
     # must own that file (see below), so the MCP entry is seeded into the
     # agent-config copy instead.
     enableMcpIntegration = false;
+
+    # Install the same portable plugin bundles Claude loads from the shared
+    # skills tree. Their skills remain shared through ~/.agents/skills; native
+    # Codex installation additionally activates plugin lifecycle hooks.
+    plugins = [
+      claude-plugin-ponytail
+      claude-plugin-superpowers
+    ];
 
     # settings deliberately EMPTY so home-manager writes no ~/.codex/config.toml.
     # Codex must be able to write that file: it persists hook trust and project
@@ -34,10 +55,8 @@ in
     # agent-config-links.nix) - the same arrangement .claude/settings.json
     # already uses for a config its app writes to.
     #
-    # The declarative settings (approval_policy, sandbox_mode, agents.enabled,
-    # mcp_servers, project trust) currently live in that seeded file. Once the
-    # shape Codex writes for hook trust is known, they can move back into nix
-    # with that shape baked in.
+    # The declarative settings, plugin enablement, MCP servers, and persisted
+    # trust state live in that seeded file.
     settings = { };
 
     # AGENTS.md's deny-list, as closely as Codex's hook API allows. The script
@@ -62,6 +81,98 @@ in
             command = "${hooksDir}/guard.sh";
             timeout = 10;
             statusMessage = "Checking command against deny-list";
+          }
+        ];
+      }
+      {
+        matcher = "^(exec|local_shell|exec_command|shell_command|shell|bash)$";
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/op-item-conventions.sh";
+            timeout = 10;
+            statusMessage = "Loading 1Password conventions";
+          }
+        ];
+      }
+      {
+        matcher = "^request_user_input$";
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+            async = true;
+          }
+        ];
+      }
+    ];
+
+    hooks.PostToolUse = [
+      {
+        matcher = "^request_user_input$";
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+            async = true;
+          }
+        ];
+      }
+    ];
+
+    hooks.SessionStart = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+            async = true;
+          }
+        ];
+      }
+    ];
+
+    hooks.PermissionRequest = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+          }
+        ];
+      }
+    ];
+
+    hooks.SessionEnd = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+          }
+        ];
+      }
+    ];
+
+    hooks.Stop = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+            async = true;
+          }
+        ];
+      }
+    ];
+
+    hooks.UserPromptSubmit = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/moshi-hook.sh";
+            async = true;
           }
         ];
       }

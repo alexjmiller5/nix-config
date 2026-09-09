@@ -8,8 +8,8 @@ routing table and workflow; this file is the in-repo map.
 ## Layout
 
 * `flake.nix` — `mkHost { host, home }`; exports `homeModules.*` for external
-  flakes (planned work-laptop config pins this repo); `formatter` = nixfmt
-  (RFC 166 — `just fmt`)
+  flakes (planned work-laptop config pins this repo); `formatter` = nixfmt-tree
+  (`just fmt`)
 * `hosts/*.nix` — system layer DIFFS from `modules/darwin-base.nix`: brew
   taps/brews/casks/masApps (zap cleanup: the lists ARE the machine), power,
   per-host defaults
@@ -17,9 +17,11 @@ routing table and workflow; this file is the in-repo map.
   `git.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
-  `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog,
-  gcloud, wrangler - AI Agent vault creds in every context, read per call so nothing
-  credential-shaped touches disk. Deliberately NOT cached: 1Password's
+  `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog, wacli,
+  wrangler, gcloud, ntn - AI Agent vault creds in every context, read per call
+  so nothing credential-shaped touches disk. Every op call in the family sits
+  behind `op_has_auth` (agent-op-env.sh) - with no auth source at all, op
+  prompts on /dev/tty and hangs headless callers. Deliberately NOT cached: 1Password's
   1000-requests/24h cap is per-1Password-account, and the answer to hitting
   it is switching to desktop auth, not persisting secrets locally - see the
   `1password` skill's rate-limit protocol),

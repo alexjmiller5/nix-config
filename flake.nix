@@ -143,7 +143,7 @@
     in
     {
       # RFC 166 formatting: `nix fmt` (also `just fmt`).
-      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt;
+      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-tree;
 
       darwinConfigurations."mac-mini" = mkHost {
         host = ./hosts/mac-mini.nix;

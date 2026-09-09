@@ -74,7 +74,7 @@ let
       trap 'rm -rf "$cache"' EXIT
       creds="$cache/credentials.json"
       cid=""
-      if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+      if op_has_auth; then
         item="$(op item get ${item} --vault ${vault} --format json 2>/dev/null || true)"
         cid="$(op read 'op://${vault}/${clientItem}/client_id' 2>/dev/null || true)"
         jq -r '[.fields[] | select(.label == "credential")][0].value // empty' <<<"$item" > "$creds"

@@ -32,6 +32,7 @@ switch-laptop:
 check:
     nix flake check
     bash tests/agent-detect.sh
+    bash tests/op-auth-guard.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
 

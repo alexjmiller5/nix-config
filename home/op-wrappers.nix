@@ -7,10 +7,13 @@
 # `op read` at call time — nothing credential-shaped ever touches disk.
 #
 # Shared shape: caller-set env vars win → agent-detect.sh maps agent CLIs to
-# AGENT_SHELL → agent-op-env.sh arms the SA token in agent contexts → op
-# read (desktop-app auth, Touch ID, in Alex's own terminals) → exec the real
-# binary. Both seams are interpolated (builtins.readFile) because wrapper
-# callers may skip zshrc entirely.
+# AGENT_SHELL → agent-op-env.sh arms the SA token in agent contexts and
+# defines op_has_auth → op read (desktop-app auth, Touch ID, in Alex's own
+# terminals) → exec the real binary. Both seams are interpolated
+# (builtins.readFile) because wrapper callers may skip zshrc entirely.
+# EVERY op call in here sits behind op_has_auth: with no auth source at all
+# (Alex's own ssh shells on the mini) op prompts on /dev/tty and hangs
+# headless callers, and 2>/dev/null does not suppress a prompt.
 #
 # Exported via homeModules; consumers must pass `nix-openclaw-tools` through
 # extraSpecialArgs (for gog).
@@ -51,11 +54,7 @@ in
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
-          # SA token → headless; otherwise desktop-app auth (Touch ID).
-          # No auth source at all (Alex's own ssh shells on the mini): skip —
-          # op read would prompt "add an account?" on /dev/tty and
-          # hang/garble headless callers.
-          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+          if op_has_auth; then
             GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
             if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
           fi
@@ -78,7 +77,7 @@ in
         if [ -z "''${MODAL_TOKEN_ID:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
-          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+          if op_has_auth; then
             MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id' 2>/dev/null || true)"
             MODAL_TOKEN_SECRET="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret' 2>/dev/null || true)"
             if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
@@ -126,7 +125,10 @@ in
         fi
         ${builtins.readFile ./agent-detect.sh}
         ${builtins.readFile ./agent-op-env.sh}
-        item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json 2>/dev/null || true)"
+        item=""
+        if op_has_auth; then
+          item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json 2>/dev/null || true)"
+        fi
         if [ -n "$item" ]; then
           at="$(jq -r '[.fields[] | select(.label == "access_token")][0].value // empty' <<<"$item")"
           exp="$(jq -r '[.fields[] | select(.label == "expires_at")][0].value // empty' <<<"$item")"
@@ -189,7 +191,7 @@ in
         fi
         ${builtins.readFile ./agent-detect.sh}
         ${builtins.readFile ./agent-op-env.sh}
-        if [ -z "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -z "$(op account list 2>/dev/null)" ]; then
+        if ! op_has_auth; then
           echo "wacli wrapper: no 1Password auth in this shell - the linked-device session lives in 1Password, refusing to run without it" >&2
           exit 1
         fi
@@ -250,7 +252,7 @@ in
         if [ -z "''${CLOUDFLARE_API_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
-          if [ -n "''${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]; then
+          if op_has_auth; then
             CLOUDFLARE_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/mxxpo6neiz3grdyrjj7rv7nume/credential' 2>/dev/null || true)"
             if [ -n "$CLOUDFLARE_API_TOKEN" ]; then export CLOUDFLARE_API_TOKEN; fi
           fi
@@ -274,10 +276,33 @@ in
         ${builtins.readFile ./agent-op-env.sh}
         keyfile="$(mktemp "''${TMPDIR:-/tmp}/gcloud-key-XXXXXX")"
         trap 'rm -f "$keyfile"' EXIT
-        if op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/iqywn6he6twhyonw3fhnqmot5i/credential' > "$keyfile" 2>/dev/null && [ -s "$keyfile" ]; then
+        if op_has_auth && op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/iqywn6he6twhyonw3fhnqmot5i/credential' > "$keyfile" 2>/dev/null && [ -s "$keyfile" ]; then
           export CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE="$keyfile"
         fi
         ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
+      '';
+    })
+
+    # ntn (Notion CLI), ALWAYS authed via 1Password (the AI Agent Notion
+    # internal-integration secret). NOTION_API_TOKEN overrides ntn's own
+    # workspace login, which is deliberately never established — without this
+    # wrapper every caller had to paste the op:// ref out of a skill.
+    # The binary is a Homebrew cask (not in nixpkgs), so this execs it by
+    # absolute path; the nix profile sorts ahead of Homebrew on PATH, so
+    # plain `ntn` resolves to this wrapper.
+    (pkgs.writeShellApplication {
+      name = "ntn";
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        if [ -z "''${NOTION_API_TOKEN:-}" ]; then
+          ${builtins.readFile ./agent-detect.sh}
+          ${builtins.readFile ./agent-op-env.sh}
+          if op_has_auth; then
+            NOTION_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/nhsh73sfidj4cdowvbaayaq7tq/credential' 2>/dev/null || true)"
+            if [ -n "$NOTION_API_TOKEN" ]; then export NOTION_API_TOKEN; fi
+          fi
+        fi
+        exec "''${HOMEBREW_PREFIX:-/opt/homebrew}/bin/ntn" "$@"
       '';
     })
   ];

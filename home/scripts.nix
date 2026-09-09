@@ -11,13 +11,11 @@ in
 {
   home.packages = [
     # Notion data-source schema (2026-03-11 API; the old /v1/databases/ query
-    # endpoint is dead). Token = AI Agent integration, by 1P IDs.
+    # endpoint is dead). Auth comes from the ntn wrapper (op-wrappers.nix).
     (script "notiondbprops" {
       text = ''
         [ $# -eq 1 ] || { echo "Usage: notiondbprops <data-source-id>"; exit 1; }
-        curl -s "https://api.notion.com/v1/data_sources/$1" \
-          -H "Authorization: Bearer $(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/nhsh73sfidj4cdowvbaayaq7tq/credential')" \
-          -H "Notion-Version: 2026-03-11"
+        exec ntn api "v1/data_sources/$1"
       '';
     })
 

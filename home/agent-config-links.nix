@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 
 # The agent-config fan-out, shared by every host: live symlinks from the
 # agent homes into the agent-config working clone at ~/.config/agent-config
@@ -26,6 +26,9 @@ in
     ".codex/hooks".source = mkLink "${agentConfig}/codex/hooks";
     # Writable on purpose: Codex persists hook/project trust into config.toml,
     # and a store copy makes that fail. Its writes land as a git diff here.
-    ".codex/config.toml".source = mkLink "${agentConfig}/codex/config.toml";
+    # programs.codex also derives plugin cache entries from its native plugin
+    # option. Keep the writable agent-config file authoritative for settings
+    # and Codex's persisted trust state while retaining that plugin wiring.
+    ".codex/config.toml".source = lib.mkForce (mkLink "${agentConfig}/codex/config.toml");
   };
 }
