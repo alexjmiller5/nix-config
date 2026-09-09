@@ -24,5 +24,8 @@ in
     # deny-list guard that home/codex.nix registers.
     ".codex/AGENTS.md".source = mkLink "${agentConfig}/AGENTS.md";
     ".codex/hooks".source = mkLink "${agentConfig}/codex/hooks";
+    # Writable on purpose: Codex persists hook/project trust into config.toml,
+    # and a store copy makes that fail. Its writes land as a git diff here.
+    ".codex/config.toml".source = mkLink "${agentConfig}/codex/config.toml";
   };
 }

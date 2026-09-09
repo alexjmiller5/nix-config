@@ -20,54 +20,25 @@ in
   programs.codex = {
     enable = true;
 
-    # Merges programs.mcp.servers (mcp.nix) into config.toml's mcp_servers,
-    # which is exactly the integration mcp.nix's header promises.
-    enableMcpIntegration = true;
+    # OFF deliberately: it would inject mcp_servers into `settings`, which
+    # makes the module write ~/.codex/config.toml back into the store. Codex
+    # must own that file (see below), so the MCP entry is seeded into the
+    # agent-config copy instead.
+    enableMcpIntegration = false;
 
-    settings = {
-      # Mirrors Claude Code's bypassPermissions posture - Alex drives these
-      # sessions interactively and reviews at the shell. "untrusted" is the
-      # conservative dial if Codex ever runs somewhere less supervised.
-      approval_policy = "on-request";
-      sandbox_mode = "danger-full-access";
-
-      # Trust is DECLARED, never persisted. config.toml is a read-only store
-      # file, so Codex cannot write a trust decision at runtime - it fails with
-      # `config/batchWrite failed`. Declaring the roots here is the right end
-      # state anyway: same reason nothing else on these machines is configured
-      # imperatively. A new root that needs trusting gets a line here, not a
-      # click. Trust is per project root, so the roots are listed explicitly
-      # rather than relying on inheritance from $HOME.
-      projects = builtins.listToAttrs (
-        map (dir: {
-          name = "${config.home.homeDirectory}${dir}";
-          value.trust_level = "trusted";
-        }) [
-          ""
-          "/Desktop"
-          "/Desktop/coding"
-          "/Desktop/coding/active-projects"
-          "/Desktop/coding/templates"
-          "/Desktop/coding/misc-scripts"
-          "/.config/nix-config"
-          "/.config/agent-config"
-          "/.config/agent-config-public"
-        ]
-      );
-
-      # Same reasoning for hooks: Codex otherwise wants to persist a
-      # `trusted_hash` for each hook into that same read-only file. There is no
-      # untrusted-hook risk to gate here - the only hook is the deny-list guard
-      # this module itself declares, out of the git-managed agent-config clone.
-      bypass_hook_trust = true;
-
-      # superpowers' subagent skills (dispatching-parallel-agents,
-      # subagent-driven-development) need the multi-agent tools.
-      # NB: superpowers' own Codex reference calls this `features.multi_agent`;
-      # the current vendor config reference calls it `agents.enabled`. The
-      # vendor reference wins - revisit if spawn_agent turns up missing.
-      agents.enabled = true;
-    };
+    # settings deliberately EMPTY so home-manager writes no ~/.codex/config.toml.
+    # Codex must be able to write that file: it persists hook trust and project
+    # trust there, and a read-only store copy makes both fail with
+    # `config/batchWrite failed ... failed to persist config.toml`. The file is
+    # instead an out-of-store symlink into agent-config (see
+    # agent-config-links.nix) - the same arrangement .claude/settings.json
+    # already uses for a config its app writes to.
+    #
+    # The declarative settings (approval_policy, sandbox_mode, agents.enabled,
+    # mcp_servers, project trust) currently live in that seeded file. Once the
+    # shape Codex writes for hook trust is known, they can move back into nix
+    # with that shape baked in.
+    settings = { };
 
     # AGENTS.md's deny-list, as closely as Codex's hook API allows. The script
     # is reached through the ~/.codex/hooks symlink so it stays editable in
