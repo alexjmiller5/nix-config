@@ -34,6 +34,10 @@
 
     # Goes to .zshenv (read by every shell, incl. non-interactive).
     envExtra = ''
+      # SSH Match rules need the agent marker even in noninteractive tool
+      # shells. Wrappers reuse this same detection for direct process spawns.
+      source ${./agent-detect.sh}
+
       # uv-installed tools
       export PATH="$HOME/.local/bin:$PATH"
     '';
@@ -81,15 +85,6 @@
       # gh/gcloud/gog/modal op auth: PATH-level wrappers (op-wrappers.nix)
       # inject tokens via op read in EVERY context — the old interactive-only
       # `op plugin run` aliases (~/.config/op/plugins.sh) are retired.
-
-      # Agent-shell detection: agent-detect.sh is the ONE place that maps
-      # per-agent raw vars -> AGENT_SHELL (the agent-agnostic seam everything
-      # downstream gates on). The gh/gcloud/gog/modal PATH wrappers
-      # interpolate the same file, so their callers that skip zshrc
-      # (agent-core direct spawns, launchd) are covered too. Adding a new
-      # agent CLI = one line in that file. (Headless op auth lives elsewhere:
-      # shell-init.sh per Bash call, agent-op-env.sh in the wrappers.)
-      source ${./agent-detect.sh}
 
       # Agent shells: SA-authed op can't reach the Personal vault; op-personal
       # strips the token so op falls back to desktop-app auth. Agents RUN this

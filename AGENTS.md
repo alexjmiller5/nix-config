@@ -16,7 +16,8 @@ routing table and workflow; this file is the in-repo map.
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
   `git.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
-  `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
+  `zsh.nix` (full shell + starship; agent detection runs in `.zshenv` so
+  noninteractive tool shells select the dedicated SSH agent), `aliases/{dev,ai,infra}`,
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog, wacli,
   wrangler, gcloud, ntn - AI Agent vault creds in every context, read per call
   so nothing credential-shaped touches disk. Every op call in the family sits
