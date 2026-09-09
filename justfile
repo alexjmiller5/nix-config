@@ -31,6 +31,7 @@ switch-laptop:
 # Validate the flake
 check:
     nix flake check
+    bash tests/agent-detect.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
 

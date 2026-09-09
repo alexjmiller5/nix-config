@@ -7,4 +7,6 @@
 # Alex's own terminals set none of these vars, so this no-ops there.
 if [ -z "${AGENT_SHELL:-}" ] && [ -n "${CLAUDECODE:-}${CLAUDE_CODE_ENTRYPOINT:-}" ]; then
   export AGENT_SHELL=claude
+elif [ -z "${AGENT_SHELL:-}" ] && [ -n "${CODEX_SESSION_ID:-}" ]; then
+  export AGENT_SHELL=codex
 fi
