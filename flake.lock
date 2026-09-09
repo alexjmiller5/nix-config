@@ -405,11 +405,11 @@
     },
     "screentime-backup": {
       "locked": {
-        "lastModified": 1788849821,
-        "narHash": "sha256-4sYSzZ7Lkyi0RL5VqjA82c80Tj1ZGZ14FdSnI7aV8fc=",
+        "lastModified": 1788858534,
+        "narHash": "sha256-zFfsGOV/pKlXJ5dyMBHDHlacFHnBZlFeB8F+2jlN3/w=",
         "owner": "alexjmiller5",
         "repo": "screentime-backup",
-        "rev": "c6128b1c9c2f0aea9f529ef5f568a66a7719b7bb",
+        "rev": "235205fbc05cf9461e0fa2a19d1954d000b7fb79",
         "type": "github"
       },
       "original": {
@@ -425,11 +425,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788856646,
-        "narHash": "sha256-SxqbGd2GlnklOhIB7dCq2MqdKSNxN4tvA4YND63lYdQ=",
+        "lastModified": 1788977382,
+        "narHash": "sha256-QJL1Nln3jjR3GPAE3p2Anqf2qW+81bSB+4FlWsunO3c=",
         "owner": "alexjmiller5",
         "repo": "screentime-dashboard",
-        "rev": "40c184473f29430fc61f13bb4e90dca85d52a59f",
+        "rev": "53cfc91e03c8f1b4533e59c52232221006d0fb0e",
         "type": "github"
       },
       "original": {

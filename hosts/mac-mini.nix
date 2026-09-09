@@ -144,12 +144,7 @@ in
     # After every snapshot (weekly, or kicked by a dashboard refresh) rebuild
     # and push the dashboard's series - inside the FDA-holding backup process.
     postRun = config.services.screentime-ingest.syncCommand;
-    # A dashboard "rebuild" should set a flag so the agent skips the snapshot,
-    # but neither input defines it yet (screentime-backup has no skipDumpFlag
-    # option; screentime-ingest exposes no such path), so the line below does
-    # not evaluate and takes the whole mini config with it. Re-enable once both
-    # modules ship the option and the flake inputs are bumped.
-    # skipDumpFlag = config.services.screentime-ingest.skipDumpFlag;
+    skipDumpFlag = config.services.screentime-ingest.skipDumpFlag;
   };
   services.screentime-ingest = {
     enable = true;
