@@ -9,6 +9,7 @@
 {
   imports = [
     ./git.nix
+    ./git-signing.nix
     ./scripts.nix
     ./cli-tools.nix
     ./mcp.nix

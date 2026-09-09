@@ -539,16 +539,6 @@ in
     })
   ];
 
-  # Commit signing via 1Password (desktop app + op-ssh-sign, laptop-only).
-  # The signer script lives in agent-config, reached via the ~/.claude/skills
-  # symlink so the path stays stable if the repo moves.
-  programs.git.settings = {
-    user.signingkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKWqJ5X61r/CFl99qjU/rZyIB4DCQpVI+cF0y33WSSMC";
-    gpg.format = "ssh";
-    gpg.ssh.program = "${config.home.homeDirectory}/.claude/skills/1password/scripts/op-ssh-sign-auto";
-    commit.gpgsign = true;
-  };
-
   home.file.".hushlogin".text = "";
 
   # --- static dotfiles (read-only; edit in dotfiles/ + rebuild) ---

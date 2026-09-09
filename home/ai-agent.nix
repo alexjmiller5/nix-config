@@ -14,7 +14,10 @@
   ...
 }:
 {
-  imports = [ ./op-agent-sa.nix ];
+  imports = [
+    ./op-agent-sa.nix
+    ./agent-env.nix
+  ];
 
   options.aiAgent.withOp = lib.mkOption {
     type = lib.types.bool;

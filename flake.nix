@@ -165,12 +165,14 @@
       # git.nix identity uses mkDefault, so consumers can override the email.
       homeModules = {
         git = ./home/git.nix;
+        git-signing = ./home/git-signing.nix;
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
         op-agent-sa = ./home/op-agent-sa.nix;
         moshi-hook = ./home/moshi-hook.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;
         ai-agent = ./home/ai-agent.nix;
+        agent-env = ./home/agent-env.nix;
         cli-tools = ./home/cli-tools.nix;
         agent-config-links = ./home/agent-config-links.nix;
         # claude-plugins needs the consumer to pass claude-plugins-official,

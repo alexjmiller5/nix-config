@@ -18,6 +18,7 @@
       window-padding-y = 4;
       window-padding-balance = true;
 
+      copy-on-select = "clipboard";
       clipboard-paste-protection = false;
       shell-integration-features = "cursor,sudo,title,ssh-env,ssh-terminfo,path";
 
