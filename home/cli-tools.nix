@@ -12,6 +12,7 @@
     bat
     git-filter-repo
     gitleaks
+    herdr
     _7zz
     shellcheck
     tree
