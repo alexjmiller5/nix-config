@@ -1,7 +1,7 @@
 { lib, ... }:
 
-# Git identity — shared by every host. Signing is laptop-only (needs the 1P
-# desktop app) and layered on in home/macbook-air.nix. Identity uses mkDefault
+# Git identity, shared by every host. Signing is provided by git-signing.nix.
+# Identity uses mkDefault
 # so downstream consumers (e.g. a work-laptop flake) can override the email.
 {
   programs.git = {

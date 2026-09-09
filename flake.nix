@@ -175,6 +175,7 @@
         agent-env = ./home/agent-env.nix;
         cli-tools = ./home/cli-tools.nix;
         agent-config-links = ./home/agent-config-links.nix;
+        mcp = ./home/mcp.nix;
         # claude-plugins needs the consumer to pass claude-plugins-official,
         # claude-plugin-superpowers and claude-plugin-ponytail via extraSpecialArgs
         claude-plugins = ./home/claude-plugins.nix;

@@ -14,10 +14,15 @@ routing table and workflow; this file is the in-repo map.
   taps/brews/casks/masApps (zap cleanup: the lists ARE the machine), power,
   per-host defaults
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
-  `git.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
+  `git.nix`, `git-signing.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
-  `zsh.nix` (full shell + starship; agent detection runs in `.zshenv` so
-  noninteractive tool shells select the dedicated SSH agent), `aliases/{dev,ai,infra}`,
+  `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
+  `agent-env.nix` (shared detection and credential initialization in `.zshenv`
+  and `~/.config/agent-shell/env.sh`, sourced by Claude's per-tool adapter;
+  `AGENT_OP_AUTH=desktop` prevents SA loading through nested shells and wrappers),
+  `git-signing.nix` (shared signing settings, `.agents/skills` signer),
+  `mcp.nix` (one `programs.mcp.servers` registry generates the native MCP
+  plugin loaded by both Claude and Codex; direct Codex MCP entries stay app-owned),
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog, wacli,
   wrangler, gcloud, ntn - AI Agent vault creds in every context, read per call
   so nothing credential-shaped touches disk. Every op call in the family sits
@@ -45,7 +50,7 @@ routing table and workflow; this file is the in-repo map.
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),
   `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
-  PATH, and `op-agent-sa.nix` — login-time refresh of the agent SA token
+  PATH, `agent-env.nix`, and `op-agent-sa.nix` - login-time refresh of the agent SA token
   from the machine vault into a 0600 file, `~/.local/state/op/agent-sa-token`;
   a file, not the Keychain, since ssh-descended shells can't read the
   per-session-locked Keychain; host-layer sibling = `claude-code` +

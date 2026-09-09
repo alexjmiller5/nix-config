@@ -33,10 +33,8 @@ in
     # claude-code@latest.
     package = null;
 
-    # OFF deliberately: it would inject mcp_servers into `settings`, which
-    # makes the module write ~/.codex/config.toml back into the store. Codex
-    # must own that file (see below), so the MCP entry is seeded into the
-    # agent-config copy instead.
+    # Shared servers come from mcp.nix's native plugin. Direct integration
+    # would rewrite the writable config that Codex uses for runtime state.
     enableMcpIntegration = false;
 
     # Install the same portable plugin bundles Claude loads from the shared

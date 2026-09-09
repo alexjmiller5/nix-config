@@ -1,8 +1,42 @@
-# Canonical MCP server registry: programs.mcp writes ~/.config/mcp/mcp.json,
-# and home-manager agent modules with enableMcpIntegration (codex, cursor,
-# opencode, ...) merge it into their own config. Claude Code instead loads
-# the same servers via agent-config's skills/mcp plugin (mcp@skills-dir) —
-# its .mcp.json mirrors this list; keep the two in sync.
+# One registry, served through a native plugin shared by Claude and Codex.
+# Codex's writable config keeps its own MCP servers and runtime trust state.
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  json = pkgs.formats.json { };
+  manifest = {
+    name = "mcp";
+    version = "1.0.0";
+    description = "Shared declarative MCP servers";
+    mcpServers = "./.mcp.json";
+  };
+  plugin =
+    (pkgs.linkFarm "mcp" [
+      {
+        name = ".mcp.json";
+        path =
+          if config.programs.mcp.servers == { } then
+            json.generate "mcp.json" { mcpServers = { }; }
+          else
+            config.xdg.configFile."mcp/mcp.json".source;
+      }
+      {
+        name = ".claude-plugin/plugin.json";
+        path = json.generate "claude-mcp-plugin.json" manifest;
+      }
+      {
+        name = ".codex-plugin/plugin.json";
+        path = json.generate "codex-mcp-plugin.json" manifest;
+      }
+    ])
+    // {
+      inherit (manifest) version;
+    };
+in
 {
   programs.mcp = {
     enable = true;
@@ -15,4 +49,6 @@
       ];
     };
   };
+  programs.codex.plugins = lib.mkIf config.programs.codex.enable [ plugin ];
+  home.file.".config/agent-config/skills/mcp".source = plugin;
 }

@@ -45,4 +45,13 @@ detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
   zsh -c 'zsh -c '\''printf "%s:%s" "$AGENT_SHELL" "${OP_SERVICE_ACCOUNT_TOKEN:-}"'\''')
 [ "$detected" = codex: ] || fail "desktop override did not survive nested shells: $detected"
 
+detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+  CODEX_SESSION_ID=test-session AGENT_SHELL=external \
+  zsh -c 'printf "%s" "$AGENT_SHELL"')
+[ "$detected" = external ] || fail "explicit agent marker was overwritten"
+rm "$scratch/.local/state/op/agent-sa-token"
+detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+  CODEX_SESSION_ID=test-session zsh -c 'printf "%s" "${OP_SERVICE_ACCOUNT_TOKEN:-}"')
+[ -z "$detected" ] || fail "missing token file did not leave auth unset"
+
 echo "agent-detect: all checks passed"
