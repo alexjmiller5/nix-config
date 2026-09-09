@@ -95,8 +95,10 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
   BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
 * **Input Monitoring**: Karabiner-Elements (grants land on its helper
   binaries), Dolphin
-* **Screen Recording**: AltTab, 1Password, Notion, Claude, Chrome,
-  VS Code, Ghostty, Telegram, Zoom, Raycast
+* **Screen & System Audio Recording** (Screen Recording on older macOS):
+  Hammerspoon, AltTab, 1Password, Notion, Claude, Chrome,
+  VS Code, Ghostty, Telegram, Zoom, Raycast.
+  Enable Hammerspoon for screen capture and restart it if macOS prompts.
 * **Full Disk Access**: VS Code, Ghostty, Raycast, Hammerspoon (reads
   Messages chat.db for the paste-OTP hotkey),
   /bin/zsh (launchd/agent shell scripts),
@@ -418,4 +420,3 @@ values churn with OS updates.
 
 * `gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
   declared. git's GitHub auth is NOT in this list anymore: it's the agenix PAT.
-
