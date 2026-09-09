@@ -83,10 +83,10 @@
       "com.apple.HIToolbox".AppleDictationAutoEnable = 1;
       "com.apple.assistant.support"."Dictation Enabled" = true;
       "com.google.Chrome".DisablePrintPreview = true;
-      # TEMPORARY (2026-09-08): suppress Dock attention bounces while the
-      # multi-hour Snapchat chat-media import into Photos runs (Photos bounces
-      # on every background import). REMOVE once that import is done.
-      "com.apple.dock".no-bouncing = true;
+      # Dock attention bounces stay ON. Declared explicitly because the key
+      # persists once written: CustomUserPreferences can set it but never
+      # unsets it, so dropping the line would leave a stale value behind.
+      "com.apple.dock".no-bouncing = false;
       # Menu bar system-icon visibility lives in the ByHost controlcenter
       # domain on macOS 26 (the plain-domain "NSStatusItem Visible" keys are
       # ignored post-migration) → declared in home/macos/menu-bar.nix instead.
