@@ -5,10 +5,25 @@
   ...
 }:
 
+let
+  undoClose = pkgs.fetchFromGitHub {
+    owner = "pedroloch";
+    repo = "herdr-undo-close";
+    rev = "0c44b901717917ade80ae2ce0e921aeeabd67381";
+    hash = "sha256-ouidTRf3h7l6UqvNJQa8VI0yJU448fiihbSnpRmGWYE=";
+  };
+in
 # Shared terminal workspace settings for local and SSH sessions.
 {
   # The bundled hooks use python3 to report session identity to Herdr's socket.
   home.packages = [ pkgs.python3 ];
+
+  home.activation.herdrUndoClose = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    run ${lib.getExe config.programs.herdr.package} plugin link ${undoClose}
+  '';
+  xdg.configFile."herdr/plugins/config/undo-close/config.json".text = builtins.toJSON {
+    undo_panes = false;
+  };
 
   # Claude owns writable settings and hook files. Its idempotent installer
   # preserves other hooks and follows the companion-repo settings symlink.
@@ -52,6 +67,14 @@
         prefix = "ctrl+b";
         previous_agent = "prefix+ctrl+p";
         next_agent = "prefix+ctrl+n";
+        command = [
+          {
+            key = "prefix+t";
+            type = "plugin_action";
+            command = "undo-close.reopen-last";
+            description = "Reopen closed tab";
+          }
+        ];
       };
       ui = {
         prompt_new_tab_name = false;

@@ -51,6 +51,7 @@
         # shortcuts to Herdr's prefix keys; regular Ghostty surfaces retain
         # their native bindings. Cmd+Shift+W detaches without stopping agents.
         ''herdr/super+t=text:\x02c''
+        ''herdr/super+shift+t=text:\x02t''
         ''herdr/super+shift+[=text:\x02p''
         ''herdr/super+shift+]=text:\x02n''
         ''herdr/super+w=text:\x02X''

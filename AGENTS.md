@@ -56,7 +56,9 @@ routing table and workflow; this file is the in-repo map.
   restoration hooks shared by both hosts; Claude's installer runs during
   activation against its writable settings, while Codex hooks are HM-managed;
   `ghostty.nix` adds `herdr-window` and a window-local key table translating
-  macOS tab/split shortcuts to Herdr prefix keys),
+  macOS tab/split shortcuts to Herdr prefix keys. The pinned Undo Close plugin
+  restores closed tabs through Cmd+Shift+T, mapped to prefix+t; closed panes
+  are excluded from its history),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),
