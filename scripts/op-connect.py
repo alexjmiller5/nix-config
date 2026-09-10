@@ -4,11 +4,11 @@
 import fcntl
 import json
 import os
-from pathlib import Path
 import socket
 import subprocess
 import sys
 import time
+from pathlib import Path
 from urllib.parse import urlsplit
 
 
@@ -22,9 +22,14 @@ def flag(args, name):
 
 
 def wants_connect(args, env, cfg):
-    if (env.get("AGENT_OP_AUTH") == "desktop" or not env.get("AGENT_SHELL")
-            or env.get("OP_CONNECT_HOST") or env.get("OP_CONNECT_TOKEN")
-            or flag(args, "--account") or flag(args, "--session")):
+    if (
+        env.get("AGENT_OP_AUTH") == "desktop"
+        or not env.get("AGENT_SHELL")
+        or env.get("OP_CONNECT_HOST")
+        or env.get("OP_CONNECT_TOKEN")
+        or flag(args, "--account")
+        or flag(args, "--session")
+    ):
         return False
     # An explicitly selected project SA must never inherit agent-vault access.
     try:
@@ -36,9 +41,11 @@ def wants_connect(args, env, cfg):
     if args[:1] == ["read"]:
         refs = [arg for arg in args[1:] if arg.startswith("op://")]
         return len(refs) == 1 and urlsplit(refs[0]).netloc == cfg["vaultId"]
-    return (args[:2] == ["item", "get"]
-            and flag(args, "--vault") == cfg["vaultId"]
-            and flag(args, "--format") == "json")
+    return (
+        args[:2] == ["item", "get"]
+        and flag(args, "--vault") == cfg["vaultId"]
+        and flag(args, "--format") == "json"
+    )
 
 
 def command_env(args, env, cfg):
@@ -72,14 +79,18 @@ def cloud_env(cfg):
     env = os.environ.copy()
     for key in ("OP_CONNECT_HOST", "OP_CONNECT_TOKEN", "AGENT_OP_AUTH"):
         env.pop(key, None)
-    env["OP_SERVICE_ACCOUNT_TOKEN"] = Path(cfg["serviceAccountTokenFile"]).read_text().strip()
+    env["OP_SERVICE_ACCOUNT_TOKEN"] = (
+        Path(cfg["serviceAccountTokenFile"]).read_text().strip()
+    )
     if not env["OP_SERVICE_ACCOUNT_TOKEN"]:
         raise RuntimeError("Agent service-account token file is empty")
     return env
 
 
 def cloud_op(cfg, env, *args):
-    result = subprocess.run([cfg["op"], *args], env=env, capture_output=True, text=True)
+    result = subprocess.run(
+        [cfg["op"], *args], env=env, capture_output=True, text=True, check=False
+    )
     if result.returncode:
         # op's read/document diagnostics contain no returned secret values.
         raise RuntimeError(result.stderr.strip() or "1Password bootstrap failed")
@@ -90,8 +101,13 @@ def wait_for_docker(cfg):
     deadline = time.monotonic() + 180
     while time.monotonic() < deadline:
         try:
-            result = subprocess.run([cfg["docker"], "info"], stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL, timeout=10)
+            result = subprocess.run(
+                [cfg["docker"], "info"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=10,
+                check=False,
+            )
             if result.returncode == 0:
                 return
         except subprocess.TimeoutExpired:
@@ -119,8 +135,15 @@ def serve(cfg):
         env = cloud_env(cfg)
         credentials = state / "1password-credentials.json"
         if not credentials.exists():
-            document = cloud_op(cfg, env, "document", "get", cfg["credentialsItemId"],
-                                "--vault", cfg["vaultId"])
+            document = cloud_op(
+                cfg,
+                env,
+                "document",
+                "get",
+                cfg["credentialsItemId"],
+                "--vault",
+                cfg["vaultId"],
+            )
             json.loads(document)
             temporary = state / ".credentials.tmp"
             temporary.write_text(document)
@@ -132,10 +155,13 @@ def serve(cfg):
         del env
         if not token:
             raise RuntimeError("Connect token is empty")
-        subprocess.run(["/usr/bin/open", "-g", "-j", "-a", cfg["dockerApp"]], check=True)
+        subprocess.run(
+            ["/usr/bin/open", "-g", "-j", "-a", cfg["dockerApp"]], check=True
+        )
         wait_for_docker(cfg)
-        subprocess.run([cfg["docker"], "compose", "-f", cfg["composeFile"], "up", "-d"],
-                       check=True)
+        subprocess.run(
+            [cfg["docker"], "compose", "-f", cfg["composeFile"], "up", "-d"], check=True
+        )
         path = state / "token.sock"
         path.unlink(missing_ok=True)
         with socket.socket(socket.AF_UNIX) as server:

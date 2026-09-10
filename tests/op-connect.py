@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """Exercise routing and the local token handoff without real credentials."""
 
+import contextlib
 import importlib.util
+import io
+import json
 import os
-from pathlib import Path
 import socket
 import subprocess
 import sys
 import tempfile
 import threading
 import unittest
+from pathlib import Path
 from unittest.mock import patch
-import contextlib
-import io
-import json
 
 spec = importlib.util.spec_from_file_location(
     "connect", Path(__file__).resolve().parents[1] / "scripts/op-connect.py"
@@ -48,10 +48,13 @@ class ConnectTests(unittest.TestCase):
 
     def test_agent_reads_use_connect(self):
         self.assertTrue(connect.wants_connect(self.read, self.env, self.cfg))
-        self.assertTrue(connect.wants_connect(
-            ["item", "get", "item", "--vault=fixture-vault", "--format=json"],
-            self.env, self.cfg,
-        ))
+        self.assertTrue(
+            connect.wants_connect(
+                ["item", "get", "item", "--vault=fixture-vault", "--format=json"],
+                self.env,
+                self.cfg,
+            )
+        )
 
     def test_other_auth_and_operations_stay_direct(self):
         for args, overrides in [
@@ -68,10 +71,14 @@ class ConnectTests(unittest.TestCase):
             (["connect", "server", "list"], {}),
         ]:
             with self.subTest(args=args, overrides=overrides):
-                self.assertFalse(connect.wants_connect(args, self.env | overrides, self.cfg))
+                self.assertFalse(
+                    connect.wants_connect(args, self.env | overrides, self.cfg)
+                )
 
     def test_dead_service_does_not_fall_back_to_cloud(self):
-        with self.assertRaisesRegex(RuntimeError, "Connect token service is unavailable"):
+        with self.assertRaisesRegex(
+            RuntimeError, "Connect token service is unavailable"
+        ):
             connect.command_env(self.read, self.env, self.cfg)
 
     def test_token_is_delivered_only_to_op_environment(self):
@@ -93,32 +100,52 @@ class ConnectTests(unittest.TestCase):
         self.assertEqual(env["OP_CONNECT_HOST"], self.cfg["host"])
         self.assertNotIn("OP_CONNECT_TOKEN", self.env)
         self.assertNotIn("OP_SERVICE_ACCOUNT_TOKEN", env)
-        self.assertEqual(sorted(p.name for p in self.state.iterdir()),
-                         ["agent-sa-token", "token.sock"])
+        self.assertEqual(
+            sorted(p.name for p in self.state.iterdir()),
+            ["agent-sa-token", "token.sock"],
+        )
 
     def test_desktop_clears_inherited_connect_and_sa(self):
-        env = connect.command_env(self.read, self.env | {
-            "AGENT_OP_AUTH": "desktop", "OP_CONNECT_TOKEN": "old", "OP_CONNECT_HOST": "old",
-        }, self.cfg)
+        env = connect.command_env(
+            self.read,
+            self.env
+            | {
+                "AGENT_OP_AUTH": "desktop",
+                "OP_CONNECT_TOKEN": "old",
+                "OP_CONNECT_HOST": "old",
+            },
+            self.cfg,
+        )
         self.assertFalse(any(k.startswith("OP_CONNECT_") for k in env))
         self.assertNotIn("OP_SERVICE_ACCOUNT_TOKEN", env)
 
     def test_bootstrap_cloud_environment_cannot_loop_through_connect(self):
-        with patch.dict(os.environ, {
-            "OP_CONNECT_TOKEN": "old", "OP_CONNECT_HOST": "old", "AGENT_OP_AUTH": "desktop",
-        }, clear=True):
+        with patch.dict(
+            os.environ,
+            {
+                "OP_CONNECT_TOKEN": "old",
+                "OP_CONNECT_HOST": "old",
+                "AGENT_OP_AUTH": "desktop",
+            },
+            clear=True,
+        ):
             env = connect.cloud_env(self.cfg)
         self.assertEqual(env["OP_SERVICE_ACCOUNT_TOKEN"], "fixture-agent-token")
         self.assertNotIn("OP_CONNECT_TOKEN", env)
         self.assertNotIn("AGENT_OP_AUTH", env)
 
     def test_docker_readiness_is_bounded_even_if_info_hangs(self):
-        with patch.object(connect.time, "monotonic", side_effect=[0, 1, 181]), \
-                patch.object(connect.time, "sleep"), \
-                patch.object(connect.subprocess, "run",
-                             side_effect=subprocess.TimeoutExpired("docker", 10)) as run:
-            with self.assertRaisesRegex(RuntimeError, "Docker did not start"):
-                connect.wait_for_docker({"docker": "/fixture/docker"})
+        with (
+            patch.object(connect.time, "monotonic", side_effect=[0, 1, 181]),
+            patch.object(connect.time, "sleep"),
+            patch.object(
+                connect.subprocess,
+                "run",
+                side_effect=subprocess.TimeoutExpired("docker", 10),
+            ) as run,
+            self.assertRaisesRegex(RuntimeError, "Docker did not start"),
+        ):
+            connect.wait_for_docker({"docker": "/fixture/docker"})
         self.assertEqual(run.call_args.kwargs["timeout"], 10)
 
     def test_provisioning_handles_cli_output_and_keeps_token_out_of_argv(self):
@@ -136,10 +163,16 @@ class ConnectTests(unittest.TestCase):
                 result = json.dumps(servers)
             elif command == ["connect", "server", "create"]:
                 servers.append({"id": "server-id", "name": "fixture-server"})
-                (self.state / "1password-credentials.json").write_text('{"encCredentials":"fixture"}')
-                result = "Server created. Credentials written to 1password-credentials.json."
+                (self.state / "1password-credentials.json").write_text(
+                    '{"encCredentials":"fixture"}'
+                )
+                result = (
+                    "Server created. Credentials written to 1password-credentials.json."
+                )
             elif command[:2] == ["document", "create"]:
-                items.append({"id": "document-id", "title": "Fixture op Connect Credentials"})
+                items.append(
+                    {"id": "document-id", "title": "Fixture op Connect Credentials"}
+                )
                 result = '{"uuid":"document-id"}'
             elif command == ["connect", "token", "create"]:
                 self.assertIn("fixture-vault,r", args)
@@ -154,18 +187,36 @@ class ConnectTests(unittest.TestCase):
                 self.fail(f"Unexpected provisioning operation: {command}")
             return subprocess.CompletedProcess(args, 0, result, "")
 
-        argv = ["bootstrap", "--vault", "fixture-vault", "--server", "fixture-server",
-                "--owner", "Fixture", "--state-directory", str(self.state)]
-        with patch.object(sys, "argv", argv), patch.object(bootstrap.subprocess, "run", run):
+        argv = [
+            "bootstrap",
+            "--vault",
+            "fixture-vault",
+            "--server",
+            "fixture-server",
+            "--owner",
+            "Fixture",
+            "--state-directory",
+            str(self.state),
+        ]
+        with (
+            patch.object(sys, "argv", argv),
+            patch.object(bootstrap.subprocess, "run", run),
+        ):
             for attempt in range(2):
                 output = io.StringIO()
                 with contextlib.redirect_stdout(output):
                     bootstrap.main()
-                self.assertEqual(json.loads(output.getvalue())["tokenOpRef"],
-                                 "op://fixture-vault/token-id/credential")
+                self.assertEqual(
+                    json.loads(output.getvalue())["tokenOpRef"],
+                    "op://fixture-vault/token-id/credential",
+                )
                 self.assertNotIn("fixture-connect-token", output.getvalue())
-        self.assertEqual(sum(args[1:4] == ["connect", "token", "create"] for args in calls), 1)
-        self.assertFalse(any("fixture-connect-token" in arg for args in calls for arg in args))
+        self.assertEqual(
+            sum(args[1:4] == ["connect", "token", "create"] for args in calls), 1
+        )
+        self.assertFalse(
+            any("fixture-connect-token" in arg for args in calls for arg in args)
+        )
 
 
 if __name__ == "__main__":

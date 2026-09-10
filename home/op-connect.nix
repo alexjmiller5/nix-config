@@ -147,7 +147,7 @@ in
           "serve"
         ];
         EnvironmentVariables = {
-          PATH = "${cfg.dockerApp}/Contents/Resources/bin:/usr/bin:/bin";
+          PATH = "${cfg.dockerApp}/Contents/Resources/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           DOCKER_HOST = "unix://${config.home.homeDirectory}/.docker/run/docker.sock";
         };
         RunAtLoad = true;

@@ -7,7 +7,7 @@ Docker restarts. The login service opens Docker and runs Compose at login.
 
 The installed `op` wrapper routes agent `op read op://<configured-vault-id>/...`
 and `op item get ... --vault <configured-vault-id> --format json` through
-Connect. CLI wrappers such as `gh`, `ntn`, `modal` and `posthog-cli` consume
+Connect. CLI wrappers such as `gh`, `ntn`, `modal`, `spotify_player` and `posthog-cli` consume
 that package automatically. The command and secret references stay the same.
 Writes, Documents, `op run`, `op inject`, human shells, explicit project SAs,
 and other vaults use direct authentication. `AGENT_OP_AUTH=desktop` clears

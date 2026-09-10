@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 # spotify-player (TUI + scripting CLI, binary: spotify_player) via the native
 # HM module - package + ~/.config/spotify-player/app.toml in one place.
@@ -58,7 +58,7 @@ let
   wrapped = pkgs.writeShellApplication {
     name = "spotify_player";
     runtimeInputs = [
-      pkgs._1password-cli
+      config.opConnect.cliPackage
       pkgs.jq
       pkgs.coreutils
     ];
@@ -118,6 +118,7 @@ let
   };
 in
 {
+  imports = [ ./op-connect.nix ];
   programs.spotify-player = {
     enable = true;
     package = wrapped;

@@ -41,7 +41,9 @@ routing table and workflow; this file is the in-repo map.
   Docker environment, Git, Nix store or an additional plaintext file.
   `op-connect-start` restarts the login service after rotation or failure;
   supported reads fail closed when it is unavailable. `op run`/`inject` and
-  item reads without explicit vault ID plus JSON format remain direct),
+  item reads without explicit vault ID plus JSON format remain direct.
+  Its launch PATH includes /usr/sbin and /sbin: Docker's privileged-helper
+  installer invokes /sbin/md5 by name),
   `posthog-auth.sh` (PostHog credential aliases and API-host normalization;
   the agent CLI uses the existing broad AI Agent key. Explicit
   `POSTHOG_CLI_API_KEY` / `POSTHOG_CLI_HOST` override it; an app's public
