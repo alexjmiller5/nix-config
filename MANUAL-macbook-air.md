@@ -53,6 +53,55 @@ straight from the github: ref.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in alexjmiller5/tap steipete/tap; do brew trust "$t"; done`
 
+## Life background sync: replacement-machine recovery
+
+Nix installs Life, its configuration and the login-time background runner
+through `home/common.nix` and Life's Home Manager module. It does **not**
+restore the local Keychain entry or the user's sync toggle. A fresh machine
+starts with sync off; a normal Nix rebuild preserves an existing toggle.
+
+After completing this manual's machine bootstrap:
+
+1. Sign into 1Password using recovery access that does not depend on either
+   old Mac. Retrieve this laptop's Life token from vault
+   `a4gdaq4rjdpewl4uppphpjqewm`, item `yaasgo467sp23p77bijckaitrm`, field
+   `credential` (`op://a4gdaq4rjdpewl4uppphpjqewm/yaasgo467sp23p77bijckaitrm/credential`).
+   This is a dedicated Life-issued device token, separate from the mini's
+   token and the AI Agent/admin credential. Its `full` scope permits Life
+   data and schema sync, but not token administration. If it has been
+   revoked, have a Life administrator issue a replacement and store it in
+   this machine's vault; never substitute the admin token.
+2. In Terminal on the replacement laptop's desktop, run:
+
+   ```sh
+   life background enable --token-stdin
+   ```
+
+   Paste the credential at the hidden `Life device token:` prompt and press
+   Return. Approve macOS Keychain access if requested. The installed Life
+   command stores the runtime copy in Keychain; 1Password holds the recovery
+   copy. Routine background sync does not call 1Password or need a 1Password
+   service account. Never put the token in a shell command, file, Git or the
+   Nix store.
+3. Let the background runner initialize and download the replica, then run:
+
+   ```sh
+   life background status
+   ```
+
+   Verify `enabled: true`, `running: true`, a populated `last_success`,
+   `last_error: null` and zero rejected rows in `stats`. `enabled` alone is
+   not proof that data synced. Large first downloads take longer. Do not
+   start a concurrent `life sync` while the background round is running.
+   Check status again after logout/login to verify automatic startup.
+
+If both Macs are lost, recovery uses GitHub for the machine/software config,
+1Password for credentials, and the surviving Life hub for synced schema,
+tables and history. Edits that never reached the hub need an independent
+backup; Nix cannot recover them. This procedure assumes the hub is healthy
+and reachable. The mini's equivalent is in
+[MANUAL-mac-mini.md](MANUAL-mac-mini.md#life-background-sync-replacement-machine-recovery).
+
 ## Machine vaults (1P) — the secret architecture
 
 Each machine has a 1P vault ("MacBook Air" / "Mac Mini") and a read-only
