@@ -1,5 +1,6 @@
 # Official local Connect containers, plus a memory-only token handoff. Import
-# on any host; enable only where Docker Desktop and agent SA bootstrap exist.
+# on any host; enable where Docker Desktop and independently enrolled operator
+# credentials are available.
 {
   config,
   lib,

@@ -1,6 +1,6 @@
 # A dedicated ssh-agent for agent shells, loaded at login with keys read from
-# 1Password through the agent SA token file (op-agent-sa.nix). The private
-# key exists only in the agent's memory - never on disk, never in the nix
+# 1Password through the independently enrolled operator credential file. The
+# private key exists only in the agent's memory - never on disk, never in the nix
 # store - and no 1Password SSH-agent approval dialog is involved, so
 # unattended agent sessions can ssh to hosts that trust these keys. Alex's
 # own terminals keep using the 1Password SSH agent (ssh.nix); an ssh config

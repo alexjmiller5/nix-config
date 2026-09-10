@@ -126,7 +126,7 @@ def serve(cfg):
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             raise RuntimeError("Connect token service is already running") from None
-        # Wait for the existing login bootstrap to write the SA, without op polling.
+        # Wait for the independently enrolled operator token file, without op polling.
         deadline = time.monotonic() + 120
         while not Path(cfg["serviceAccountTokenFile"]).is_file():
             if time.monotonic() > deadline:
