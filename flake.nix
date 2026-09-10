@@ -161,7 +161,6 @@
         git-signing = ./home/git-signing.nix;
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
-        op-agent-sa = ./home/op-agent-sa.nix;
         op-connect = ./home/op-connect.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;
         ai-agent = ./home/ai-agent.nix;

@@ -17,7 +17,8 @@ both SA and Connect credentials for desktop authentication.
 
 1. The credentials Document and dedicated read-only Connect token live in
    the configured 1Password vault, referenced by IDs in the host module.
-2. At login, the service uses the existing agent SA to restore a missing
+2. At login, the service uses the independently enrolled agent SA from the
+   existing `~/.local/state/op/agent-sa-token` file to restore a missing
    `1password-credentials.json` into `$XDG_STATE_HOME/1password-connect`
    (default `~/.local/state/1password-connect`). Directory permissions are
    `0700`; the file is `0600` and mounted read-only into both containers.
@@ -52,9 +53,14 @@ volume and the encrypted credentials bundle persist.
 
 ## Reproduce provisioning
 
-Restoring the existing laptop configuration needs no new Connect server or
-manual secret copying: existing item IDs restore the working bundle and
-load the token through the normal machine/agent SA bootstrap.
+An enrolled laptop keeps its existing agent credential file, encrypted
+Connect bundle and Docker volume. A replacement laptop first needs
+[independent operator enrollment](../MANUAL-macbook-air.md#agent-operator-credentials-enrollment-and-rotation)
+from the authoritative AI Agent credential record using native user auth.
+Nix bootstrap and machine service accounts do not populate that file.
+Once enrolled, the existing item IDs let Connect restore a missing bundle
+and load its token at service startup; no new Connect server is needed.
+Startup still requires working agent SA access, including available quota.
 
 For an independent new deployment, run the installed bootstrap with desktop
 authentication (or `python3 scripts/op-connect-bootstrap.py` before the first

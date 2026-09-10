@@ -53,13 +53,6 @@ in
     tokenFile = "${config.home.homeDirectory}/.local/state/op/agent-sa-token";
   };
 
-  # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
-  # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
-  opAgentSa = {
-    tokenOpRef = "op://a4gdaq4rjdpewl4uppphpjqewm/qol7eck3fumtefiwyrw4w5m3pm/credential";
-    tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
-  };
-
   # Local trial on the laptop. The exported module remains opt-in on other
   # hosts; the mini keeps direct SA/desktop auth and needs no Docker runtime.
   opConnect = {

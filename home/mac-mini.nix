@@ -87,15 +87,6 @@ in
     };
   };
 
-  # Agent SA token file (~/.local/state/op/agent-sa-token), refreshed at every
-  # login from the machine vault via the machine SA — see home/op-agent-sa.nix.
-  # This gives agent shells on the mini the same 1P access as on the laptop
-  # (AI Agent vault + project vaults).
-  opAgentSa = {
-    tokenOpRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/qyi6fxsxyrog3mfpcbjzkjqvzi/credential";
-    tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
-  };
-
   home.packages = [
     # Time-boxed Personal-vault access for agents on the headless mini. No
     # desktop app here, so Touch ID isn't an option: Alex runs `op-unlock`

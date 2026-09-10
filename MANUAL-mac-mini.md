@@ -155,6 +155,29 @@ the tailnet ACL so tagged devices are approved automatically:
   afterward; no re-linking needed as long as the phone comes online every
   14 days and the app keeps running.
 
+#### Agent operator credentials: enrollment and rotation
+
+Agent tools use the independently provisioned AI Agent credential in the
+existing `~/.local/state/op/agent-sa-token` file (raw token only, owned by
+the local user, mode `0600`). Preserve it on an enrolled machine. Nix
+installs the initializer; it neither creates nor refreshes this file.
+No machine service account supplies or refreshes the agent token. The mini
+keeps its existing forwarded SSH agent and does not enable local Connect.
+
+For a replacement machine or deliberate rotation, use native 1Password
+user authentication to retrieve the authoritative AI Agent credential:
+vault `4eeyrkqibibn7k4j6rz2fbzvxm`, item `bktt2mfgbrbry53jrvitgxq45q`.
+The existing `op-unlock`/`op-personal` user-session path above is available
+on the headless mini. The credential owner enrolls the token into the
+existing file with private permissions, using hidden input rather than a
+shell-history literal. Enrollment is separate from Nix bootstrap; do not
+recover from a machine-vault copy or substitute a machine SA. No additional
+credential cache is needed. Restart agent sessions after rotation.
+
+Claude Code and Codex subscription sign-ins are separate native logins
+(`claude` -> `/login`, `codex login`). Preserve their app-owned auth state;
+neither the operator token nor a Nix rebuild recreates it.
+
 #### agent-chrome: sign into Claude in Chrome (GUI-only)
 
 The extension itself is policy-installed (`services.agent-chrome.extensions`

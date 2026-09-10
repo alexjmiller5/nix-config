@@ -35,7 +35,8 @@ routing table and workflow; this file is the in-repo map.
   `op-connect.nix` (opt-in, exported local Docker Desktop deployment, enabled
   on the laptop. Official API/sync images share Connect's encrypted cache;
   API binds only 127.0.0.1. A login service restores the encrypted credentials
-  Document when absent, reads the Connect token once through the existing SA,
+  Document when absent, reads the Connect token once through the independently
+  enrolled agent SA (never the machine bootstrap SA),
   opens Docker and starts Compose. The token stays in memory behind a 0600
   Unix socket, delivered only to the op child process. No token in shell init,
   Docker environment, Git, Nix store or an additional plaintext file.
@@ -78,13 +79,16 @@ routing table and workflow; this file is the in-repo map.
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),
-  `ai-agent.nix` (one-import AI-agent readiness: node for hooks, `op` on
-  PATH, `agent-env.nix`, and `op-agent-sa.nix` - login-time refresh of the agent SA token
-  from the machine vault into a 0600 file, `~/.local/state/op/agent-sa-token`;
-  a file, not the Keychain, since ssh-descended shells can't read the
-  per-session-locked Keychain; host-layer sibling = `claude-code` +
-  `notion-cli` casks),
-  `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-remote-debugging,notification-prefs}.nix`
+  `ai-agent.nix` (node for hooks, `op` on PATH and `agent-env.nix` for
+  independently enrolled operator credentials. The existing 0600
+  `~/.local/state/op/agent-sa-token` interface serves agent shells, agent SSH
+  and Connect without a login Keychain. Enrollment/rotation belongs to the
+  AI Agent credential owner, using native user authentication and its
+  authoritative record, separate from Nix bootstrap; see both host manuals.
+  Nix never populates or refreshes this file. Claude/Codex subscription login
+  remains native app state, separate from operator tool credentials.
+  Host-layer sibling = `claude-code` + `notion-cli` casks),
+  `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),
   `ssh.nix` (programs.ssh + private Include),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state

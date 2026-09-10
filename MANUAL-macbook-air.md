@@ -25,9 +25,8 @@ straight from the github: ref.
    key, no rekey; encryption needs only the public keys in secrets.nix). Read
    the token from the 1Password **web vault** (1password.com in Safari — the
    1P app isn't installed until the first switch; the SA token item lives in
-   the "MacBook Air" vault). Every other secret (git PAT, future ones) is
-   fetched from that vault at runtime via `op read`, so this is the only
-   paste:
+   the "MacBook Air" vault). Agent operator credentials have their own
+   enrollment below; this machine token does not supply them:
    ```Shell
    cd secrets && rm machine-sa-laptop.age
    EDITOR=nano nix run github:ryantm/agenix -- -e machine-sa-laptop.age   # paste SA token from 1P web
@@ -52,6 +51,28 @@ straight from the github: ref.
    auth works now.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
    otherwise): `for t in alexjmiller5/tap steipete/tap; do brew trust "$t"; done`
+
+## Agent operator credentials: enrollment and rotation
+
+Agent tools use the independently provisioned AI Agent credential in the
+existing `~/.local/state/op/agent-sa-token` file (raw token only, owned by
+the local user, mode `0600`). Preserve it on an enrolled machine. Nix installs
+the initializer and consumers; it neither creates nor refreshes this file.
+Agent SSH and local Connect continue to consume it through their existing
+interfaces. No machine service account supplies or refreshes the agent token.
+
+For a replacement machine or deliberate rotation, use native 1Password
+desktop authentication to retrieve the authoritative AI Agent credential:
+vault `4eeyrkqibibn7k4j6rz2fbzvxm`, item `bktt2mfgbrbry53jrvitgxq45q`.
+The credential owner enrolls that token into the existing file with private
+permissions, using hidden input rather than a shell-history literal. This
+is separate from Nix bootstrap; do not recover from a machine-vault copy or
+substitute a machine SA. No additional credential cache is needed. After
+rotation, restart agent sessions and follow [Connect recovery](docs/op-connect.md).
+
+Claude Code and Codex subscription sign-ins are separate native logins
+(`claude` -> `/login`, `codex login`). Preserve their app-owned auth state;
+neither the operator token nor a Nix rebuild recreates it.
 
 ## Life background sync: replacement-machine recovery
 
@@ -106,10 +127,10 @@ and reachable. The mini's equivalent is in
 
 Each machine has a 1P vault ("MacBook Air" / "Mac Mini") and a read-only
 service account (`macbook-air-machine` / `mac-mini-machine`). agenix encrypts
-exactly ONE secret per machine — its SA token — and everything else lives in
-the machine vault, fetched at runtime with `op read` (by vault/item **ID**,
-never name). Adding or rotating a secret = edit the 1P item; the repo and the
-machines don't change.
+exactly ONE secret per machine - its bootstrap SA token. Machine vaults are
+for initial Nix bootstrap; agent operator credentials use the independent
+enrollment above. The existing Git helper's machine-vault reads are described
+below; they do not authorize additional runtime credentials in these vaults.
 
 In the vaults today:
 
