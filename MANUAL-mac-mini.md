@@ -106,19 +106,34 @@ the tailnet ACL so tagged devices are approved automatically:
   dialogs themselves; only these grants and anything asking for the admin
   password stay human.
 * **moshi-hook (Moshi phone-terminal agent daemon)**: the brew formula, its
-  launchd service, and the Claude Code hooks (agent-config
-  `claude/settings.json`) are all declared; the pairing state is restored at
-  login from the 1P item "Mac Mini Moshi Host Secret" (`home/moshi-hook.nix`).
-  Pairing itself is a one-time secret handshake you do over ssh, only when the
-  1P item does not exist yet (first setup, or after un-pairing the host in the
-  app): Moshi app → Settings → Hooks → copy the token, then
-  `moshi-hook pair --store file --token <token>` (`--store file`: the login
-  Keychain is locked for ssh shells), then put the resulting
-  `~/.config/moshi/secrets.json` and `config.json` contents into that item's
-  `secrets_json` / `config_json` fields (an agent does this with one
-  desktop-auth `op item create`). Never run `moshi-hook install` here -
-  `~/.claude/settings.json` is a read-only nix symlink; the hooks it would
-  write are already in agent-config.
+  launchd service, and the Claude/Codex hooks are declared. Moshi owns its
+  pairing and recovery; no machine vault or service account restores it.
+  An already-paired machine keeps its current native state: preserve
+  `~/.config/moshi/` and `~/Library/Application Support/Moshi/`, including
+  `secrets.json`, `config.json` and any `config.toml`. Do not re-pair or
+  unpair it as part of a Nix rebuild.
+
+  On a new or unpaired machine, get a pairing token from the Moshi iPhone
+  app's Settings → Integrations. Check `moshi-hook pair --help` for the
+  installed version. In an interactive zsh session, use a hidden prompt
+  and Moshi's `MOSHI_PAIRING_TOKEN` environment input so the token is not
+  entered in command history or passed as a command-line argument:
+
+  ```zsh
+  (
+    read -rs 'moshi_pairing_token?Moshi pairing token: ' || exit
+    printf '\n'
+    MOSHI_PAIRING_TOKEN="$moshi_pairing_token" moshi-hook pair --store file
+  )
+  ```
+
+  `--store file` uses Moshi's native 0600 `~/.config/moshi/secrets.json`
+  storage for headless sessions where Keychain is unavailable. Moshi
+  remembers the selected store; macOS otherwise defaults to Keychain.
+  Keep native files writable by the user and outside the Nix store.
+  Do not run `moshi-hook install` here: its Claude/Codex hooks are already
+  declared. After pairing a new host, restart its existing Homebrew service
+  and verify pairing with `moshi-hook status` and the phone app.
 * **1Password CLI account (for `op-unlock`)**: once, over ssh, register the
   account on this machine so `op signin` works headlessly (no desktop app on
   the mini): `op account add --address my.1password.com --email <1P email>`

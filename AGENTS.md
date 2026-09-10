@@ -96,11 +96,19 @@ routing table and workflow; this file is the in-repo map.
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
 * `dotfiles/` — file payloads (karabiner, nvim, vscode, ssh pubs, duti list)
 * `secrets/` - agenix: exactly ONE secret per machine (its 1P machine-vault
-  SA token). Machine credentials have authoritative copies in the per-machine
-  1P vaults. Credential-command consumers fetch them with `op read` by ID;
+  SA token). Machine vaults and their service accounts are exclusively for
+  initial Nix bootstrap. Applications own enrollment, credential storage
+  and recovery through their supported interfaces. Some existing modules
+  still read machine vaults at runtime, as described above; those consumers
+  do not authorize additional runtime dependencies.
   Life background sync imports its own device token once into Keychain via
   the installed CLI. Edit = recreate-not-decrypt (see
   `secrets/secrets.nix` header); no master key exists.
+* Moshi on the Mini uses its declared Homebrew formula/service and native
+  pairing store. Nix does not restore or rewrite Moshi credentials. Existing
+  machines retain their pairing; replacement machines pair through Moshi.
+  The Air does not install the Moshi daemon. Claude/Codex hook wiring stays
+  declared independently of pairing.
 * `MANUAL-macbook-air.md`, `MANUAL-mac-mini.md` - steps outside Nix (TCC,
   SIP, sign-ins, bootstrap order), including Life token recovery, desktop
   Keychain setup and verification after replacing a machine.

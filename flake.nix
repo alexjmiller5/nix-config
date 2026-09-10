@@ -163,7 +163,6 @@
         scripts = ./home/scripts.nix;
         op-agent-sa = ./home/op-agent-sa.nix;
         op-connect = ./home/op-connect.nix;
-        moshi-hook = ./home/moshi-hook.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;
         ai-agent = ./home/ai-agent.nix;
         agent-env = ./home/agent-env.nix;
