@@ -24,13 +24,19 @@ routing table and workflow; this file is the in-repo map.
   `mcp.nix` (one `programs.mcp.servers` registry generates the native MCP
   plugin loaded by both Claude and Codex; direct Codex MCP entries stay app-owned),
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog, wacli,
-  wrangler, gcloud, ntn - AI Agent vault creds in every context, read per call
+  wrangler, gcloud, ntn, posthog-cli - AI Agent vault creds in every context, read per call
   so nothing credential-shaped touches disk. Every op call in the family sits
   behind `op_has_auth` (agent-op-env.sh) - with no auth source at all, op
   prompts on /dev/tty and hangs headless callers. Deliberately NOT cached: 1Password's
   1000-requests/24h cap is per-1Password-account, and the answer to hitting
   it is switching to desktop auth, not persisting secrets locally - see the
   `1password` skill's rate-limit protocol),
+  `posthog-auth.sh` (PostHog credential aliases and API-host normalization;
+  the agent CLI uses the existing broad AI Agent key. Explicit
+  `POSTHOG_CLI_API_KEY` / `POSTHOG_CLI_HOST` override it; an app's public
+  ingestion token does not. `pkgs/posthog-cli.nix` pins the official binary,
+  Node API bundle, and upstream skills exposed at
+  `$XDG_DATA_HOME/posthog/skills` with the usual `~/.local/share` default),
   `agent-config-links.nix` (the agent-config fan-out symlinks, one list for
   both machines),
   `claude-plugins.nix` (Claude Code plugins as pinned flake inputs, linked
@@ -46,7 +52,9 @@ routing table and workflow; this file is the in-repo map.
   credential helper + companion clone-if-missing),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
-  `herdr.nix` (native `programs.herdr` settings shared by both hosts;
+  `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
+  restoration hooks shared by both hosts; Claude's installer runs during
+  activation against its writable settings, while Codex hooks are HM-managed;
   `ghostty.nix` adds `herdr-window` and a window-local key table translating
   macOS tab/split shortcuts to Herdr prefix keys),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the

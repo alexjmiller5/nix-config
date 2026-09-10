@@ -37,8 +37,11 @@ Ordinary Ghostty windows keep their existing shortcuts. Running plain
 `herdr` attaches with Herdr's Ctrl+B prefix shortcuts instead. Preferences
 are managed in `home/herdr.nix`; edit that module rather than saving changes
 in Herdr's settings screen. Closing a client preserves running processes;
-a machine restart restores saved layout, but agent conversation restoration
-also requires the corresponding Herdr integration.
+a machine restart restores saved layout and resumes supported Claude/Codex
+conversations captured by the installed SessionStart integrations. Start or
+resume those agents inside Herdr after activation so their IDs are captured.
+`python3 tests/herdr-integrations.py` checks the installed hooks against an
+isolated socket. Codex may request review of a changed hook in `/hooks`.
 
 ## Manual setup steps (per host)
 

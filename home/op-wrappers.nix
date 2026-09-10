@@ -21,6 +21,7 @@ let
   # gogcli from the openclaw flake — tracks upstream releases; nixpkgs' copy
   # lags months behind at gog's weekly cadence.
   gogcliPkg = nix-openclaw-tools.packages.${pkgs.stdenv.hostPlatform.system}.gogcli;
+  posthogCli = pkgs.callPackage ../pkgs/posthog-cli.nix { };
   # wacli (WhatsApp linked-device CLI) from its GitHub release — not in
   # nixpkgs or nix-openclaw-tools. Installed under libexec on purpose: the
   # `wacli` on PATH must be the wrapper below, never the raw binary.
@@ -44,7 +45,20 @@ let
   };
 in
 {
+  xdg.dataFile."posthog/skills".source = "${posthogCli.skills}/skills";
   home.packages = [
+    # Agent-wide PostHog access, using the existing broad personal API key.
+    (pkgs.writeShellApplication {
+      name = "posthog-cli";
+      runtimeInputs = [ pkgs._1password-cli ];
+      text = ''
+        ${builtins.readFile ./agent-detect.sh}
+        ${builtins.readFile ./agent-op-env.sh}
+        ${builtins.readFile ./posthog-auth.sh}
+        exec ${posthogCli}/bin/posthog-cli "$@"
+      '';
+    })
+
     # gh, ALWAYS authed via 1Password (PAT item in the AI Agent vault) — the
     # keyring is not used.
     (pkgs.writeShellApplication {
