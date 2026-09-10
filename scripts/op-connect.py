@@ -86,6 +86,20 @@ def cloud_op(cfg, env, *args):
     return result.stdout.strip()
 
 
+def wait_for_docker(cfg):
+    deadline = time.monotonic() + 180
+    while time.monotonic() < deadline:
+        try:
+            result = subprocess.run([cfg["docker"], "info"], stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.DEVNULL, timeout=10)
+            if result.returncode == 0:
+                return
+        except subprocess.TimeoutExpired:
+            pass  # Docker can accept a connection before the engine is ready.
+        time.sleep(2)
+    raise RuntimeError("Docker did not start; check Docker Desktop's setup dialog")
+
+
 def serve(cfg):
     os.umask(0o077)
     state = Path(cfg["stateDirectory"])
@@ -119,12 +133,7 @@ def serve(cfg):
         if not token:
             raise RuntimeError("Connect token is empty")
         subprocess.run(["/usr/bin/open", "-g", "-j", "-a", cfg["dockerApp"]], check=True)
-        deadline = time.monotonic() + 180
-        while subprocess.run([cfg["docker"], "info"], stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL).returncode:
-            if time.monotonic() > deadline:
-                raise RuntimeError("Docker did not start; check Docker Desktop's setup dialog")
-            time.sleep(2)
+        wait_for_docker(cfg)
         subprocess.run([cfg["docker"], "compose", "-f", cfg["composeFile"], "up", "-d"],
                        check=True)
         path = state / "token.sock"

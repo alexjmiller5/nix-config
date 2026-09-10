@@ -112,6 +112,15 @@ class ConnectTests(unittest.TestCase):
         self.assertNotIn("OP_CONNECT_TOKEN", env)
         self.assertNotIn("AGENT_OP_AUTH", env)
 
+    def test_docker_readiness_is_bounded_even_if_info_hangs(self):
+        with patch.object(connect.time, "monotonic", side_effect=[0, 1, 181]), \
+                patch.object(connect.time, "sleep"), \
+                patch.object(connect.subprocess, "run",
+                             side_effect=subprocess.TimeoutExpired("docker", 10)) as run:
+            with self.assertRaisesRegex(RuntimeError, "Docker did not start"):
+                connect.wait_for_docker({"docker": "/fixture/docker"})
+        self.assertEqual(run.call_args.kwargs["timeout"], 10)
+
     def test_provisioning_handles_cli_output_and_keeps_token_out_of_argv(self):
         items, servers, calls = [], [], []
 

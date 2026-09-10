@@ -177,6 +177,8 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 ## App sign-ins (after first switch; GUI-only, none scriptable)
 
 * **Docker Desktop** - complete its first-run agreement/setup if prompted.
+  Approve macOS's administrator prompt if Docker needs to install/update its
+  privileged networking helper. This can also recur after Docker upgrades.
   The declared Connect LaunchAgent opens Docker at login; no separate login
   item or Docker account sign-in is needed. Docker must remain running for
   local Connect reads.
