@@ -27,10 +27,21 @@ routing table and workflow; this file is the in-repo map.
   wrangler, gcloud, ntn, posthog-cli - AI Agent vault creds in every context, read per call
   so nothing credential-shaped touches disk. Every op call in the family sits
   behind `op_has_auth` (agent-op-env.sh) - with no auth source at all, op
-  prompts on /dev/tty and hangs headless callers. Deliberately NOT cached: 1Password's
-  1000-requests/24h cap is per-1Password-account, and the answer to hitting
-  it is switching to desktop auth, not persisting secrets locally - see the
-  `1password` skill's rate-limit protocol),
+  prompts on /dev/tty and hangs headless callers. `opConnect.cliPackage`
+  routes supported AI Agent vault reads through local Connect when enabled.
+  Writes, documents, other vaults, explicit project SAs and desktop auth
+  keep the direct path. Direct SA rate limits still require the `1password`
+  skill's desktop-auth protocol),
+  `op-connect.nix` (opt-in, exported local Docker Desktop deployment, enabled
+  on the laptop. Official API/sync images share Connect's encrypted cache;
+  API binds only 127.0.0.1. A login service restores the encrypted credentials
+  Document when absent, reads the Connect token once through the existing SA,
+  opens Docker and starts Compose. The token stays in memory behind a 0600
+  Unix socket, delivered only to the op child process. No token in shell init,
+  Docker environment, Git, Nix store or an additional plaintext file.
+  `op-connect-start` restarts the login service after rotation or failure;
+  supported reads fail closed when it is unavailable. `op run`/`inject` and
+  item reads without explicit vault ID plus JSON format remain direct),
   `posthog-auth.sh` (PostHog credential aliases and API-host normalization;
   the agent CLI uses the existing broad AI Agent key. Explicit
   `POSTHOG_CLI_API_KEY` / `POSTHOG_CLI_HOST` override it; an app's public
@@ -57,8 +68,11 @@ routing table and workflow; this file is the in-repo map.
   activation against its writable settings, while Codex hooks are HM-managed;
   `ghostty.nix` adds `herdr-window` and a window-local key table translating
   macOS tab/split shortcuts to Herdr prefix keys. The pinned Undo Close plugin
-  restores closed tabs through Cmd+Shift+T, mapped to prefix+t; closed panes
-  are excluded from its history),
+  restores closed tabs through Cmd+Shift+T, mapped to prefix+t. Cmd+W snapshots
+  the current agent sessions before closing; the plugin patch adds this action
+  and Codex resume support. Closed panes are excluded from its history.
+  Native selection copying stays enabled; clipboard feedback comes from
+  Hammerspoon, so Herdr's clipboard toast is disabled),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),

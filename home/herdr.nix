@@ -6,12 +6,7 @@
 }:
 
 let
-  undoClose = pkgs.fetchFromGitHub {
-    owner = "pedroloch";
-    repo = "herdr-undo-close";
-    rev = "0c44b901717917ade80ae2ce0e921aeeabd67381";
-    hash = "sha256-ouidTRf3h7l6UqvNJQa8VI0yJU448fiihbSnpRmGWYE=";
-  };
+  undoClose = pkgs.callPackage ../pkgs/herdr-undo-close.nix { };
 in
 # Shared terminal workspace settings for local and SSH sessions.
 {
@@ -67,7 +62,14 @@ in
         prefix = "ctrl+b";
         previous_agent = "prefix+ctrl+p";
         next_agent = "prefix+ctrl+n";
+        close_tab = [ ];
         command = [
+          {
+            key = "prefix+shift+x";
+            type = "plugin_action";
+            command = "undo-close.close-tab";
+            description = "Close tab and save agent sessions";
+          }
           {
             key = "prefix+t";
             type = "plugin_action";
@@ -77,6 +79,8 @@ in
         ];
       };
       ui = {
+        copy_on_select = true;
+        toast.clipboard.enabled = false;
         prompt_new_tab_name = false;
         agent_panel_sort = "spaces";
         show_agent_labels_on_pane_borders = true;

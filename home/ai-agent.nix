@@ -17,6 +17,7 @@
   imports = [
     ./op-agent-sa.nix
     ./agent-env.nix
+    ./op-connect.nix
   ];
 
   options.aiAgent.withOp = lib.mkOption {
@@ -29,7 +30,7 @@
     pkgs.nodejs # agent-config hooks exec `node`; nix's shadows brew's (see zsh.nix)
     pkgs.skills # skills.sh agent-skills manager (was a laptop brew formula)
   ]
-  ++ lib.optional config.aiAgent.withOp pkgs._1password-cli;
+  ++ lib.optional config.aiAgent.withOp config.opConnect.cliPackage;
 
   # Claude Code never persists home-dir trust acceptance to disk (session-only
   # by design), so launching `claude` from ~ re-prompts on every start. Seed

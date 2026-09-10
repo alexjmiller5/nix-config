@@ -176,6 +176,10 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 
 ## App sign-ins (after first switch; GUI-only, none scriptable)
 
+* **Docker Desktop** - complete its first-run agreement/setup if prompted.
+  The declared Connect LaunchAgent opens Docker at login; no separate login
+  item or Docker account sign-in is needed. Docker must remain running for
+  local Connect reads.
 * **1Password** — covered in bootstrap step 5 (app sign-in, `op signin`).
 * **Claude** — sign into the Claude desktop app and Claude Code (`claude` →
   `/login`); auth state lands in `~/.claude.json` (deliberate leftover).

@@ -8,7 +8,7 @@
 # AGENT_SHELL, so the arming no-ops and his calls keep desktop auth.
 if [ "${AGENT_OP_AUTH:-}" = desktop ]; then
   # Explicit user auth stays selected across hooks, wrappers and child shells.
-  unset OP_SERVICE_ACCOUNT_TOKEN
+  unset OP_SERVICE_ACCOUNT_TOKEN OP_CONNECT_HOST OP_CONNECT_TOKEN
 elif [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "${AGENT_SHELL:-}" ]; then
   # 0600 token file refreshed at login by op-agent-sa.nix (a file, not the
   # Keychain — ssh-descended shells can't read the per-session-locked Keychain).

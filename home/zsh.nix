@@ -94,9 +94,9 @@
           op-personal() {
               local f="$HOME/.local/state/op/personal-session"
               if [[ -r $f ]]; then
-                  AGENT_OP_AUTH=desktop env -u OP_SERVICE_ACCOUNT_TOKEN op --session "$(<"$f")" "$@"
+                  AGENT_OP_AUTH=desktop env -u OP_SERVICE_ACCOUNT_TOKEN -u OP_CONNECT_HOST -u OP_CONNECT_TOKEN op --session "$(<"$f")" "$@"
               else
-                  AGENT_OP_AUTH=desktop env -u OP_SERVICE_ACCOUNT_TOKEN sh -c \
+                  AGENT_OP_AUTH=desktop env -u OP_SERVICE_ACCOUNT_TOKEN -u OP_CONNECT_HOST -u OP_CONNECT_TOKEN sh -c \
                       'op signin --account my.1password.com >/dev/null 2>&1; exec op "$@"' sh "$@"
               fi
           }

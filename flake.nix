@@ -46,12 +46,6 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Workspace Snapshot — ships a home-manager module (Spoon + scripts +
-    # VS Code extension); enabled in home/macbook-air.nix.
-    workspace-snapshot = {
-      url = "github:alexjmiller5/workspace-snapshot";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # openclaw tool packages (gogcli et al.) at upstream release cadence —
     # nixpkgs lags gogcli by months at its weekly release pace.
     nix-openclaw-tools = {
@@ -119,7 +113,6 @@
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "backup";
               home-manager.sharedModules = [
-                inputs.workspace-snapshot.homeModules.default
                 inputs.life-data.homeModules.default
               ];
               # Explicit per-input args (not `inherit inputs`) on purpose: each
@@ -169,6 +162,7 @@
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
         op-agent-sa = ./home/op-agent-sa.nix;
+        op-connect = ./home/op-connect.nix;
         moshi-hook = ./home/moshi-hook.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;
         ai-agent = ./home/ai-agent.nix;

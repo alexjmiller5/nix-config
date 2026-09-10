@@ -33,6 +33,7 @@ check:
     nix flake check
     bash tests/agent-detect.sh
     bash tests/op-auth-guard.sh
+    python3 tests/op-connect.py
     bash tests/posthog-auth.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh

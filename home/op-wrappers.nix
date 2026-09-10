@@ -1,4 +1,9 @@
-{ pkgs, nix-openclaw-tools, ... }:
+{
+  config,
+  pkgs,
+  nix-openclaw-tools,
+  ...
+}:
 
 # The op-authed CLI wrapper family — one paradigm, one file. PATH-level
 # shadows (not aliases/functions, so scripts, launchd, justfiles, and agent
@@ -11,6 +16,8 @@
 # defines op_has_auth → op read (desktop-app auth, Touch ID, in Alex's own
 # terminals) → exec the real binary. Both seams are interpolated
 # (builtins.readFile) because wrapper callers may skip zshrc entirely.
+# opConnect.cliPackage selects local Connect for supported agent-vault reads
+# when enabled; document operations and writes keep direct authentication.
 # EVERY op call in here sits behind op_has_auth: with no auth source at all
 # (Alex's own ssh shells on the mini) op prompts on /dev/tty and hangs
 # headless callers, and 2>/dev/null does not suppress a prompt.
@@ -45,12 +52,13 @@ let
   };
 in
 {
+  imports = [ ./op-connect.nix ];
   xdg.dataFile."posthog/skills".source = "${posthogCli.skills}/skills";
   home.packages = [
     # Agent-wide PostHog access, using the existing broad personal API key.
     (pkgs.writeShellApplication {
       name = "posthog-cli";
-      runtimeInputs = [ pkgs._1password-cli ];
+      runtimeInputs = [ config.opConnect.cliPackage ];
       text = ''
         ${builtins.readFile ./agent-detect.sh}
         ${builtins.readFile ./agent-op-env.sh}
@@ -63,7 +71,7 @@ in
     # keyring is not used.
     (pkgs.writeShellApplication {
       name = "gh";
-      runtimeInputs = [ pkgs._1password-cli ];
+      runtimeInputs = [ config.opConnect.cliPackage ];
       text = ''
         if [ -z "''${GH_TOKEN:-}''${GITHUB_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
@@ -84,7 +92,7 @@ in
     (pkgs.writeShellApplication {
       name = "modal";
       runtimeInputs = [
-        pkgs._1password-cli
+        config.opConnect.cliPackage
         pkgs.uv
       ];
       text = ''
@@ -129,7 +137,7 @@ in
     (pkgs.writeShellApplication {
       name = "gog";
       runtimeInputs = [
-        pkgs._1password-cli
+        config.opConnect.cliPackage
         pkgs.jq
         pkgs.curl
       ];
@@ -195,7 +203,7 @@ in
     (pkgs.writeShellApplication {
       name = "wacli";
       runtimeInputs = [
-        pkgs._1password-cli
+        config.opConnect.cliPackage
         pkgs.sqlite
         pkgs.coreutils
       ];
@@ -261,7 +269,7 @@ in
     # The token is account-scoped, so wrangler infers the account ID itself.
     (pkgs.writeShellApplication {
       name = "wrangler";
-      runtimeInputs = [ pkgs._1password-cli ];
+      runtimeInputs = [ config.opConnect.cliPackage ];
       text = ''
         if [ -z "''${CLOUDFLARE_API_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}
@@ -281,7 +289,7 @@ in
     # (same mechanism `op plugin run` uses internally).
     (pkgs.writeShellApplication {
       name = "gcloud";
-      runtimeInputs = [ pkgs._1password-cli ];
+      runtimeInputs = [ config.opConnect.cliPackage ];
       text = ''
         if [ -n "''${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE:-}''${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
           exec ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
@@ -306,7 +314,7 @@ in
     # plain `ntn` resolves to this wrapper.
     (pkgs.writeShellApplication {
       name = "ntn";
-      runtimeInputs = [ pkgs._1password-cli ];
+      runtimeInputs = [ config.opConnect.cliPackage ];
       text = ''
         if [ -z "''${NOTION_API_TOKEN:-}" ]; then
           ${builtins.readFile ./agent-detect.sh}

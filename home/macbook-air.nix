@@ -61,6 +61,15 @@ in
     tokenOpAuthFile = osConfig.age.secrets.machine-sa.path;
   };
 
+  # Local trial on the laptop. The exported module remains opt-in on other
+  # hosts; the mini keeps direct SA/desktop auth and needs no Docker runtime.
+  opConnect = {
+    enable = true;
+    vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
+    credentialsItemId = "ztahtbkzccclf3nvchiwmrb7ci";
+    tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/qc67dntzaer2k4n3jx6baql7va/credential";
+  };
+
   # Tab Copy's ⇧⌘C shortcut is NOT codified: it lives in Chrome's HMAC-signed
   # Secure Preferences (extensions.settings.<id>.commands), so an unsigned
   # external write is ignored on startup. Re-bind it by hand after an
@@ -563,15 +572,5 @@ in
   # Hammerspoon profile selector — read by ~/.hammerspoon/init.lua at load.
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
   home.file.".config/hammerspoon-profile".text = "personal";
-
-  # Workspace Snapshot — its flake's home-manager module (imported via
-  # sharedModules in flake.nix) installs the Application Support scripts dir
-  # the Claude SessionStart hook references and the VS Code terminals
-  # extension. Replaces the repo's install.sh; updates ride the weekly flake
-  # input bump. The Spoon itself is NOT symlinked anymore: the hammerspoon
-  # repo vendors all spoons in-tree (real dir at the same path), so the
-  # module's spoon file is disabled here.
-  programs.workspace-snapshot.enable = true;
-  home.file.".hammerspoon/Spoons/WorkspaceSnapshot.spoon".enable = false;
 
 }

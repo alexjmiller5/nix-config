@@ -1,20 +1,36 @@
-{ pkgs, nix-vscode-extensions, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  nix-vscode-extensions,
+  ...
+}:
 
 # VS Code extensions, fully declared and grouped by function (audited
 # 2026-08-15: every entry either matches the current stack — Python/uv/ruff,
 # Bun/Svelte/Tailwind, Swift/iOS, nix, cherri, hammerspoon, just — or is
 # wired into settings.json; unused, deprecated, and superseded extensions
 # removed). The app itself stays the visual-studio-code cask — package = null
-# installs nothing — but home-manager owns ~/.vscode/extensions as an
-# immutable set: VS Code can no longer install or update extensions itself.
+# installs nothing - home-manager links the declared extensions alongside
+# extensions managed by VS Code.
 # Add/remove = edit this list + rebuild; versions ride the weekly
-# nix-vscode-extensions input bump. (workspace-snapshot-terminals joins this
-# set via the workspace-snapshot flake module — see
-# programs.workspace-snapshot in macbook-air.nix.)
+# nix-vscode-extensions input bump.
 let
   mkt = nix-vscode-extensions.extensions.${pkgs.stdenv.hostPlatform.system}.vscode-marketplace;
 in
 {
+  # Home Manager skips registry invalidation when the app is Cask-owned.
+  # Use its normal change marker and rescan all installed extensions.
+  home.file.".vscode/extensions/.extensions-immutable.json" =
+    lib.mkIf (config.programs.vscode.package == null)
+      {
+        text = pkgs.vscode-utils.toExtensionJson config.programs.vscode.profiles.default.extensions;
+        onChange = ''
+          run rm -f "$HOME/.vscode/extensions/extensions.json" "$HOME/.vscode/extensions/.init-default-profile-extensions"
+          run "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" --list-extensions > /dev/null
+        '';
+      };
+
   programs.vscode = {
     enable = true;
     package = null; # app comes from the cask
@@ -128,7 +144,7 @@ in
         hashicorp.terraform # OCI VM fleet
         nefrob.vscode-just-syntax
         james-yu.latex-workshop # resume is .tex
-        ms-vscode.extension-test-runner # workspace-snapshot extension dev
+        ms-vscode.extension-test-runner
       ])
       ++ (with pkgs.vscode-extensions; [
         # Platform-specific / licensed builds the marketplace mirror refuses to

@@ -190,6 +190,7 @@ in
         ${op} read '${peopleSyncCiTokenRef}')"
       export LIFE_HUB_URL="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/LIFE_HUB_URL')"
       export LIFE_HUB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/LIFE_HUB_TOKEN')"
+      export NOTION_API_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/NOTION_API_TOKEN')"
       unset ci
       state="$HOME/.local/state/people-sync"
       mkdir -p "$state"
