@@ -20,15 +20,9 @@
     ./machine-vault-git.nix
   ];
 
-  # life-data (module shipped by the app's flake). The admin hub token IS
-  # the agent estate's daily credential (Alex's call 2026-09-02: agents are
-  # the sole CLI users; a separate machine token added no real isolation -
-  # the SA on these machines can read this item regardless). Scoped tokens
-  # exist for OTHER clients (OwnTracks, notion-automations, ...).
-  #
-  # The two contexts authenticate independently (Alex's call 2026-09-02):
-  # interactive `life` rides the shell's existing op auth; the daemon's
-  # command is self-sufficient because launchd has no shell environment.
+  # Life supplies the installed background runner and its CLI toggle.
+  # Interactive agent auth remains separate; background credentials are
+  # configured through `life background enable` on each device.
   lifeData =
     let
       hubTokenRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/3qq7d6cltvwh3yzken2b46einm/credential";
@@ -36,10 +30,6 @@
     {
       enable = true;
       cli.tokenCommand = "op read '${hubTokenRef}'";
-      watch = {
-        tokenCommand = ''OP_SERVICE_ACCOUNT_TOKEN="$(cat "$HOME/.local/state/op/agent-sa-token")" op read '${hubTokenRef}' '';
-        packages = [ pkgs._1password-cli ];
-      };
     };
 
   home.stateVersion = "25.05";
