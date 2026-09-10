@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, pkgs, ... }:
 
 # Ghostty, via the native HM module (app itself stays the cask; the nixpkgs
 # ghostty package is broken on darwin, hence package = null). Settings land
@@ -6,6 +6,17 @@
 # Application Support path. Docs: https://ghostty.org/docs/config —
 # `ghostty +show-config --default --docs` lists every option + default.
 {
+  imports = [ ./herdr.nix ];
+
+  home.packages = [
+    (pkgs.writeShellApplication {
+      name = "herdr-window";
+      text = ''
+        exec /usr/bin/osascript ${../scripts/herdr-window.applescript} "$PWD" "${pkgs.herdr}/bin/herdr"
+      '';
+    })
+  ];
+
   programs.ghostty = {
     enable = true;
     package = null;
@@ -35,7 +46,31 @@
         ''super+arrow_right=text:\x1b[F''
         ''super+arrow_up=text:\x1b[1;5H''
         ''super+arrow_down=text:\x1b[1;5F''
-      ];
+
+        # Only herdr-window activates this table. Translate familiar macOS
+        # shortcuts to Herdr's prefix keys; regular Ghostty surfaces retain
+        # their native bindings. Cmd+Shift+W detaches without stopping agents.
+        ''herdr/super+t=text:\x02c''
+        ''herdr/super+shift+[=text:\x02p''
+        ''herdr/super+shift+]=text:\x02n''
+        ''herdr/super+w=text:\x02X''
+        ''herdr/super+d=text:\x02v''
+        ''herdr/super+shift+d=text:\x02-''
+        ''herdr/super+[=text:\x02\x1b[Z''
+        ''herdr/super+]=text:\x02\t''
+        ''herdr/super+shift+enter=text:\x02z''
+        ''herdr/super+shift+n=text:\x02N''
+        ''herdr/super+p=text:\x02g''
+        ''herdr/super+backslash=text:\x02b''
+        ''herdr/super+alt+[=text:\x02\x10''
+        ''herdr/super+alt+]=text:\x02\x0e''
+        ''herdr/super+shift+w=text:\x02q''
+        ''herdr/super+comma=text:\x02s''
+      ]
+      ++ lib.concatMap (n: [
+        ''herdr/super+${n}=text:\x02${n}''
+        ''herdr/super+digit_${n}=text:\x02${n}''
+      ]) (map toString (lib.range 1 9));
     };
   };
 }

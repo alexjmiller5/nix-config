@@ -4,6 +4,8 @@
 # is exportable via homeModules (work-laptop flake imports it as-is).
 # (fzf lives in zsh.nix as programs.fzf — its value is the shell integration.)
 {
+  imports = [ ./herdr.nix ];
+
   home.packages = with pkgs; [
     uv
     ripgrep
@@ -12,7 +14,6 @@
     bat
     git-filter-repo
     gitleaks
-    herdr
     _7zz
     shellcheck
     tree

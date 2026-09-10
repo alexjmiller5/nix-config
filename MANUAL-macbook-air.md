@@ -110,6 +110,8 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
 * **Calendar / Contacts**: Raycast
 * **Microphone**: Raycast
 * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker;
+  the terminal running `herdr-window` -> Ghostty (allow the first launch
+  prompt so its native AppleScript API can open the dedicated window);
   Ghostty → Messages (for `imsg send` — macOS prompts on first send; reads
   need only Ghostty's existing Full Disk Access)
 

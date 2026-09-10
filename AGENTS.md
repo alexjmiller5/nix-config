@@ -46,6 +46,9 @@ routing table and workflow; this file is the in-repo map.
   credential helper + companion clone-if-missing),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
+  `herdr.nix` (native `programs.herdr` settings shared by both hosts;
+  `ghostty.nix` adds `herdr-window` and a window-local key table translating
+  macOS tab/split shortcuts to Herdr prefix keys),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),
