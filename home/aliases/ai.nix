@@ -1,8 +1,11 @@
 # AI agent / Claude Code aliases. The op-* scripts resolve through
 # ~/.claude/skills (a symlink into the agent-config repo).
+{ config, lib, ... }:
+
 {
   programs.zsh.shellAliases = {
     cdx = "codex";
+    hdr = lib.mkIf config.programs.ghostty.enable "herdr-window";
     # Claude's default model lives in agent-config's claude/settings.json.
     cc = "claude";
     claude-max = "claude --effort max";

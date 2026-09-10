@@ -14,7 +14,7 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 
 ## Herdr in Ghostty
 
-Run `herdr-window` from a project directory to open a dedicated Ghostty
+Run `hdr` (an alias for `herdr-window`) from a project directory to open a dedicated Ghostty
 window. That window uses a native Ghostty key table to control Herdr:
 
 | Shortcut | Action |
