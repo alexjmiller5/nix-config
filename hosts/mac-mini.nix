@@ -32,7 +32,7 @@ let
   # Screentime Dashboard: the mini pushes rebuilt Screen Time series to the
   # dashboard Worker through Cloudflare Access with a service token that
   # lives in this machine's vault - one hop via the machine SA, read only
-  # when a sync actually runs (never by the 60s poll).
+  # when a sync actually runs (never by the idle long-poll).
   screentimeDashboardCredential = pkgs.writeShellScript "screentime-dashboard-credential" ''
     set -euo pipefail
     OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \

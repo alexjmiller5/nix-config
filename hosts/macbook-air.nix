@@ -16,6 +16,7 @@
 {
   imports = [
     ../modules/notunes.nix
+    ../modules/yabai.nix
     ./macbook-air-chrome-policy.nix
   ];
 
@@ -56,25 +57,6 @@
     user = username;
   };
 
-  # yabai: the org.nixos.yabai launchd agent runs the nix package for BSP
-  # tiling. The scripting addition is OFF — macOS 26.1's AMFI enforces library
-  # validation on Dock (a platform binary) and refuses to load yabai's
-  # third-party ad-hoc payload, so SA-only features (space create/destroy,
-  # cross-display space moves, opacity, sticky windows) don't work regardless
-  # of SIP state. With the SA off there's no yabai-sa daemon and no
-  # /etc/sudoers.d/yabai. Still manual: granting Accessibility when the store
-  # path changes on upgrades (MANUAL-macbook-air.md). Revisit if yabai ships
-  # real macOS 26.x injection support.
-  #
-  # config.layout is set purely so the module writes a yabairc and passes
-  # `-c` — without any config yabai warns "could not locate config file" on
-  # every start. `float` matches yabai's own default (no auto-tiling); switch
-  # to "bsp" here for automatic tiling.
-  services.yabai = {
-    enable = true;
-    config.layout = "float";
-  };
-
   # Disable auto display brightness (laptop-only; written to /Library/Preferences
   # as root — takes effect after a restart).
   system.defaults.CustomSystemPreferences = {
@@ -83,7 +65,7 @@
     };
   };
 
-  # Laptop-only root activation steps (Rosetta, yabai TCC nudge). The cask
+  # Laptop-only root activation steps (Rosetta). The cask
   # de-quarantine lives in darwin-base.nix (both machines); modules/chrome-policy.nix
   # contributes its own entry too — the option is types.lines, so all the
   # definitions merge.
@@ -93,20 +75,6 @@
     # so install here, guarded by the oahd check to stay idempotent.
     if ! /usr/bin/pgrep -q oahd; then
       /usr/sbin/softwareupdate --install-rosetta --agree-to-license
-    fi
-
-    # yabai TCC reminder: Accessibility grants key on the nix store path,
-    # which changes on version bumps — the old grant dies and the keepalive
-    # agent spams Accessibility prompts (MANUAL-macbook-air.md). Compare
-    # against the last-switched path and print re-grant instructions.
-    yabaiBin='${config.services.yabai.package}/bin/yabai'
-    if [ "$(cat /var/db/yabai-tcc-path 2>/dev/null)" != "$yabaiBin" ]; then
-      printf '\n\033[1;33myabai store path changed — re-grant Accessibility or the prompt spam returns:\033[0m\n'
-      echo "  System Settings > Privacy & Security > Accessibility:"
-      echo "    1. remove the stale yabai row (minus button)"
-      echo "    2. + > Cmd+Shift+G > paste: $yabaiBin"
-      echo "    3. toggle it ON"
-      echo "$yabaiBin" > /var/db/yabai-tcc-path
     fi
   '';
 
