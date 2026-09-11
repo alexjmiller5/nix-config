@@ -24,3 +24,14 @@ code() {
     command code "$@"
   fi
 }
+herdr() {
+  # Bare `herdr` attaches in whatever window you're in, so only the ctrl+b
+  # prefix works; herdr-window opens a Ghostty window with the key table that
+  # maps the macOS shortcuts. Subcommands (plugin, integration, server) and any
+  # host without Ghostty fall through to the real binary.
+  if [[ $# -eq 0 ]] && command -v herdr-window >/dev/null; then
+    herdr-window
+  else
+    command herdr "$@"
+  fi
+}

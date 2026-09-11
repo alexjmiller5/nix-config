@@ -311,8 +311,18 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
   Chrome's MAC + super_mac, which risks a protected-prefs reset). An extension
   reload wipes them. Re-bind by hand at `chrome://extensions/shortcuts`:
   - **Tab Copy → Copy selected tabs = ⇧⌘C** ("In Chrome" scope).
-  (Tab Copy's custom formats DO survive — they're in the extension's
-  unprotected LevelDB, restored by the `chrome-extension-storage` module.)
+* **Tab Copy's custom format** lives in the extension's unprotected LevelDB
+  and IS declared, in `home/macbook-air.nix` under `chrome.extensionStorage`.
+  Two things keep it from restoring itself, so check both when it goes missing:
+  - The module needs the LevelDB lock, so it **skips whenever Chrome is
+    running** and only converges on a switch with Chrome quit. Chrome is
+    opened at login by its own agent, so quit it first and re-switch.
+  - The format id is Tab Copy's own random mint. **Rebuilding the format by
+    hand in the UI mints a new id**, which makes the declared id stale — and a
+    stale id is destructive, not inert: it overwrites the live format with one
+    that no longer exists. After any hand-rebuild, re-dump and update the id.
+    Dump it by copying the profile's `Local Extension Settings/<extid>` dir,
+    deleting `LOCK`, and reading it with plyvel.
 * **1Password** app settings can't be restored from backup (checksummed) —
   configure by hand.
 * **Raycast**: clipboard history retention → 7 days; Advanced → Interface Size

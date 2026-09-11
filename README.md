@@ -33,8 +33,10 @@ window. That window uses a native Ghostty key table to control Herdr:
 | Cmd+Shift+W | Detach, leaving processes running |
 | Cmd+, | Settings |
 
-Ordinary Ghostty windows keep their existing shortcuts. Running plain
-`herdr` attaches with Herdr's Ctrl+B prefix shortcuts instead. Preferences
+Ordinary Ghostty windows keep their existing shortcuts. Bare `herdr` is a
+shell function that runs `herdr-window` too, so the shortcuts are never missed
+by forgetting the alias; `herdr <subcommand>` still hits the real binary, as
+does any host without Ghostty (the key table only exists there). Preferences
 are managed in `home/herdr.nix`; edit that module rather than saving changes
 in Herdr's settings screen. Closing a client preserves running processes;
 a machine restart restores saved layout and resumes supported Claude/Codex

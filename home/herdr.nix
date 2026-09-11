@@ -84,14 +84,35 @@ in
         prompt_new_tab_name = false;
         agent_panel_sort = "spaces";
         show_agent_labels_on_pane_borders = true;
+        # Fill behind the focused sidebar row. A palette name (not a hex) so it
+        # tracks the catppuccin light/dark switch; cyan reads too faint to spot.
+        accent = "magenta";
+        # Herdr mutes every row after the first; dim = false opts out without
+        # pinning a color, so the catppuccin light/dark switch still applies.
         sidebar.agents.rows = [
           [
             "state_icon"
-            "workspace"
-            "tab"
+            {
+              token = "workspace";
+              dim = false;
+            }
+            {
+              token = "tab";
+              dim = false;
+            }
           ]
-          [ "terminal_title_stripped" ]
-          [ "agent" ]
+          [
+            {
+              token = "terminal_title_stripped";
+              dim = false;
+            }
+          ]
+          [
+            {
+              token = "agent";
+              dim = false;
+            }
+          ]
         ];
       };
     };

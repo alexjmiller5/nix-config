@@ -84,27 +84,38 @@ in
   # chrome-control skill reads this and drives it over an ssh port-forward.
   home.sessionVariables.CHROME_CONTROL_HOST = "mac-mini-tailscale";
 
-  # Tab Copy's custom "URL Format" (urls only, newline-delimited) — lives in
-  # the extension's chrome.storage.local, wiped on reinstall. Captured from a
-  # live plyvel dump 2026-08-18; edit here (or re-dump) after UI changes,
-  # since these values are enforced over UI edits at every switch.
+  # Tab Copy's custom format (urls only, newline-delimited) — lives in the
+  # extension's chrome.storage.local, wiped on reinstall. Captured from a live
+  # plyvel dump; edit here (or re-dump) after UI changes, since these values
+  # are enforced over UI edits at every switch.
+  #
+  # The format id is Tab Copy's own random mint, and recreating the format by
+  # hand in the UI mints a NEW one — so a stale id here is not a no-op, it is
+  # destructive: the enforced customFormatIds/orderedFormatIds/formatOpts
+  # point at a format that no longer exists and overwrite the live one. After
+  # ever rebuilding the format in the UI, re-dump and update the id below.
+  # formatOpts is written whole, so every entry to keep (incl. the built-in
+  # "link") must be listed or it is dropped.
   chrome.extensionStorage = {
     profile = "Profile 1";
     storage.micdllihgoppmejpecmkilggmaagfdmb = {
-      customFormatIds = [ "custom-9hVL4q" ];
-      orderedFormatIds = [ "custom-9hVL4q" ];
+      customFormatIds = [ "custom-rw1VLp" ];
+      orderedFormatIds = [ "custom-rw1VLp" ];
       hiddenFormatIds = [ ];
-      formatOpts."custom-9hVL4q" = {
-        name = "URL Format";
-        template = {
-          start = "";
-          end = "";
-          tab = "[url]";
-          tabDelimiter = "[n]";
-          windowStart = "";
-          windowEnd = "";
-          windowDelimiter = "[n]";
+      formatOpts = {
+        "custom-rw1VLp" = {
+          name = "Default";
+          template = {
+            start = "";
+            end = "";
+            tab = "[url]";
+            tabDelimiter = "[n]";
+            windowStart = "";
+            windowEnd = "";
+            windowDelimiter = "[n]";
+          };
         };
+        link.plaintextFallback = "url";
       };
     };
 
