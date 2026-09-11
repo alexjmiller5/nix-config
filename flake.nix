@@ -189,7 +189,6 @@
         macos-menu-bar = ./home/macos/menu-bar.nix;
         macos-spotlight-raycast = ./home/macos/spotlight-raycast.nix;
         macos-nightlight = ./home/macos/nightlight.nix;
-        macos-chrome-extension-storage = ./home/macos/chrome-extension-storage.nix;
         macos-chrome-remote-debugging = ./home/macos/chrome-remote-debugging.nix;
         macos-notification-prefs = ./home/macos/notification-prefs.nix;
       };
