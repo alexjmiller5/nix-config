@@ -139,8 +139,8 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
    ORDER BY service, client;"
 ```
 
-* **Accessibility**: Hammerspoon, Karabiner-Elements, yabai (the nix store
-  binary — re-grant on version bumps), AltTab, Raycast,
+* **Accessibility**: Hammerspoon, Karabiner-Elements, yabai
+  (`/Library/Application Support/yabai/yabai`), AltTab, Raycast,
   BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
 * **Input Monitoring**: Karabiner-Elements (grants land on its helper
   binaries), Dolphin
@@ -170,9 +170,9 @@ snippet expansion), Files and Folders, Calendar and Contacts, Microphone
 Full Disk Access instead of the per-folder "Files and Folders" rows; it
 supersedes them and is what the search-files extension needs.
 
-Path-keyed clients (nix-store yabai, brew's versioned node/claude-code paths)
-re-key on every version bump: yabai needs its Accessibility re-grant, the
-others just shed a dead row. Harmless — purge dead rows whenever auditing.
+Path-keyed clients (brew's versioned node/claude-code paths) re-key on every
+version bump and just shed a dead row. Harmless — purge dead rows whenever
+auditing.
 
 Purging dead rows: `tccutil reset` does NOT work for uninstalled software
 (it errors "No such bundle identifier" once the app leaves LaunchServices)
@@ -190,18 +190,25 @@ sudo killall tccd
 
 ## yabai (Accessibility only — the rest is declared)
 
-The launchd agent is declarative (`services.yabai` in `hosts/macbook-air.nix`),
-BSP tiling only. The scripting addition is OFF: macOS 26.1's AMFI enforces
-library validation on Dock and won't load yabai's third-party ad-hoc payload,
-so the SA can't inject regardless of SIP state (verified 2026-08-15). yabai
-therefore needs no SIP disable and no `arm64e_preview_abi` boot-arg.
+The launchd agent is declarative (`modules/yabai.nix`, imported by
+`hosts/macbook-air.nix`). The scripting addition is OFF: macOS 26.1's AMFI
+enforces library validation on Dock and won't load yabai's third-party ad-hoc
+payload, so the SA can't inject regardless of SIP state (verified 2026-08-15).
+yabai therefore needs no SIP disable and no `arm64e_preview_abi` boot-arg.
 
-What stays manual:
+yabai runs from `/Library/Application Support/yabai/yabai` — a copy of the
+store binary that activation re-signs with the stable `yabai-signing` cert.
+Fixed path + fixed code identity = the Accessibility grant survives every
+version bump (nixpkgs' own build is ad-hoc/linker-signed under a hashed store
+path, so its grant died on every rebuild and the KeepAlive agent then spammed
+Accessibility prompts). The `yabai` CLI on PATH is still the store build; it
+only talks to the running server over its socket and needs no grant.
 
-1. Accessibility grant (below) — and RE-grant after any yabai version bump:
-   the nix store path (and the binary TCC keys on) changes with each update.
-   `switch-macbook` detects the path change (state in /var/db/yabai-tcc-path)
-   and prints the new path + re-grant steps at the end of activation.
+What stays manual (TCC is GUI-only), once:
+
+System Settings > Privacy & Security > Accessibility > `+` > Cmd+Shift+G >
+paste `/Library/Application Support/yabai/yabai` > toggle it ON. Remove any
+leftover `/nix/store/...-yabai-*/bin/yabai` rows while there.
 
 ## SIP status: DISABLED — keep it that way for now
 

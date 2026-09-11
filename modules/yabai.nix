@@ -19,6 +19,7 @@
 # windows) can't work regardless of SIP state. Hence no yabai-sa daemon and no
 # /etc/sudoers.d/yabai.
 {
+  lib,
   pkgs,
   username,
   ...
@@ -38,7 +39,10 @@ let
   '';
 in
 {
-  system.activationScripts.postActivation.text = ''
+  # mkBefore: this runs ahead of the home-manager activation chunk, so an
+  # unrelated home-manager failure can't leave the agent pointing at a binary
+  # that was never installed.
+  system.activationScripts.postActivation.text = lib.mkBefore ''
     # Stable self-signed signing cert (one-time, idempotent).
     if ! /usr/bin/security find-certificate -c ${signingIdentity} /Library/Keychains/System.keychain >/dev/null 2>&1; then
       echo "creating code-signing identity ${signingIdentity} (one-time)..."
