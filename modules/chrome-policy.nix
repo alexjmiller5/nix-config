@@ -62,7 +62,21 @@ in
     system.activationScripts.postActivation.text = "${install}";
 
     launchd.daemons.chrome-policy.serviceConfig = {
-      ProgramArguments = [ "${install}" ];
+      # /bin/sh + wait4path, never the store path directly. launchd loads
+      # every /Library/LaunchDaemons plist in one pass at boot, BEFORE
+      # org.nixos.darwin-store unlocks the encrypted /nix APFS volume - and
+      # an exec check against a not-yet-mounted store path makes launchd
+      # declare the program missing ("Missing executable detected") and drop
+      # the job for the whole session, WatchPaths included. The policy plist
+      # then never comes back, Chrome starts against no policy, and every
+      # forced extension is uninstalled WITH ITS DATA. /bin/sh always exists,
+      # so the job survives the exec check and wait4path holds it until the
+      # store is mounted (same idiom as the login agents in home/macos).
+      ProgramArguments = [
+        "/bin/sh"
+        "-c"
+        "/bin/wait4path '${install}' && exec '${install}'"
+      ];
       RunAtLoad = true;
       # Both levels: ManagedClient recreates the per-user dir itself, which
       # only the parent's watch is guaranteed to see.
