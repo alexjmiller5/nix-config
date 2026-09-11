@@ -127,20 +127,33 @@ let
     /usr/bin/xcrun simctl delete unavailable || true
   '';
 
-  # A login item as a launchd agent: launch the app hidden (-j) and without
-  # stealing focus (-g) — it runs in the background, no window on startup.
+  # Most login items use open so launchd does not own the app process. Raycast
+  # and Hammerspoon are launched directly because their global hooks are ready
+  # much sooner than when Launch Services starts them through open.
+  directLoginApps = [
+    "Hammerspoon"
+    "Raycast"
+  ];
+
   loginItem = app: {
     enable = true;
     config = {
       Label = "com.alexmiller.login.${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] app)}";
-      ProgramArguments = [
-        "/usr/bin/open"
-        "-g"
-        "-j"
-        "-a"
-        app
-      ];
+      ProgramArguments =
+        if lib.elem app directLoginApps then
+          [ "/Applications/${app}.app/Contents/MacOS/${app}" ]
+        else
+          [
+            "/usr/bin/open"
+            "-g"
+            "-j"
+            "-a"
+            app
+          ];
       RunAtLoad = true;
+    }
+    // lib.optionalAttrs (lib.elem app directLoginApps) {
+      ProcessType = "Interactive";
     };
   };
 in
