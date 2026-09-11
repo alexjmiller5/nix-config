@@ -33,6 +33,11 @@ let
   allowed = {
     installation_mode = "allowed";
   };
+  # Hard uninstall: "removed" purges an existing install (and its data)
+  # instead of merely policy-disabling it like a commented entry does.
+  removed = {
+    installation_mode = "removed";
+  };
   # toolbar_pin "force_pinned" = pinned to the toolbar, pin locked
   # (unpinning = remove the attr + switch). Only honored on
   # policy-installed extensions; on `allowed` ones Chrome may ignore it
@@ -80,7 +85,7 @@ in
           "chklaanhfefbnpoihckbnefhakgolnmc" = normal; # JSONVue
           "dijpdmknlincdehpemajfobhfcmjkhof" = normal; # LinkedIn Feed Blocker
           # "iepgempfdndmbciedjdladndpoeodepl" = normal; # Lovable Project Downloader (off — uncomment to install)
-          # "nkbihfbeogaeaoehlefnkodbefgpgknn" = normal; # MetaMask (off — uncomment to install)
+          "nkbihfbeogaeaoehlefnkodbefgpgknn" = removed; # MetaMask
           "pobhoodpcipjmedfenaigbeloiidbflp" = normal; # Minimal Theme for Twitter / X
           "knheggckgoiihginacbkhaalnibhilkk" = normal; # Notion Web Clipper
           "bkhaagjahfmjljalopjnoealnfndnagc" = normal; # Octotree
