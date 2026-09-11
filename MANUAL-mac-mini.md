@@ -200,30 +200,31 @@ through `home/common.nix` and Life's Home Manager module. It does **not**
 restore the local Keychain entry or the user's sync toggle. A fresh machine
 starts with sync off; a normal Nix rebuild preserves an existing toggle.
 
-After completing the machine bootstrap above:
+After completing the machine bootstrap above, connect through Screen Sharing,
+sign into the mini's desktop and open **Terminal inside that desktop**. Run:
 
-1. Retrieve the mini's Life token using 1Password on a trusted device. Its
-   vault is `g532a3e4zyqqrc7b2v3lhv4zmy`, item `z6eqset3ymtovlbiy52i7tl3lm`,
-   field `credential`
-   (`op://g532a3e4zyqqrc7b2v3lhv4zmy/z6eqset3ymtovlbiy52i7tl3lm/credential`).
-   This is a dedicated Life-issued device token, separate from the laptop's
-   token and the AI Agent/admin credential. Its `full` scope permits Life
-   data and schema sync, but not token administration. If it has been
-   revoked, have a Life administrator issue a replacement and store it in
-   this machine's vault; never substitute the admin token.
-2. Connect through Screen Sharing, sign into the mini's desktop and open
-   **Terminal inside that desktop**. Run:
+```sh
+life login --name "Mac mini"
+```
 
-   ```sh
-   life background enable --token-stdin
-   ```
+The command opens the Life browser sign-in flow. Complete the email one-time
+code challenge and approve the displayed device. Life stores the scoped device
+credential in macOS Keychain. This login does not enable background sync.
 
-   Paste the credential at the hidden `Life device token:` prompt and press
-   Return. Approve macOS Keychain access if requested. SSH can report
-   `Keychain operation failed (OS status -25308)` even while the desktop
-   is unlocked; run credential setup in the desktop Terminal in that case.
-   Merely opening Screen Sharing does not grant Keychain access to SSH.
-3. Let the background runner initialize and download the replica, then run
+Then opt into background sync explicitly:
+
+```sh
+life background enable
+```
+
+If the browser did not open automatically, copy the URL printed by `life login`
+into the signed-in browser. Enrollment and the enable command must run in the
+logged-in desktop Terminal so macOS can authorize Keychain access. SSH can
+report `Keychain operation failed (OS status -25308)` even while the desktop
+is unlocked; resolve the Keychain prompt in the desktop Terminal rather than
+adding a plaintext credential file or an admin token to the runner.
+
+1. Let the background runner initialize and download the replica, then run
    this command in Terminal or over SSH:
 
    ```sh
@@ -238,16 +239,11 @@ After completing the machine bootstrap above:
    access fails, resolve its desktop prompt rather than adding a plaintext
    credential file or an admin token to the runner.
 
-Life stores the runtime token in Keychain; 1Password holds its recovery copy.
-Routine sync does not call 1Password, require its desktop app on the mini,
-or need a 1Password service account. Never put the token in a shell command, file,
-Git or the Nix store.
-
-If both Macs are lost, first recover access to 1Password independently of
-them. GitHub supplies the machine/software config and the surviving Life
-hub supplies synced schema, tables and history. Edits that never reached
-the hub need an independent backup; Nix cannot recover them. This procedure
-assumes the hub is healthy and reachable. The laptop's equivalent is in
+If both Macs are lost, install Nix from GitHub and enroll each replacement
+through the Life browser sign-in flow. The surviving Life hub supplies synced
+schema, tables and history. Edits that never reached the hub need an
+independent backup; Nix cannot recover them. This procedure assumes the hub is
+healthy and reachable. The laptop's equivalent is in
 [MANUAL-macbook-air.md](MANUAL-macbook-air.md#life-background-sync-replacement-machine-recovery).
 
 ### 7. Exit exam

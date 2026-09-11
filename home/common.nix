@@ -23,14 +23,9 @@
   # Life supplies the installed background runner and its CLI toggle.
   # Interactive agent auth remains separate; background credentials are
   # configured through `life background enable` on each device.
-  lifeData =
-    let
-      hubTokenRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/3qq7d6cltvwh3yzken2b46einm/credential";
-    in
-    {
-      enable = true;
-      cli.tokenCommand = "op read '${hubTokenRef}'";
-    };
+  lifeData = {
+    enable = true;
+  };
 
   home.stateVersion = "25.05";
   home.username = username;

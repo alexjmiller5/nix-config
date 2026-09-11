@@ -114,7 +114,7 @@ routing table and workflow; this file is the in-repo map.
   The Air does not install the Moshi daemon. Claude/Codex hook wiring stays
   declared independently of pairing.
 * `MANUAL-macbook-air.md`, `MANUAL-mac-mini.md` - steps outside Nix (TCC,
-  SIP, sign-ins, bootstrap order), including Life token recovery, desktop
+  SIP, sign-ins, bootstrap order), including Life browser enrollment, desktop
   Keychain setup and verification after replacing a machine.
 
 ## Conventions

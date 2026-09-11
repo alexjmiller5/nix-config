@@ -81,30 +81,30 @@ through `home/common.nix` and Life's Home Manager module. It does **not**
 restore the local Keychain entry or the user's sync toggle. A fresh machine
 starts with sync off; a normal Nix rebuild preserves an existing toggle.
 
-After completing this manual's machine bootstrap:
+After completing this manual's machine bootstrap, sign the Mac into Life from
+its logged-in desktop Terminal:
 
-1. Sign into 1Password using recovery access that does not depend on either
-   old Mac. Retrieve this laptop's Life token from vault
-   `a4gdaq4rjdpewl4uppphpjqewm`, item `yaasgo467sp23p77bijckaitrm`, field
-   `credential` (`op://a4gdaq4rjdpewl4uppphpjqewm/yaasgo467sp23p77bijckaitrm/credential`).
-   This is a dedicated Life-issued device token, separate from the mini's
-   token and the AI Agent/admin credential. Its `full` scope permits Life
-   data and schema sync, but not token administration. If it has been
-   revoked, have a Life administrator issue a replacement and store it in
-   this machine's vault; never substitute the admin token.
-2. In Terminal on the replacement laptop's desktop, run:
+```sh
+life login --name "MacBook Air"
+```
 
-   ```sh
-   life background enable --token-stdin
-   ```
+The command opens the Life browser sign-in flow. Complete the email one-time
+code challenge and approve the displayed device. Life stores the scoped device
+credential in macOS Keychain. This login does not enable background sync.
 
-   Paste the credential at the hidden `Life device token:` prompt and press
-   Return. Approve macOS Keychain access if requested. The installed Life
-   command stores the runtime copy in Keychain; 1Password holds the recovery
-   copy. Routine background sync does not call 1Password or need a 1Password
-   service account. Never put the token in a shell command, file, Git or the
-   Nix store.
-3. Let the background runner initialize and download the replica, then run:
+Then opt into background sync explicitly:
+
+```sh
+life background enable
+```
+
+If the browser did not open automatically, copy the URL printed by `life login`
+into the signed-in browser. Run enrollment and the enable command in a Terminal
+attached to the logged-in desktop so macOS can authorize Keychain access. Do
+not recover or copy a Life token through a machine vault, a service account, a
+shell literal, a file, Git or the Nix store.
+
+1. Let the background runner initialize and download the replica, then run:
 
    ```sh
    life background status
@@ -116,11 +116,11 @@ After completing this manual's machine bootstrap:
    start a concurrent `life sync` while the background round is running.
    Check status again after logout/login to verify automatic startup.
 
-If both Macs are lost, recovery uses GitHub for the machine/software config,
-1Password for credentials, and the surviving Life hub for synced schema,
-tables and history. Edits that never reached the hub need an independent
-backup; Nix cannot recover them. This procedure assumes the hub is healthy
-and reachable. The mini's equivalent is in
+If both Macs are lost, install Nix from GitHub and enroll each replacement
+through the Life browser sign-in flow. The surviving Life hub supplies synced
+schema, tables and history. Edits that never reached the hub need an
+independent backup; Nix cannot recover them. This procedure assumes the hub is
+healthy and reachable. The mini's equivalent is in
 [MANUAL-mac-mini.md](MANUAL-mac-mini.md#life-background-sync-replacement-machine-recovery).
 
 ## Machine vaults (1P) — the secret architecture
