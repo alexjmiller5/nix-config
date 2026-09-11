@@ -17,6 +17,20 @@
   # system-level one in /etc/zshrc double-runs it and litters ~/.zcompdump.
   programs.zsh.enableCompletion = false;
 
+  # macOS application firewall: block unsolicited incoming to unsigned apps,
+  # plus stealth mode (drop probes to closed ports / ICMP). allowSigned +
+  # allowSignedApp stay ON so Apple-signed services (Screen Sharing, Remote
+  # Login/sshd) and notarized apps (Tailscale) still accept connections -
+  # essential for reaching the headless mini over the tailnet. Not
+  # blockAllIncoming: that would break those same local/tailnet services.
+  networking.applicationFirewall = {
+    enable = true;
+    enableStealthMode = true;
+    allowSigned = true;
+    allowSignedApp = true;
+    blockAllIncoming = false;
+  };
+
   system.defaults = {
     NSGlobalDomain = {
       "com.apple.trackpad.scaling" = 5.0;
