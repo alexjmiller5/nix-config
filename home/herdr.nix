@@ -58,8 +58,25 @@ in
         light_name = "catppuccin-latte";
         dark_name = "catppuccin";
       };
+      # Every prefix key Hammerspoon's herdrHotkeys.lua types is pinned here:
+      # it presses ctrl+b then these keys, so a changed Herdr default must not
+      # silently move a shortcut. `herdr config check` validates the pairs.
       keys = {
         prefix = "ctrl+b";
+        new_tab = "prefix+c";
+        next_tab = "prefix+n";
+        previous_tab = "prefix+p";
+        switch_tab = "prefix+1";
+        split_vertical = "prefix+v";
+        split_horizontal = "prefix+minus";
+        cycle_pane_next = "prefix+tab";
+        cycle_pane_previous = "prefix+shift+tab";
+        zoom = "prefix+z";
+        new_workspace = "prefix+shift+n";
+        goto = "prefix+g";
+        toggle_sidebar = "prefix+b";
+        detach = "prefix+q";
+        settings = "prefix+s";
         previous_agent = "prefix+ctrl+p";
         next_agent = "prefix+ctrl+n";
         close_tab = [ ];

@@ -69,8 +69,9 @@ routing table and workflow; this file is the in-repo map.
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
   restoration hooks shared by both hosts; Claude's installer runs during
   activation against its writable settings, while Codex hooks are HM-managed;
-  `ghostty.nix` adds `herdr-window` and a window-local key table translating
-  macOS tab/split shortcuts to Herdr prefix keys. The pinned Undo Close plugin
+  `ghostty.nix` adds `herdr-window`, which claims its window for the
+  Hammerspoon hotkeys that translate macOS tab/split shortcuts into Herdr
+  prefix keys (pinned in `herdr.nix`). The pinned Undo Close plugin
   restores closed tabs through Cmd+Shift+T, mapped to prefix+t. Cmd+W snapshots
   the current agent sessions before closing; the plugin patch adds this action
   and Codex resume support. Closed panes are excluded from its history.

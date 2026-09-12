@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 
 # Ghostty, via the native HM module (app itself stays the cask; the nixpkgs
 # ghostty package is broken on darwin, hence package = null). Settings land
@@ -11,7 +11,16 @@
   home.packages = [
     (pkgs.writeShellApplication {
       name = "herdr-window";
+      # The macOS shortcuts live in Hammerspoon (herdrHotkeys.lua), scoped to
+      # the windows it is told about - a Ghostty key table would work too, but
+      # an active one paints an indicator pill that cannot be turned off.
       text = ''
+        # Claim the next new Ghostty window for Hammerspoon's hotkeys. A
+        # sentinel file, not an `hs -c` call: opening a terminal must not wait
+        # on (or fail with) Hammerspoon's IPC port.
+        state="''${XDG_STATE_HOME:-$HOME/.local/state}/herdr-window"
+        mkdir -p "$state"
+        : > "$state/pending"
         exec /usr/bin/osascript ${../scripts/herdr-window.applescript} "$PWD" "${pkgs.herdr}/bin/herdr"
       '';
     })
@@ -46,32 +55,7 @@
         ''super+arrow_right=text:\x1b[F''
         ''super+arrow_up=text:\x1b[1;5H''
         ''super+arrow_down=text:\x1b[1;5F''
-
-        # Only herdr-window activates this table. Translate familiar macOS
-        # shortcuts to Herdr's prefix keys; regular Ghostty surfaces retain
-        # their native bindings. Cmd+Shift+W detaches without stopping agents.
-        ''herdr/super+t=text:\x02c''
-        ''herdr/super+shift+t=text:\x02t''
-        ''herdr/super+shift+[=text:\x02p''
-        ''herdr/super+shift+]=text:\x02n''
-        ''herdr/super+w=text:\x02X''
-        ''herdr/super+d=text:\x02v''
-        ''herdr/super+shift+d=text:\x02-''
-        ''herdr/super+[=text:\x02\x1b[Z''
-        ''herdr/super+]=text:\x02\t''
-        ''herdr/super+shift+enter=text:\x02z''
-        ''herdr/super+shift+n=text:\x02N''
-        ''herdr/super+p=text:\x02g''
-        ''herdr/super+backslash=text:\x02b''
-        ''herdr/super+alt+[=text:\x02\x10''
-        ''herdr/super+alt+]=text:\x02\x0e''
-        ''herdr/super+shift+w=text:\x02q''
-        ''herdr/super+comma=text:\x02s''
-      ]
-      ++ lib.concatMap (n: [
-        ''herdr/super+${n}=text:\x02${n}''
-        ''herdr/super+digit_${n}=text:\x02${n}''
-      ]) (map toString (lib.range 1 9));
+      ];
     };
   };
 }

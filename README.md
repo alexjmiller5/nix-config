@@ -15,7 +15,8 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 ## Herdr in Ghostty
 
 Run `hdr` (an alias for `herdr-window`) from a project directory to open a dedicated Ghostty
-window. That window uses a native Ghostty key table to control Herdr:
+window. Hammerspoon (`herdrHotkeys.lua`) gives that window macOS-style shortcuts,
+typing Herdr's ctrl+b prefix for each one:
 
 | Shortcut | Action |
 | --- | --- |
@@ -33,10 +34,17 @@ window. That window uses a native Ghostty key table to control Herdr:
 | Cmd+Shift+W | Detach, leaving processes running |
 | Cmd+, | Settings |
 
-Ordinary Ghostty windows keep their existing shortcuts. Bare `herdr` is a
-shell function that runs `herdr-window` too, so the shortcuts are never missed
-by forgetting the alias; `herdr <subcommand>` still hits the real binary, as
-does any host without Ghostty (the key table only exists there). Preferences
+Ordinary Ghostty windows keep their native shortcuts: the hotkeys are enabled
+only while a window `herdr-window` opened is focused (it claims the window
+through a sentinel file that Hammerspoon consumes). A Ghostty key table would
+also work, but an active one paints an indicator pill Ghostty cannot hide. To
+adopt a herdr window opened before this - or any other way - focus it and run
+`hs -c 'require("herdrHotkeys").markFocusedWindow()'`. The prefix keys the
+hotkeys type are pinned in `home/herdr.nix`, so a changed Herdr default cannot
+silently move a shortcut. Bare `herdr` is a shell function that runs
+`herdr-window` too, so the shortcuts are never missed by forgetting the alias;
+`herdr <subcommand>` still hits the real binary, as does any host without
+Ghostty. Preferences
 are managed in `home/herdr.nix`; edit that module rather than saving changes
 in Herdr's settings screen. Closing a client preserves running processes;
 a machine restart restores saved layout and resumes supported Claude/Codex
