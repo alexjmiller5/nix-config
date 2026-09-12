@@ -69,6 +69,17 @@
   # contributes its own entry too — the option is types.lines, so all the
   # definitions merge.
   system.activationScripts.postActivation.text = ''
+    # Package removal needs root; Homebrew's user activation cannot prompt for
+    # sudo. Use the vendor uninstaller when its files are still present.
+    if [ -x '/Library/Application Support/org.pqrs/Karabiner-Elements/uninstall.sh' ]; then
+      /bin/bash '/Library/Application Support/org.pqrs/Karabiner-Elements/uninstall.sh'
+    fi
+    for receipt in org.pqrs.Karabiner-Elements org.pqrs.Karabiner-DriverKit-VirtualHIDDevice; do
+      if /usr/sbin/pkgutil --pkg-info "$receipt" >/dev/null 2>&1; then
+        /usr/sbin/pkgutil --forget "$receipt"
+      fi
+    done
+
     # Window controls use Hammerspoon; remove the separately installed binary
     # and its dedicated signing identity along with the undeclared service.
     /bin/rm -f '/Library/Application Support/yabai/yabai'
