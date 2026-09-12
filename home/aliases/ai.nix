@@ -5,7 +5,9 @@
 {
   programs.zsh.shellAliases = {
     cdx = "codex";
-    hdr = lib.mkIf config.programs.ghostty.enable "herdr-window";
+    # The herdr function (home/zsh/functions.zsh) opens the window and closes
+    # the tab it was typed in, so hdr routes through it rather than the wrapper.
+    hdr = lib.mkIf config.programs.ghostty.enable "herdr";
     # Claude's default model lives in agent-config's claude/settings.json.
     cc = "claude";
     claude-max = "claude --effort max";

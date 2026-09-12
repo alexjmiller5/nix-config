@@ -26,11 +26,15 @@ code() {
 }
 herdr() {
   # Bare `herdr` attaches in whatever window you're in, so only the ctrl+b
-  # prefix works; herdr-window opens a Ghostty window with the key table that
-  # maps the macOS shortcuts. Subcommands (plugin, integration, server) and any
+  # prefix works; herdr-window opens a Ghostty window that Hammerspoon gives
+  # the macOS shortcuts to. Subcommands (plugin, integration, server) and any
   # host without Ghostty fall through to the real binary.
   if [[ $# -eq 0 ]] && command -v herdr-window >/dev/null; then
-    herdr-window
+    herdr-window || return
+    # Then get out of the way: the tab this was typed in has served its
+    # purpose. Ghostty owns the new window, so exiting here never touches it.
+    # Non-interactive shells (scripts) keep running.
+    [[ -o interactive ]] && exit
   else
     command herdr "$@"
   fi
