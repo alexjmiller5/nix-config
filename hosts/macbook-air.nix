@@ -92,6 +92,7 @@
     { app = "/Applications/Notion.app"; }
     { app = "/Applications/Claude.app"; }
     { app = "/Users/${username}/Applications/Chrome Apps.localized/Google Maps.app"; }
+    { app = "/System/Applications/Utilities/Screen Sharing.app"; }
   ];
 
   # Brew-ONLY leftovers — everything available in nixpkgs migrated to
