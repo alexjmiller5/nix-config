@@ -122,6 +122,9 @@ routing table and workflow; this file is the in-repo map.
   extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import)
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
 * `dotfiles/` — file payloads (karabiner, nvim, vscode, ssh pubs, duti list)
+  Karabiner is laptop-only and owns Hyper, mouse navigation, and the Mail /
+  WhatsApp remaps. Spotify transport belongs to the personal Hammerspoon
+  profile and requires no Karabiner-to-Raycast mappings.
 * `secrets/` - agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token). Machine vaults and their service accounts are exclusively for
   initial Nix bootstrap. Applications own enrollment, credential storage
