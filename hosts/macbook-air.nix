@@ -90,7 +90,6 @@
     { app = "/Applications/Google Chrome.app"; }
     { app = "/Applications/Notion Calendar.app"; }
     { app = "/Applications/Notion.app"; }
-    { app = "/Applications/Gemini.app"; }
     { app = "/Applications/Claude.app"; }
     { app = "/Users/${username}/Applications/Chrome Apps.localized/Google Maps.app"; }
   ];
@@ -103,7 +102,7 @@
     # it brew ignores the tap's formulae/casks entirely.
     taps = [
       # Alex's personal cask tap — apps released by their repos' CI
-      # (gemini-desktop, receptor, ...).
+      # (receptor, ...).
       {
         name = "alexjmiller5/tap";
         trusted = true;
@@ -138,10 +137,6 @@
       "discord"
       "docker-desktop"
       "dolphin"
-      # From alexjmiller5/tap — released + notarized by gemini-desktop's CI.
-      # Replaces the old imperative install.sh install. MUST stay fully
-      # qualified: bare "gemini" is MacPaw's disk cleaner in homebrew/cask.
-      "alexjmiller5/tap/gemini"
       "ghostty"
       "google-chrome"
       "hammerspoon"

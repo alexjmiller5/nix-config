@@ -196,24 +196,6 @@ in
       };
     };
 
-    # Ported from the imperative com.alexmiller.geminidesktop plist: launch
-    # Gemini at login windowless + resident (--background — no window, no
-    # focus steal; windows appear instantly on demand via opt+g / Dock /
-    # geminiapp://). Can't use loginItem: `open -a` can't pass the flag, so
-    # exec the cask-installed binary directly.
-    login-gemini = {
-      enable = true;
-      config = {
-        Label = "com.alexmiller.login.gemini";
-        ProgramArguments = [
-          "/Applications/Gemini.app/Contents/MacOS/Gemini"
-          "--background"
-        ];
-        RunAtLoad = true;
-        ProcessType = "Interactive";
-      };
-    };
-
     simulator-prune = {
       enable = true;
       config = {
@@ -260,7 +242,6 @@ in
       )
       # Current Open-at-Login list (2026-08-01 screenshot), minus:
       #  - FigmaAgent: Figma's self-registered helper — Figma owns it, leave it.
-      #  - Gemini: needs --background, so it has its own login-gemini agent above.
       [
         "1Password"
         "AltTab"
