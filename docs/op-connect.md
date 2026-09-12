@@ -1,7 +1,7 @@
 # Local 1Password Connect
 
 `homeModules.op-connect` runs the official API and sync containers on Docker
-Desktop. The laptop enables it; the mini keeps its existing authentication.
+Desktop. The laptop enables it; both machines use the shared operator auth router.
 The API listens at `http://127.0.0.1:8080` by default. Containers restart when
 Docker restarts. The login service opens Docker and runs Compose at login.
 
@@ -10,8 +10,10 @@ and `op item get ... --vault <configured-vault-id> --format json` through
 Connect. CLI wrappers such as `gh`, `ntn`, `modal`, `spotify_player` and `posthog-cli` consume
 that package automatically. The command and secret references stay the same.
 Writes, Documents, `op run`, `op inject`, human shells, explicit project SAs,
-and other vaults use direct authentication. `AGENT_OP_AUTH=desktop` clears
-both SA and Connect credentials for desktop authentication.
+and other vaults use direct authentication. Explicit other-vault references
+use user auth. `op-auth desktop` selects user auth for the current agent
+session; `op-personal <op arguments>` selects it for one operation.
+See [operator authentication](op-auth.md).
 
 ## Credentials and startup
 
@@ -45,7 +47,7 @@ volume and the encrypted credentials bundle persist.
   status. Use the same file with `logs --tail 30` for container diagnostics.
 - `~/Library/Logs/op-connect.log`: startup diagnostics, without secret values.
 - If Connect is down, eligible reads fail with a recovery message. They do
-  not silently fall back to the metered SA. Select `AGENT_OP_AUTH=desktop`
+  not silently fall back to the metered SA. Run `op-auth desktop`
   explicitly when direct user auth is needed.
 - Startup does not automatically retry a failed cloud-auth request. Resolve
   the auth issue and restart the service. Existing SA quota exhaustion uses

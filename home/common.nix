@@ -21,6 +21,8 @@
     ./people-sync-operator.nix
   ];
 
+  opAuth.vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
+
   # Life supplies the installed background runner and its CLI toggle.
   # Interactive agent auth remains separate; background credentials are
   # configured through `life background enable` on each device.

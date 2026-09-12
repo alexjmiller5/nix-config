@@ -17,9 +17,15 @@ routing table and workflow; this file is the in-repo map.
   `git.nix`, `git-signing.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
-  `agent-env.nix` (shared detection and credential initialization in `.zshenv`
-  and `~/.config/agent-shell/env.sh`, sourced by Claude's per-tool adapter;
-  `AGENT_OP_AUTH=desktop` prevents SA loading through nested shells and wrappers),
+  `agent-env.nix` (shared credential initialization in `.zshenv` and
+  `~/.config/agent-shell/env.sh`; Claude's native SessionStart environment
+  hook supplies its session ID and sources this initializer for each tool call),
+  `op-auth.nix` (exported operator auth module; installs `op`, `op-personal`
+  and `op-auth`. Confirmed direct-SA quota errors select desktop mode for
+  that session, with one retry for reads. Writes and `op run` are never
+  replayed. Explicit project credentials retain their scope. Only a mode
+  marker is persisted under `$XDG_STATE_HOME/op/auth-sessions`;
+  `op-auth desktop` selects it and `op-auth status` inspects it),
   `git-signing.nix` (shared signing settings, `.agents/skills` signer),
   `mcp.nix` (one `programs.mcp.servers` registry generates the native MCP
   plugin loaded by both Claude and Codex; direct Codex MCP entries stay app-owned),
@@ -30,8 +36,7 @@ routing table and workflow; this file is the in-repo map.
   prompts on /dev/tty and hangs headless callers. `opConnect.cliPackage`
   routes supported AI Agent vault reads through local Connect when enabled.
   Writes, documents, other vaults, explicit project SAs and desktop auth
-  keep the direct path. Direct SA rate limits still require the `1password`
-  skill's desktop-auth protocol),
+  keep the direct path. Direct SA rate limits are handled by the shared auth router),
   `op-connect.nix` (opt-in, exported local Docker Desktop deployment, enabled
   on the laptop. Official API/sync images share Connect's encrypted cache;
   API binds only 127.0.0.1. A login service restores the encrypted credentials

@@ -22,7 +22,7 @@ nix eval --raw .#darwinConfigurations.macbook-air.config.home-manager.users \
   > "$scratch/.zshenv"
 for mode in codex claude human thread; do
   detected=$(
-    env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+    env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" AGENT_OP_TOKEN_FILE="$scratch/.local/state/op/agent-sa-token" \
       CODEX_SESSION_ID="$([ "$mode" != codex ] || echo test-session)" \
       CODEX_THREAD_ID="$([ "$mode" != thread ] || echo test-thread)" \
       CLAUDECODE="$([ "$mode" != claude ] || echo 1)" \
@@ -31,26 +31,26 @@ for mode in codex claude human thread; do
   expected="$mode:fixture-token"
   [ "$mode" != human ] || expected=human:
   [ "$mode" != thread ] || expected=codex:fixture-token
-  [ "$detected" = "$expected" ] || fail "noninteractive $mode shell: $detected, expected $expected"
+  [ "$detected" = "$expected" ] || fail "noninteractive $mode shell did not match the fixture credentials"
 done
 
 for token in caller-token ''; do
-  detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+  detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" AGENT_OP_TOKEN_FILE="$scratch/.local/state/op/agent-sa-token" \
     CODEX_SESSION_ID=test-session OP_SERVICE_ACCOUNT_TOKEN="$token" \
     zsh -c 'printf "%s" "$OP_SERVICE_ACCOUNT_TOKEN"')
   [ "$detected" = "${token:-fixture-token}" ] || fail "caller token was overwritten"
 done
-detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" AGENT_OP_TOKEN_FILE="$scratch/.local/state/op/agent-sa-token" \
   CODEX_SESSION_ID=test-session OP_SERVICE_ACCOUNT_TOKEN=caller-token AGENT_OP_AUTH=desktop \
   zsh -c 'zsh -c '\''printf "%s:%s" "$AGENT_SHELL" "${OP_SERVICE_ACCOUNT_TOKEN:-}"'\''')
-[ "$detected" = codex: ] || fail "desktop override did not survive nested shells: $detected"
+[ "$detected" = codex: ] || fail "desktop override did not survive nested shells"
 
-detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" AGENT_OP_TOKEN_FILE="$scratch/.local/state/op/agent-sa-token" \
   CODEX_SESSION_ID=test-session AGENT_SHELL=external \
   zsh -c 'printf "%s" "$AGENT_SHELL"')
 [ "$detected" = external ] || fail "explicit agent marker was overwritten"
 rm "$scratch/.local/state/op/agent-sa-token"
-detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" \
+detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" AGENT_OP_TOKEN_FILE="$scratch/.local/state/op/agent-sa-token" \
   CODEX_SESSION_ID=test-session zsh -c 'printf "%s" "${OP_SERVICE_ACCOUNT_TOKEN:-}"')
 [ -z "$detected" ] || fail "missing token file did not leave auth unset"
 

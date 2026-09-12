@@ -75,8 +75,8 @@ let
       creds="$cache/credentials.json"
       cid=""
       if op_has_auth; then
-        item="$(op item get ${item} --vault ${vault} --format json 2>/dev/null || true)"
-        cid="$(op read 'op://${vault}/${clientItem}/client_id' 2>/dev/null || true)"
+        item="$(op item get ${item} --vault ${vault} --format json)"
+        cid="$(op read 'op://${vault}/${clientItem}/client_id')"
         jq -r '[.fields[] | select(.label == "credential")][0].value // empty' <<<"$item" > "$creds"
         tokens="$(jq -r '[.fields[] | select(.label == "token")][0].value // empty' <<<"$item")"
         if jq -e 'type == "object" and (to_entries | all(.value | type == "string"))' <<<"$tokens" >/dev/null 2>&1; then

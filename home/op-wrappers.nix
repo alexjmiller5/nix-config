@@ -77,7 +77,7 @@ in
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
           if op_has_auth; then
-            GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token' 2>/dev/null || true)"
+            GH_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/spmkea5afgjzcekuahclmwowxq/token')"
             if [ -n "$GH_TOKEN" ]; then export GH_TOKEN; fi
           fi
         fi
@@ -100,8 +100,8 @@ in
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
           if op_has_auth; then
-            MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id' 2>/dev/null || true)"
-            MODAL_TOKEN_SECRET="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret' 2>/dev/null || true)"
+            MODAL_TOKEN_ID="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_id')"
+            MODAL_TOKEN_SECRET="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/2sfxybjpv3c3ohzxhf5qeken4a/token_secret')"
             if [ -n "$MODAL_TOKEN_ID" ] && [ -n "$MODAL_TOKEN_SECRET" ]; then
               export MODAL_TOKEN_ID MODAL_TOKEN_SECRET
             fi
@@ -149,7 +149,7 @@ in
         ${builtins.readFile ./agent-op-env.sh}
         item=""
         if op_has_auth; then
-          item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json 2>/dev/null || true)"
+          item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json)"
         fi
         if [ -n "$item" ]; then
           at="$(jq -r '[.fields[] | select(.label == "access_token")][0].value // empty' <<<"$item")"
@@ -162,8 +162,8 @@ in
           fi
           # Access token missing/expired: refresh it ourselves and cache it
           # back into the item. Secrets travel via stdin, never argv.
-          rt="$(jq -r '[.fields[] | select(.id == "credential")][0].value // empty' <<<"$item" | jq -r '.refresh_token // empty' 2>/dev/null || true)"
-          client="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/4x66lrvreiljbmepa6esgkyu2e/credential' 2>/dev/null || true)"
+          rt="$(jq -r '[.fields[] | select(.id == "credential")][0].value // empty' <<<"$item" | jq -r '.refresh_token // empty')"
+          client="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/4x66lrvreiljbmepa6esgkyu2e/credential')"
           cid="$(jq -r '.installed.client_id // .web.client_id // empty' <<<"$client" 2>/dev/null || true)"
           csec="$(jq -r '.installed.client_secret // .web.client_secret // empty' <<<"$client" 2>/dev/null || true)"
           if [ -n "$rt" ] && [ -n "$cid" ]; then
@@ -173,7 +173,7 @@ in
             expin="$(jq -r '.expires_in // 3600' <<<"$resp" 2>/dev/null || echo 3600)"
             if [ -n "$at" ]; then
               op item edit jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm \
-                "access_token[concealed]=$at" "expires_at[text]=$((now + expin))" >/dev/null 2>&1 || true
+                --tags "$(jq -r '(.tags // []) | join(",")' <<<"$item")" "access_token[concealed]=$at" "expires_at[text]=$((now + expin))" >/dev/null 2>&1 || true
               export GOG_ACCESS_TOKEN="$at"
             else
               # invalid_grant = refresh token revoked (password change / 6mo
@@ -223,7 +223,7 @@ in
         mkdir -p "$store"
         chmod 700 "$store"
         if [ -f "$store/session.db.unsynced" ]; then
-          if op document edit "$item" "$store/session.db" --vault "$vault" >/dev/null 2>&1; then
+          if op document edit "$item" "$store/session.db" --vault "$vault" >/dev/null; then
             rm -f "$store/session.db.unsynced"
           else
             echo "wacli wrapper: a previous run changed the session but could not write it back to 1Password, and this retry failed too - not running (op rate-limited or unauthenticated?)" >&2
@@ -231,7 +231,7 @@ in
           fi
         fi
         tmp="$(mktemp "$store/.session.XXXXXX")"
-        if ! op document get "$item" --vault "$vault" --out-file "$tmp" --force >/dev/null 2>&1; then
+        if ! op document get "$item" --vault "$vault" --out-file "$tmp" --force >/dev/null; then
           rm -f "$tmp"
           echo "wacli wrapper: could not fetch the linked-device session from 1Password - refusing to run against a possibly stale local copy" >&2
           exit 1
@@ -253,7 +253,7 @@ in
           fi
           after="$(sha256sum "$store/session.db" | cut -d' ' -f1)"
           if [ "$after" != "$before" ]; then
-            if ! op document edit "$item" "$store/session.db" --vault "$vault" >/dev/null 2>&1; then
+            if ! op document edit "$item" "$store/session.db" --vault "$vault" >/dev/null; then
               touch "$store/session.db.unsynced"
               echo "wacli wrapper: WARNING - the session changed but could not be written back to 1Password; it will be pushed on the next run from THIS machine. Do not run wacli elsewhere until then." >&2
             fi
@@ -275,7 +275,7 @@ in
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
           if op_has_auth; then
-            CLOUDFLARE_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/mxxpo6neiz3grdyrjj7rv7nume/credential' 2>/dev/null || true)"
+            CLOUDFLARE_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/mxxpo6neiz3grdyrjj7rv7nume/credential')"
             if [ -n "$CLOUDFLARE_API_TOKEN" ]; then export CLOUDFLARE_API_TOKEN; fi
           fi
         fi
@@ -298,7 +298,9 @@ in
         ${builtins.readFile ./agent-op-env.sh}
         keyfile="$(mktemp "''${TMPDIR:-/tmp}/gcloud-key-XXXXXX")"
         trap 'rm -f "$keyfile"' EXIT
-        if op_has_auth && op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/iqywn6he6twhyonw3fhnqmot5i/credential' > "$keyfile" 2>/dev/null && [ -s "$keyfile" ]; then
+        if op_has_auth; then
+          op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/iqywn6he6twhyonw3fhnqmot5i/credential' > "$keyfile"
+          [ -s "$keyfile" ] || exit 1
           export CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE="$keyfile"
         fi
         ${pkgs.google-cloud-sdk}/bin/gcloud "$@"
@@ -320,7 +322,7 @@ in
           ${builtins.readFile ./agent-detect.sh}
           ${builtins.readFile ./agent-op-env.sh}
           if op_has_auth; then
-            NOTION_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/nhsh73sfidj4cdowvbaayaq7tq/credential' 2>/dev/null || true)"
+            NOTION_API_TOKEN="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/nhsh73sfidj4cdowvbaayaq7tq/credential')"
             if [ -n "$NOTION_API_TOKEN" ]; then export NOTION_API_TOKEN; fi
           fi
         fi

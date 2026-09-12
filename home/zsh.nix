@@ -82,31 +82,6 @@
       # inject tokens via op read in EVERY context — the old interactive-only
       # `op plugin run` aliases (~/.config/op/plugins.sh) are retired.
 
-      # Agent shells: SA-authed op can't reach the Personal vault; op-personal
-      # strips the token so op falls back to desktop-app auth. Agents RUN this
-      # themselves for Personal-vault reads - each call pops Touch ID for Alex
-      # to approve, so it needs him at the machine, but it beats pasting
-      # commands (paste only deny-listed writes: op * delete/edit).
-      # Headless machines have no desktop app: there `op-unlock` (mac-mini.nix)
-      # writes a time-boxed CLI session token to ~/.local/state/op/personal-session
-      # and op-personal uses it while the file exists.
-      if [[ -n $AGENT_SHELL ]]; then
-          op-personal() {
-              local f="$HOME/.local/state/op/personal-session"
-              if [[ -r $f ]]; then
-                  AGENT_OP_AUTH=desktop env -u OP_SERVICE_ACCOUNT_TOKEN -u OP_CONNECT_HOST -u OP_CONNECT_TOKEN op --session "$(<"$f")" "$@"
-              else
-                  AGENT_OP_AUTH=desktop env -u OP_SERVICE_ACCOUNT_TOKEN -u OP_CONNECT_HOST -u OP_CONNECT_TOKEN sh -c \
-                      'op signin --account my.1password.com >/dev/null 2>&1; exec op "$@"' sh "$@"
-              fi
-          }
-      fi
-
-      # Per-call agent env (Claude Code sources this before every Bash call;
-      # env vars don't survive between calls, functions/aliases do). The file
-      # lives in agent-config: claude/shell-init.sh - env exports ONLY.
-      export CLAUDE_ENV_FILE="$HOME/.claude/shell-init.sh"
-
       # Shell functions (plain zsh, edited in the repo)
       source ${./zsh/functions.zsh}
 

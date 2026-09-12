@@ -1,31 +1,29 @@
-# Two jobs, both needed by every op-authed wrapper. (1) Agent context: ensure
-# OP_SERVICE_ACCOUNT_TOKEN is set so op reads are headless (never Touch ID).
-# (2) Define op_has_auth, the shared guard those wrappers gate their op calls
-# on. Interpolated (builtins.readFile) into the wrappers, always AFTER
-# agent-detect.sh - this file gates on AGENT_SHELL alone and knows no agent
-# CLI's raw vars. agent-env.nix also installs both as the shared initializer
-# for zshenv and lifecycle hooks. Alex's own terminals have no
-# AGENT_SHELL, so the arming no-ops and his calls keep desktop auth.
-if [ "${AGENT_OP_AUTH:-}" = desktop ]; then
-  # Explicit user auth stays selected across hooks, wrappers and child shells.
+# Shared by shell startup, lifecycle hooks, CLI wrappers and Git signing.
+# Explicit credentials win over a remembered desktop preference.
+_agent_op_token="$(/bin/cat "${AGENT_OP_TOKEN_FILE:-$HOME/.local/state/op/agent-sa-token}" 2>/dev/null || true)"
+_agent_op_desktop=
+_agent_op_session="${CODEX_THREAD_ID:-${CODEX_SESSION_ID:-${AGENT_OP_SESSION:-}}}"
+case "$_agent_op_session" in
+  ''|*[!a-zA-Z0-9_-]*) ;;
+  *)
+    if [ -f "${XDG_STATE_HOME:-$HOME/.local/state}/op/auth-sessions/$_agent_op_session" ] \
+      && [ -z "${OP_CONNECT_HOST:-}${OP_CONNECT_TOKEN:-}" ] \
+      && { [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ "$OP_SERVICE_ACCOUNT_TOKEN" = "$_agent_op_token" ]; }; then
+      _agent_op_desktop=1
+    fi
+    ;;
+esac
+if [ "${AGENT_OP_AUTH:-}" = desktop ] || [ -n "$_agent_op_desktop" ]; then
   unset OP_SERVICE_ACCOUNT_TOKEN OP_CONNECT_HOST OP_CONNECT_TOKEN
-elif [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "${AGENT_SHELL:-}" ]; then
-  # Existing 0600 operator credential file, enrolled and rotated independently
-  # of Nix bootstrap. SSH sessions use this file without a login Keychain.
-  OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat "$HOME/.local/state/op/agent-sa-token" 2>/dev/null || true)"
-  if [ -n "$OP_SERVICE_ACCOUNT_TOKEN" ]; then
-    export OP_SERVICE_ACCOUNT_TOKEN
-  else
-    unset OP_SERVICE_ACCOUNT_TOKEN
-  fi
+elif [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "${AGENT_SHELL:-}" ] && [ -n "$_agent_op_token" ]; then
+  export OP_SERVICE_ACCOUNT_TOKEN="$_agent_op_token"
 fi
+unset _agent_op_token _agent_op_desktop _agent_op_session
 
-# True when op can read WITHOUT prompting: an SA token (headless) or a
-# configured desktop account (Touch ID). With neither — Alex's own ssh shells
-# on the mini — `op read` asks "add an account?" on /dev/tty and hangs or
-# garbles headless callers, and 2>/dev/null does not suppress a prompt. So
-# every wrapper skips its op calls unless this returns true; none of them may
-# call op unguarded.
+# With no auth source, skip reads that would prompt on /dev/tty in headless
+# callers. The router supplies the mini's supported user session when present.
 op_has_auth() {
-  [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -n "$(op account list 2>/dev/null)" ]
+  [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}${OP_SESSION:-}${OP_CONNECT_TOKEN:-}" ] \
+    || [ -s "$HOME/.local/state/op/personal-session" ] \
+    || [ -n "$(op account list 2>/dev/null)" ]
 }

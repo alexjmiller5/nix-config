@@ -53,13 +53,10 @@ let
     composeFile = compose;
   };
   runner = "${pkgs.python3}/bin/python3 ${../scripts/op-connect.py} ${settings}";
-  op = pkgs.writeShellScriptBin "op" ''
-    ${builtins.readFile ./agent-detect.sh}
-    ${builtins.readFile ./agent-op-env.sh}
-    exec ${runner} exec "$@"
-  '';
+
 in
 {
+  imports = [ ./op-auth.nix ];
   options.opConnect = {
     enable = lib.mkEnableOption "local 1Password Connect for agent-vault reads";
     vaultId = lib.mkOption {
@@ -115,12 +112,21 @@ in
     cliPackage = lib.mkOption {
       type = lib.types.package;
       readOnly = true;
-      default = if cfg.enable then op else pkgs._1password-cli;
-      description = "op CLI with selective Connect routing when enabled.";
+      default = config.opAuth.package;
+      description = "Shared authenticated op CLI, with optional local Connect routing.";
     };
   };
 
   config = lib.mkIf cfg.enable {
+    opAuth = {
+      vaultId = lib.mkDefault cfg.vaultId;
+      serviceAccountTokenFile = lib.mkDefault cfg.serviceAccountTokenFile;
+      connect = {
+        inherit (cfg) vaultId stateDirectory serviceAccountTokenFile;
+        helper = toString ../scripts/op-connect.py;
+        host = "http://127.0.0.1:${toString cfg.port}";
+      };
+    };
     assertions = [
       {
         assertion = cfg.vaultId != "" && cfg.credentialsItemId != "" && cfg.tokenOpRef != "";
