@@ -64,13 +64,19 @@
     };
   };
 
-  # Laptop-only root activation steps (Rosetta). The cask
-  # de-quarantine lives in darwin-base.nix (both machines); modules/chrome-policy.nix
-  # contributes its own entry too — the option is types.lines, so all the
-  # definitions merge.
-  system.activationScripts.postActivation.text = ''
+  system.activationScripts.preActivation.text = ''
     # Package removal needs root; Homebrew's user activation cannot prompt for
-    # sudo. Use the vendor uninstaller when its files are still present.
+    # sudo. Stop the remaining registered helpers before package cleanup.
+    keyboardUser=$(/usr/bin/id -u ${lib.escapeShellArg username})
+    for service in \
+      system/org.pqrs.service.daemon.Karabiner-Core-Service \
+      system/org.pqrs.service.daemon.Karabiner-VirtualHIDDevice-Daemon \
+      "gui/$keyboardUser/org.pqrs.service.agent.Karabiner-Core-Service-rev2" \
+      "gui/$keyboardUser/org.pqrs.service.agent.Karabiner-Console-User-Server"; do
+      if /bin/launchctl print "$service" >/dev/null 2>&1; then
+        /bin/launchctl bootout "$service"
+      fi
+    done
     if [ -x '/Library/Application Support/org.pqrs/Karabiner-Elements/uninstall.sh' ]; then
       /bin/bash '/Library/Application Support/org.pqrs/Karabiner-Elements/uninstall.sh'
     fi
@@ -79,7 +85,17 @@
         /usr/sbin/pkgutil --forget "$receipt"
       fi
     done
+    # Retain leftover runtime state in a private temporary backup; leaving it
+    # under Application Support would make Homebrew request sudo again.
+    if [ -d '/Library/Application Support/org.pqrs/tmp' ]; then
+      keyboardBackup=$(/usr/bin/mktemp -d /private/tmp/karabiner-uninstall.XXXXXX)
+      /bin/mv '/Library/Application Support/org.pqrs/tmp' "$keyboardBackup/"
+      /bin/rmdir '/Library/Application Support/org.pqrs' 2>/dev/null || true
+    fi
+  '';
 
+  # Laptop-only root activation steps. Other modules append their own entries.
+  system.activationScripts.postActivation.text = ''
     # Window controls use Hammerspoon; remove the separately installed binary
     # and its dedicated signing identity along with the undeclared service.
     /bin/rm -f '/Library/Application Support/yabai/yabai'
