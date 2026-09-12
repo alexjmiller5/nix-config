@@ -105,7 +105,9 @@ the tailnet ACL so tagged devices are approved automatically:
   `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
   `backup OK` lines (a `cannot read` line means the grant is missing).
 * **Screentime Dashboard uploads**: run `screentime-ingest login --no-browser`
-  as the logged-in desktop user. Open the printed link in an authenticated
+  in a terminal on the mini's desktop through Screen Sharing. SSH sessions
+  can reject Keychain writes with `User interaction is not allowed`.
+  Open the printed link in an authenticated
   dashboard browser, match its approval code, and approve the upload device.
   The CLI stores its own revocable upload credential in macOS Keychain.
   Keep that user's login Keychain unlocked for the watcher and backup hook;
