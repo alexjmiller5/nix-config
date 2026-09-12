@@ -139,8 +139,39 @@ def auth_env(args, env, cfg, personal=False):
     )
 
 
+def sign_in(args, env, cfg):
+    command = command_args(args)
+    own_args = args[: args.index("--")] if "--" in args else args
+    if (
+        env.get("AGENT_OP_AUTH") != "desktop"
+        or env.get("OP_SESSION")
+        or option(args, "--session")
+        or not command
+        or command[0] in {"signin", "signout", "account", "help"}
+        or any(arg in {"--help", "-h", "--version", "-v"} for arg in own_args)
+    ):
+        return 0
+    flags = []
+    for name in ("--account", "--config"):
+        value = option(args, name)
+        if value:
+            flags.extend([name, value])
+    # The native desktop sign-in is idempotent. Never consume the operation's
+    # stdin or expose sign-in output, which can contain a session credential.
+    return subprocess.run(
+        [cfg["op"], "signin", *flags],
+        env=env,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        check=False,
+    ).returncode
+
+
 def execute(args, env, cfg, personal=False):
     child, automatic = auth_env(args, env, cfg, personal)
+    signed_in = sign_in(args, child, cfg)
+    if signed_in:
+        return signed_in
     # A launched command can have side effects and its own unrelated 429.
     # Preserve stdin/stdout, signals and exit status through exec.
     command = command_args(args)
@@ -177,9 +208,13 @@ def execute(args, env, cfg, personal=False):
             file=sys.stderr,
         )
         if read_only:
+            child = user_env(child)
+            signed_in = sign_in(args, child, cfg)
+            if signed_in:
+                return signed_in
             result = subprocess.run(
                 [cfg["op"], *args],
-                env=user_env(child),
+                env=child,
                 check=False,
                 input=input_data,
                 capture_output=True,

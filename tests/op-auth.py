@@ -27,6 +27,12 @@ auth = os.environ.get('OP_SERVICE_ACCOUNT_TOKEN', 'desktop')
 data = sys.stdin.read() if os.environ.get('ECHO_INPUT') else ''
 with open(os.environ['CALLS'], 'a') as f:
     f.write(json.dumps([auth, sys.argv[1:]]) + '\\n')
+if sys.argv[1:2] == ['signin']:
+    Path(os.environ['CALLS'] + '.signed-in').touch()
+    sys.exit(0)
+if auth == 'desktop' and os.environ.get('REQUIRE_SIGNIN') and not Path(os.environ['CALLS'] + '.signed-in').exists():
+    print('account is not signed in', file=sys.stderr)
+    sys.exit(11)
 if auth == 'fixture-agent' and os.environ.get('FAIL'):
     print(os.environ['FAIL'], file=sys.stderr)
     sys.exit(7)
@@ -73,7 +79,9 @@ print(auth + (':' + data if os.environ.get('ECHO_INPUT') else ''))
 
     def calls(self):
         return [
-            json.loads(line) for line in (self.root / "calls").read_text().splitlines()
+            json.loads(line)
+            for line in (self.root / "calls").read_text().splitlines()
+            if json.loads(line)[1][:1] != ["signin"]
         ]
 
     def test_rate_limit_switches_once_and_survives_the_next_tool_call(self):
@@ -191,6 +199,18 @@ print(auth + (':' + data if os.environ.get('ECHO_INPUT') else ''))
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(result.stdout.strip(), "desktop:fixture-item")
+
+    def test_desktop_auth_signs_in_before_the_requested_operation(self):
+        result = self.run_auth("personal", *self.read, REQUIRE_SIGNIN="1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "desktop")
+
+    def test_child_help_flag_does_not_skip_desktop_signin(self):
+        result = self.run_auth(
+            "personal", "run", "--", "child", "--help", REQUIRE_SIGNIN="1"
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "desktop")
 
     def test_background_context_without_session_does_not_escalate(self):
         result = self.run_auth(

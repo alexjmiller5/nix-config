@@ -29,8 +29,9 @@ interpret child command arguments: use `op-personal run --env-file=... -- ...`
 for a project template, or select session desktop mode before a provisioning
 script. An explicit `AGENT_OP_AUTH=desktop` override remains supported.
 
-Desktop auth uses the installed 1Password app on the laptop. The mini uses
-its existing supported `op-unlock` user-session window. If user auth is
+Desktop auth signs in automatically through the installed 1Password app on
+the laptop when needed. The mini uses its existing supported `op-unlock`
+user-session window. If user auth is
 unavailable, the command fails; it does not return to the exhausted SA.
 Connect outages remain explicit errors; `op-auth desktop` selects an
 alternative without consuming more SA quota.
