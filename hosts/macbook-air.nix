@@ -8,7 +8,7 @@
 
 # MacBook Air — the GUI-full host. The mini matches it at the shell/dev
 # level (see home/dev-tools.nix + home/mac-mini.nix); this host adds the GUI
-# layer (casks, dock, Chrome policy, yabai) and the Apple build chain, and
+# layer (casks, dock, Chrome policy) and the Apple build chain, and
 # lacks the mini's headless-server bits (never-sleep power, headless
 # tailscaled, callhistory backup). Home profile: home/macbook-air.nix.
 # Shared base (stateVersion, unfree predicate, /etc/nix-darwin, brew zap, …)
@@ -16,7 +16,6 @@
 {
   imports = [
     ../modules/notunes.nix
-    ../modules/yabai.nix
     ./macbook-air-chrome-policy.nix
   ];
 
@@ -70,6 +69,14 @@
   # contributes its own entry too — the option is types.lines, so all the
   # definitions merge.
   system.activationScripts.postActivation.text = ''
+    # Window controls use Hammerspoon; remove the separately installed binary
+    # and its dedicated signing identity along with the undeclared service.
+    /bin/rm -f '/Library/Application Support/yabai/yabai'
+    /bin/rmdir '/Library/Application Support/yabai' 2>/dev/null || true
+    if /usr/bin/security find-certificate -c yabai-signing /Library/Keychains/System.keychain >/dev/null 2>&1; then
+      /usr/bin/security delete-identity -c yabai-signing /Library/Keychains/System.keychain
+    fi
+
     # Rosetta 2, declared (needed by EGGNOGG+ in home/macbook-air.nix —
     # x86_64-only). No nix-darwin option exists; activation runs as root,
     # so install here, guarded by the oahd check to stay idempotent.

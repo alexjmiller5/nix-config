@@ -108,6 +108,9 @@ routing table and workflow; this file is the in-repo map.
   `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),
   `macos/finder.nix` owns the shared Finder baseline and nested list defaults.
+  Window controls are implemented by Hammerspoon; the exported
+  `macos-window-management` module declares native Control-arrow navigation
+  on the laptop. The headless mini does not import desktop interaction settings.
   `macos.finder.desktop.enable` adds desktop-specific preferences and large
   list icons; enabled on the laptop, disabled on the headless mini. Defaults
   use `mkDefault` so other flakes can override individual values. Sidebar

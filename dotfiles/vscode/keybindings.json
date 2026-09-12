@@ -10,13 +10,18 @@
 		"command": "workbench.action.terminal.focusPrevious",
 		"when": "(terminalFocus || terminalTabsFocus) && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
 	},
-	// Close the current terminal window with cmd+w
+	// Close the focused terminal, or selected terminals in the terminal sidebar.
 	{
 		"key": "cmd+w",
-		"command": "workbench.action.terminal.kill",
-		"when": "terminalFocus || terminalTabsFocus"
+		"command": "workbench.action.terminal.killViewOrEditor",
+		"when": "terminalFocus"
 	},
-	// Use the duplicate action extension for duplicating files in the explorer
+	{
+		"key": "cmd+w",
+		"command": "workbench.action.terminal.killActiveTab",
+		"when": "terminalTabsFocus"
+	},
+	// Duplicate files with the Explorer's native copy and paste commands.
 	{
 		"key": "cmd+d",
 		"command": "runCommands",
@@ -33,6 +38,11 @@
 		"key": "cmd+d",
 		"command": "workbench.action.terminal.split",
 		"when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
+	},
+	{
+		"key": "cmd+d",
+		"command": "workbench.action.terminal.splitActiveTab",
+		"when": "terminalTabsFocus"
 	},
 	// Disable conflicting Jupyter/Python keybindings for Shift+Enter where lines would be sent to the terminal
 	{
@@ -92,7 +102,7 @@
 	// Use tab movement just like web browser tabs
 	{
 		"key": "cmd+0",
-		"command": "workbench.action.openLastEditorInGroup",
+		"command": "workbench.action.lastEditorInGroup",
 		"when": "!terminalFocus && !terminalTabsFocus"
 	},
 	{
@@ -148,18 +158,6 @@
 	{
 		"key": "cmd+r",
 		"command": "workbench.action.reloadWindow",
-	},
-	// Power Clipper copy file contents for ai
-	{
-		"key": "cmd+shift+c",
-		"command": "power-clipper.copyFilesContentOnly",
-		"when": "filesExplorerFocus"
-	},
-	// Power clipper just copy file tree for ai
-	{
-		"key": "cmd+shift+t",
-		"command": "power-clipper.copyFolderStructure",
-		"when": "filesExplorerFocus"
 	},
 	// Change rename symbol to cmd + shift + enter
 	{

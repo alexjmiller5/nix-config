@@ -175,8 +175,7 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
    ORDER BY service, client;"
 ```
 
-* **Accessibility**: Hammerspoon, Karabiner-Elements, yabai
-  (`/Library/Application Support/yabai/yabai`), AltTab, Raycast,
+* **Accessibility**: Hammerspoon, Karabiner-Elements, AltTab, Raycast,
   BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
 * **Input Monitoring**: Karabiner-Elements (grants land on its helper
   binaries), Dolphin
@@ -224,32 +223,17 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
 sudo killall tccd
 ```
 
-## yabai (Accessibility only — the rest is declared)
+## Window controls
 
-The launchd agent is declarative (`modules/yabai.nix`, imported by
-`hosts/macbook-air.nix`). The scripting addition is OFF: macOS 26.1's AMFI
-enforces library validation on Dock and won't load yabai's third-party ad-hoc
-payload, so the SA can't inject regardless of SIP state (verified 2026-08-15).
-yabai therefore needs no SIP disable and no `arm64e_preview_abi` boot-arg.
-
-yabai runs from `/Library/Application Support/yabai/yabai` — a copy of the
-store binary that activation re-signs with the stable `yabai-signing` cert.
-Fixed path + fixed code identity = the Accessibility grant survives every
-version bump (nixpkgs' own build is ad-hoc/linker-signed under a hashed store
-path, so its grant died on every rebuild and the KeepAlive agent then spammed
-Accessibility prompts). The `yabai` CLI on PATH is still the store build; it
-only talks to the running server over its socket and needs no grant.
-
-What stays manual (TCC is GUI-only), once:
-
-System Settings > Privacy & Security > Accessibility > `+` > Cmd+Shift+G >
-paste `/Library/Application Support/yabai/yabai` > toggle it ON. Remove any
-leftover `/nix/store/...-yabai-*/bin/yabai` rows while there.
+Hammerspoon owns manual placement, resize, and native Space navigation. Its
+Accessibility grant covers these controls; no separate window manager or
+scripting addition is required. The exported `homeModules.macos-window-management`
+module declares native Control-Left/Right desktop navigation. The laptop imports
+it; the headless mini does not need interactive desktop shortcuts.
 
 ## SIP status: DISABLED — keep it that way for now
 
-SIP is currently disabled on this machine (originally for yabai; nothing
-declared depends on it anymore). **Deliberately kept disabled** since
+SIP is currently disabled on this machine. **Deliberately kept disabled** since
 2026-08-26: macOS ≥26.3 locks the ScreenTimeAgent store (the
 DeviceActivity/Cloud segments that carry cross-device per-app AND per-site
 Screen Time, incl. iPhone web domains) behind kernel sandbox/TCC enforcement

@@ -36,6 +36,7 @@ in
     ./macos/duti.nix
     ./macos/chrome-remote-debugging.nix
     ./macos/notification-prefs.nix
+    ./macos/window-management.nix
     ./ghostty.nix
     ./spotify-player.nix
     ./vscode.nix
@@ -269,12 +270,6 @@ in
     "com.apple.weather" = {
       enable = false;
       flags = 832577550;
-      content_visibility = 0;
-      grouping = 0;
-    };
-    "com.asmvik.yabai" = {
-      enable = true;
-      flags = 41951246;
       content_visibility = 0;
       grouping = 0;
     };
