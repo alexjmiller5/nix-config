@@ -13,13 +13,12 @@
 # laptop-only is the GUI layer (casks, dock, Chrome policy, hammerspoon,
 # karabiner, VS Code) and the Apple build chain.
 #
-# agent-config is a real git clone (cloned at activation, refreshed by a
-# daily pull-only agent below) — no iCloud involved. For the agent-config
+# agent-config is cloned by bootstrap-companion-repos and refreshed by the
+# daily pull-only agent below. No iCloud is involved. For the agent-config
 # SYNC, the laptop stays the only pusher (its sync agent commits+pushes;
 # the mini's sync never writes, so there's no push race) — but the mini is
 # otherwise a full dev machine: general git pushes work and auth via the
-# AI Agent vault PAT (gh wrapper), same as the laptop. Sync clone/pull auth
-# = the repo-scoped machine-vault PAT credential helper below.
+# AI Agent vault PAT (gh wrapper), same as the laptop, including daily sync.
 let
   agentConfigPull = pkgs.writeShellScript "agent-config-pull" ''
     set -euo pipefail
@@ -67,8 +66,8 @@ in
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
-  # Machine-vault git bootstrap (home/machine-vault-git.nix): the mini's PAT
-  # is read-only on these repos — its sync only pulls. nix-config (public) +
+  # Explicit initial cloning only (home/machine-vault-git.nix): the mini's
+  # machine PAT is read-only on these repos. nix-config (public) +
   # nix-secrets make the mini self-sufficient for dev: /etc/nix-darwin
   # resolves (infra aliases), ssh host blocks resolve.
   machineVaultGit = {
@@ -159,6 +158,9 @@ in
     enable = true;
     config = {
       Label = "com.alexmiller.agent-config-pull";
+      # launchd has no agent shell marker; gh needs the independently enrolled
+      # operator token for unattended pulls, just as the laptop sync does.
+      EnvironmentVariables.AGENT_SHELL = "repo-sync";
       ProgramArguments = [ "${agentConfigPull}" ];
       RunAtLoad = true;
       StartCalendarInterval = [

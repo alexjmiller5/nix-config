@@ -10,7 +10,7 @@
 # System Settings login-item list should be emptied by hand, see MANUAL-macbook-air.md).
 let
   # Commit → pull --rebase → push for the agent-config working clone.
-  # Robot commits are unsigned on purpose (no 1P dependency in launchd).
+  # Robot commits are unsigned; remote sync uses the enrolled operator auth.
   # Conflicts abort loudly via notification and leave the repo pre-pull.
   # Daily + RunAtLoad; launchd runs missed calendar jobs on wake, so this
   # effectively also fires when the lid opens after 10:00 passed asleep. Both
@@ -163,6 +163,9 @@ in
       enable = true;
       config = {
         Label = "com.alexmiller.agent-config-sync";
+        # launchd does not source shell init; select the gh wrapper's enrolled
+        # operator credential through the existing agent-op-env.sh seam.
+        EnvironmentVariables.AGENT_SHELL = "repo-sync";
         ProgramArguments = [ (lib.getExe agentConfigSync) ];
         RunAtLoad = true;
         StartCalendarInterval = [

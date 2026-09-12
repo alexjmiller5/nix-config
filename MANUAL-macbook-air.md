@@ -37,16 +37,33 @@ straight from the github: ref.
    nix build .#darwinConfigurations.macbook-air.system
    sudo ./result/sw/bin/darwin-rebuild switch --flake .#macbook-air
    ```
-   Activation decrypts the token onto the agenix RAM disk, the git credential
-   helper goes live, and `/etc/nix-darwin` links to the clone — from here on
-   the `switch-laptop` alias works from anywhere.
+   Activation decrypts the bootstrap token onto the agenix RAM disk and
+   installs `bootstrap-companion-repos`. `/etc/nix-darwin` links to the clone;
+   the `switch-laptop` alias works from anywhere. Activation never reads the
+   machine vault or clones companions.
 5. Sign into the 1Password app (installed by the switch); `op signin`. There
-   is NO `gh auth login` and no `op plugin` setup — git auth is the agenix
-   PAT, `gh`/`gcloud` are the op-authed PATH wrappers, and no token enters
-   the keychain.
-6. `switch-laptop` again — activation now clones the private companions
-   (agent-config, nix-secrets, hammerspoon) via the credential helper, and
-   the out-of-store symlinks resolve.
+   is no `gh auth login` or `op plugin` setup: ongoing Git auth uses the
+   operator `gh` PATH wrapper.
+6. Home Manager creates plugin links inside `~/.config/agent-config` before
+   the first clone. If this directory has no `.git`, preserve it elsewhere
+   first (choose an unused backup destination):
+   ```Shell
+   mv ~/.config/agent-config ~/.config/agent-config.bootstrap-links
+   ```
+   Then run the explicit initial clone command as the user in that terminal:
+   ```Shell
+   bootstrap-companion-repos
+   ```
+   It skips existing clones and refuses non-repository directories without
+   reading credentials. Only missing repos in `patRepos` get a
+   machine-vault helper passed to that single `git clone` command; nothing
+   is saved in Git config. Other clones, including hammerspoon, use normal
+   Git auth. Failure stops the command; correct bootstrap access and rerun
+   it to finish initial setup. Run `switch-laptop` again to restore declared
+   plugin links into the clone; the out-of-store symlinks then resolve.
+   Later switches never retry bootstrap. To recover a deleted clone on an
+   enrolled machine, use ordinary `git clone` with operator auth.
+   Enroll the independent AI Agent token below for unattended repo sync.
 7. Commit + push the step-3 changes (secrets.nix + the recreated .age) — push
    auth works now.
 8. Trust the third-party taps (brew's tap-trust gate blocks formula loads
@@ -58,8 +75,9 @@ Agent tools use the independently provisioned AI Agent credential in the
 existing `~/.local/state/op/agent-sa-token` file (raw token only, owned by
 the local user, mode `0600`). Preserve it on an enrolled machine. Nix installs
 the initializer and consumers; it neither creates nor refreshes this file.
-Agent SSH and local Connect continue to consume it through their existing
-interfaces. No machine service account supplies or refreshes the agent token.
+Agent SSH, local Connect and launchd companion-repo sync consume it through
+their existing interfaces. No machine service account supplies or refreshes
+the agent token.
 
 For a replacement machine or deliberate rotation, use native 1Password
 desktop authentication to retrieve the authoritative AI Agent credential:
@@ -129,21 +147,19 @@ Each machine has a 1P vault ("MacBook Air" / "Mac Mini") and a read-only
 service account (`macbook-air-machine` / `mac-mini-machine`). agenix encrypts
 exactly ONE secret per machine - its bootstrap SA token. Machine vaults are
 for initial Nix bootstrap; agent operator credentials use the independent
-enrollment above. The existing Git helper's machine-vault reads are described
-below; they do not authorize additional runtime credentials in these vaults.
-
-In the vaults today:
-
-* **MacBook Air**: `MacBook Air GitHub PAT nix-config-git` — fine-grained, repos
-  `agent-config`/`nix-secrets`/`hammerspoon`, Contents **read/write** (the
-  sync agent pushes agent-config). Feeds the git credential helper.
-* **Mac Mini**: `Mac Mini GitHub PAT nix-config-git` — same repos, Contents
-  **read-only** (the mini is pull-only by design).
+enrollment above. Each host's `machineVaultGit.patOpRef` identifies its
+fine-grained bootstrap GitHub PAT. `patRepos` limits the helper to initial
+clones of the listed repositories; it must stay within the PAT's grants.
+Cloning needs Contents read access only, regardless of any broader existing
+PAT grant. No routine pull or push uses these PATs. Both hosts' launchd repo
+sync jobs use the operator `gh` helper with the independently enrolled AI
+Agent token; they do not read or refresh machine-vault credentials.
 
 PATs are minted by hand (GitHub has no token-creation API): github.com →
 Settings → Developer settings → Fine-grained tokens; they cap at 1-year
-expiry, so re-mint + update the 1P item annually — no repo commit, no
-rebuild. Machine lost = revoke that machine's SA (1P dashboard), drop its
+expiry, so ensure the bootstrap PAT is valid before setting up a replacement
+machine. Its expiry does not affect daily repo sync. Machine lost = revoke
+that machine's SA (1P dashboard), drop its
 pubkey from secrets.nix, recreate its .age; the vault contents rotate at
 leisure since the SA token was the only thing the disk could yield.
 

@@ -76,13 +76,26 @@ the tailnet ACL so tagged devices are approved automatically:
 
 ### 6. Per-module manual steps (TCC — GUI-only by design)
 
-* **agent-config (Claude skills/settings fan-out)**: no login — the clone +
-  daily pull authenticate via the machine-vault git credential helper
-  (agenix `machine-sa-mini` → `op read` of the read-only PAT). If the mini is
-  rebuilt from scratch its host key is new: recreate `machine-sa-mini.age`
+* **agent-config (Claude skills/settings fan-out)**: initial cloning is an
+  explicit bootstrap step. If the mini is rebuilt from scratch its host key
+  is new: recreate `machine-sa-mini.age`
   (recreate-not-decrypt, commands in `secrets/secrets.nix` header, token from
-  the 1P "Mac Mini" vault) BEFORE the first deploy, then `just deploy` again
-  so activation clones `~/.config/agent-config` and the symlinks resolve.
+  the 1P "Mac Mini" vault) BEFORE the first deploy. Home Manager creates
+  plugin links in `~/.config/agent-config` before the first clone. If that
+  directory has no `.git`, preserve it with
+  `mv ~/.config/agent-config ~/.config/agent-config.bootstrap-links` (choose
+  an unused backup destination). Then run `bootstrap-companion-repos` as
+  the user on the mini. It clones missing
+  companions and the symlinks resolve. Only repos listed in `patRepos` use
+  the machine PAT, passed through a helper for that one clone command.
+  Existing clones are skipped; non-repository directories are refused
+  without reading credentials. A failed clone stops the command so bootstrap
+  access can be corrected before rerunning it. Deploy once more to restore
+  declared plugin links into the clone. No machine helper
+  is installed in Git config, and later deploys never retry bootstrap.
+  Daily pulls use the operator `gh` helper and require the independently
+  enrolled AI Agent token described below. Recover deleted clones on an
+  enrolled machine with ordinary `git clone` using operator auth.
 * **screentime-backup** + **callhistory-backup** (weekly Apple-data snapshots):
   grant Full Disk Access once per app — System Settings → Privacy & Security →
   **Full Disk Access** → **\[+]** → `/Applications/ScreenTimeBackup.app` and

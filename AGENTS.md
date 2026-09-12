@@ -62,8 +62,9 @@ routing table and workflow; this file is the in-repo map.
   AGENTS.md are left to `agent-config-links.nix` so both stay editable
   without a rebuild, and `programs.codex.context` stays at its "" default
   so the module writes no competing AGENTS.md),
-  `machine-vault-git.nix` (per-host options: repo-scoped machine-vault PAT
-  credential helper + companion clone-if-missing),
+  `machine-vault-git.nix` (per-host options for explicit initial cloning via
+  `bootstrap-companion-repos`; machine PAT helper passed only to individual
+  allowed clones, never installed in Git config or run by activation),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
@@ -76,7 +77,9 @@ routing table and workflow; this file is the in-repo map.
   and Codex resume support. Closed panes are excluded from its history.
   Native selection copying stays enabled; clipboard feedback comes from
   Hammerspoon, so Herdr's clipboard toast is disabled),
-  `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
+  `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items;
+  both hosts' repo-sync jobs set `AGENT_SHELL=repo-sync` so the gh wrapper
+  uses the independently enrolled AI Agent token without shell startup; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),
   `ai-agent.nix` (node for hooks, `op` on PATH and `agent-env.nix` for
@@ -102,9 +105,9 @@ routing table and workflow; this file is the in-repo map.
 * `secrets/` - agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token). Machine vaults and their service accounts are exclusively for
   initial Nix bootstrap. Applications own enrollment, credential storage
-  and recovery through their supported interfaces. Some existing modules
-  still read machine vaults at runtime, as described above; those consumers
-  do not authorize additional runtime dependencies.
+  and recovery through their supported interfaces. Git uses the machine
+  vault only through the explicit initial bootstrap command. Routine pulls,
+  pushes and switches do not invoke its credential helper.
   Life background sync imports its own device token once into Keychain via
   the installed CLI. Edit = recreate-not-decrypt (see
   `secrets/secrets.nix` header); no master key exists.

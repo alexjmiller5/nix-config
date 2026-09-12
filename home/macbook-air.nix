@@ -408,12 +408,10 @@ in
     };
   };
 
-  # Machine-vault git bootstrap (home/machine-vault-git.nix): the laptop's
-  # PAT is contents:write on exactly these repos — headless, so the launchd
-  # sync agents keep pushing. Deliberately NOT write-broadened; general
-  # pushes belong to the gh-wrapper PAT. hammerspoon (private) is cloned via
-  # the gh default helper instead — switches run in Alex's desktop-authed
-  # terminal, where that resolves.
+  # Explicit initial cloning only (home/machine-vault-git.nix). The machine
+  # PAT is used only for these repos; all ongoing sync uses the operator gh
+  # wrapper. hammerspoon uses gh even during bootstrap, so run the command
+  # from a desktop-authenticated terminal after signing into 1Password.
   machineVaultGit = {
     patOpRef = "op://a4gdaq4rjdpewl4uppphpjqewm/kxvidplfszmwyaxke6sbwrbl5u/credential";
     patAuthFile = osConfig.age.secrets.machine-sa.path;

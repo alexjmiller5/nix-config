@@ -17,9 +17,8 @@
     # list; the per-URL helper below still applies.
     settings.credential.helper = "";
 
-    # Default GitHub https auth for external consumers of this module (work
-    # laptop etc.). Alex's machines override it with the machine-vault
-    # credential helper in their per-host home files.
+    # Ongoing GitHub HTTPS auth, including companion-repo sync, uses the
+    # operator gh wrapper. Machine bootstrap never installs a Git helper.
     settings.credential."https://github.com".helper = lib.mkDefault "!gh auth git-credential";
   };
 
