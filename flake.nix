@@ -58,6 +58,12 @@
       url = "github:alexjmiller5/life-data";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Shared album reminder module, imported only by the mini profile.
+    shared-album-reminders = {
+      url = "github:alexjmiller5/shared-album-reminders";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.life-data.follows = "life-data";
+    };
     # Claude Code plugins, pinned and loaded in place (see home/claude-plugins.nix).
     # `claude plugin install` is an imperative install that leaves a fresh
     # machine with nothing, so the sources are inputs and ride the weekly bump.
@@ -124,6 +130,7 @@
                   nix-vscode-extensions
                   nix-openclaw-tools
                   life-data
+                  shared-album-reminders
                   claude-plugins-official
                   claude-plugin-superpowers
                   claude-plugin-ponytail

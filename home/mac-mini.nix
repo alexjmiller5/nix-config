@@ -3,6 +3,7 @@
   osConfig,
   lib,
   pkgs,
+  shared-album-reminders,
   ...
 }:
 
@@ -33,6 +34,7 @@ let
 in
 {
   imports = [
+    shared-album-reminders.homeModules.default
     ./common.nix
     ./ai-agent.nix
     ./dev-tools.nix
@@ -42,6 +44,10 @@ in
     ./aliases/infra.nix
     ./ssh.nix
   ];
+
+  # Apple-bound daily job belongs only on the mini. The task writer awaits
+  # the migrated Life task catalog, so importing its module creates no job.
+  services.shared-album-reminders.enable = false;
 
   # No 1P desktop app here — outbound ssh uses the default agent socket
   # (SSH_AUTH_SOCK), so a laptop agent forwarded over `ssh -A` serves the

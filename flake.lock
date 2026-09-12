@@ -399,6 +399,7 @@
         "people-sync": "people-sync",
         "screentime-backup": "screentime-backup",
         "screentime-dashboard": "screentime-dashboard",
+        "shared-album-reminders": "shared-album-reminders",
         "sticker-sync": "sticker-sync"
       }
     },
@@ -434,6 +435,29 @@
       "original": {
         "owner": "alexjmiller5",
         "repo": "screentime-dashboard",
+        "type": "github"
+      }
+    },
+    "shared-album-reminders": {
+      "inputs": {
+        "life-data": [
+          "life-data"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789257210,
+        "narHash": "sha256-RsJeWg5TDIIev+WJGcQupn2AFUbbW4PNFTd41UQs/X4=",
+        "owner": "alexjmiller5",
+        "repo": "shared-album-reminders",
+        "rev": "b986e8330c96e70e0b8ebe96567e5dd53cdc827c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "shared-album-reminders",
         "type": "github"
       }
     },

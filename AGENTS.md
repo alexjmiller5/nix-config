@@ -119,7 +119,9 @@ routing table and workflow; this file is the in-repo map.
   `ssh.nix` (programs.ssh + private Include),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
-  per-host `macbook-air.nix` / `mac-mini.nix`
+  per-host `macbook-air.nix` / `mac-mini.nix`. The mini alone imports
+  Shared Album Reminders; it stays disabled until its Life task integration
+  and launch-context access are ready
 * `modules/` — darwin modules: `darwin-base.nix` + `macos-defaults.nix`
   (both injected for every host by mkHost), `chrome-policy.nix` (declared
   extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import)
