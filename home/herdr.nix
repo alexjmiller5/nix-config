@@ -7,6 +7,7 @@
 
 let
   undoClose = pkgs.callPackage ../pkgs/herdr-undo-close.nix { };
+  autoTitle = pkgs.callPackage ../pkgs/herdr-auto-title.nix { };
 in
 # Shared terminal workspace settings for local and SSH sessions.
 {
@@ -16,6 +17,19 @@ in
   home.activation.herdrUndoClose = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
     run ${lib.getExe config.programs.herdr.package} plugin link ${undoClose}
   '';
+  home.activation.herdrAutoTitle = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    run ${lib.getExe config.programs.herdr.package} plugin link ${autoTitle}
+  '';
+  home.file."herdr-auto-title-config" = {
+    target =
+      if pkgs.stdenv.hostPlatform.isDarwin then
+        "Library/Application Support/herdr-auto-title/config.env"
+      else
+        "${config.xdg.configHome}/herdr-auto-title/config.env";
+    text = ''
+      HERDR_AUTO_TITLE_AGENT_NAME=false
+    '';
+  };
   xdg.configFile."herdr/plugins/config/undo-close/config.json".text = builtins.toJSON {
     undo_panes = false;
   };
