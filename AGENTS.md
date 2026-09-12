@@ -76,7 +76,11 @@ routing table and workflow; this file is the in-repo map.
   the current agent sessions before closing; the plugin patch adds this action
   and Codex resume support. Closed panes are excluded from its history.
   Native selection copying stays enabled; clipboard feedback comes from
-  Hammerspoon, so Herdr's clipboard toast is disabled),
+  Hammerspoon, so Herdr's clipboard toast is disabled. The pinned Auto Title
+  plugin derives top-tab names from directory and task context, keeps shortcut
+  numbers, and preserves manual labels. Its config omits redundant agent names.
+  The packaged `herdr.auto-title.start` action can start it in a live server;
+  check plugin logs first to avoid starting a duplicate),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items; the
   sync repairs mangled SKILL.md frontmatter before staging, since that damage
   silently disables a skill and has twice ridden a snapshot into history),

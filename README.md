@@ -53,6 +53,18 @@ resume those agents inside Herdr after activation so their IDs are captured.
 `python3 tests/herdr-integrations.py` checks the installed hooks against an
 isolated socket. Codex may request review of a changed hook in `/hooks`.
 
+[Auto Title](https://github.com/kryptamine/herdr-auto-title) names top tabs
+from the directory and current terminal task title, keeping the shortcut number
+first. Agent names are omitted because the sidebar already shows them. Manual
+tab names are preserved; clear a tab's name to resume automatic naming.
+The plugin and its configuration are managed by `home/herdr.nix` on both Macs.
+It starts with the Herdr server. For the first activation into an already-running
+server, invoke `herdr plugin action invoke herdr.auto-title.start` once, after
+checking `herdr plugin log list --plugin herdr.auto-title` has no running entry.
+This starts naming without stopping any panes. Configuration is read on plugin
+startup, from `~/Library/Application Support/herdr-auto-title/config.env` on macOS
+or `$XDG_CONFIG_HOME/herdr-auto-title/config.env` on Linux.
+
 ## Manual setup steps (per host)
 
 Everything nix *cannot* do, per machine — TCC grants, first-boot quirks,
