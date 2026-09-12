@@ -31,6 +31,7 @@ switch-laptop:
 # Validate the flake
 check:
     nix flake check
+    python3 tests/finder-defaults.py
     bash tests/agent-detect.sh
     bash tests/op-auth-guard.sh
     python3 tests/machine-vault-git.py

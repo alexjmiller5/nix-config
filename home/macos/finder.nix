@@ -58,7 +58,7 @@ in
       const value = ObjC.deepUnwrap(prefs.objectForKey('ListViewSettings'));
       if (value && Object.keys(value).length === 1 && value.calculateAllSizes === true) {
         prefs.removeObjectForKey('ListViewSettings');
-        prefs.synchronize();
+        prefs.synchronize;
       }
       JXA
     '';
