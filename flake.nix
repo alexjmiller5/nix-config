@@ -187,6 +187,7 @@
         aliases-infra = ./home/aliases/infra.nix;
         macos-duti = ./home/macos/duti.nix;
         macos-finder = ./home/macos/finder.nix;
+        macos-hyper-key = ./home/macos/hyper-key.nix;
         macos-window-management = ./home/macos/window-management.nix;
         macos-menu-bar = ./home/macos/menu-bar.nix;
         macos-spotlight-raycast = ./home/macos/spotlight-raycast.nix;

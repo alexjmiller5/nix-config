@@ -175,10 +175,9 @@ sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
    ORDER BY service, client;"
 ```
 
-* **Accessibility**: Hammerspoon, Karabiner-Elements, AltTab, Raycast,
+* **Accessibility**: Hammerspoon, AltTab, Raycast,
   BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
-* **Input Monitoring**: Karabiner-Elements (grants land on its helper
-  binaries), Dolphin
+* **Input Monitoring**: Dolphin
 * **Screen & System Audio Recording** (Screen Recording on older macOS):
   Hammerspoon, AltTab, 1Password, Notion, Claude, Chrome,
   VS Code, Ghostty, Telegram, Zoom, Raycast.
@@ -230,6 +229,21 @@ Accessibility grant covers these controls; no separate window manager or
 scripting addition is required. The exported `homeModules.macos-window-management`
 module declares native Control-Left/Right desktop navigation. The laptop imports
 it; the headless mini does not need interactive desktop shortcuts.
+
+## Hyper key
+
+Import `homeModules.macos-hyper-key` and enable `macos.hyperKey.enable` on
+interactive machines. `keyboardKey` selects the native keyboard preference
+suffix (VendorID-ProductID-HIDVirtualDevice); the default `0-0-0` matches the
+built-in laptop keyboard. Native preferences persist the Caps-to-Right-Control
+mapping; a one-shot hidutil login job also reapplies it. Hammerspoon must be
+running with Accessibility permission and the shared configuration installed.
+
+Hold Caps with a shortcut key for Hyper. A quick unused tap toggles Caps Lock.
+Right Control is reserved for Hyper on enabled Hammerspoon profiles. Secure
+Input prevents interception: Caps is only Right Control in that context, and
+Hyper is unavailable before login. After enrolling another Mac, test Caps+B,
+release Caps and type normally, then repeat after a fresh login.
 
 ## SIP status: DISABLED — keep it that way for now
 

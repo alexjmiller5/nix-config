@@ -148,7 +148,6 @@
       "ghostty"
       "google-chrome"
       "hammerspoon"
-      "karabiner-elements"
       "libreoffice"
       "mactex-no-gui"
       "notion"

@@ -124,10 +124,13 @@ routing table and workflow; this file is the in-repo map.
   (both injected for every host by mkHost), `chrome-policy.nix` (declared
   extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import)
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
-* `dotfiles/` — file payloads (karabiner, nvim, vscode, ssh pubs, duti list)
-  Karabiner is laptop-only and owns Hyper, mouse navigation, and the Mail /
-  WhatsApp remaps. Spotify transport belongs to the personal Hammerspoon
-  profile and requires no Karabiner-to-Raycast mappings.
+* `dotfiles/` - file payloads (nvim, vscode, ssh pubs, duti list)
+  Hyper uses the exported `homeModules.macos-hyper-key` module: native Caps
+  to Right Control, saved per keyboard and reapplied once at login through
+  hidutil. The module creates Hammerspoon's native-hyper marker; its event
+  tap adds the Hyper modifiers. This is enabled only on the interactive
+  laptop. Secure Input prevents the Hammerspoon transformation. Mail,
+  WhatsApp and Spotify remaps belong to the personal Hammerspoon profile.
 * `secrets/` - agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token). Machine vaults and their service accounts are exclusively for
   initial Nix bootstrap. Applications own enrollment, credential storage

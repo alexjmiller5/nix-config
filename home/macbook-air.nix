@@ -11,7 +11,7 @@
 #
 # Two file-management modes in here, chosen per file:
 #  - store symlink (home.file.source = ./path): immutable, edit via repo+rebuild.
-#    For configs their apps never write and no HM module covers (karabiner).
+#    For configs their apps never write and no HM module covers.
 #  - mkOutOfStoreSymlink: symlink into a live git working copy — tracked, but
 #    the app can write at runtime (VS Code settings, Claude settings, skills).
 let
@@ -37,6 +37,7 @@ in
     ./macos/chrome-remote-debugging.nix
     ./macos/notification-prefs.nix
     ./macos/window-management.nix
+    ./macos/hyper-key.nix
     ./ghostty.nix
     ./spotify-player.nix
     ./vscode.nix
@@ -48,6 +49,9 @@ in
   # Desktop preferences are useful on the laptop; the headless mini consumes
   # only the shared Finder baseline from common.nix.
   macos.finder.desktop.enable = true;
+
+  # The interactive laptop uses Caps as Hyper; the headless mini does not.
+  macos.hyperKey.enable = true;
 
   # Dedicated ssh-agent for agent shells, loaded at login from the AI Agent
   # vault via the agent SA token file - lets unattended agent sessions ssh to
@@ -490,7 +494,6 @@ in
   # anything in ~/Library/Services; no further wiring needed.
   home.file."Library/Services/Open in VS Code.workflow".source =
     ../dotfiles/services + "/Open in VS Code.workflow";
-  xdg.configFile."karabiner/karabiner.json".source = ../dotfiles/karabiner/karabiner.json;
 
   # --- VS Code (app-writable → out-of-store into THIS repo's working clone) ---
   home.file."Library/Application Support/Code/User/settings.json".source =
