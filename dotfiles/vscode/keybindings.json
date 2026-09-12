@@ -28,7 +28,7 @@
 		},
 		"when": "filesExplorerFocus && !inputFocus"
 	},
-	// Override default terminal split to use cmd+shift+s tinstead of ctrl+shift+5
+	// Split the terminal with cmd+d.
 	{
 		"key": "cmd+d",
 		"command": "workbench.action.terminal.split",
@@ -185,14 +185,19 @@
 		"command": "revealFileInOS",
 		"when": "!editorFocus"
 	},
-	// Raycast owns cmd+shift+f globally; use ctrl+shift+f to search this workspace.
+	// Raycast owns cmd+shift+f globally; use cmd+shift+s to search this workspace.
 	{
 		"key": "cmd+shift+f",
 		"command": "-workbench.action.findInFiles"
 	},
 	{
-		"key": "ctrl+shift+f",
-		"command": "workbench.action.findInFiles"
+		"key": "cmd+shift+s",
+		"command": "-workbench.action.files.saveAs"
+	},
+	{
+		"key": "cmd+shift+s",
+		"command": "workbench.action.findInFiles",
+		"when": "!issueReporterOpen && !remoteFileDialogVisible"
 	},
 	// Open a new terminal with cmd+n when terminal is focused
 	{

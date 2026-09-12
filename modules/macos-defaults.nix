@@ -37,7 +37,6 @@
       InitialKeyRepeat = 10;
       KeyRepeat = 2;
       ApplePressAndHoldEnabled = false;
-      AppleShowAllExtensions = true;
     };
 
     dock = {
@@ -54,18 +53,6 @@
       wvous-br-corner = 1;
     };
 
-    finder = {
-      QuitMenuItem = true;
-      AppleShowAllFiles = true;
-      _FXShowPosixPathInTitle = true;
-      ShowPathbar = true;
-      ShowStatusBar = true;
-      _FXSortFoldersFirst = true;
-      FXEnableExtensionChangeWarning = false;
-      FXPreferredViewStyle = "Nlsv"; # list view
-      FXDefaultSearchScope = "SCcf"; # search current folder
-    };
-
     WindowManager = {
       EnableStandardClickToShowDesktop = false;
       EnableTiledWindowMargins = false;
@@ -74,14 +61,6 @@
     CustomUserPreferences = {
       # no typed option for mouse speed (only trackpad)
       NSGlobalDomain."com.apple.mouse.scaling" = 5.0;
-      "com.apple.finder" = {
-        StandardViewSettings = {
-          ExtendedListViewSettings_calculateAllSizes = true;
-        };
-        ListViewSettings = {
-          calculateAllSizes = true;
-        };
-      };
       # iCloud Drive "Optimize Mac Storage" behavior
       "com.apple.bird" = {
         optimize-storage = true;

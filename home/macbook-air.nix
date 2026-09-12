@@ -44,6 +44,10 @@ in
     ./agent-ssh-agent.nix
   ];
 
+  # Desktop preferences are useful on the laptop; the headless mini consumes
+  # only the shared Finder baseline from common.nix.
+  macos.finder.desktop.enable = true;
+
   # Dedicated ssh-agent for agent shells, loaded at login from the AI Agent
   # vault via the agent SA token file - lets unattended agent sessions ssh to
   # the mini with no 1Password approval dialog (see home/agent-ssh-agent.nix).

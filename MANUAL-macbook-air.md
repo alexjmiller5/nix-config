@@ -1,8 +1,7 @@
-# MANUAL-macbook-air.md — MacBook steps nix cannot do
+# MANUAL-macbook-air.md - MacBook steps nix cannot do
 
-Everything on the laptop that can't be declared, in bootstrap order. (The
-mini's equivalent is MANUAL-mac-mini.md.) Sources: blueprint's
-MANUAL\_STEPS.md + its TCC snapshot, and the 2026-07/08 migration itself.
+Everything on the laptop that requires native setup, in bootstrap order.
+The mini's equivalent is MANUAL-mac-mini.md.
 
 ## Fresh-machine bootstrap order
 
@@ -540,3 +539,29 @@ values churn with OS updates.
 
 * `gcloud`/`op` credentials, `~/.claude.json` — runtime auth state, never
   declared. git's GitHub auth is NOT in this list anymore: it's the agenix PAT.
+
+## Finder preferences and sidebar
+
+`home/macos/finder.nix` declares full paths, list view, large list icons,
+folder-size calculation, filename extensions, search scope, sorting, desktop
+disk visibility, new-window target, tabs, trash options, and Recent Tags.
+The laptop enables `macos.finder.desktop.enable`; the mini keeps the shared
+baseline. Activation does not restart Finder. Existing folder view choices
+in `.DS_Store` can override global defaults; use Finder's View Options for
+intentional per-folder changes.
+
+Set the remaining Sidebar selections in Finder Settings on a replacement Mac:
+
+- Favorites: Applications, Desktop, Documents, and Downloads enabled.
+- Locations: External disks and CDs/DVDs/iOS Devices enabled.
+- Disable the other pictured entries: Recents, Shared, Movies, Music,
+  Pictures, iCloud Drive, Cloud Storage, home folder, On My Mac, the computer,
+  Hard disks, AirDrop, Bonjour computers, Connected servers, and Trash.
+
+Modern Finder stores these selections in shared-file-list archives containing
+machine-bound bookmarks. The available CLI and supported management APIs do
+not expose the complete checkbox set; do not copy those archives or write
+the obsolete `com.apple.sidebarlists` domain.
+
+iCloud sign-in and Desktop/Documents syncing use the native Apple Account
+interface. Nix does not enroll an account or restore its session.

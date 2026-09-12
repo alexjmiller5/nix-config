@@ -8,6 +8,7 @@
 # extraSpecialArgs).
 {
   imports = [
+    ./macos/finder.nix
     ./git.nix
     ./git-signing.nix
     ./scripts.nix

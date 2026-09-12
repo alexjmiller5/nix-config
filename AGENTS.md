@@ -105,8 +105,14 @@ routing table and workflow; this file is the in-repo map.
   Nix never populates or refreshes this file. Claude/Codex subscription login
   remains native app state, separate from operator tool credentials.
   Host-layer sibling = `claude-code` + `notion-cli` casks),
-  `macos/{menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
+  `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
   (activation-script defaults by concern, each exported via `homeModules`),
+  `macos/finder.nix` owns the shared Finder baseline and nested list defaults.
+  `macos.finder.desktop.enable` adds desktop-specific preferences and large
+  list icons; enabled on the laptop, disabled on the headless mini. Defaults
+  use `mkDefault` so other flakes can override individual values. Sidebar
+  selections and iCloud enrollment remain native user state. Activation does
+  not restart Finder or change per-folder `.DS_Store` settings,
   `ssh.nix` (programs.ssh + private Include),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),

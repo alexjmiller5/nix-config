@@ -186,6 +186,7 @@
         aliases-ai = ./home/aliases/ai.nix;
         aliases-infra = ./home/aliases/infra.nix;
         macos-duti = ./home/macos/duti.nix;
+        macos-finder = ./home/macos/finder.nix;
         macos-menu-bar = ./home/macos/menu-bar.nix;
         macos-spotlight-raycast = ./home/macos/spotlight-raycast.nix;
         macos-nightlight = ./home/macos/nightlight.nix;

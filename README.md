@@ -75,3 +75,11 @@ one-time app setup, bootstrap order:
 
 * **MacBook Air**: [MANUAL-macbook-air.md](MANUAL-macbook-air.md)
 * **Mac mini (headless, from scratch)**: [MANUAL-mac-mini.md](MANUAL-mac-mini.md)
+
+### Finder preferences
+
+`homeModules.macos-finder` exports the Finder defaults as a standalone
+home-manager module. Both hosts use its baseline; the laptop enables
+`macos.finder.desktop.enable = true` for its desktop preferences and 32px
+list icons. Values use `mkDefault` and can be overridden by consuming flakes.
+Sidebar selections and iCloud setup are documented in the laptop manual.
