@@ -65,6 +65,9 @@ routing table and workflow; this file is the in-repo map.
   `machine-vault-git.nix` (per-host options for explicit initial cloning via
   `bootstrap-companion-repos`; machine PAT helper passed only to individual
   allowed clones, never installed in Git config or run by activation),
+  `people-sync-operator.nix` (shared operator injection manifest containing
+  only the dedicated app credential references; the mini launcher owns no
+  credential supplier and retains Chrome's native social sessions),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
@@ -117,6 +120,8 @@ routing table and workflow; this file is the in-repo map.
   Life background sync imports its own device token once into Keychain via
   the installed CLI. Edit = recreate-not-decrypt (see
   `secrets/secrets.nix` header); no master key exists.
+  Screentime ingest enrolls through its own browser approval and Keychain;
+  its watcher and backup hook use the same native app credential.
 * Moshi on the Mini uses its declared Homebrew formula/service and native
   pairing store. Nix does not restore or rewrite Moshi credentials. Existing
   machines retain their pairing; replacement machines pair through Moshi.

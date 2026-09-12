@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  lib,
   username,
   inputs,
   ...
@@ -11,81 +10,6 @@
 # comes from modules/darwin-base.nix via mkHost.
 let
   peopleSync = inputs.people-sync.packages.${pkgs.stdenv.hostPlatform.system}.default;
-  op = "${pkgs._1password-cli}/bin/op";
-  jq = "${pkgs.jq}/bin/jq";
-  # People Sync: the scrape job signs into each site with a login copy held
-  # in the project vault, read by the people-sync-ci service account. That
-  # SA's token sits in this machine's vault (Mac Mini), reachable through
-  # the machine SA - the same two-hop pattern as the agent token file.
-  peopleSyncVault = "ug25zl4cfxnyk7rnwkyhea752i";
-  peopleSyncCiTokenRef = "op://g532a3e4zyqqrc7b2v3lhv4zmy/yvzwnlyp5yt2z5fmslh3u7lkk4/password";
-  peopleSyncLogins = {
-    facebook = "hrhy367724zrscj7pu5o33ko6i";
-    instagram = "dl57v3ospxj7ilto26zizrdf3e";
-    linkedin = "kcydj6vtwovqmjowc4zvwv46my";
-    venmo = "zdlpzwotyr6gmcdwqgsgbkorma";
-    spotify = "rydldw3mn7znxtq6kgr6gqe74e";
-    partiful = "4t5fqj3c6lsf6wn3p6wqiht4ja";
-  };
-  # $1 = platform. Prints {"username","password","totp"} (totp = current code
-  # or null) - the contract in the people-sync README.
-  # Screentime Dashboard: the mini pushes rebuilt Screen Time series to the
-  # dashboard Worker through Cloudflare Access with a service token that
-  # lives in this machine's vault - one hop via the machine SA, read only
-  # when a sync actually runs (never by the idle long-poll).
-  screentimeDashboardCredential = pkgs.writeShellScript "screentime-dashboard-credential" ''
-    set -euo pipefail
-    OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \
-      ${op} item get oeet73ymsgiwoozsfsvu2rprku --vault g532a3e4zyqqrc7b2v3lhv4zmy --format json \
-      | ${jq} -c '{
-          clientId: ([.fields[] | select(.label == "client_id") | .value] | first),
-          clientSecret: ([.fields[] | select(.label == "client_secret") | .value] | first)
-        }'
-  '';
-  peopleSyncCredential = pkgs.writeShellScript "people-sync-credential" ''
-    set -euo pipefail
-    case "$1" in
-      ${lib.concatStringsSep "\n      " (
-        lib.mapAttrsToList (platform: id: "${platform}) item=${id} ;;") peopleSyncLogins
-      )}
-      *) echo "no login item for platform $1" >&2; exit 1 ;;
-    esac
-    export OP_SERVICE_ACCOUNT_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \
-      ${op} read '${peopleSyncCiTokenRef}')"
-    ${op} item get "$item" --vault ${peopleSyncVault} --format json | ${jq} -c '{
-      username: ([.fields[] | select(.id == "username") | .value] | first),
-      password: ([.fields[] | select(.id == "password") | .value] | first),
-      totp: ([.fields[] | select(.type == "OTP") | .totp] | first)
-    }'
-  '';
-  # Newest 6-8 digit code texted to this Mac after the request time (or
-  # within 10 minutes) whose message names the platform ($1); prints
-  # nothing when none has arrived.
-  peopleSyncSmsCode = pkgs.writeShellScript "people-sync-sms-code" ''
-    set -euo pipefail
-    # people-sync hands over the moment it asked for the code; fall back to a
-    # short window for other callers.
-    since="''${PEOPLE_SYNC_CODE_AFTER:-$(/bin/date -u -v-10M +%Y-%m-%dT%H:%M:%SZ)}"
-    /opt/homebrew/bin/imsg search --query code --limit 30 --json \
-      | ${jq} -r --arg since "$since" --arg p "$1" \
-          'select(.is_from_me == false and .created_at > $since and ((.text // "") | ascii_downcase | contains($p)))
-           | (.text | [match("\\b[0-9]{6,8}\\b")] | .[0].string // empty)' \
-      | head -n 1
-  '';
-  # Same for email: newest thread after the request time (or within 15
-  # minutes) mentioning the platform, first 6-8 digit run in its body or
-  # snippet.
-  peopleSyncEmailCode = pkgs.writeShellScript "people-sync-email-code" ''
-    set -euo pipefail
-    gog=/etc/profiles/per-user/${username}/bin/gog
-    since="''${PEOPLE_SYNC_CODE_AFTER:-$(/bin/date -u -v-15M +%Y-%m-%dT%H:%M:%SZ)}"
-    id="$("$gog" gmail search "newer_than:1h $1" --max 5 -j 2>/dev/null \
-      | ${jq} -r --arg since "$since" '[.threads[] | select(.internalDateIso > $since)][0].id // empty')"
-    [ -n "$id" ] || exit 0
-    "$gog" gmail get "$id" -j 2>/dev/null \
-      | ${jq} -r '((.body // "") + " " + (.message.snippet // "")) | [match("\\b[0-9]{6,8}\\b")] | .[0].string // empty' \
-      | head -n 1
-  '';
 in
 {
   # Headless box: never sleep, come back after power loss.
@@ -109,8 +33,7 @@ in
     }
   ];
   homebrew.brews = [
-    # iMessage CLI - the people-sync SMS-code command reads texted 2FA codes
-    # from this Mac's Messages (it is signed in). Not in nixpkgs.
+    # iMessage CLI for operator use. Not in nixpkgs.
     "steipete/tap/imsg"
     # Moshi (phone terminal) agent daemon: surfaces Claude Code sessions on
     # this Mac in the Moshi app (inbox, waiting-state pushes, diffs). Runs as
@@ -150,7 +73,6 @@ in
     enable = true;
     user = username;
     url = "https://screentime-dashboard.nqipomyrjb.workers.dev";
-    credentialCommand = "${screentimeDashboardCredential}";
   };
   services.callhistory-backup = {
     enable = true;
@@ -173,25 +95,13 @@ in
     extensions = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
   };
 
-  # people-sync on this Mac: an ad-hoc tool an agent drives with Alex in the
-  # loop (the people-review skill), never a schedule. `people-sync-mini`
-  # wraps the CLI with this machine's wiring - the shared Chrome endpoint
-  # and the three commands above (run as `sh -c "<cmd>" people-sync-login
-  # <platform>`, so the platform is `$1` of the command string).
+  # People Sync is operator-invoked. Chrome owns its saved site sessions;
+  # the caller supplies dedicated file/Notion credentials when needed.
   environment.systemPackages = [
     peopleSync
     (pkgs.writeShellScriptBin "people-sync-mini" ''
+      set -euo pipefail
       export PEOPLE_SYNC_CDP_ENDPOINT="127.0.0.1:${toString config.services.agent-chrome.port}"
-      export PEOPLE_SYNC_CREDENTIAL_COMMAND='${peopleSyncCredential} "$1"'
-      export PEOPLE_SYNC_SMS_CODE_COMMAND='${peopleSyncSmsCode} "$1"'
-      export PEOPLE_SYNC_EMAIL_CODE_COMMAND='${peopleSyncEmailCode} "$1"'
-      # Scoped Life Data file access from the project ENV item.
-      ci="$(OP_SERVICE_ACCOUNT_TOKEN="$(/bin/cat ${config.age.secrets.machine-sa.path})" \
-        ${op} read '${peopleSyncCiTokenRef}')"
-      export LIFE_HUB_URL="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/LIFE_HUB_URL')"
-      export LIFE_HUB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/LIFE_HUB_TOKEN')"
-      export NOTION_API_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$ci" ${op} read 'op://${peopleSyncVault}/5xs6y3x5sxkhmvbjlredlpk7oi/NOTION_API_TOKEN')"
-      unset ci
       state="$HOME/.local/state/people-sync"
       mkdir -p "$state"
       cd "$state"
@@ -200,9 +110,8 @@ in
   ];
 
   # The mini's ONE agenix secret: the mac-mini-machine 1P service-account
-  # token (read-only on the "Mac Mini" vault). Every other secret — e.g. the
-  # git PAT — lives in that vault, fetched at runtime via op read; see
-  # secrets/secrets.nix.
+  # token (read-only on the "Mac Mini" vault), used only by explicit initial
+  # bootstrap commands; see secrets/secrets.nix.
   age.secrets.machine-sa = {
     file = ../secrets/machine-sa-mini.age;
     owner = username;

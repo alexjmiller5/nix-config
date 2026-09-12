@@ -18,6 +18,7 @@
     ./claude-plugins.nix
     ./codex.nix
     ./machine-vault-git.nix
+    ./people-sync-operator.nix
   ];
 
   # Life supplies the installed background runner and its CLI toggle.

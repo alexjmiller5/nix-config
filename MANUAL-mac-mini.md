@@ -104,6 +104,26 @@ the tailnet ACL so tagged devices are approved automatically:
   `launchctl kickstart -k gui/$(id -u)/com.alexmiller.screentime-backup` (and
   `...callhistory-backup`), then check `~/Library/Logs/<name>.log` for
   `backup OK` lines (a `cannot read` line means the grant is missing).
+* **Screentime Dashboard uploads**: run `screentime-ingest login --no-browser`
+  as the logged-in desktop user. Open the printed link in an authenticated
+  dashboard browser, match its approval code, and approve the upload device.
+  The CLI stores its own revocable upload credential in macOS Keychain.
+  Keep that user's login Keychain unlocked for the watcher and backup hook;
+  native Keychain prompts must be approved on the desktop. Verify an actual
+  dashboard Refresh completes, including its import stage. Replacement
+  machines enroll again; revoke the replaced uploader in Upload devices.
+  `screentime-ingest logout` revokes the current uploader and removes its
+  local credential. Neither path uses the machine bootstrap vault.
+* **People Sync**: Chrome owns saved social sessions. Sign in through the
+  site's normal interface on a replacement machine or after session expiry.
+  `people-sync-mini` supplies the local browser endpoint and state directory;
+  it does not fetch credentials. For an operator run needing file capture or
+  Notion, inject `~/.config/people-sync/operator.env` through desktop-auth
+  `op run`, using `op-unlock` for direct mini operator access. From the laptop,
+  forward only those three app values over SSH stdin, never an operator or
+  CI service-account token. Life's background runner syncs local table rows
+  separately using its own enrolled credential. Do not run `life sync` inside
+  People Sync's file-token environment.
 * **See + click the screen from ssh (agents)**: every ssh-spawned process is
   attributed by TCC to `/usr/libexec/sshd-keygen-wrapper`, so grant that ONE
   binary, via Screen Sharing: System Settings → Privacy & Security →

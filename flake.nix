@@ -173,6 +173,7 @@
         # claude-plugin-superpowers and claude-plugin-ponytail via extraSpecialArgs
         claude-plugins = ./home/claude-plugins.nix;
         machine-vault-git = ./home/machine-vault-git.nix;
+        people-sync-operator = ./home/people-sync-operator.nix;
         # op-wrappers needs the consumer to pass nix-openclaw-tools via extraSpecialArgs
         op-wrappers = ./home/op-wrappers.nix;
         # dev-tools needs the consumer to pass cherri via extraSpecialArgs
