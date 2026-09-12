@@ -28,6 +28,7 @@ in
         "${config.xdg.configHome}/herdr-auto-title/config.env";
     text = ''
       HERDR_AUTO_TITLE_AGENT_NAME=false
+      HERDR_AUTO_TITLE_MAX_LENGTH=24
     '';
   };
   xdg.configFile."herdr/plugins/config/undo-close/config.json".text = builtins.toJSON {

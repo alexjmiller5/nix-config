@@ -78,8 +78,9 @@ routing table and workflow; this file is the in-repo map.
   and Codex resume support. Closed panes are excluded from its history.
   Native selection copying stays enabled; clipboard feedback comes from
   Hammerspoon, so Herdr's clipboard toast is disabled. The pinned Auto Title
-  plugin derives top-tab names from directory and task context, keeps shortcut
-  numbers, and preserves manual labels. Its config omits redundant agent names.
+  plugin provides fallback top-tab names capped at 24 columns, omits redundant
+  agent names, and preserves custom labels. Agents follow global AGENTS.md to
+  write their own 2-3 word task names without separate model calls.
   The packaged `herdr.auto-title.start` action can start it in a live server;
   check plugin logs first to avoid starting a duplicate),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items;
