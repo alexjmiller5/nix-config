@@ -221,7 +221,7 @@ in
         ProgramArguments = [
           "/opt/homebrew/bin/brew"
           "upgrade"
-          "claude-code"
+          "claude-code@latest"
         ];
         StartCalendarInterval = [
           {

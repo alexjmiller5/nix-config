@@ -5,7 +5,7 @@
 # the op-authed CLI wrappers (op-wrappers.nix) and cli-tools.
 #
 # HOST-LAYER SIBLING (home-manager can't declare casks): the host's
-# homebrew.casks needs `claude-code` and `notion-cli` (ntn — not in
+# homebrew.casks needs `claude-code@latest` and `notion-cli` (ntn — not in
 # nixpkgs), and its allowUnfreePredicate must include "1password-cli".
 {
   config,
