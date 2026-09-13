@@ -15,6 +15,13 @@
     # IdentityFile *.pub entries in the included file select among them.
     settings."*" = {
       IdentityAgent = ''"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"'';
+
+      # Two files, space-separated: ssh reads both and only ever WRITES to the
+      # first, so ~/.ssh/known_hosts stays the mutable trust-on-first-use store
+      # while the declared file below pins the hosts we already know. Without
+      # it, a machine whose ~/.ssh/known_hosts is missing fails every git push
+      # and fetch with "Host key verification failed".
+      UserKnownHostsFile = "~/.ssh/known_hosts ${../dotfiles/ssh/known_hosts}";
     };
 
     includes = [
