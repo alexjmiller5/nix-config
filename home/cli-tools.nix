@@ -18,6 +18,8 @@
     shellcheck
     tree
     yq-go
+    # Agent-provider quota windows (Claude, Codex, ...) - see the `quota` skill
+    (callPackage ../pkgs/quota-axi.nix { })
   ];
 
   # Editor everywhere: nvim, with a real `vim` shim and $EDITOR set
