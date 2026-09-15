@@ -43,10 +43,13 @@ in
     # Apple HID usages: keyboard page 0x07, Caps Lock 0x39, F19 0x6e. A plain
     # key carries no modifier, so Hyper chords never collide with system or app
     # shortcuts. Native modifier preferences cannot target F19, so the mapping
-    # is hidutil only; drop the global Caps-to-modifier preference an earlier
-    # version of this module wrote (System Settings uses per-keyboard keys).
+    # is hidutil only. The native modifier remap runs before hidutil's key map
+    # and would swallow Caps first, so this keyboard's modifier preference is
+    # pinned to an explicit empty list: deleting the key leaves the old remap
+    # cached in the keyboard filter until the next login, an empty write
+    # reloads it. (The built-in keyboard reports vendor 0, product 0.)
     home.activation.nativeHyperKey = lib.hm.dag.entryAfter [ "setDarwinDefaults" ] ''
-      run /usr/bin/defaults -currentHost delete -g ${lib.escapeShellArg "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"} 2>/dev/null || true
+      run /usr/bin/defaults -currentHost write -g ${lib.escapeShellArg "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"} -array
       run ${lib.escapeShellArgs args}
     '';
 
