@@ -28,20 +28,25 @@ let
     docs = config.manual.docs;
     bootstrap = builtins.readFile (../docs/manual + "/${host}-bootstrap.md");
   };
-  line = status: s: "report ${status} ${lib.escapeShellArg s.owner} ${lib.escapeShellArg s.title}";
+  arg = lib.escapeShellArg;
   checkLines = lib.mapAttrsToList (
     _: s:
     if s.verify == null then
-      line "manual" s
+      "report manual ${arg s.owner} ${arg s.title}"
     else
-      "if (${s.verify}) >/dev/null 2>&1; then ${line "done" s}; else ${line "todo" s}; todo=1; fi"
+      "check ${arg s.owner} ${arg s.title} ${arg s.verify}"
   ) steps;
   manualCheck = pkgs.writeShellApplication {
     name = "manual-check";
+    # Verify strings are single-quoted on purpose: bash -c expands them.
+    excludeShellChecks = [ "SC2016" ];
     text = ''
       # Verifies this host's manual.steps; never performs one.
       todo=0
       report() { printf '%-6s %-20s %s\n' "$1" "$2" "$3"; }
+      check() { # owner title verify-command
+        if bash -c "$3" >/dev/null 2>&1; then report "done" "$1" "$2"; else report todo "$1" "$2"; todo=1; fi
+      }
       ${lib.concatStringsSep "\n" checkLines}
       exit "$todo"
     '';
