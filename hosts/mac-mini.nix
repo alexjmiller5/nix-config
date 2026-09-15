@@ -8,9 +8,6 @@
 
 # Shared base (stateVersion, unfree predicate, /etc/nix-darwin, brew zap, …)
 # comes from modules/darwin-base.nix via mkHost.
-let
-  peopleSync = inputs.people-sync.packages.${pkgs.stdenv.hostPlatform.system}.default;
-in
 {
   # Headless box: never sleep, come back after power loss.
   power.sleep.computer = "never";
@@ -94,20 +91,6 @@ in
     # Sign-in is manual (MANUAL-mac-mini.md).
     extensions = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
   };
-
-  # People Sync is operator-invoked. Chrome owns its saved site sessions;
-  # the caller supplies dedicated file/Notion credentials when needed.
-  environment.systemPackages = [
-    peopleSync
-    (pkgs.writeShellScriptBin "people-sync-mini" ''
-      set -euo pipefail
-      export PEOPLE_SYNC_CDP_ENDPOINT="127.0.0.1:${toString config.services.agent-chrome.port}"
-      state="$HOME/.local/state/people-sync"
-      mkdir -p "$state"
-      cd "$state"
-      exec ${peopleSync}/bin/people-sync "$@"
-    '')
-  ];
 
   # The mini's ONE agenix secret: the mac-mini-machine 1P service-account
   # token (read-only on the "Mac Mini" vault), used only by explicit initial

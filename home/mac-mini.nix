@@ -33,6 +33,9 @@ let
   '';
 in
 {
+  # People Sync attaches to this machine's own shared agent Chrome.
+  programs.people-sync.endpoint = "127.0.0.1:${toString osConfig.services.agent-chrome.port}";
+
   imports = [
     shared-album-reminders.homeModules.default
     ./common.nix

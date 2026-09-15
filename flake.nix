@@ -120,6 +120,7 @@
               home-manager.backupFileExtension = "backup";
               home-manager.sharedModules = [
                 inputs.life-data.homeModules.default
+                inputs.people-sync.homeModules.default
               ];
               # Explicit per-input args (not `inherit inputs`) on purpose: each
               # exported homeModule documents exactly what a consumer must pass.
