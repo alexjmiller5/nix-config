@@ -64,7 +64,7 @@
         login-keychain password. Until it is done every read reports
         `claude … auth_required · keychain_access_required`.
       '';
-      verify = "! quota-axi --provider claude --no-credential-refresh | grep -q keychain_access_required";
+      verify = "quota-axi --provider claude --no-credential-refresh --json | jq -e '.providers[0].state.status != \"auth_required\"' >/dev/null";
       redo = "if Claude Code recreates its Keychain item (a fresh `/login` after `/logout`)";
     };
   };

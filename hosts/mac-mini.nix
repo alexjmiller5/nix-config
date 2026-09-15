@@ -201,7 +201,7 @@
         declared. After pairing a new host, restart its existing Homebrew service
         and verify pairing with `moshi-hook status` and the phone app.
       '';
-      verify = "moshi-hook status";
+      verify = "/opt/homebrew/bin/moshi-hook status";
       redo = "on a new or unpaired machine only";
     };
     messages-sms-forwarding = {
