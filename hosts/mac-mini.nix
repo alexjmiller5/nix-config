@@ -92,13 +92,6 @@
     extensions = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
   };
 
-  # One-time repair: the retired people-sync scheduler's activation created
-  # ~/.local/share/people-sync as root; the app's home module now owns it.
-  system.activationScripts.preActivation.text = pkgs.lib.mkAfter ''
-    d=/Users/${username}/.local/share/people-sync
-    if [ -d "$d" ] && [ "$(stat -f %Su "$d")" = root ]; then chown -R ${username}:staff "$d"; fi
-  '';
-
   # The mini's ONE agenix secret: the mac-mini-machine 1P service-account
   # token (read-only on the "Mac Mini" vault), used only by explicit initial
   # bootstrap commands; see secrets/secrets.nix.
