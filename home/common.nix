@@ -20,13 +20,9 @@
     ./codex.nix
     ./machine-vault-git.nix
     ./people-sync-operator.nix
-    ./compliance.nix
   ];
 
   opAuth.vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
-
-  # Chrome sync session tag of the iPhone (compliance browser scans).
-  compliance.browser.phoneSession = "c2mnfQRic1xsw8tlDY83ew==";
 
   # Life supplies the installed background runner and its CLI toggle.
   # Interactive agent auth remains separate; background credentials are
