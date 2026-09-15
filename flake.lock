@@ -318,11 +318,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1789490463,
-        "narHash": "sha256-oKvu6dwjlOGVAYR29J9f+Jwbig8n444ywC/sPCfIkgA=",
+        "lastModified": 1789492856,
+        "narHash": "sha256-j30ZdNDSwU/WaZIsbtsk/jLJ0CpRahO3MbFVmc2mDQU=",
         "owner": "alexjmiller5",
         "repo": "people-sync",
-        "rev": "a7f4a8e0bc8e2622e9cbd7dc25c3c86d2221d5fb",
+        "rev": "79465980430e5e82be4a0c226cd933a135a8aac6",
         "type": "github"
       },
       "original": {
