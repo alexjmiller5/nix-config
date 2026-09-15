@@ -66,7 +66,9 @@
       app=$(/usr/bin/readlink "$link" || echo "$link")
       if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
         echo "de-quarantining $app" >&2
-        /usr/bin/xattr -dr com.apple.quarantine "$app"
+        # A half-upgraded bundle (brew's *.upgrading leftovers) can hold dangling
+        # symlinks; a failed strip must not abort the whole activation.
+        /usr/bin/xattr -dr com.apple.quarantine "$app" || true
       fi
     done
   '';
