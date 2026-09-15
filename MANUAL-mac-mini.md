@@ -228,6 +228,25 @@ window + tab group; verify from the laptop:
 `node ~/.claude/skills/chrome-control/scripts/cdp-group.mjs test https://example.com --port 9223`
 (prints `window=… group=…`), then the same with `--close`.
 
+#### agent-chrome: sync types for the compliance skill (GUI-only)
+
+The compliance skill's browser scan reads the iPhone's synced tabs and the
+saved tab groups from this agent Chrome profile, and its remote group
+deletion (closes the group on the phone too) needs the same sync. Sync state
+is per profile and manual; Nix cannot force sync types on. In the **agent
+Chrome's** window, open `chrome://settings/syncSetup/advanced` and turn on
+**Open tabs** and **Saved tab groups** only; leave History off. On builds
+where the page shows one combined "History and tabs" switch, the per-type
+rows are still there with zero size - drive them from the laptop through
+CDP (`cdp-eval.mjs` with a synthetic `.click()` on the `cr-toggle` whose row
+text starts with the type name). Leave the settings page afterwards: an open
+sync setup page holds the type from starting. Verify on
+`chrome://sync-internals/`: Sessions and Saved Tab Group = Running, History
+= Not Running. Then, in an agent shell on this machine, point the skill at
+its local Chrome and the phone (IDs from a first `scan browser`):
+`compliance.py connections set browser port 9222` and
+`compliance.py connections set browser phone-session <foreign_session.id>`.
+
 ### Life background sync: replacement-machine recovery
 
 Nix installs Life, its configuration and the login-time background runner
