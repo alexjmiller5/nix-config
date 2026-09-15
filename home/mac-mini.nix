@@ -49,6 +49,9 @@ in
   # the migrated Life task catalog, so importing its module creates no job.
   services.shared-album-reminders.enable = false;
 
+  # The agent Chrome runs here; the compliance collector talks to it directly.
+  compliance.browser.port = 9222;
+
   # No 1P desktop app here — outbound ssh uses the default agent socket
   # (SSH_AUTH_SOCK), so a laptop agent forwarded over `ssh -A` serves the
   # keys the nix-secrets host blocks select. ssh.nix's 1P IdentityAgent
