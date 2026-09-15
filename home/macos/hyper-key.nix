@@ -17,7 +17,7 @@ let
       UserKeyMapping = [
         {
           HIDKeyboardModifierMappingSrc = 30064771129;
-          HIDKeyboardModifierMappingDst = 30064771300;
+          HIDKeyboardModifierMappingDst = 30064771182;
         }
       ];
     })
@@ -25,57 +25,28 @@ let
 in
 {
   options.macos.hyperKey = {
-    enable = lib.mkEnableOption "native Caps Lock to right Control for Hammerspoon Hyper";
+    enable = lib.mkEnableOption "Caps Lock as F19 for Hammerspoon Hyper";
     keyboardKey = lib.mkOption {
       type = lib.types.strMatching "(0|[1-9][0-9]*)-(0|[1-9][0-9]*)-[01]";
       default = "0-0-0";
       description = ''
         Native modifier preference key suffix: VendorID-ProductID-HIDVirtualDevice.
-        The immediate and login remaps match keyboards with these vendor/product IDs.
+        The immediate and login remaps match keyboards with these vendor/product IDs
+        (0 matches every keyboard).
       '';
     };
   };
 
   config = lib.mkIf cfg.enable {
-    xdg.configFile."hammerspoon/native-hyper".text = "rightctrl\n";
+    xdg.configFile."hammerspoon/native-hyper".text = "f19\n";
 
-    # Apple HID usages: keyboard page 0x07, Caps Lock 0x39, right Control 0xe4.
-    # Preserve independent modifier choices in the native per-keyboard preference.
+    # Apple HID usages: keyboard page 0x07, Caps Lock 0x39, F19 0x6e. A plain
+    # key carries no modifier, so Hyper chords never collide with system or app
+    # shortcuts. Native modifier preferences cannot target F19, so the mapping
+    # is hidutil only; drop the global Caps-to-modifier preference an earlier
+    # version of this module wrote (System Settings uses per-keyboard keys).
     home.activation.nativeHyperKey = lib.hm.dag.entryAfter [ "setDarwinDefaults" ] ''
-      run /usr/bin/osascript -l JavaScript <<'JXA'
-      ObjC.import('Foundation');
-      const app = Application.currentApplication();
-      app.includeStandardAdditions = true;
-      const domain = '-g';
-      const key = ${builtins.toJSON "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"};
-      const quote = value => "'" + value.replace(/'/g, "'\"'\"'") + "'";
-      const defaults = '/usr/bin/defaults -currentHost ';
-      let pairs = [];
-      let nativePairs;
-      let stored;
-      try { stored = app.doShellScript(defaults + 'export ' + quote(domain) + ' -'); }
-      catch (error) { if (!error.message.includes('does not exist')) throw error; }
-      if (stored !== undefined) {
-        const data = $(stored).dataUsingEncoding($.NSUTF8StringEncoding);
-        const nativePrefs = $.NSPropertyListSerialization.propertyListWithDataOptionsFormatError(data, 0, null, null);
-        const prefs = ObjC.deepUnwrap(nativePrefs);
-        if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs)) throw Error('Could not read native keyboard preferences');
-        nativePairs = nativePrefs.objectForKey(key);
-        pairs = prefs[key] === undefined ? [] : prefs[key];
-      }
-      if (!Array.isArray(pairs)) throw Error('Native keyboard modifier preference must be an array');
-      const updated = $.NSMutableArray.alloc.init;
-      pairs.forEach((pair, index) => {
-        if (!pair || pair.HIDKeyboardModifierMappingSrc !== 30064771129) updated.addObject(nativePairs.objectAtIndex(index));
-      });
-      const replacement = $.NSMutableDictionary.alloc.init;
-      replacement.setObjectForKey($.NSNumber.numberWithLongLong(30064771129), 'HIDKeyboardModifierMappingSrc');
-      replacement.setObjectForKey($.NSNumber.numberWithLongLong(30064771300), 'HIDKeyboardModifierMappingDst');
-      updated.addObject(replacement);
-      const data = $.NSPropertyListSerialization.dataWithPropertyListFormatOptionsError(updated, $.NSPropertyListXMLFormat_v1_0, 0, null);
-      const xml = $.NSString.alloc.initWithDataEncoding(data, $.NSUTF8StringEncoding).js;
-      app.doShellScript(defaults + 'write ' + quote(domain) + ' ' + quote(key) + ' ' + quote(xml));
-      JXA
+      run /usr/bin/defaults -currentHost delete -g ${lib.escapeShellArg "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"} 2>/dev/null || true
       run ${lib.escapeShellArgs args}
     '';
 
