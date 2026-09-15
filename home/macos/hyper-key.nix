@@ -45,11 +45,12 @@ in
     # shortcuts. Native modifier preferences cannot target F19, so the mapping
     # is hidutil only. The native modifier remap runs before hidutil's key map
     # and would swallow Caps first, so this keyboard's modifier preference is
-    # pinned to an explicit empty list: deleting the key leaves the old remap
-    # cached in the keyboard filter until the next login, an empty write
-    # reloads it. (The built-in keyboard reports vendor 0, product 0.)
+    # pinned to the identity pair System Settings itself writes for "no
+    # change". A stale Caps remap stays cached until the next login; only
+    # login rebuilds it. (The built-in keyboard reports vendor 0, product 0.)
     home.activation.nativeHyperKey = lib.hm.dag.entryAfter [ "setDarwinDefaults" ] ''
-      run /usr/bin/defaults -currentHost write -g ${lib.escapeShellArg "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"} -array
+      run /usr/bin/defaults -currentHost write -g ${lib.escapeShellArg "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"} -array \
+        '<dict><key>HIDKeyboardModifierMappingSrc</key><integer>30064771129</integer><key>HIDKeyboardModifierMappingDst</key><integer>30064771129</integer></dict>'
       run ${lib.escapeShellArgs args}
     '';
 

@@ -188,6 +188,8 @@
       # Replaces the DerivedData rm-cp-codesign flow. Fully qualified to
       # avoid any future homebrew/cask collision.
       "alexjmiller5/tap/receptor"
+      # From alexjmiller5/tap — Offline Shazam's Mac app, released by its CI.
+      "alexjmiller5/tap/offline-shazam"
       "repobar"
       "slack"
       "spotify"

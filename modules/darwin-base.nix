@@ -76,4 +76,9 @@
   # lists ARE the machine.
   homebrew.enable = true;
   homebrew.onActivation.cleanup = "zap";
+  # Declared casks/formulas track their taps' latest release at every switch -
+  # without this a CI-released cask (receptor) would stay pinned to whatever
+  # version was first installed.
+  homebrew.onActivation.autoUpdate = true;
+  homebrew.onActivation.upgrade = true;
 }
