@@ -6,6 +6,7 @@
 deploy host="mac-mini-tailscale":
     #!/usr/bin/env bash
     set -euo pipefail
+    just manual
     echo "→ copying flake + inputs to {{host}} …"
     flake="$(nix flake archive --to "ssh://{{host}}" --json \
       | /usr/bin/python3 -c 'import json,sys;print(json.load(sys.stdin)["path"])')"
@@ -21,6 +22,7 @@ switch:
 switch-laptop:
     #!/usr/bin/env bash
     set -euo pipefail
+    just manual
     nix build .#darwinConfigurations.macbook-air.system
     # /run/current-system path matches the NOPASSWD sudoers rule (darwin-base.nix);
     # the ./result fallback is bootstrap-only (first activation, password prompt).
@@ -31,6 +33,7 @@ switch-laptop:
 # Validate the flake
 check:
     nix flake check
+    python3 tests/manual-render.py
     python3 tests/finder-defaults.py
     bash tests/agent-detect.sh
     bash tests/op-auth-guard.sh
@@ -41,6 +44,19 @@ check:
     bash tests/posthog-auth.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
+
+# Render MANUAL-<host>.md from the declared manual.steps; rewrites only when the body changed
+manual:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for h in macbook-air mac-mini; do
+      fresh="$(nix build --no-link --print-out-paths ".#manual-$h")"
+      if [ -f "MANUAL-$h.md" ] && cmp -s <(tail -n +2 "$fresh") <(tail -n +2 "MANUAL-$h.md"); then
+        echo "MANUAL-$h.md unchanged"
+      else
+        cp "$fresh" "MANUAL-$h.md" && chmod 644 "MANUAL-$h.md" && echo "MANUAL-$h.md rendered"
+      fi
+    done
 
 # Bump all inputs
 update:

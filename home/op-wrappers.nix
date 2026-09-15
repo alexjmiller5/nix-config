@@ -52,7 +52,8 @@ let
   };
 in
 {
-  imports = [ ./op-connect.nix ];
+  imports = [
+    ../modules/manual-steps.nix ./op-connect.nix ];
   xdg.dataFile."posthog/skills".source = "${posthogCli.skills}/skills";
   home.packages = [
     # Agent-wide PostHog access, using the existing broad personal API key.
@@ -330,4 +331,24 @@ in
       '';
     })
   ];
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  manual.steps = {
+    wacli-pairing = {
+      title = "wacli WhatsApp linked-device pairing (one pairing for both Macs)";
+      owner = "wacli";
+      body = ''
+        (WhatsApp linked device for agent group sends; ONE pairing shared
+        by both Macs via 1Password): `wacli auth` in a terminal, scan the QR from
+        the phone (WhatsApp → Linked devices → Link a device), Ctrl+C once the
+        bootstrap sync idles. The wrapper (`op-wrappers.nix`) pushes the session to
+        the "AI Agent WhatsApp Linked Device Session" document and pulls it before
+        every run, so the mini needs no pairing of its own - just never run wacli
+        on both machines at the same moment. If the phone is offline 14 days
+        WhatsApp unlinks the device → re-run `wacli auth` anywhere.
+      '';
+      redo = "if WhatsApp unlinks the device (phone offline 14 days)";
+    };
+  };
+
 }

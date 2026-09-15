@@ -128,6 +128,15 @@ in
           }
         ];
       }
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/herdr-tab-name.sh";
+            timeout = 10;
+          }
+        ];
+      }
     ];
 
     hooks.PermissionRequest = [

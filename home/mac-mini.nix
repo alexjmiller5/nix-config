@@ -182,4 +182,44 @@ in
       StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-pull.log";
     };
   };
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  manual.steps = {
+    people-sync-sessions = {
+      title = "People Sync browser sessions";
+      owner = "people-sync";
+      desktop = true;
+      body = ''
+        Chrome owns saved social sessions. Sign in through the
+        site's normal interface on a replacement machine or after session expiry.
+        `people-sync-mini` supplies the local browser endpoint and state directory;
+        it does not fetch credentials. For an operator run needing file capture or
+        Notion, inject `~/.config/people-sync/operator.env` through desktop-auth
+        `op run`, using `op-unlock` for direct mini operator access. From the laptop,
+        forward only those three app values over SSH stdin, never an operator or
+        CI service-account token. Life's background runner syncs local table rows
+        separately using its own enrolled credential. Do not run `life sync` inside
+        People Sync's file-token environment.
+      '';
+      redo = "after session expiry";
+    };
+    op-account = {
+      title = "1Password CLI account (for op-unlock)";
+      owner = "op-unlock";
+      body = ''
+        Once, over ssh, register the
+        account on this machine so `op signin` works headlessly (no desktop app on
+        the mini): `op account add --address my.1password.com --email <1P email>`
+        - it prompts for the Secret Key and account password (password: the
+        "1Password Account" item, Personal vault; Secret Key: 1Password app →
+        account name in the sidebar → Manage Accounts → the account → Set Up
+        Another Device, or the Emergency Kit PDF). Afterwards `op-unlock [hours]`
+        from any ssh shell (phone terminal included) gives agent sessions
+        time-boxed Personal-vault reads via `op-personal`; `op-unlock lock` ends
+        it, `op-unlock status` checks.
+      '';
+      verify = "op account list | grep -q my.1password.com";
+    };
+  };
+
 }

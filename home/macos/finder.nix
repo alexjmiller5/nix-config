@@ -10,9 +10,36 @@ let
   };
 in
 {
+  imports = [ ../../modules/manual-steps.nix ];
+
   options.macos.finder.desktop.enable = lib.mkEnableOption "desktop Finder preferences";
 
   config = {
+
+    # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+    manual.steps = lib.mkIf cfg.desktop.enable = {
+      finder-sidebar = {
+        title = "Finder sidebar selections";
+        owner = "finder";
+        phase = "snapshot";
+        desktop = true;
+        body = ''
+          Set the remaining Sidebar selections in Finder Settings on a replacement Mac:
+
+          - Favorites: Applications, Desktop, Documents, and Downloads enabled.
+          - Locations: External disks and CDs/DVDs/iOS Devices enabled.
+          - Disable the other pictured entries: Recents, Shared, Movies, Music,
+            Pictures, iCloud Drive, Cloud Storage, home folder, On My Mac, the computer,
+            Hard disks, AirDrop, Bonjour computers, Connected servers, and Trash.
+
+          Modern Finder stores these selections in shared-file-list archives containing
+          machine-bound bookmarks. The available CLI and supported management APIs do
+          not expose the complete checkbox set; do not copy those archives or write
+          the obsolete `com.apple.sidebarlists` domain.
+        '';
+      };
+    };
+
     targets.darwin.defaults = {
       NSGlobalDomain.AppleShowAllExtensions = lib.mkDefault true;
       "com.apple.finder" = {

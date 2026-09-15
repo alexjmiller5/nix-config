@@ -24,6 +24,8 @@ let
   ];
 in
 {
+  imports = [ ../../modules/manual-steps.nix ];
+
   options.macos.hyperKey = {
     enable = lib.mkEnableOption "Caps Lock as F19 for Hammerspoon Hyper";
     keyboardKey = lib.mkOption {
@@ -38,6 +40,23 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+
+    # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+    manual.steps = {
+      hyper-key-test = {
+        title = "Test the Hyper key after enrolling";
+        owner = "hyper-key";
+        desktop = true;
+        body = ''
+          Hold Caps with a shortcut key for Hyper. A quick unused tap toggles Caps Lock.
+          Right Control is reserved for Hyper on enabled Hammerspoon profiles. Secure
+          Input prevents interception: Caps is only Right Control in that context, and
+          Hyper is unavailable before login. After enrolling another Mac, test Caps+B,
+          release Caps and type normally, then repeat after a fresh login.
+        '';
+      };
+    };
+
     xdg.configFile."hammerspoon/native-hyper".text = "f19\n";
 
     # Apple HID usages: keyboard page 0x07, Caps Lock 0x39, F19 0x6e. A plain

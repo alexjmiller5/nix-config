@@ -4,7 +4,8 @@
 # is exportable via homeModules (work-laptop flake imports it as-is).
 # (fzf lives in zsh.nix as programs.fzf — its value is the shell integration.)
 {
-  imports = [ ./herdr.nix ];
+  imports = [
+    ../modules/manual-steps.nix ./herdr.nix ];
 
   home.packages = with pkgs; [
     uv
@@ -44,4 +45,26 @@
   xdg.enable = true;
   # less pre-598 ignores XDG; the env var works on every version.
   home.sessionVariables.LESSHISTFILE = "${config.xdg.stateHome}/lesshst";
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  manual.steps = {
+    quota-axi-keychain = {
+      title = "quota-axi Keychain grant";
+      owner = "quota-axi";
+      desktop = true;
+      body = ''
+        After the Claude Code login, run
+        `quota-axi --allow-keychain-prompt` once from a desktop Terminal and click
+        **Always Allow** (it asks for the login password). Claude keeps its OAuth
+        token in the Keychain item "Claude Code-credentials"; that click adds
+        `/usr/bin/security` to the item's ACL so `quota-axi` can read Claude quota
+        silently from then on. Undeclarable: editing a Keychain ACL needs the
+        login-keychain password. Until it is done every read reports
+        `claude … auth_required · keychain_access_required`.
+      '';
+      verify = "! quota-axi --provider claude --no-credential-refresh | grep -q keychain_access_required";
+      redo = "if Claude Code recreates its Keychain item (a fresh `/login` after `/logout`)";
+    };
+  };
+
 }

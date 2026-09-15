@@ -15,6 +15,7 @@
 }:
 {
   imports = [
+    ../modules/manual-steps.nix
     ./agent-env.nix
     ./op-connect.nix
   ];
@@ -44,4 +45,46 @@
         > "$claudeJson.tmp" && mv "$claudeJson.tmp" "$claudeJson" && chmod 600 "$claudeJson"
     fi
   '';
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  config.manual.steps = {
+    agent-operator-token = {
+      title = "Enroll the AI Agent operator token";
+      owner = "ai-agent";
+      body = ''
+        Agent tools use the independently provisioned AI Agent credential in the
+        existing `~/.local/state/op/agent-sa-token` file (raw token only, owned by
+        the local user, mode `0600`). Preserve it on an enrolled machine. Nix installs
+        the initializer and consumers; it neither creates nor refreshes this file.
+        Agent SSH, local Connect and launchd companion-repo sync consume it through
+        their existing interfaces. No machine service account supplies or refreshes
+        the agent token.
+
+        For a replacement machine or deliberate rotation, use native 1Password
+        desktop authentication to retrieve the authoritative AI Agent credential:
+        vault `4eeyrkqibibn7k4j6rz2fbzvxm`, item `bktt2mfgbrbry53jrvitgxq45q`.
+        The credential owner enrolls that token into the existing file with private
+        permissions, using hidden input rather than a shell-history literal. This
+        is separate from Nix bootstrap; do not recover from a machine-vault copy or
+        substitute a machine SA. No additional credential cache is needed. After
+        rotation, restart agent sessions and follow [Connect recovery](docs/op-connect.md).
+        On the headless mini the `op-unlock` / `op-personal` user-session path is the way to retrieve it.
+      '';
+      verify = "test -s ~/.local/state/op/agent-sa-token";
+      redo = "on a replacement machine or a deliberate rotation";
+    };
+    claude-code-login = {
+      title = "Sign into Claude Code";
+      owner = "claude-code";
+      desktop = true;
+      body = ''
+        Sign into Claude Code (`claude` → `/login`) and, where installed, the Claude desktop app.
+        Auth state lands in `~/.claude.json` and the login Keychain item "Claude Code-credentials" -
+        deliberate imperative leftovers, never declared (same for `gcloud` / `op` credentials).
+        Neither the operator token nor a Nix rebuild recreates it.
+      '';
+      verify = "security find-generic-password -s 'Claude Code-credentials' >/dev/null";
+    };
+  };
+
 }

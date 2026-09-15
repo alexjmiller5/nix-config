@@ -84,6 +84,7 @@
 
   outputs =
     inputs@{
+      self,
       nixpkgs,
       nix-darwin,
       home-manager,
@@ -91,6 +92,9 @@
     }:
     let
       username = "alexmiller";
+      system = "aarch64-darwin";
+      pkgs = nixpkgs.legacyPackages.${system};
+      manualOf = host: self.darwinConfigurations.${host}.config.system.build.manual;
       mkHost =
         { host, home }:
         nix-darwin.lib.darwinSystem {
@@ -98,6 +102,7 @@
           modules = [
             host
             ./modules/darwin-base.nix
+            ./modules/manual.nix
             ./modules/macos-defaults.nix
             ./modules/agent-chrome.nix
             ./modules/chrome-policy.nix
@@ -154,6 +159,21 @@
         host = ./hosts/macbook-air.nix;
         home = ./home/macbook-air.nix;
       };
+
+      # Rendered MANUAL-<host>.md files (modules/manual.nix); `just manual`
+      # copies them into the repo, and the check below fails when a committed
+      # body (everything after the header line) has drifted from its render.
+      packages.${system} = {
+        manual-macbook-air = manualOf "macbook-air";
+        manual-mac-mini = manualOf "mac-mini";
+      };
+      checks.${system}.manual-fresh = pkgs.runCommand "manual-fresh" { } ''
+        cmp <(tail -n +2 ${manualOf "macbook-air"}) <(tail -n +2 ${./MANUAL-macbook-air.md}) \
+          || { echo "MANUAL-macbook-air.md is stale: run just manual" >&2; exit 1; }
+        cmp <(tail -n +2 ${manualOf "mac-mini"}) <(tail -n +2 ${./MANUAL-mac-mini.md}) \
+          || { echo "MANUAL-mac-mini.md is stale: run just manual" >&2; exit 1; }
+        touch $out
+      '';
 
       # Reusable nix-darwin modules, same audience.
       darwinModules = {

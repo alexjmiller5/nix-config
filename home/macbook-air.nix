@@ -511,4 +511,40 @@ in
   # The hammerspoon repo itself stays an independent live clone (never nix-managed).
   home.file.".config/hammerspoon-profile".text = "personal";
 
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  manual.steps = {
+    menu-bar-order = {
+      title = "Third-party menu bar icon order";
+      owner = "menu-bar";
+      phase = "snapshot";
+      desktop = true;
+      body = ''
+        Manual: THIRD-PARTY icon order (⌘-drag). Can't sanely be declared: each
+        app's spot is an `"NSStatusItem Preferred Position"` pixel-offset key in
+        that app's own defaults domain, reread only at app launch - and apps that
+        skip `autosaveName` (e.g. CodexBar) get no position persistence from macOS
+        at all. If arrangement drift ever gets annoying, the Thaw cask
+        (Accessibility-based layout profiles) is the tool-shaped answer. Full
+        research: Notion note "Menu bar / dock in nix - findings" (2026-08-02).
+
+        Reference layout, right → left (snapshotted 2026-08-04): clock,
+        Control Center, Sound, WiFi, BetterDisplay, Tailscale, Battery, Bluetooth,
+        Screen Mirroring, Weather, 1Password, AirDrop, RepoBar, CodexBar.
+      '';
+    };
+    notification-sources = {
+      title = "OS notification sources stay undeclared";
+      owner = "notification-prefs";
+      phase = "snapshot";
+      body = ''
+        Manual: the OS's own notification sources (Wi-Fi, Bluetooth, Software Update,
+        tccd - the `_SYSTEM_CENTER_:` entries and the bundles under
+        `/System/Library/UserNotifications/`) are deliberately left undeclared; their
+        values churn with OS updates.
+        What IS declared, and the usernoted store gotchas: docs/notifications.md.
+      '';
+    };
+  };
+
 }
