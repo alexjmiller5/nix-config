@@ -107,7 +107,7 @@ in
     # after 30 idle minutes) and after N hours (default 6) signs out
     # server-side and deletes the file. No secrets ever touch disk - only the
     # session token, which the sign-out invalidates. One-time prerequisite:
-    # `op account add` on this machine (MANUAL-mac-mini.md §6).
+    # `op account add` on this machine (the op-account manual step below).
     (pkgs.writeShellApplication {
       name = "op-unlock";
       runtimeInputs = [ pkgs._1password-cli ];

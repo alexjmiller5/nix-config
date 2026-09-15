@@ -337,11 +337,10 @@ in
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
     wacli-pairing = {
-      title = "wacli WhatsApp linked-device pairing (one pairing for both Macs)";
+      title = "wacli WhatsApp linked-device pairing";
       owner = "wacli";
       body = ''
-        (WhatsApp linked device for agent group sends; ONE pairing shared
-        by both Macs via 1Password): `wacli auth` in a terminal, scan the QR from
+        One pairing shared by both Macs via 1Password: `wacli auth` in a terminal, scan the QR from
         the phone (WhatsApp → Linked devices → Link a device), Ctrl+C once the
         bootstrap sync idles. The wrapper (`op-wrappers.nix`) pushes the session to
         the "AI Agent WhatsApp Linked Device Session" document and pulls it before

@@ -42,8 +42,8 @@
     "steipete/tap/imsg"
     # Moshi (phone terminal) agent daemon: surfaces Claude Code sessions on
     # this Mac in the Moshi app (inbox, waiting-state pushes, diffs). Runs as
-    # a brew launchd service. One-time pairing + hook install in
-    # MANUAL-mac-mini.md §6; the Claude Code hooks it wants live in
+    # a brew launchd service. One-time pairing: the moshi-pairing
+    # manual step below; the Claude Code hooks it wants live in
     # agent-config's settings.json (nix-managed, read-only here).
     {
       name = "rjyo/moshi/moshi-hook";
@@ -115,8 +115,7 @@
       owner = "screentime-backup";
       desktop = true;
       body = ''
-        + **callhistory-backup** (weekly Apple-data snapshots):
-        grant Full Disk Access once per app - System Settings → Privacy & Security →
+        Grant Full Disk Access once per app - System Settings → Privacy & Security →
         **Full Disk Access** → **\[+]** → `/Applications/ScreenTimeBackup.app` and
         `/Applications/CallHistoryBackup.app`, toggle on. Each app is re-signed with
         its same stable cert every rebuild, so the grants persist. Verify:

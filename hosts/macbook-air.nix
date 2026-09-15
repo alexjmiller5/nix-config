@@ -371,8 +371,8 @@
       owner = "claude-in-chrome";
       desktop = true;
       body = ''
-        ("Always allow actions on this
-        site") - same LevelDB, same reason, so allow sites by clicking the
+        Its "Always allow actions on this site" grants live in the same LevelDB as
+        Tab Copy's format (same reason it cannot be declared), so allow sites by clicking the
         extension's own popup once per site.
       '';
     };
