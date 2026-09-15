@@ -24,6 +24,12 @@ stdenv.mkDerivation (finalAttrs: {
     fetcherVersion = 4;
     hash = "sha256-dWRK3kNESr8osq8FDIVTeE4IcHAR/0lBudUZOrDXl9M=";
   };
+  # Codex CLI >= 0.149 dropped the `untrusted` approval policy; upstream still
+  # passes it (kunchenguid/quota-axi#177), so every Codex read fails.
+  postPatch = ''
+    substituteInPlace src/providers/codex.ts \
+      --replace-fail '"-a", "untrusted"' '"-a", "never"'
+  '';
   nativeBuildInputs = [
     nodejs
     pnpm_11
