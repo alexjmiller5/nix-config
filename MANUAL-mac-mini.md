@@ -213,6 +213,13 @@ Claude Code and Codex subscription sign-ins are separate native logins
 (`claude` -> `/login`, `codex login`). Preserve their app-owned auth state;
 neither the operator token nor a Nix rebuild recreates it.
 
+After the Claude Code login, grant `quota-axi` Keychain access once: over
+Screen Sharing, in a Terminal on the logged-in desktop (the ACL dialog only
+renders on the console session), run `quota-axi --allow-keychain-prompt` and
+click **Always Allow** (login password). It adds `/usr/bin/security` to the
+"Claude Code-credentials" item's ACL, which is why nix cannot declare it.
+Redo it if Claude Code recreates the item (fresh `/login` after `/logout`).
+
 #### agent-chrome: sign into Claude in Chrome (GUI-only)
 
 The extension itself is policy-installed (`services.agent-chrome.extensions`

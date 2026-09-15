@@ -275,6 +275,15 @@ Restoring SIP: `csrutil enable` in Recovery; boot-arg cleanup:
 * **1Password** — covered in bootstrap step 5 (app sign-in, `op signin`).
 * **Claude** — sign into the Claude desktop app and Claude Code (`claude` →
   `/login`); auth state lands in `~/.claude.json` (deliberate leftover).
+* **quota-axi Keychain grant** — after the Claude Code login, run
+  `quota-axi --allow-keychain-prompt` once from a desktop Terminal and click
+  **Always Allow** (it asks for the login password). Claude keeps its OAuth
+  token in the Keychain item "Claude Code-credentials"; that click adds
+  `/usr/bin/security` to the item's ACL so `quota-axi` can read Claude quota
+  silently from then on. Undeclarable: editing a Keychain ACL needs the
+  login-keychain password. Until it is done every read reports
+  `claude … auth_required · keychain_access_required`. Redo it if Claude Code
+  recreates the item (a fresh `/login` after `/logout`).
 * **Claude in Chrome** — sign into the browser extension (toolbar icon →
   sign in). Store-installed via the Chrome policy plist, but auth is per-
   profile and GUI-only.
