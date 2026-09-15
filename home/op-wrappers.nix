@@ -53,7 +53,9 @@ let
 in
 {
   imports = [
-    ../modules/manual-steps.nix ./op-connect.nix ];
+    ../modules/manual-steps.nix
+    ./op-connect.nix
+  ];
   xdg.dataFile."posthog/skills".source = "${posthogCli.skills}/skills";
   home.packages = [
     # Agent-wide PostHog access, using the existing broad personal API key.

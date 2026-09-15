@@ -5,7 +5,9 @@
 # (fzf lives in zsh.nix as programs.fzf — its value is the shell integration.)
 {
   imports = [
-    ../modules/manual-steps.nix ./herdr.nix ];
+    ../modules/manual-steps.nix
+    ./herdr.nix
+  ];
 
   home.packages = with pkgs; [
     uv

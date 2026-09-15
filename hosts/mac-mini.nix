@@ -108,7 +108,6 @@
     owner = username;
   };
 
-
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
     screentime-backup-fda = {

@@ -17,7 +17,7 @@ in
   config = {
 
     # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
-    manual.steps = lib.mkIf cfg.desktop.enable = {
+    manual.steps = lib.mkIf cfg.desktop.enable {
       finder-sidebar = {
         title = "Finder sidebar selections";
         owner = "finder";
