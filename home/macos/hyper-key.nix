@@ -26,8 +26,6 @@ in
 {
   imports = [ ../../modules/manual-steps.nix ];
 
-  imports = [ ../../modules/manual-steps.nix ];
-
   options.macos.hyperKey = {
     enable = lib.mkEnableOption "Caps Lock as F19 for Hammerspoon Hyper";
     keyboardKey = lib.mkOption {
