@@ -57,12 +57,15 @@
   # --no-quarantine (Homebrew/brew#20755). Runs after brew bundle
   # (postActivation is last), so freshly installed casks are covered. Both
   # machines: the mini's agent-launched Chrome hits the same Gatekeeper
-  # prompt a GUI login would. Scoped to brew-managed apps via the Caskroom
-  # app symlinks on purpose: anything else in /Applications keeps its
-  # Gatekeeper prompt. Quarantine-flag check on the bundle root keeps
-  # re-runs cheap (no recursive walk unless there's something to strip).
+  # prompt a GUI login would. Covers every top-level entry of a cask
+  # version dir, not just *.app: a bare-binary cask (claude-code@latest's
+  # `claude`) exec'd from an ssh shell blocks in _dyld_start forever, since
+  # Gatekeeper's first-launch prompt has no GUI session to land in. Scoped
+  # to the Caskroom on purpose: anything else in /Applications keeps its
+  # Gatekeeper prompt. Quarantine-flag check on the root keeps re-runs
+  # cheap (no recursive walk unless there's something to strip).
   system.activationScripts.postActivation.text = ''
-    for link in /opt/homebrew/Caskroom/*/*/*.app; do
+    for link in /opt/homebrew/Caskroom/*/*/*; do
       app=$(/usr/bin/readlink "$link" || echo "$link")
       if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
         echo "de-quarantining $app" >&2

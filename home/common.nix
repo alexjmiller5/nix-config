@@ -12,6 +12,7 @@
     ./macos/finder.nix
     ./git.nix
     ./git-signing.nix
+    ./git-hooks.nix
     ./scripts.nix
     ./cli-tools.nix
     ./mcp.nix

@@ -58,7 +58,10 @@ let
       ${pkgs.python3}/bin/python3 scripts/fix-skill-frontmatter || true
 
       git add -A
-      git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
+      git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))" || {
+        /usr/bin/osascript -e 'display notification "snapshot commit blocked (secret scan) - see ~/Library/Logs/agent-config-sync.log" with title "agent-config sync"'
+        exit 1
+      }
       # Login and wake both fire this before the network is up, and the op-backed
       # credential helper then comes back empty, so every git op fails as "auth".
       # Wait up to 15min for the remote to answer rather than skipping the run;
@@ -86,7 +89,10 @@ let
       # Network is known up here (wait-for-remote gated the private push).
       cd "$HOME/.config/agent-config-public"
       git add -A
-      git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))"
+      git diff --cached --quiet || git -c commit.gpgsign=false commit -m "auto: config snapshot ($(hostname -s))" || {
+        /usr/bin/osascript -e 'display notification "snapshot commit blocked (secret scan, agent-config-public) - see ~/Library/Logs/agent-config-sync.log" with title "agent-config sync"'
+        exit 1
+      }
       if ! git pull --rebase origin main; then
         git rebase --abort 2>/dev/null || true
         /usr/bin/osascript -e 'display notification "sync conflict - resolve manually in agent-config-public" with title "agent-config sync"'

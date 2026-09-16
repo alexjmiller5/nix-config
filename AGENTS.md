@@ -14,7 +14,7 @@ routing table and workflow; this file is the in-repo map.
   taps/brews/casks/masApps (zap cleanup: the lists ARE the machine), power,
   per-host defaults
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
-  `git.nix`, `git-signing.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
+  `git.nix`, `git-signing.nix`, `git-hooks.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agent-env.nix` (shared credential initialization in `.zshenv` and
@@ -27,6 +27,11 @@ routing table and workflow; this file is the in-repo map.
   marker is persisted under `$XDG_STATE_HOME/op/auth-sessions`;
   `op-auth desktop` selects it and `op-auth status` inspects it),
   `git-signing.nix` (shared signing settings, `.agents/skills` signer),
+  `git-hooks.nix` (global `core.hooksPath` pre-commit: ggshield scans every
+  staged change with GitGuardian's detectors using the AI Agent vault scan
+  key read at commit time; fails closed without auth, chains a repo's own
+  `.git/hooks/pre-commit`; body in `git-pre-commit.sh`, test in
+  `tests/git-hooks.sh`),
   `mcp.nix` (one `programs.mcp.servers` registry generates the native MCP
   plugin loaded by both Claude and Codex; direct Codex MCP entries stay app-owned),
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog, wacli,

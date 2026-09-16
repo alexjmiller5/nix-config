@@ -37,6 +37,7 @@ check:
     python3 tests/finder-defaults.py
     bash tests/agent-detect.sh
     bash tests/op-auth-guard.sh
+    bash tests/git-hooks.sh
     python3 tests/machine-vault-git.py
     python3 tests/op-auth.py
     python3 tests/op-connect.py

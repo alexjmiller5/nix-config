@@ -18,7 +18,7 @@
     (pkgs.writeShellApplication {
       name = "claude-rc";
       text = ''
-        pattern='claude remote[-]control'
+        pattern='(^|/)claude remote[-]control'
         case "''${1:-}" in
           start)
             /usr/bin/screen -wipe >/dev/null 2>&1 || true

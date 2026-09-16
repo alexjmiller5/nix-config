@@ -187,6 +187,8 @@
       homeModules = {
         git = ./home/git.nix;
         git-signing = ./home/git-signing.nix;
+        # git-hooks needs op-auth/op-connect (imported) for the commit-time key read
+        git-hooks = ./home/git-hooks.nix;
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
         op-auth = ./home/op-auth.nix;
