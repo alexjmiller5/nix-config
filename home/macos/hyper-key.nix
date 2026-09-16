@@ -26,6 +26,8 @@ in
 {
   imports = [ ../../modules/manual-steps.nix ];
 
+  imports = [ ../../modules/manual-steps.nix ];
+
   options.macos.hyperKey = {
     enable = lib.mkEnableOption "Caps Lock as F19 for Hammerspoon Hyper";
     keyboardKey = lib.mkOption {
@@ -72,6 +74,23 @@ in
         '<dict><key>HIDKeyboardModifierMappingSrc</key><integer>30064771129</integer><key>HIDKeyboardModifierMappingDst</key><integer>30064771129</integer></dict>'
       run ${lib.escapeShellArgs args}
     '';
+
+    # macOS caches the native modifier remap until the next login, so the first
+    # activation (and any change to what Caps Lock maps to) needs a logout.
+    manual.steps.hyper-key-relogin = {
+      title = "Log out after the first Hyper key activation";
+      owner = "hyper-key";
+      phase = "after-switch";
+      body = ''
+        macOS applies the native modifier remap (System Settings > Modifier Keys,
+        `com.apple.keyboard.modifiermapping.<vid>-<pid>-0`; the built-in keyboard
+        is `0-0-0`) before hidutil's key map and caches it until the next login.
+        After this module first activates, or whenever the Caps Lock target
+        changes, log out and back in (or restart): until then `hidutil --get`
+        shows the new map while Caps still arrives as the old key.
+      '';
+      redo = "after any change to the Caps Lock mapping";
+    };
 
     # hidutil is transient; reapply once at login without a resident remapping app.
     launchd.agents.native-hyper-key = {
