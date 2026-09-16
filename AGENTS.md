@@ -136,12 +136,17 @@ routing table and workflow; this file is the in-repo map.
   manual step's verify diffs live against committed
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
 * `dotfiles/` - file payloads (nvim, vscode, ssh pubs, duti list)
-  Hyper uses the exported `homeModules.macos-hyper-key` module: native Caps
-  to Right Control, saved per keyboard and reapplied once at login through
-  hidutil. The module creates Hammerspoon's native-hyper marker; its event
-  tap adds the Hyper modifiers. This is enabled only on the interactive
-  laptop. Secure Input prevents the Hammerspoon transformation. Mail,
-  WhatsApp and Spotify remaps belong to the personal Hammerspoon profile.
+  Hyper uses the exported `homeModules.macos-hyper-key` module: hidutil maps
+  Caps Lock to F19 at activation and again at login (hidutil does not
+  survive a reboot), pins the keyboard's native modifier preference to the
+  identity pair so macOS's own remap layer leaves Caps alone, and writes
+  Hammerspoon's native-hyper marker, which makes Hammerspoon hold the Hyper
+  bindings in an F19 modal. **The first activation, and any change to the
+  Caps target, needs a logout: macOS caches its native modifier remap until
+  login, so Caps keeps arriving as the old key while `hidutil --get` already
+  shows F19** (declared as a `manual.steps` entry beside the module). Enabled
+  only on the interactive laptop. Mail, WhatsApp and Spotify remaps belong to
+  the personal Hammerspoon profile.
 * `secrets/` - agenix: exactly ONE secret per machine (its 1P machine-vault
   SA token). Machine vaults and their service accounts are exclusively for
   initial Nix bootstrap. Applications own enrollment, credential storage
