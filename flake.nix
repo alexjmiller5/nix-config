@@ -193,6 +193,7 @@
         op-connect = ./home/op-connect.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;
         ai-agent = ./home/ai-agent.nix;
+        claude-rc = ./home/claude-rc.nix;
         agent-env = ./home/agent-env.nix;
         cli-tools = ./home/cli-tools.nix;
         herdr = ./home/herdr.nix;

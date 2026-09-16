@@ -40,6 +40,7 @@ in
     shared-album-reminders.homeModules.default
     ./common.nix
     ./ai-agent.nix
+    ./claude-rc.nix
     ./dev-tools.nix
     ./zsh.nix
     ./aliases/dev.nix
