@@ -1,0 +1,15 @@
+vertical_tabs.enabled=true
+vertical_tabs.collapsed=true
+toolbar.pinned_actions=kActionShowChromeLabs,kActionShowDownloads,kActionShowTranslate,kActionDevTools
+toolbar.pinned_extension=Claude
+toolbar.pinned_extension=iaocbfnfliofajghjjeddjmpagigngmp
+toolbar.pinned_extension=lkbebcjgcmobigpeffafkodonchffocl
+toolbar.pinned_extension=oocalimimngaihdkbihfgmpkcpnmlaoa
+shortcut 1Password – Password Manager _execute_action = mac:Command+Shift+X
+shortcut Claude toggle-side-panel = mac:Command+E
+shortcut Notion Web Clipper _execute_action = mac:Command+Shift+K
+shortcut SAML-tracer _execute_action = mac:Alt+Shift+S
+shortcut Simplify Copilot - Autofill job applications, job tracker & AI resumes trigger-autofill = mac:Alt+Shift+F
+shortcut Spotify Ad Blocker - Blockify open_spotify = mac:Alt+S
+shortcut Tab Copy 1copy-highlighted-tabs = mac:Command+Shift+C
+shortcut gmlllbghnfkpflemihljekbapjopfjik _execute_page_action = mac:Command+D

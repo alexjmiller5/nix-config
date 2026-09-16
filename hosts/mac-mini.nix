@@ -110,6 +110,19 @@
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    tcc-grants = {
+      title = "TCC grants";
+      owner = "tcc";
+      phase = "snapshot";
+      desktop = true;
+      verify = "capture-snapshot tcc --diff ${../snapshots/mac-mini/tcc.txt}";
+      body = ''
+        System Settings → Privacy & Security (over Screen Sharing). The committed
+        capture `snapshots/mac-mini/tcc.txt` IS the intended grant set
+        (`capture-snapshot tcc`; refresh with `just snapshot tcc mac-mini`); audit
+        and purge per docs/tcc.md.
+      '';
+    };
     screentime-backup-fda = {
       title = "ScreenTimeBackup.app + CallHistoryBackup.app Full Disk Access";
       owner = "screentime-backup";

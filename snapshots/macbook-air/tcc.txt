@@ -1,0 +1,36 @@
+kTCCServiceAccessibility|/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_console_user_server
+kTCCServiceAccessibility|/Library/Application Support/yabai/yabai
+kTCCServiceAccessibility|/nix/store/*-yabai-*/bin/yabai
+kTCCServiceAccessibility|com.1password.1password
+kTCCServiceAccessibility|com.anthropic.claudefordesktop
+kTCCServiceAccessibility|com.hnc.Discord
+kTCCServiceAccessibility|com.lwouis.alt-tab-macos
+kTCCServiceAccessibility|com.microsoft.VSCode
+kTCCServiceAccessibility|com.mitchellh.ghostty
+kTCCServiceAccessibility|com.openai.sky.CUAService
+kTCCServiceAccessibility|com.raycast.macos
+kTCCServiceAccessibility|org.hammerspoon.Hammerspoon
+kTCCServiceAccessibility|org.pqrs.Karabiner-Core-Service
+kTCCServiceAccessibility|pro.betterdisplay.BetterDisplay
+kTCCServiceAccessibility|us.zoom.xos
+kTCCServiceListenEvent|/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_grabber
+kTCCServiceListenEvent|/Library/Application Support/org.pqrs/Karabiner-Elements/bin/karabiner_observer
+kTCCServiceListenEvent|org.dolphin-emu.dolphin
+kTCCServiceListenEvent|org.pqrs.Karabiner-Core-Service
+kTCCServiceListenEvent|org.pqrs.Karabiner-EventViewer
+kTCCServiceScreenCapture|com.1password.1password
+kTCCServiceScreenCapture|com.anthropic.claudefordesktop
+kTCCServiceScreenCapture|com.google.Chrome
+kTCCServiceScreenCapture|com.lwouis.alt-tab-macos
+kTCCServiceScreenCapture|com.microsoft.VSCode
+kTCCServiceScreenCapture|com.mitchellh.ghostty
+kTCCServiceScreenCapture|com.raycast.macos
+kTCCServiceScreenCapture|notion.id
+kTCCServiceScreenCapture|org.hammerspoon.Hammerspoon
+kTCCServiceScreenCapture|ru.keepcoder.Telegram
+kTCCServiceScreenCapture|us.zoom.xos
+kTCCServiceSystemPolicyAllFiles|/bin/zsh
+kTCCServiceSystemPolicyAllFiles|com.alexmiller.sticker-sync
+kTCCServiceSystemPolicyAllFiles|com.microsoft.VSCode
+kTCCServiceSystemPolicyAllFiles|com.mitchellh.ghostty
+kTCCServiceSystemPolicyAllFiles|com.raycast.macos

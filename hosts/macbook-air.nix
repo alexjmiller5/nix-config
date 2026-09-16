@@ -433,31 +433,11 @@
       owner = "tcc";
       phase = "snapshot";
       desktop = true;
+      verify = "capture-snapshot tcc --diff ${../snapshots/macbook-air/tcc.txt}";
       body = ''
-        System Settings → Privacy & Security. Audit and purge per docs/tcc.md; snapshot verified 2026-08-13.
-
-        * **Accessibility**: Hammerspoon, AltTab, Raycast,
-          BetterDisplay, Ghostty, VS Code, Claude, 1Password, Discord, Zoom
-        * **Input Monitoring**: Dolphin
-        * **Screen & System Audio Recording** (Screen Recording on older macOS):
-          Hammerspoon, AltTab, 1Password, Notion, Claude, Chrome,
-          VS Code, Ghostty, Telegram, Zoom, Raycast.
-          Enable Hammerspoon for screen capture and restart it if macOS prompts.
-        * **Full Disk Access**: VS Code, Ghostty, Raycast, Hammerspoon (reads
-          Messages chat.db for the paste-OTP hotkey),
-          /bin/zsh (launchd/agent shell scripts),
-          /Applications/ScreenTimeBackup.app (the weekly Screen Time backup agent -
-          grant ONCE after the enabling rebuild; the stable self-signed cert keeps
-          the grant valid across rebuilds),
-          /Applications/StickerSync.app (the weekly iMessage sticker sync - same
-          one-time grant, same stable-cert pattern)
-        * **Calendar / Contacts**: Raycast
-        * **Microphone**: Raycast
-        * **Automation**: Ghostty/Terminal/VS Code → System Events; Hammerspoon; Docker;
-          the terminal running `herdr-window` -> Ghostty (allow the first launch
-          prompt so its native AppleScript API can open the dedicated window);
-          Ghostty → Messages (for `imsg send` - macOS prompts on first send; reads
-          need only Ghostty's existing Full Disk Access)
+        System Settings → Privacy & Security. The committed capture is
+        `snapshots/macbook-air/tcc.txt` (`capture-snapshot tcc`; refresh with
+        `just snapshot tcc`); audit and purge per docs/tcc.md.
 
         Raycast asks for five at onboarding - Accessibility (window management,
         snippet expansion), Files and Folders, Calendar and Contacts, Microphone
@@ -471,7 +451,10 @@
       owner = "chrome";
       phase = "snapshot";
       desktop = true;
+      verify = "capture-snapshot chrome-ui --diff ${../snapshots/macbook-air/chrome-ui.txt}";
       body = ''
+        Live capture: `capture-snapshot chrome-ui` (tab strip, toolbar pins, extension
+        shortcuts) vs `snapshots/macbook-air/chrome-ui.txt`; refresh with `just snapshot chrome-ui`.
         App-owned profile `Preferences`, NO policy exists
         (Chrome rewrites the file constantly, so nix can't own it either) - this
         snapshot IS the declaration (2026-08-13):
@@ -495,6 +478,7 @@
       owner = "chrome";
       phase = "snapshot";
       desktop = true;
+      verify = "capture-snapshot chrome-ui --diff ${../snapshots/macbook-air/chrome-ui.txt}";
       body = ''
         App-owned, HMAC-signed in the
         profile's `Secure Preferences` (`extensions.settings.<id>.commands`), so an

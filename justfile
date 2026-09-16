@@ -58,6 +58,18 @@ manual:
       fi
     done
 
+# Re-capture a snapshot (tcc | chrome-ui) into snapshots/<host>/; remote hosts run over ssh
+snapshot name host="macbook-air":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p "snapshots/{{host}}"
+    if [ "{{host}}" = macbook-air ]; then
+      capture-snapshot "{{name}}" > "snapshots/{{host}}/{{name}}.txt"
+    else
+      ssh "{{host}}-tailscale" capture-snapshot "{{name}}" > "snapshots/{{host}}/{{name}}.txt"
+    fi
+    git diff --stat -- "snapshots/{{host}}/{{name}}.txt"
+
 # Bump all inputs
 update:
     nix flake update

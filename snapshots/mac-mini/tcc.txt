@@ -1,0 +1,8 @@
+kTCCServiceAccessibility|/usr/libexec/sshd-keygen-wrapper
+kTCCServiceScreenCapture|/usr/libexec/sshd-keygen-wrapper
+kTCCServiceScreenCapture|com.apple.screensharing.agent
+kTCCServiceSystemPolicyAllFiles|/usr/libexec/sshd-keygen-wrapper
+kTCCServiceSystemPolicyAllFiles|com.alexmiller.callhistory-backup
+kTCCServiceSystemPolicyAllFiles|com.alexmiller.nfs-tcc-spike
+kTCCServiceSystemPolicyAllFiles|com.alexmiller.notion-finance-sync
+kTCCServiceSystemPolicyAllFiles|com.alexmiller.screentime-backup

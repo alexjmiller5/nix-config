@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Print the live state of things nix cannot own, normalized for diffing, or
+# compare it with a committed snapshot. Read-only: it never changes the app.
+#
+#   capture-snapshot tcc                 grants in the system TCC db
+#   capture-snapshot chrome-ui           tab strip, toolbar pins, extension shortcuts
+#   capture-snapshot <name> --diff FILE  exit 0 = matches, 1 = differs (unified diff on stdout)
+#
+# Exit 3 = cannot capture in this context (e.g. no Full Disk Access); exit 2 = usage.
+set -euo pipefail
+
+capture_tcc() {
+  local db="/Library/Application Support/com.apple.TCC/TCC.db"
+  # Version-keyed client paths (nix store hashes, Homebrew Cellar versions)
+  # re-key on every bump; normalize them so a bump is not drift.
+  /usr/bin/sqlite3 -readonly "$db" "SELECT service, client FROM access WHERE auth_value > 0 AND service IN
+    ('kTCCServiceAccessibility','kTCCServiceListenEvent','kTCCServiceScreenCapture',
+     'kTCCServiceSystemPolicyAllFiles','kTCCServiceCalendar','kTCCServiceAddressBook',
+     'kTCCServiceMicrophone');" 2>/dev/null \
+    | sed -E 's#/nix/store/[a-z0-9]{32}-([^/]+)-[0-9][^/]*/#/nix/store/*-\1-*/#; s#/nix/store/[a-z0-9]{32}-#/nix/store/*-#; s#(/opt/homebrew/Cellar/[^/]+/)[^/]+/#\1*/#' \
+    | sort -u \
+    || { echo "capture-snapshot: cannot read $db (the shell needs Full Disk Access)" >&2; return 3; }
+}
+
+capture_chrome_ui() {
+  local chrome="$HOME/Library/Application Support/Google/Chrome"
+  local profile
+  profile=$(jq -r '.profile.last_used // "Default"' "$chrome/Local State" 2>/dev/null) \
+    || { echo "capture-snapshot: no Chrome profile at $chrome" >&2; return 3; }
+  local prefs="$chrome/$profile/Preferences" secure="$chrome/$profile/Secure Preferences"
+  [ -r "$prefs" ] && [ -r "$secure" ] || { echo "capture-snapshot: cannot read $prefs" >&2; return 3; }
+  # Extension ids resolve to names through either file's manifests.
+  jq -r --slurpfile sp "$secure" '
+    . as $p
+    | def name: ($sp[0].extensions.settings[.].manifest.name // $p.extensions.settings[.].manifest.name // .);
+    "vertical_tabs.enabled=\(.vertical_tabs.enabled // false)",
+    "vertical_tabs.collapsed=\(.vertical_tabs.collapsed_state // false)",
+    "toolbar.pinned_actions=\((.toolbar.pinned_actions // []) | join(","))",
+    ((.extensions.pinned_extensions // []) | map("toolbar.pinned_extension=\(name)") | sort[]),
+    ((.extensions.commands // {}) | to_entries | map("shortcut \(.value.extension | name) \(.value.command_name) = \(.key)") | sort[])
+  ' "$prefs"
+}
+
+name=${1:-}
+case "$name" in
+  tcc|chrome-ui) ;;
+  *) echo "usage: capture-snapshot <tcc|chrome-ui> [--diff FILE]" >&2; exit 2 ;;
+esac
+fn="capture_${name//-/_}"
+if [ "${2:-}" = "--diff" ]; then
+  [ -n "${3:-}" ] || { echo "usage: capture-snapshot <name> --diff FILE" >&2; exit 2; }
+  live=$("$fn") || exit $?
+  diff -u --label "committed $3" --label "live $name" "$3" <(printf '%s\n' "$live")
+else
+  "$fn"
+fi

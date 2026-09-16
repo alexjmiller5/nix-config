@@ -36,6 +36,13 @@ let
     else
       "check ${arg s.owner} ${arg s.title} ${arg s.verify}"
   ) steps;
+  # Read-only captures of state nix cannot own (scripts/capture-snapshot);
+  # snapshot steps diff the live capture against the committed snapshots/ file.
+  captureSnapshot = pkgs.writeShellApplication {
+    name = "capture-snapshot";
+    runtimeInputs = [ pkgs.jq ];
+    text = lib.removePrefix "#!/usr/bin/env bash\n" (builtins.readFile ../scripts/capture-snapshot);
+  };
   manualCheck = pkgs.writeShellApplication {
     name = "manual-check";
     # Verify strings are single-quoted on purpose: bash -c expands them.
@@ -45,7 +52,9 @@ let
       todo=0
       report() { printf '%-6s %-20s %s\n' "$1" "$2" "$3"; }
       check() { # owner title verify-command
-        if bash -c "$3" >/dev/null 2>&1; then report "done" "$1" "$2"; else report todo "$1" "$2"; todo=1; fi
+        if bash -c "$3" >/dev/null 2>&1; then report "done" "$1" "$2"
+        elif [ $? -eq 3 ]; then report skip "$1" "$2" # cannot verify in this context
+        else report todo "$1" "$2"; todo=1; fi
       }
       ${lib.concatStringsSep "\n" checkLines}
       exit "$todo"
@@ -70,6 +79,9 @@ in
   config = {
     home-manager.sharedModules = [ ./manual-steps.nix ];
     system.build.manual = pkgs.writeText "MANUAL-${host}.md" text;
-    environment.systemPackages = [ manualCheck ];
+    environment.systemPackages = [
+      manualCheck
+      captureSnapshot
+    ];
   };
 }
