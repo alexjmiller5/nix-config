@@ -125,6 +125,10 @@ routing table and workflow; this file is the in-repo map.
 * `modules/` — darwin modules: `darwin-base.nix` + `macos-defaults.nix`
   (both injected for every host by mkHost), `chrome-policy.nix` (declared
   extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import)
+* `snapshots/<host>/` - committed read-only captures of state nix cannot own
+  (TCC grants, Chrome UI prefs); `scripts/capture-snapshot` produces them,
+  `just snapshot <name> [host]` refreshes one, and the matching `snapshot`
+  manual step's verify diffs live against committed
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
 * `dotfiles/` - file payloads (nvim, vscode, ssh pubs, duti list)
   Hyper uses the exported `homeModules.macos-hyper-key` module: native Caps
