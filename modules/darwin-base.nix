@@ -60,8 +60,13 @@
   # prompt a GUI login would. Covers every top-level entry of a cask
   # version dir, not just *.app: a bare-binary cask (claude-code@latest's
   # `claude`) exec'd from an ssh shell blocks in _dyld_start forever, since
-  # Gatekeeper's first-launch prompt has no GUI session to land in. Scoped
-  # to the Caskroom on purpose: anything else in /Applications keeps its
+  # Gatekeeper's first-launch prompt has no GUI session to land in. A
+  # launch that already blocked BEFORE the strip stays blocked, and so does
+  # every later exec of that path (syspolicyd keeps the verdict per path;
+  # copying, replacing or touching the file does not clear it): restart it
+  # with `sudo launchctl kickstart -k system/com.apple.security.syspolicy`
+  # or reboot. Scoped to the Caskroom on purpose: anything else in
+  # /Applications keeps its
   # Gatekeeper prompt. Quarantine-flag check on the root keeps re-runs
   # cheap (no recursive walk unless there's something to strip).
   system.activationScripts.postActivation.text = ''
