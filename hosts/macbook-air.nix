@@ -35,6 +35,9 @@
   age.secrets.machine-sa = {
     file = ../secrets/machine-sa-laptop.age;
     owner = username;
+    # agenix's default group reads users.users.<name>.group, which nix-darwin
+    # does not define - eval fails with "attribute 'group' missing". Set it.
+    group = "staff";
   };
 
   # The laptop has a normal pre-existing /opt/homebrew; let nix-homebrew

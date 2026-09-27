@@ -25,6 +25,14 @@ let
     set -euo pipefail
     export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
     cd "$HOME/.config/agent-config"
+    # Claude Code rewrites claude/settings.json in place on this host (model,
+    # theme) by design, and a modified tracked file aborts every ff-only pull -
+    # which is how this agent sat at exit 1 for days. The laptop is
+    # authoritative for that file, so drop this host's churn before pulling.
+    # Memory files written here are untracked and survive; any OTHER dirty
+    # tracked file still aborts on purpose (see agents.nix: mini-local memories
+    # are intentional), and Vitals reports that as a red row.
+    git checkout --quiet -- claude/settings.json 2>/dev/null || true
     git pull --ff-only --quiet origin main
     # PUBLIC sibling clone (generic skills reached via committed symlinks
     # in agent-config/skills) - same pull-only refresh, anonymous auth.

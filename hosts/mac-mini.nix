@@ -106,6 +106,9 @@
   age.secrets.machine-sa = {
     file = ../secrets/machine-sa-mini.age;
     owner = username;
+    # agenix's default group reads users.users.<name>.group, which nix-darwin
+    # does not define - eval fails with "attribute 'group' missing". Set it.
+    group = "staff";
   };
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
