@@ -137,9 +137,10 @@ routing table and workflow; this file is the in-repo map.
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
 * `dotfiles/` - file payloads (nvim, vscode, ssh pubs, duti list)
   Hyper uses the exported `homeModules.macos-hyper-key` module: hidutil maps
-  Caps Lock to F19 at activation and again at login (hidutil does not
-  survive a reboot), pins the keyboard's native modifier preference to the
-  identity pair so macOS's own remap layer leaves Caps alone, and writes
+  Caps Lock to F19 at activation, at login and, because macOS silently drops
+  the map across sleep/wake, from a 60s launchd agent that re-sets it only
+  when it is actually gone (`hidutil --get` empty = dead Hyper), pins the
+  keyboard's native modifier preference to the identity pair so macOS's own remap layer leaves Caps alone, and writes
   Hammerspoon's native-hyper marker, which makes Hammerspoon hold the Hyper
   bindings in an F19 modal. **The first activation, and any change to the
   Caps target, needs a logout: macOS caches its native modifier remap until

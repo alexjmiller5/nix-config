@@ -1,27 +1,35 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   cfg = config.macos.hyperKey;
   ids = lib.splitString "-" cfg.keyboardKey;
-  args = [
-    "/usr/bin/hidutil"
-    "property"
-    "--matching"
-    (builtins.toJSON {
-      VendorID = builtins.fromJSON (builtins.elemAt ids 0);
-      ProductID = builtins.fromJSON (builtins.elemAt ids 1);
-      PrimaryUsagePage = 1;
-      PrimaryUsage = 6;
-    })
-    "--set"
-    (builtins.toJSON {
-      UserKeyMapping = [
-        {
-          HIDKeyboardModifierMappingSrc = 30064771129;
-          HIDKeyboardModifierMappingDst = 30064771182;
-        }
-      ];
-    })
-  ];
+  capsLock = 30064771129;
+  f19 = 30064771182;
+  matching = builtins.toJSON {
+    VendorID = builtins.fromJSON (builtins.elemAt ids 0);
+    ProductID = builtins.fromJSON (builtins.elemAt ids 1);
+    PrimaryUsagePage = 1;
+    PrimaryUsage = 6;
+  };
+  mapping = builtins.toJSON {
+    UserKeyMapping = [
+      {
+        HIDKeyboardModifierMappingSrc = capsLock;
+        HIDKeyboardModifierMappingDst = f19;
+      }
+    ];
+  };
+  # hidutil's key map is transient and macOS drops it somewhere across days of
+  # sleep/wake, which silently kills Hyper until the next login. launchd has no
+  # wake trigger, so the agent below polls - but only sets the map when it is
+  # actually missing: an unconditional --set reloads the keyboard's map and can
+  # glitch a chord held at that moment.
+  apply = pkgs.writeShellScript "native-hyper-key" ''
+    set -eu
+    if ! /usr/bin/hidutil property --matching ${lib.escapeShellArg matching} --get UserKeyMapping \
+      | /usr/bin/grep -q ${toString f19}; then
+      /usr/bin/hidutil property --matching ${lib.escapeShellArg matching} --set ${lib.escapeShellArg mapping}
+    fi
+  '';
 in
 {
   imports = [ ../../modules/manual-steps.nix ];
@@ -70,7 +78,7 @@ in
     home.activation.nativeHyperKey = lib.hm.dag.entryAfter [ "setDarwinDefaults" ] ''
       run /usr/bin/defaults -currentHost write -g ${lib.escapeShellArg "com.apple.keyboard.modifiermapping.${cfg.keyboardKey}"} -array \
         '<dict><key>HIDKeyboardModifierMappingSrc</key><integer>30064771129</integer><key>HIDKeyboardModifierMappingDst</key><integer>30064771129</integer></dict>'
-      run ${lib.escapeShellArgs args}
+      run ${apply}
     '';
 
     # macOS caches the native modifier remap until the next login, so the first
@@ -90,13 +98,14 @@ in
       redo = "after any change to the Caps Lock mapping";
     };
 
-    # hidutil is transient; reapply once at login without a resident remapping app.
+    # Reapplied at login and on a timer; no resident remapping app.
     launchd.agents.native-hyper-key = {
       enable = true;
       config = {
         Label = "org.nix-community.home.native-hyper-key";
-        ProgramArguments = args;
+        ProgramArguments = [ "${apply}" ];
         RunAtLoad = true;
+        StartInterval = 60;
       };
     };
   };
