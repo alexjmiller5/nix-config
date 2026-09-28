@@ -106,6 +106,7 @@
             ./modules/macos-defaults.nix
             ./modules/agent-chrome.nix
             ./modules/chrome-policy.nix
+            ./modules/xcode-agent.nix
             inputs.agenix.darwinModules.default
             inputs.screentime-backup.darwinModules.default
             inputs.screentime-dashboard.darwinModules.default
@@ -179,6 +180,7 @@
       darwinModules = {
         agent-chrome = ./modules/agent-chrome.nix;
         chrome-policy = ./modules/chrome-policy.nix;
+        xcode-agent = ./modules/xcode-agent.nix;
       };
 
       # Reusable home-manager modules, for consumption by other flakes

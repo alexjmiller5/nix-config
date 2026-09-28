@@ -22,6 +22,14 @@
   power.sleep.display = "never";
   power.restartAfterPowerFailure = true;
 
+  # Apple build host for agents: Xcode 27 (App Store), Apple's headless MCP
+  # server, simulators. The laptop stays on Xcode 26.3 until its macOS passes
+  # 26.2 (Screen Time backup hold), so it does not enable this yet.
+  services.xcode-agent = {
+    enable = true;
+    user = username;
+  };
+
   # Headless tailscaled (no GUI app). One-time join after first switch:
   #   sudo tailscale up --auth-key=<oauth-minted key, tag:oauth-generated> --hostname=mac-mini
   services.tailscale.enable = true;
