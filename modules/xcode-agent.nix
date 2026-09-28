@@ -69,7 +69,10 @@ in
         title = "Accept the Xcode license and install its components";
         owner = "xcode-agent";
         body = ''
-          Over ssh (admin password needed once):
+          Do this right after the App Store install: Homebrew refuses to run
+          at all while an installed Xcode's license is unaccepted, so every
+          later switch fails at "Homebrew bundle..." until it is. Over ssh
+          (admin password needed once):
 
           ```bash
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
