@@ -34,14 +34,19 @@
 
   # Claude Code never persists home-dir trust acceptance to disk (session-only
   # by design), so launching `claude` from ~ re-prompts on every start. Seed
-  # the flag at each switch; everything else in ~/.claude.json stays app-owned
-  # runtime state we never manage. A claude session running during the switch
-  # may clobber the write on exit - it converges at the next switch.
+  # the flag at each switch, plus the built-in computer-use MCP for the home
+  # project (its `/mcp` enable is stored per project directory in the same
+  # file, so a fresh machine has no screen tools until this lands); everything
+  # else in ~/.claude.json stays app-owned runtime state we never manage. A
+  # claude session running during the switch may clobber the write on exit -
+  # it converges at the next switch.
   config.home.activation.claudeTrustHomeDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     claudeJson="$HOME/.claude.json"
     [ -s "$claudeJson" ] || echo '{}' > "$claudeJson"
-    if [ "$(${pkgs.jq}/bin/jq -r --arg d "$HOME" '.projects[$d].hasTrustDialogAccepted' "$claudeJson")" != "true" ]; then
-      ${pkgs.jq}/bin/jq --arg d "$HOME" '.projects[$d].hasTrustDialogAccepted = true' "$claudeJson" \
+    want='.projects[$d].hasTrustDialogAccepted = true
+      | .projects[$d].enabledMcpServers = ((.projects[$d].enabledMcpServers // []) as $e | $e + (["computer-use"] - $e))'
+    if [ "$(${pkgs.jq}/bin/jq -c --arg d "$HOME" "$want" "$claudeJson")" != "$(${pkgs.jq}/bin/jq -c . "$claudeJson")" ]; then
+      ${pkgs.jq}/bin/jq --arg d "$HOME" "$want" "$claudeJson" \
         > "$claudeJson.tmp" && mv "$claudeJson.tmp" "$claudeJson" && chmod 600 "$claudeJson"
     fi
   '';
