@@ -42,19 +42,19 @@ routing table and workflow; this file is the in-repo map.
   routes supported AI Agent vault reads through local Connect when enabled.
   Writes, documents, other vaults, explicit project SAs and desktop auth
   keep the direct path. Direct SA rate limits are handled by the shared auth router),
-  `op-connect.nix` (opt-in, exported local Docker Desktop deployment, enabled
-  on the laptop. Official API/sync images share Connect's encrypted cache;
+  `op-connect.nix` (opt-in, exported local Connect deployment on a colima VM,
+  enabled on both hosts. Official API/sync images share Connect's encrypted cache;
   API binds only 127.0.0.1. A login service restores the encrypted credentials
   Document when absent, reads the Connect token once through the independently
   enrolled agent SA (never the machine bootstrap SA),
-  opens Docker and starts Compose. The token stays in memory behind a 0600
+  starts colima and runs Compose. The token stays in memory behind a 0600
   Unix socket, delivered only to the op child process. No token in shell init,
   Docker environment, Git, Nix store or an additional plaintext file.
   `op-connect-start` restarts the login service after rotation or failure;
   supported reads fail closed when it is unavailable. `op run`/`inject` and
   item reads without explicit vault ID plus JSON format remain direct.
-  Its launch PATH includes /usr/sbin and /sbin: Docker's privileged-helper
-  installer invokes /sbin/md5 by name),
+  Its launch PATH includes /usr/bin, /usr/sbin and /sbin: colima shells out
+  to macOS ssh and the Lima tooling by name),
   `posthog-auth.sh` (PostHog credential aliases and API-host normalization;
   the agent CLI uses the existing broad AI Agent key. Explicit
   `POSTHOG_CLI_API_KEY` / `POSTHOG_CLI_HOST` override it; an app's public

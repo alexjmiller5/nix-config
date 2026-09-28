@@ -40,8 +40,6 @@
 
     initContent = ''
       # --- PATH stack ---
-      export PATH="$PATH:/Applications/Docker.app/Contents/Resources/bin/"
-
       # Homebrew env + its zsh completions
       if [[ -x /opt/homebrew/bin/brew ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"

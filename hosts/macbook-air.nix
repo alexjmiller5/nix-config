@@ -236,19 +236,6 @@
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
-    docker-first-run = {
-      title = "Docker Desktop first run";
-      owner = "docker-desktop";
-      desktop = true;
-      body = ''
-        Complete its first-run agreement/setup if prompted.
-        Approve macOS's administrator prompt if Docker needs to install/update its
-        privileged networking helper. This can also recur after Docker upgrades.
-        The declared Connect LaunchAgent opens Docker at login; no separate login
-        item or Docker account sign-in is needed. Docker must remain running for
-        local Connect reads.
-      '';
-    };
     codex-login = {
       title = "Sign into Codex";
       owner = "codex";
