@@ -1,5 +1,6 @@
---- a/herdr-plugin.toml
-+++ b/herdr-plugin.toml
+diff -ruN -x __pycache__ -x *.pyc a/herdr-plugin.toml b/herdr-plugin.toml
+--- a/herdr-plugin.toml	2026-09-28 17:51:03
++++ b/herdr-plugin.toml	2026-09-28 17:51:03
 @@ -65,3 +65,10 @@
  width = "80%"
  height = 14
@@ -11,6 +12,7 @@
 +description = "Capture the current agent sessions, then close this tab."
 +contexts = ["tab", "pane"]
 +command = ["python3", "-m", "herdr_undo_close.cli", "close"]
+diff -ruN -x __pycache__ -x *.pyc a/herdr_undo_close/cli.py b/herdr_undo_close/cli.py
 --- a/herdr_undo_close/cli.py
 +++ b/herdr_undo_close/cli.py
 @@ -127,8 +127,8 @@
@@ -24,7 +26,7 @@
      state_dir = _state_dir()
      cfg = config_mod.load_config()
  
-@@ -147,9 +147,27 @@
+@@ -147,6 +147,7 @@
                  forced_tab_id=forced_tab_id,
                  undo_panes=cfg["undo_panes"],
                  restore_process=cfg["restore_process"],
@@ -32,10 +34,10 @@
              )
      except HerdrApiError as exc:
          sys.stderr.write("herdr-undo-close: record failed: %s\n" % exc)
-+        return 1
-+    return 0
-+
-+
+@@ -154,6 +155,23 @@
+     return 0
+ 
+ 
 +def cmd_close(argv):
 +    """Snapshot the current agent identities before destroying their tab."""
 +    tab_id = os.environ.get("HERDR_TAB_ID")
@@ -49,9 +51,13 @@
 +            api.call("tab.close", {"tab_id": tab_id})
 +    except HerdrApiError as exc:
 +        sys.stderr.write("herdr-undo-close: close failed: %s\n" % exc)
-         return 1
-     return 0
- 
++        return 1
++    return 0
++
++
+ def cmd_reopen(argv):
+     # type: (List[str]) -> int
+     state_dir = _state_dir()
 @@ -244,6 +262,7 @@
  
  COMMANDS = {
@@ -60,109 +66,7 @@
      "reopen": cmd_reopen,
      "pick": cmd_pick,
      "open-picker": cmd_open_picker,
---- a/herdr_undo_close/relaunch.py
-+++ b/herdr_undo_close/relaunch.py
-@@ -48,6 +48,7 @@
- # is launched plainly instead (see agent_command).
- AGENT_RESUME_FLAGS = {
-     "claude": "-r",
-+    "codex": "resume",
-     "opencode": "-s",
- }  # type: Dict[str, str]
- 
---- a/herdr_undo_close/restore.py
-+++ b/herdr_undo_close/restore.py
-@@ -158,9 +158,23 @@
-     """Apply a record's layout as a new tab, then best-effort reposition it.
-     Returns a result summary; raises on a failed layout.apply (that failure
-     must abort the pop, see reopen_at)."""
--    workspace_id, fallback_used = choose_workspace(record, workspaces, env_workspace_id)
-+    empty_tab_id = None
-+    if workspaces:
-+        workspace_id, fallback_used = choose_workspace(record, workspaces, env_workspace_id)
-+    else:
-+        created = api.call("workspace.create", {
-+            "label": record.get("workspace_label", ""),
-+            "cwd": next((pane["cwd"] for pane in record.get("panes", []) if pane.get("cwd")), None),
-+            "focus": focus,
-+        })
-+        workspace_id = created["workspace"]["workspace_id"]
-+        empty_tab_id = created["tab"]["tab_id"]
-+        fallback_used = True
-     plans = tab_relaunch_plans(record, config)
-     params = build_apply_params(record, workspace_id, focus, config)
-+    if empty_tab_id:
-+        del params["workspace_id"]
-+        params["tab_id"] = empty_tab_id
-     result = api.call("layout.apply", params)
- 
-     layout = result.get("layout") if isinstance(result, dict) else None
---- a/tests/test_relaunch.py
-+++ b/tests/test_relaunch.py
-@@ -278,6 +278,9 @@
- 
- 
- class TestAgentCommand(unittest.TestCase):
-+    def test_codex_resumes_the_exact_session(self):
-+        self.assertEqual(relaunch.agent_command("codex", "session-1"), ["codex", "resume", "session-1"])
-+
-     def test_claude_with_and_without_an_id(self):
-         self.assertEqual(relaunch.agent_command("claude", "abc"), ["claude", "-r", "abc"])
-         self.assertEqual(relaunch.agent_command("claude", None), ["claude"])
---- /dev/null
-+++ b/tests/test_close.py
-@@ -0,0 +1,51 @@
-+"""Closing must record the current session before the terminal disappears."""
-+import os
-+import tempfile
-+import unittest
-+from unittest.mock import patch
-+from herdr_undo_close import cli, store
-+from test_record import FakeApi
-+
-+class TestClose(unittest.TestCase):
-+    @patch.dict(os.environ, {"HERDR_TAB_ID": "w1:t2"}, clear=True)
-+    def test_record_then_close(self):
-+        calls = []
-+        with patch.object(cli, "cmd_record", side_effect=lambda args, **kwargs: calls.append("record") or 0), patch.object(cli, "HerdrApi") as api:
-+            api.return_value.__enter__.return_value.call.side_effect = lambda method, params: calls.append((method, params))
-+            self.assertEqual(cli.COMMANDS["close"]([]), 0)
-+        self.assertEqual(calls, ["record", ("tab.close", {"tab_id": "w1:t2"})])
-+
-+    @patch.dict(os.environ, {"HERDR_TAB_ID": "w1:t2"}, clear=True)
-+    def test_failed_record_leaves_tab_open(self):
-+        with patch.object(cli, "cmd_record", return_value=1), patch.object(cli, "HerdrApi") as api:
-+            self.assertEqual(cli.COMMANDS["close"]([]), 1)
-+            api.assert_not_called()
-+
-+    @patch.dict(os.environ, {}, clear=True)
-+    def test_missing_context_leaves_tabs_open(self):
-+        with patch.object(cli, "HerdrApi") as api:
-+            self.assertEqual(cli.COMMANDS["close"]([]), 1)
-+            api.assert_not_called()
-+
-+    def test_failed_target_export_preserves_tab_and_previous_snapshot(self):
-+        for export in (cli.HerdrApiError("export failed"), {}, {"layout": {"root": None}},
-+                       {"layout": {"root": {"type": "split"}}}):
-+            with self.subTest(export=export), tempfile.TemporaryDirectory() as state:
-+                previous = {"version": 2, "closed": [], "index": {
-+                    "w1:t2": {"tab_id": "w1:t2", "panes": [], "refreshed_ms": 100}}}
-+                store.save_state(state, previous)
-+                api = FakeApi({
-+                    "tab.list": {"tabs": [{"tab_id": "w1:t2", "workspace_id": "w1"}]},
-+                    "workspace.list": {"workspaces": []},
-+                    "pane.list": {"panes": []},
-+                    "agent.list": {"agents": []},
-+                    "layout.export": export,
-+                })
-+                with patch.dict(os.environ, {"HERDR_TAB_ID": "w1:t2", "HERDR_PLUGIN_STATE_DIR": state}, clear=True), \
-+                     patch.object(cli, "HerdrApi") as client, \
-+                     patch.object(cli.config_mod, "load_config", return_value={"max_entries": 20, "undo_panes": False, "restore_process": True}), \
-+                     patch.object(cli.record_mod, "current_time_ms", return_value=100):
-+                    client.return_value.__enter__.return_value = api
-+                    self.assertEqual(cli.cmd_close([]), 1)
-+                self.assertNotIn("tab.close", [method for method, _ in api.calls])
-+                self.assertEqual(store.load_state(state), previous)
+diff -ruN -x __pycache__ -x *.pyc a/herdr_undo_close/record.py b/herdr_undo_close/record.py
 --- a/herdr_undo_close/record.py
 +++ b/herdr_undo_close/record.py
 @@ -58,7 +58,7 @@
@@ -229,3 +133,165 @@
          store.save_state(state_dir, state)
  
      return state
+diff -ruN -x __pycache__ -x *.pyc a/herdr_undo_close/relaunch.py b/herdr_undo_close/relaunch.py
+--- a/herdr_undo_close/relaunch.py
++++ b/herdr_undo_close/relaunch.py
+@@ -48,6 +48,7 @@
+ # is launched plainly instead (see agent_command).
+ AGENT_RESUME_FLAGS = {
+     "claude": "-r",
++    "codex": "resume",
+     "opencode": "-s",
+ }  # type: Dict[str, str]
+ 
+diff -ruN -x __pycache__ -x *.pyc a/herdr_undo_close/restore.py b/herdr_undo_close/restore.py
+--- a/herdr_undo_close/restore.py	2026-09-28 17:51:03
++++ b/herdr_undo_close/restore.py	2026-09-28 17:51:22
+@@ -158,9 +158,23 @@
+     """Apply a record's layout as a new tab, then best-effort reposition it.
+     Returns a result summary; raises on a failed layout.apply (that failure
+     must abort the pop, see reopen_at)."""
+-    workspace_id, fallback_used = choose_workspace(record, workspaces, env_workspace_id)
++    empty_tab_id = None
++    if workspaces:
++        workspace_id, fallback_used = choose_workspace(record, workspaces, env_workspace_id)
++    else:
++        created = api.call("workspace.create", {
++            "label": record.get("workspace_label", ""),
++            "cwd": next((pane["cwd"] for pane in record.get("panes", []) if pane.get("cwd")), None),
++            "focus": focus,
++        })
++        workspace_id = created["workspace"]["workspace_id"]
++        empty_tab_id = created["tab"]["tab_id"]
++        fallback_used = True
+     plans = tab_relaunch_plans(record, config)
+     params = build_apply_params(record, workspace_id, focus, config)
++    if empty_tab_id:
++        del params["workspace_id"]
++        params["tab_id"] = empty_tab_id
+     result = api.call("layout.apply", params)
+ 
+     layout = result.get("layout") if isinstance(result, dict) else None
+@@ -181,6 +195,14 @@
+         position_restored = True
+     except Exception:
+         position_restored = False
++
++    # layout.apply's focus flag only moves server-side focus; a client viewing
++    # a saved machine follows an explicit tab.focus, so send one as well.
++    if focus:
++        try:
++            api.call("tab.focus", {"tab_id": new_tab_id})
++        except Exception:
++            pass
+ 
+     return {
+         "kind": "tab",
+diff -ruN -x __pycache__ -x *.pyc a/tests/test_close.py b/tests/test_close.py
+--- a/tests/test_close.py	1969-12-31 19:00:00
++++ b/tests/test_close.py	2026-09-28 17:51:03
+@@ -0,0 +1,51 @@
++"""Closing must record the current session before the terminal disappears."""
++import os
++import tempfile
++import unittest
++from unittest.mock import patch
++from herdr_undo_close import cli, store
++from test_record import FakeApi
++
++class TestClose(unittest.TestCase):
++    @patch.dict(os.environ, {"HERDR_TAB_ID": "w1:t2"}, clear=True)
++    def test_record_then_close(self):
++        calls = []
++        with patch.object(cli, "cmd_record", side_effect=lambda args, **kwargs: calls.append("record") or 0), patch.object(cli, "HerdrApi") as api:
++            api.return_value.__enter__.return_value.call.side_effect = lambda method, params: calls.append((method, params))
++            self.assertEqual(cli.COMMANDS["close"]([]), 0)
++        self.assertEqual(calls, ["record", ("tab.close", {"tab_id": "w1:t2"})])
++
++    @patch.dict(os.environ, {"HERDR_TAB_ID": "w1:t2"}, clear=True)
++    def test_failed_record_leaves_tab_open(self):
++        with patch.object(cli, "cmd_record", return_value=1), patch.object(cli, "HerdrApi") as api:
++            self.assertEqual(cli.COMMANDS["close"]([]), 1)
++            api.assert_not_called()
++
++    @patch.dict(os.environ, {}, clear=True)
++    def test_missing_context_leaves_tabs_open(self):
++        with patch.object(cli, "HerdrApi") as api:
++            self.assertEqual(cli.COMMANDS["close"]([]), 1)
++            api.assert_not_called()
++
++    def test_failed_target_export_preserves_tab_and_previous_snapshot(self):
++        for export in (cli.HerdrApiError("export failed"), {}, {"layout": {"root": None}},
++                       {"layout": {"root": {"type": "split"}}}):
++            with self.subTest(export=export), tempfile.TemporaryDirectory() as state:
++                previous = {"version": 2, "closed": [], "index": {
++                    "w1:t2": {"tab_id": "w1:t2", "panes": [], "refreshed_ms": 100}}}
++                store.save_state(state, previous)
++                api = FakeApi({
++                    "tab.list": {"tabs": [{"tab_id": "w1:t2", "workspace_id": "w1"}]},
++                    "workspace.list": {"workspaces": []},
++                    "pane.list": {"panes": []},
++                    "agent.list": {"agents": []},
++                    "layout.export": export,
++                })
++                with patch.dict(os.environ, {"HERDR_TAB_ID": "w1:t2", "HERDR_PLUGIN_STATE_DIR": state}, clear=True), \
++                     patch.object(cli, "HerdrApi") as client, \
++                     patch.object(cli.config_mod, "load_config", return_value={"max_entries": 20, "undo_panes": False, "restore_process": True}), \
++                     patch.object(cli.record_mod, "current_time_ms", return_value=100):
++                    client.return_value.__enter__.return_value = api
++                    self.assertEqual(cli.cmd_close([]), 1)
++                self.assertNotIn("tab.close", [method for method, _ in api.calls])
++                self.assertEqual(store.load_state(state), previous)
+diff -ruN -x __pycache__ -x *.pyc a/tests/test_relaunch.py b/tests/test_relaunch.py
+--- a/tests/test_relaunch.py	2026-09-28 17:51:03
++++ b/tests/test_relaunch.py	2026-09-28 17:51:03
+@@ -278,6 +278,9 @@
+ 
+ 
+ class TestAgentCommand(unittest.TestCase):
++    def test_codex_resumes_the_exact_session(self):
++        self.assertEqual(relaunch.agent_command("codex", "session-1"), ["codex", "resume", "session-1"])
++
+     def test_claude_with_and_without_an_id(self):
+         self.assertEqual(relaunch.agent_command("claude", "abc"), ["claude", "-r", "abc"])
+         self.assertEqual(relaunch.agent_command("claude", None), ["claude"])
+diff -ruN -x __pycache__ -x *.pyc a/tests/test_restore.py b/tests/test_restore.py
+--- a/tests/test_restore.py	2026-09-28 17:51:03
++++ b/tests/test_restore.py	2026-09-28 17:51:22
+@@ -393,6 +393,36 @@
+         self.assertEqual(result["new_tab_id"], "w1:new")
+         self.assertFalse(result["position_restored"])
+ 
++    def test_focus_true_focuses_the_new_tab_explicitly(self):
++        # layout.apply's focus flag moves server focus, but a multi-machine
++        # client only follows an explicit tab.focus.
++        rec = make_record()
++        api = FakeApi(
++            {
++                "layout.apply": {"layout": {"tab_id": "w1:new"}},
++                "tab.list": {"tabs": [{"workspace_id": "w1"}]},
++                "tab.move": {},
++                "tab.focus": {},
++            }
++        )
++        restore.restore_record(api, rec, [{"workspace_id": "w1"}], None, focus=True, config=CONFIG)
++        methods = [m for (m, _) in api.calls]
++        self.assertIn("tab.focus", methods)
++        self.assertGreater(methods.index("tab.focus"), methods.index("layout.apply"))
++        self.assertEqual([p for (m, p) in api.calls if m == "tab.focus"][0], {"tab_id": "w1:new"})
++
++    def test_focus_false_never_focuses(self):
++        rec = make_record()
++        api = FakeApi(
++            {
++                "layout.apply": {"layout": {"tab_id": "w1:new"}},
++                "tab.list": {"tabs": [{"workspace_id": "w1"}]},
++                "tab.move": {},
++            }
++        )
++        restore.restore_record(api, rec, [{"workspace_id": "w1"}], None, focus=False, config=CONFIG)
++        self.assertNotIn("tab.focus", [m for (m, _) in api.calls])
++
+     def test_layout_apply_failure_propagates(self):
+         rec = make_record()
+         api = FakeApi({"layout.apply": RuntimeError("apply failed")})
