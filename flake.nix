@@ -200,6 +200,8 @@
         claude-rc = ./home/claude-rc.nix;
         agent-env = ./home/agent-env.nix;
         agent-machine = ./home/agent-machine.nix;
+        # needs an Xcode 27 install on the host (modules/xcode-agent.nix)
+        apple-agent = ./home/apple-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         herdr = ./home/herdr.nix;
         agent-config-links = ./home/agent-config-links.nix;

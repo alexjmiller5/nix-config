@@ -455,7 +455,7 @@ in
   home.packages = [
     # Laptop-only leftovers — the portable dev toolbox lives in
     # home/dev-tools.nix (shared with the mini). What stays here: the Apple
-    # build chain (Xcode-bound, iOS builds are laptop-by-design), GUI
+    # build chain pieces the mini does not need (fastlane, device tools), GUI
     # helpers, and fonts.
     pkgs.create-dmg
     # VS Code's editor font — home-manager copies package fonts into
@@ -465,7 +465,6 @@ in
     pkgs.fastlane
     pkgs.libimobiledevice
     pkgs.mas
-    pkgs.xcodegen
     # Tailscale CLI for the GUI app (tailscale-app cask ships no PATH binary) —
     # replaces the hand-written /usr/local/bin/tailscale shim.
     (pkgs.writeShellApplication {

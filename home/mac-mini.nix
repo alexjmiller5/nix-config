@@ -56,6 +56,7 @@ in
     ./ai-agent.nix
     ./claude-rc.nix
     ./dev-tools.nix
+    ./apple-agent.nix
     ./zsh.nix
     ./aliases/dev.nix
     ./aliases/ai.nix

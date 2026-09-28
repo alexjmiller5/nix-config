@@ -10,6 +10,11 @@
 {
   home.packages = [
     pkgs.bun
+    # Apple build chain shared by both hosts: the mini is the agents' build
+    # host (Xcode 27), the laptop keeps its own Xcode; both run `just gen`.
+    pkgs.xcodegen
+    # Readable xcodebuild output for the raw `just` verbs (xcpretty's successor).
+    pkgs.xcbeautify
     pkgs.exiftool
     pkgs.ffmpeg
     pkgs.oci-cli
