@@ -437,7 +437,10 @@
         System Events" dialog on this screen. Refresh the TCC snapshot afterwards
         (`just snapshot tcc`).
       '';
-      verify = "ssh -o BatchMode=yes -o ConnectTimeout=5 macbook-air-tailscale 'screencapture -x -t jpg /tmp/tcc-probe.jpg && sips -g pixelWidth /tmp/tcc-probe.jpg | grep -q pixelWidth'";
+      # Through the mini: only the mini's agent key is authorized here, so the
+      # laptop cannot ssh to itself; Alex's terminal reaches the mini with his
+      # own key and the mini's agent shell comes back with the agent key.
+      verify = "ssh -o ConnectTimeout=5 mac-mini-tailscale \"AGENT_SHELL=manual-check ssh -o BatchMode=yes -o ConnectTimeout=5 macbook-air-tailscale 'screencapture -x -t jpg /tmp/tcc-probe.jpg && sips -g pixelWidth /tmp/tcc-probe.jpg | grep -q pixelWidth'\"";
     };
     tcc-grants = {
       title = "TCC grants";
