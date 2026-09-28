@@ -147,9 +147,10 @@ in
     # server-side and deletes the file. No secrets ever touch disk - only the
     # session token, which the sign-out invalidates. One-time prerequisite:
     # `op account add` on this machine (the op-account manual step below). The
-    # laptop's Hammerspoon (opUnlock.lua) drives --stdin: `request` pops the
-    # prompt there over ssh, the password travels back over ssh stdin into a
-    # pty-driven `op signin`, and nothing is written on either side.
+    # laptop's Hammerspoon (opUnlock.lua) drives --stdin: `request` drops the
+    # reason into a watched file there over ssh, the password travels back over
+    # ssh stdin into a pty-driven `op signin`, and no secret is written on
+    # either side.
     (pkgs.writeShellApplication {
       name = "op-unlock";
       runtimeInputs = [ pkgs._1password-cli ];
@@ -197,8 +198,10 @@ in
             ;;
           request) # ask the owner, on the laptop, to open a window
             reason=$(printf '%s' "''${2:-an agent needs a vault outside AI Agent}" | tr -c 'A-Za-z0-9 ._:/()-' ' ' | cut -c1-160)
+            # A watched file, not `hs -c`: an hs client spawned from an ssh
+            # session wedges Hammerspoon's IPC port (opUnlock.lua watches the dir).
             if AGENT_SHELL="''${AGENT_SHELL:-claude}" ssh -o BatchMode=yes -o ConnectTimeout=5 macbook-air-tailscale \
-                "h=\$(command -v hs || echo /opt/homebrew/bin/hs); \"\$h\" -c 'opUnlock.request(\"$reason\")'" >/dev/null 2>&1; then
+                "mkdir -p ~/.local/state/op-unlock && printf '%s' '$reason' > ~/.local/state/op-unlock/request" >/dev/null 2>&1; then
               echo "asked on the laptop; run op-unlock status when the vault is next needed"
             else
               echo "laptop unreachable: ask the owner to run op-unlock from their phone"
