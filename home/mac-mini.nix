@@ -189,7 +189,7 @@ in
             /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
             IFS= read -r pw || true
             if ! OP_BIN="$(command -v op)" OP_PW="$pw" /usr/bin/expect -f ${../scripts/op-signin-pty.exp} > "$f.tmp"; then
-              rm -f "$f.tmp"; unset pw; echo "sign-in failed" >&2; exit 1
+              rm -f "$f.tmp"; unset pw; exit 1
             fi
             unset pw
             mv "$f.tmp" "$f"

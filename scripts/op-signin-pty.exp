@@ -13,9 +13,16 @@ expect {
 }
 expect eof
 set token ""
+set last ""
 foreach line [split $expect_out(buffer) "\n"] {
     set line [string trim $line "\r "]
+    if {$line ne ""} { set last $line }
     if {[regexp {^[A-Za-z0-9_-]{40,}$} $line]} { set token $line }
 }
-if {$token eq ""} { exit 1 }
+if {$token eq ""} {
+    # op's own diagnostic (never the password): "You are not currently signed
+    # in" is what a wrong password produces.
+    puts stderr $last
+    exit 1
+}
 puts $token
