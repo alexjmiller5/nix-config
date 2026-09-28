@@ -48,6 +48,7 @@ let
       colima
       docker
       compose
+      dockerConfig
       ;
     host = "http://127.0.0.1:${toString cfg.port}";
     op = "${pkgs._1password-cli}/bin/op";
@@ -115,6 +116,11 @@ in
       default = "${pkgs.docker-compose}/bin/docker-compose";
       description = "Compose v2 binary.";
     };
+    dockerConfig = lib.mkOption {
+      type = lib.types.str;
+      default = "${cfg.stateDirectory}/docker";
+      description = "Writable private Docker client config dir (colima's context lives here; keeps ~/.docker leftovers away from Compose).";
+    };
     dockerHost = lib.mkOption {
       type = lib.types.str;
       default = "unix://${config.home.homeDirectory}/.colima/default/docker.sock";
@@ -145,10 +151,6 @@ in
       }
     ];
     xdg.configFile."1password-connect/compose.json".source = compose;
-    # Compose reads Docker's client config; a Docker Desktop leftover in
-    # ~/.docker (credsStore = desktop) would make every image pull fail, so the
-    # service gets its own empty one.
-    xdg.configFile."1password-connect/docker/config.json".text = "{}";
     home.packages = [
       pkgs.colima
       pkgs.docker-client
@@ -174,7 +176,7 @@ in
         EnvironmentVariables = {
           PATH = "${pkgs.colima}/bin:${pkgs.docker-client}/bin:${pkgs.docker-compose}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           DOCKER_HOST = cfg.dockerHost;
-          DOCKER_CONFIG = "${config.xdg.configHome}/1password-connect/docker";
+          DOCKER_CONFIG = cfg.dockerConfig;
         };
         RunAtLoad = true;
         # No automatic auth retries after a quota failure. Containers restart

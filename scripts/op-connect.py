@@ -117,6 +117,14 @@ def wait_for_docker(cfg):
 
 
 def start_runtime(cfg):
+    # A private, writable Docker client config: colima writes its context into
+    # it, and a Docker Desktop leftover in ~/.docker (credsStore=desktop) never
+    # reaches Compose. Existing content is kept.
+    docker_config = Path(cfg["dockerConfig"])
+    docker_config.mkdir(parents=True, exist_ok=True, mode=0o700)
+    docker_config.chmod(0o700)
+    if not (docker_config / "config.json").exists():
+        (docker_config / "config.json").write_text("{}")
     # Idempotent: colima reports an already-running VM and exits 0.
     subprocess.run([cfg["colima"], "start", "--cpu", "1", "--memory", "1"], check=True)
     wait_for_docker(cfg)

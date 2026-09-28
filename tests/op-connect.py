@@ -53,11 +53,27 @@ class ConnectTests(unittest.TestCase):
             calls.append(list(args))
             return subprocess.CompletedProcess(args, 0)
 
-        cfg = {**self.cfg, "colima": "/nix/colima", "docker": "/nix/docker"}
+        docker_config = self.state / "docker"
+        cfg = {
+            **self.cfg,
+            "colima": "/nix/colima",
+            "docker": "/nix/docker",
+            "dockerConfig": str(docker_config),
+        }
         with patch.object(connect.subprocess, "run", side_effect=fake_run):
             connect.start_runtime(cfg)
         self.assertEqual(calls[0], ["/nix/colima", "start", "--cpu", "1", "--memory", "1"])
         self.assertEqual(calls[1][:2], ["/nix/docker", "info"])
+        # A writable private Docker config: colima writes its context there,
+        # and a Docker Desktop leftover in ~/.docker never reaches Compose.
+        self.assertEqual(json.loads((docker_config / "config.json").read_text()), {})
+        self.assertEqual(docker_config.stat().st_mode & 0o777, 0o700)
+        (docker_config / "config.json").write_text('{"currentContext": "colima"}')
+        with patch.object(connect.subprocess, "run", side_effect=fake_run):
+            connect.start_runtime(cfg)
+        self.assertEqual(
+            json.loads((docker_config / "config.json").read_text()), {"currentContext": "colima"}
+        )
 
     def test_agent_reads_use_connect(self):
         self.assertTrue(connect.wants_connect(self.read, self.env, self.cfg))
