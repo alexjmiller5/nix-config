@@ -54,4 +54,10 @@ detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" AGENT_OP_TOKEN
   CODEX_SESSION_ID=test-session zsh -c 'printf "%s" "${OP_SERVICE_ACCOUNT_TOKEN:-}"')
 [ -z "$detected" ] || fail "missing token file did not leave auth unset"
 
+# Non-interactive shells (Herdr servers, launchd, `zsh -lc`) must see the
+# Homebrew casks (claude, codex) - .zshrc-only PATH setup is not enough.
+detected=$(env -i PATH="$PATH" HOME="$scratch" ZDOTDIR="$scratch" zsh -c 'printf "%s" "$PATH"')
+case ":$detected:" in *:/opt/homebrew/bin:*) ;; *) fail "non-interactive shell PATH lacks /opt/homebrew/bin";; esac
+case "$detected" in /etc/profiles/per-user/*) ;; *) fail "nix profile is not first on PATH: $detected";; esac
+
 echo "agent-detect: all checks passed"

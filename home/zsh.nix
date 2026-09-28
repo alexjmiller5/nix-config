@@ -36,6 +36,14 @@
     envExtra = ''
       # uv-installed tools
       export PATH="$HOME/.local/bin:$PATH"
+      # Homebrew casks (claude, codex, ...) for EVERY shell, not only the
+      # interactive .zshrc: a Herdr server started through `zsh -lc`, launchd
+      # jobs and `ssh host cmd` must find them too. brew shellenv (.zshrc)
+      # skips the prepend when the dir is already present.
+      [[ -d /opt/homebrew/bin ]] && export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+      # Nix profiles ahead of Homebrew: declared packages must shadow
+      # same-named binaries a brew formula drags in as deps.
+      export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:$PATH"
     '';
 
     initContent = ''
