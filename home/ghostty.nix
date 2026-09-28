@@ -21,7 +21,12 @@
         state="''${XDG_STATE_HOME:-$HOME/.local/state}/herdr-window"
         mkdir -p "$state"
         : > "$state/pending"
-        exec /usr/bin/osascript ${../scripts/herdr-window.applescript} "$PWD" "${pkgs.herdr}/bin/herdr"
+        # Through a login zsh: Ghostty runs the command with its own bare PATH,
+        # and the first client spawns the Herdr server daemon with that
+        # environment - the server then cannot relaunch `claude` (undo-close's
+        # reopen) or anything else from the nix profile. A login shell carries
+        # the nix PATH and the session variables into the server.
+        exec /usr/bin/osascript ${../scripts/herdr-window.applescript} "$PWD" "exec ${pkgs.herdr}/bin/herdr"
       '';
     })
   ];
