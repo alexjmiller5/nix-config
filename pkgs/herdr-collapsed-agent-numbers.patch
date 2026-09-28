@@ -1,0 +1,21 @@
+--- a/src/client/shell/endpoint_agents.rs	2026-09-28 14:56:50
++++ b/src/client/shell/endpoint_agents.rs	2026-09-28 14:56:50
+@@ -15,14 +15,16 @@
+         if row.agent.focused {
+             buffer.set_style(rect, Style::default().bg(config.palette.active_row_bg));
+         }
+-        let initial = row.machine_label.chars().next().unwrap_or('?');
++        // Number the rows like the single-machine collapsed sidebar does; the
++        // machine is already shown by the endpoint rows above.
+         put_text(
+             buffer,
+             rect.x,
+             rect.y,
+             rect.width,
+             &format!(
+-                "{initial}{}",
++                "{:<2}{}",
++                index + 1,
+                 status_icon(row.agent.status, config.status_indicators)
+             ),
+             Style::default()
