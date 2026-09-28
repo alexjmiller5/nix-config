@@ -533,10 +533,11 @@ in
         server inherits the mini's `sshd-keygen-wrapper` TCC grants; a launchd
         server would not) and saves the profile in its client state. The sidebar
         then shows Local and Mini; agents on the mini report state and get the
-        mini's capability sheet. After a mini reboot, if the Mini row shows
-        Attention, run `herdr --remote mac-mini-tailscale` once and restart the
-        client. Image handoff into a mini pane is ctrl+v (clipboard image), not
-        drag-and-drop.
+        mini's capability sheet. After a mini reboot the client restarts the
+        server over ssh by itself within a minute; only if the Mini row stays
+        on Attention, run `herdr --remote mac-mini-tailscale` once and restart
+        the client. Image handoff into a mini pane is ctrl+v (clipboard image),
+        not drag-and-drop.
       '';
       verify = "herdr machine list --json | jq -e 'any(.[]; .label == \"Mini\")' >/dev/null";
     };
