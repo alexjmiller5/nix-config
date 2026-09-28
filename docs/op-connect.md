@@ -78,7 +78,7 @@ op-connect-bootstrap --vault <vault-id> --server <server-name> \
 It creates the server, backs up the generated bundle as a tagged Document,
 creates a read-only token, saves it as a concealed field, and prints only
 stable IDs. Re-running reuses the existing server and vault items. Configure
-`opConnect.enable`, `vaultId`, `credentialsItemId`, and `tokenOpRef` using that
+`opConnect.enable`, `vaultId`, `serverItemId`, and `tokenOpRef` using that
 output, then rebuild. Each separate deployment needs its own credentials;
 the bootstrap's item titles must be unique within its owning vault.
 

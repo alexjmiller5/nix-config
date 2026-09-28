@@ -90,7 +90,7 @@ in
   opConnect = {
     enable = true;
     vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
-    credentialsItemId = "5c5nayec7aqs6dai5l4amj725a";
+    serverItemId = "5c5nayec7aqs6dai5l4amj725a";
     tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/uyrwaqz6v5k7z5py7d5u7fmp2u/credential";
   };
 

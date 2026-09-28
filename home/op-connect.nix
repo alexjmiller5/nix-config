@@ -43,7 +43,7 @@ let
       vaultId
       stateDirectory
       serviceAccountTokenFile
-      credentialsItemId
+      serverItemId
       tokenOpRef
       colima
       docker
@@ -66,7 +66,7 @@ in
       default = "";
       description = "The one vault this local Connect server and read token can access.";
     };
-    credentialsItemId = lib.mkOption {
+    serverItemId = lib.mkOption {
       type = lib.types.str;
       default = "";
       description = "Document item ID holding the original encrypted credentials bundle.";
@@ -146,8 +146,8 @@ in
     };
     assertions = [
       {
-        assertion = cfg.vaultId != "" && cfg.credentialsItemId != "" && cfg.tokenOpRef != "";
-        message = "opConnect requires vaultId, credentialsItemId and tokenOpRef from provisioning.";
+        assertion = cfg.vaultId != "" && cfg.serverItemId != "" && cfg.tokenOpRef != "";
+        message = "opConnect requires vaultId, serverItemId and tokenOpRef from provisioning.";
       }
     ];
     xdg.configFile."1password-connect/compose.json".source = compose;

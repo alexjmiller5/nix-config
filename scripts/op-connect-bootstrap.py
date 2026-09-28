@@ -141,7 +141,7 @@ def main():
         json.dumps(
             {
                 "serverId": server_id,
-                "credentialsItemId": credentials_id,
+                "serverItemId": credentials_id,
                 "tokenOpRef": f"op://{args.vault}/{token_id}/credential",
             },
             indent=2,

@@ -154,7 +154,7 @@ def serve(cfg):
                 env,
                 "document",
                 "get",
-                cfg["credentialsItemId"],
+                cfg["serverItemId"],
                 "--vault",
                 cfg["vaultId"],
             )
