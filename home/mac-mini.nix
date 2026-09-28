@@ -146,7 +146,10 @@ in
     # after 30 idle minutes) and after N hours (default 6) signs out
     # server-side and deletes the file. No secrets ever touch disk - only the
     # session token, which the sign-out invalidates. One-time prerequisite:
-    # `op account add` on this machine (the op-account manual step below).
+    # `op account add` on this machine (the op-account manual step below). The
+    # laptop's Hammerspoon (opUnlock.lua) drives --stdin: `request` pops the
+    # prompt there over ssh, the password travels back over ssh stdin into a
+    # pty-driven `op signin`, and nothing is written on either side.
     (pkgs.writeShellApplication {
       name = "op-unlock";
       runtimeInputs = [ pkgs._1password-cli ];
@@ -179,6 +182,28 @@ in
               rm -f "$f"; echo "locked"
             fi
             ;;
+          --stdin) # password on stdin (the laptop's Hammerspoon prompt), hours as $2
+            hours="''${2:-6}"
+            umask 077; mkdir -p "$state"
+            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
+            IFS= read -r pw || true
+            if ! OP_BIN="$(command -v op)" OP_PW="$pw" /usr/bin/expect -f ${../scripts/op-signin-pty.exp} > "$f.tmp"; then
+              rm -f "$f.tmp"; unset pw; echo "sign-in failed" >&2; exit 1
+            fi
+            unset pw
+            mv "$f.tmp" "$f"
+            /bin/launchctl submit -l com.alexmiller.op-unlock -- "$0" keepalive "$hours"
+            echo "unlocked for ''${hours}h"
+            ;;
+          request) # ask the owner, on the laptop, to open a window
+            reason=$(printf '%s' "''${2:-an agent needs a vault outside AI Agent}" | tr -c 'A-Za-z0-9 ._:/()-' ' ' | cut -c1-160)
+            if AGENT_SHELL="''${AGENT_SHELL:-claude}" ssh -o BatchMode=yes -o ConnectTimeout=5 macbook-air-tailscale \
+                "h=\$(command -v hs || echo /opt/homebrew/bin/hs); \"\$h\" -c 'opUnlock.request(\"$reason\")'" >/dev/null 2>&1; then
+              echo "asked on the laptop; run op-unlock status when the vault is next needed"
+            else
+              echo "laptop unreachable: ask the owner to run op-unlock from their phone"
+            fi
+            ;;
           ""|[0-9]*)
             hours="''${1:-6}"
             umask 077; mkdir -p "$state"
@@ -192,7 +217,7 @@ in
             echo "unlocked for ''${hours}h - agents can read Personal via op-personal; op-unlock lock to end early"
             ;;
           *)
-            echo "usage: op-unlock [hours=6] | lock | status" >&2
+            echo "usage: op-unlock [hours=6] | --stdin [hours] | request \"<reason>\" | lock | status" >&2
             exit 1
             ;;
         esac
@@ -255,7 +280,9 @@ in
         Another Device, or the Emergency Kit PDF). Afterwards `op-unlock [hours]`
         from any ssh shell (phone terminal included) gives agent sessions
         time-boxed Personal-vault reads via `op-personal`; `op-unlock lock` ends
-        it, `op-unlock status` checks.
+        it, `op-unlock status` checks. From an agent session here,
+        `op-unlock request "<reason>"` pops the password prompt on the laptop
+        (Hammerspoon `opUnlock.lua`); from a phone, run `op-unlock` in any ssh shell.
       '';
       verify = "op account list | grep -q my.1password.com";
     };

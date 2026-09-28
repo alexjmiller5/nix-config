@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+# Sign in to 1Password CLI with the account password from $OP_PW, driving
+# `op signin --raw` through a pty (op prompts only on a terminal). Prints the
+# session token alone on stdout; exits non-zero when no token came back.
+# Used by op-unlock --stdin (home/mac-mini.nix).
+log_user 0
+set timeout 60
+spawn $env(OP_BIN) signin --raw
+expect {
+    -re {password.*:} { send -- "$env(OP_PW)\r" }
+    timeout { exit 2 }
+    eof { exit 3 }
+}
+expect eof
+set token ""
+foreach line [split $expect_out(buffer) "\n"] {
+    set line [string trim $line "\r "]
+    if {[regexp {^[A-Za-z0-9_-]{40,}$} $line]} { set token $line }
+}
+if {$token eq ""} { exit 1 }
+puts $token
