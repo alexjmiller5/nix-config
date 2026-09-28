@@ -188,7 +188,6 @@
       "codex"
       "codexbar"
       "discord"
-      "docker-desktop"
       "dolphin"
       "ghostty"
       "google-chrome"

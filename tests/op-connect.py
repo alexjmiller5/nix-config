@@ -46,6 +46,19 @@ class ConnectTests(unittest.TestCase):
         }
         self.read = ["read", "op://fixture-vault/item/credential"]
 
+    def test_start_runtime_starts_colima_then_waits_for_docker(self):
+        calls = []
+
+        def fake_run(args, **kwargs):
+            calls.append(list(args))
+            return subprocess.CompletedProcess(args, 0)
+
+        cfg = {**self.cfg, "colima": "/nix/colima", "docker": "/nix/docker"}
+        with patch.object(connect.subprocess, "run", side_effect=fake_run):
+            connect.start_runtime(cfg)
+        self.assertEqual(calls[0], ["/nix/colima", "start", "--cpu", "1", "--memory", "1"])
+        self.assertEqual(calls[1][:2], ["/nix/docker", "info"])
+
     def test_agent_reads_use_connect(self):
         self.assertTrue(connect.wants_connect(self.read, self.env, self.cfg))
         self.assertTrue(

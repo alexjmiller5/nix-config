@@ -113,7 +113,13 @@ def wait_for_docker(cfg):
         except subprocess.TimeoutExpired:
             pass  # Docker can accept a connection before the engine is ready.
         time.sleep(2)
-    raise RuntimeError("Docker did not start; check Docker Desktop's setup dialog")
+    raise RuntimeError("Docker did not start; check colima (~/Library/Logs/op-connect.log)")
+
+
+def start_runtime(cfg):
+    # Idempotent: colima reports an already-running VM and exits 0.
+    subprocess.run([cfg["colima"], "start", "--cpu", "1", "--memory", "1"], check=True)
+    wait_for_docker(cfg)
 
 
 def serve(cfg):
@@ -155,12 +161,9 @@ def serve(cfg):
         del env
         if not token:
             raise RuntimeError("Connect token is empty")
+        start_runtime(cfg)
         subprocess.run(
-            ["/usr/bin/open", "-g", "-j", "-a", cfg["dockerApp"]], check=True
-        )
-        wait_for_docker(cfg)
-        subprocess.run(
-            [cfg["docker"], "compose", "-f", cfg["composeFile"], "up", "-d"], check=True
+            [cfg["compose"], "-f", cfg["composeFile"], "up", "-d"], check=True
         )
         path = state / "token.sock"
         path.unlink(missing_ok=True)

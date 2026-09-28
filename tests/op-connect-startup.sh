@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Docker's privileged-helper installer invokes macOS tools from its inherited
-# PATH. Exercise the actual declared launch environment, not the login shell.
+# Exercise the actual declared launch environment, not the login shell.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# colima shells out to macOS ssh and the Lima tooling from the launchd PATH.
 docker_path=$(nix eval --raw .#darwinConfigurations.macbook-air.config.home-manager.users \
   --apply 'users: (builtins.head (builtins.attrValues users)).launchd.agents.op-connect.config.EnvironmentVariables.PATH')
-env -i PATH="$docker_path" /bin/sh -c 'command -v md5 >/dev/null && command -v base64 >/dev/null'
-echo 'op-connect-startup: Docker can find its macOS installation helpers'
+env -i PATH="$docker_path" /bin/sh -c 'command -v colima >/dev/null && command -v docker >/dev/null && command -v docker-compose >/dev/null && command -v ssh >/dev/null'
+echo 'op-connect-startup: colima, docker, docker-compose and ssh are on the service PATH'

@@ -1,5 +1,5 @@
-# Official local Connect containers, plus a memory-only token handoff. Import
-# on any host; enable where Docker Desktop and independently enrolled operator
+# Official local Connect containers on a colima VM, plus a memory-only token
+# handoff. Import on any host; enable where independently enrolled operator
 # credentials are available.
 {
   config,
@@ -45,8 +45,9 @@ let
       serviceAccountTokenFile
       credentialsItemId
       tokenOpRef
-      dockerApp
+      colima
       docker
+      compose
       ;
     host = "http://127.0.0.1:${toString cfg.port}";
     op = "${pkgs._1password-cli}/bin/op";
@@ -99,15 +100,25 @@ in
       default = "op-connect";
       description = "Docker Compose project that owns the containers and encrypted cache volume.";
     };
-    dockerApp = lib.mkOption {
+    colima = lib.mkOption {
       type = lib.types.str;
-      default = "/Applications/Docker.app";
-      description = "Docker Desktop application to open at login.";
+      default = "${pkgs.colima}/bin/colima";
+      description = "colima CLI; the login service starts its VM before Compose.";
     };
     docker = lib.mkOption {
       type = lib.types.str;
-      default = "${cfg.dockerApp}/Contents/Resources/bin/docker";
-      description = "Docker CLI path.";
+      default = "${pkgs.docker-client}/bin/docker";
+      description = "Docker CLI (client only).";
+    };
+    compose = lib.mkOption {
+      type = lib.types.str;
+      default = "${pkgs.docker-compose}/bin/docker-compose";
+      description = "Compose v2 binary.";
+    };
+    dockerHost = lib.mkOption {
+      type = lib.types.str;
+      default = "unix://${config.home.homeDirectory}/.colima/default/docker.sock";
+      description = "Docker socket colima exposes.";
     };
     cliPackage = lib.mkOption {
       type = lib.types.package;
@@ -135,6 +146,9 @@ in
     ];
     xdg.configFile."1password-connect/compose.json".source = compose;
     home.packages = [
+      pkgs.colima
+      pkgs.docker-client
+      pkgs.docker-compose
       cfg.cliPackage
       (pkgs.writeShellScriptBin "op-connect-start" ''
         exec /bin/launchctl kickstart -k "gui/$(/usr/bin/id -u)/org.nix-community.op-connect"
@@ -154,8 +168,8 @@ in
           "serve"
         ];
         EnvironmentVariables = {
-          PATH = "${cfg.dockerApp}/Contents/Resources/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-          DOCKER_HOST = "unix://${config.home.homeDirectory}/.docker/run/docker.sock";
+          PATH = "${pkgs.colima}/bin:${pkgs.docker-client}/bin:${pkgs.docker-compose}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          DOCKER_HOST = cfg.dockerHost;
         };
         RunAtLoad = true;
         # No automatic auth retries after a quota failure. Containers restart

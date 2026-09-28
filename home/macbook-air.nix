@@ -76,8 +76,8 @@ in
     chmod 600 "$HOME/.ssh/authorized_keys"
   '';
 
-  # Local trial on the laptop. The exported module remains opt-in on other
-  # hosts; the mini keeps direct SA/desktop auth and needs no Docker runtime.
+  # Local Connect on a colima VM (home/op-connect.nix); the mini enables the
+  # same module with its own server.
   opConnect = {
     enable = true;
     vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
@@ -297,12 +297,6 @@ in
     "com.cron.electron" = {
       enable = false;
       flags = 8396822;
-      content_visibility = 0;
-      grouping = 0;
-    };
-    "com.electron.dockerdesktop" = {
-      enable = false;
-      flags = 8396814;
       content_visibility = 0;
       grouping = 0;
     };
