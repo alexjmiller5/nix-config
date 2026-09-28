@@ -95,7 +95,17 @@ def user_env(env):
     result["AGENT_OP_AUTH"] = "desktop"
     session = Path(env["HOME"]) / ".local/state/op/personal-session"
     if not result.get("OP_SESSION") and session.is_file():
-        result["OP_SESSION"] = session.read_text().strip()
+        token = session.read_text().strip()
+        result["OP_SESSION"] = token
+        # op itself reads OP_SESSION_<account shorthand>, never bare OP_SESSION.
+        config = Path(env.get("OP_CONFIG_DIR") or Path(env["HOME"]) / ".config/op") / "config"
+        try:
+            accounts = json.loads(config.read_text()).get("accounts", [])
+        except (OSError, ValueError):
+            accounts = []
+        for account in accounts:
+            if account.get("shorthand"):
+                result.setdefault("OP_SESSION_" + account["shorthand"], token)
     return result
 
 

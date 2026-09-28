@@ -27,6 +27,10 @@ auth = os.environ.get('OP_SERVICE_ACCOUNT_TOKEN', 'desktop')
 data = sys.stdin.read() if os.environ.get('ECHO_INPUT') else ''
 with open(os.environ['CALLS'], 'a') as f:
     f.write(json.dumps([auth, sys.argv[1:]]) + '\\n')
+for key, value in os.environ.items():
+    if key.startswith('OP_SESSION'):
+        with open(os.environ['CALLS'] + '.session', 'a') as f:
+            f.write(key + '=' + value + '\\n')
 if sys.argv[1:2] == ['signin']:
     Path(os.environ['CALLS'] + '.signed-in').touch()
     sys.exit(0)
@@ -199,6 +203,17 @@ print(auth + (':' + data if os.environ.get('ECHO_INPUT') else ''))
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(result.stdout.strip(), "desktop:fixture-item")
+
+    def test_unlock_window_session_is_named_for_the_cli_account(self):
+        (self.root / ".local/state/op").mkdir(parents=True)
+        (self.root / ".local/state/op/personal-session").write_text("fixture-session\n")
+        (self.root / ".config/op").mkdir(parents=True)
+        (self.root / ".config/op/config").write_text(json.dumps({"accounts": [{"shorthand": "my"}]}))
+        result = self.run_auth("personal", *self.read)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        seen = (self.root / "calls.session").read_text().splitlines()
+        self.assertIn("OP_SESSION_my=fixture-session", seen)
+        self.assertIn("OP_SESSION=fixture-session", seen)
 
     def test_desktop_auth_signs_in_before_the_requested_operation(self):
         result = self.run_auth("personal", *self.read, REQUIRE_SIGNIN="1")
