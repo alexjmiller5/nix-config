@@ -211,6 +211,7 @@
         # dev-tools needs the consumer to pass cherri via extraSpecialArgs
         dev-tools = ./home/dev-tools.nix;
         ghostty = ./home/ghostty.nix;
+        spotify-player = ./home/spotify-player.nix;
         # vscode needs the consumer to pass nix-vscode-extensions via extraSpecialArgs
         vscode = ./home/vscode.nix;
         aliases-dev = ./home/aliases/dev.nix;

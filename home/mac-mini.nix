@@ -47,6 +47,7 @@ in
     ./aliases/ai.nix
     ./aliases/infra.nix
     ./ssh.nix
+    ./spotify-player.nix
   ];
 
   # Apple-bound daily job belongs only on the mini. The task writer awaits

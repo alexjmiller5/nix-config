@@ -2,7 +2,8 @@
 
 # spotify-player (TUI + scripting CLI, binary: spotify_player) via the native
 # HM module - package + ~/.config/spotify-player/app.toml in one place.
-# Laptop-personal: a music player has no place in the work-exportable list.
+# On both machines: the laptop for the TUI, the mini for CLI/API scripting
+# (headless is fine - the CLI never opens an audio device).
 # Option docs: https://github.com/aome510/spotify-player/blob/master/docs/config.md
 #
 # Built from upstream master (nixpkgs' release lacks the custom-client
