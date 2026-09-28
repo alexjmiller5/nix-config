@@ -96,7 +96,7 @@
     user = username;
     # Claude in Chrome: its tabGroups permission is what chrome-control's
     # cdp-group.mjs borrows to give every agent session its own tab group.
-    # Sign-in is manual (MANUAL-mac-mini.md).
+    # Sign-in is manual (agent-chrome-login manual step below).
     extensions = [ "fcoeoabgfenejglbffodgkkbkcdhcgfn" ];
   };
 

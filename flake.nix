@@ -197,6 +197,7 @@
         ai-agent = ./home/ai-agent.nix;
         claude-rc = ./home/claude-rc.nix;
         agent-env = ./home/agent-env.nix;
+        agent-machine = ./home/agent-machine.nix;
         cli-tools = ./home/cli-tools.nix;
         herdr = ./home/herdr.nix;
         agent-config-links = ./home/agent-config-links.nix;

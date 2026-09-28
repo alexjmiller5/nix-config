@@ -24,6 +24,7 @@ in
 {
   imports = [
     ./common.nix
+    ./agent-machine.nix
     ./ai-agent.nix
     ./claude-rc.nix
     ./dev-tools.nix
@@ -72,7 +73,7 @@ in
     tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/qc67dntzaer2k4n3jx6baql7va/credential";
   };
 
-  # Chrome per-extension state is NOT codified — see MANUAL-macbook-air.md:
+  # Chrome per-extension state is NOT codified - see the chrome snapshot manual steps (hosts/macbook-air.nix):
   #  - Tab Copy's ⇧⌘C shortcut lives in Chrome's HMAC-signed Secure
   #    Preferences (extensions.settings.<id>.commands), so an unsigned
   #    external write is ignored on startup.
@@ -89,6 +90,9 @@ in
   # (hosts/mac-mini.nix services.agent-chrome), never this laptop's - the
   # chrome-control skill reads this and drives it over an ssh port-forward.
   home.sessionVariables.CHROME_CONTROL_HOST = "mac-mini-tailscale";
+
+  # Capability sheet this laptop's agent sessions load (home/agent-machine.nix).
+  agentMachine.profile = lib.mkDefault "macbook";
 
   # Per-app notification settings, `enable` included (the "Allow
   # notifications" switch) - see home/macos/notification-prefs.nix.
@@ -472,7 +476,7 @@ in
     # at launch (macOS 26, verified 2026-08-04). An on-demand command, not an
     # activation step: ControlCenter renormalizes the numbers after layout, so
     # enforcing exact values every switch would flap. Third-party icon order
-    # stays manual (⌘-drag) — see MANUAL-macbook-air.md.
+    # stays manual (⌘-drag) - the menu-bar-order manual step below.
     (pkgs.writeShellApplication {
       name = "menubar-layout";
       text = ''

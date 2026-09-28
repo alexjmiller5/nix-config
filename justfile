@@ -36,6 +36,7 @@ check:
     python3 tests/manual-render.py
     python3 tests/finder-defaults.py
     bash tests/agent-detect.sh
+    bash tests/agent-machine.sh
     bash tests/op-auth-guard.sh
     bash tests/git-hooks.sh
     python3 tests/machine-vault-git.py

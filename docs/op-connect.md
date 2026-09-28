@@ -57,7 +57,7 @@ volume and the encrypted credentials bundle persist.
 
 An enrolled laptop keeps its existing agent credential file, encrypted
 Connect bundle and Docker volume. A replacement laptop first needs
-[independent operator enrollment](../MANUAL-macbook-air.md#agent-operator-credentials-enrollment-and-rotation)
+[independent operator enrollment](../MANUAL-macbook-air.md) (the `agent-operator-token` step)
 from the authoritative AI Agent credential record using native user auth.
 Nix bootstrap and machine service accounts do not populate that file.
 Once enrolled, the existing item IDs let Connect restore a missing bundle

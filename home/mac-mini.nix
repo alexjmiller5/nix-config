@@ -47,6 +47,7 @@ in
   imports = [
     shared-album-reminders.homeModules.default
     ./common.nix
+    ./agent-machine.nix
     ./ai-agent.nix
     ./claude-rc.nix
     ./dev-tools.nix
@@ -67,6 +68,13 @@ in
   # keys the nix-secrets host blocks select. ssh.nix's 1P IdentityAgent
   # default would otherwise point at a socket that never exists.
   programs.ssh.settings."*".IdentityAgent = lib.mkForce "SSH_AUTH_SOCK";
+
+  # Capability sheet this machine's agent sessions load (home/agent-machine.nix).
+  agentMachine.profile = lib.mkDefault "mini";
+
+  # The agent Chrome (hosts/mac-mini.nix services.agent-chrome) is local here:
+  # chrome-control drives 127.0.0.1:9222 directly, no ssh forward.
+  home.sessionVariables.CHROME_CONTROL_HOST = "local";
 
   # Inbound ssh from the laptop: public halves of "Mac Mini SSH Key" (Alex's
   # terminals, private half in the 1Password Personal vault) and "AI Agent

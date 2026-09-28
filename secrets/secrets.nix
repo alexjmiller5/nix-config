@@ -1,7 +1,7 @@
 # agenix recipients — encryption needs only these PUBLIC keys, and every
 # secret's source of truth is 1Password, so editing, rotating, or enrolling a
 # replacement machine is recreate-not-decrypt (no master identity exists; see
-# MANUAL-macbook-air.md §Fresh-machine bootstrap):
+# docs/manual/macbook-air-bootstrap.md):
 #   cd secrets && rm <name>.age
 #   EDITOR=nano nix run github:ryantm/agenix -- -e <name>.age   # paste from 1P
 #

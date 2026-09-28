@@ -53,7 +53,7 @@
   # usage (incl. iPhone web domains) that the mini (26.3, vaulted) cannot
   # capture. dirSuffix keeps same-day runs from colliding in the shared
   # iCloud folder. One manual step after first rebuild: grant
-  # /Applications/ScreenTimeBackup.app Full Disk Access (MANUAL-macbook-air.md).
+  # /Applications/ScreenTimeBackup.app Full Disk Access (screentime-backup-fda manual step below).
   services.screentime-backup = {
     enable = true;
     user = username;
@@ -63,7 +63,7 @@
   # iMessage sticker sync: MacBook only (the mini has no Messages sign-in).
   # Weekly copy of the sticker drawer + chat sticker attachments into
   # ~/Documents/ios-stickers/synced. One manual step after first rebuild:
-  # grant /Applications/StickerSync.app Full Disk Access (MANUAL-macbook-air.md).
+  # grant /Applications/StickerSync.app Full Disk Access (sticker-sync-fda manual step below).
   services.sticker-sync = {
     enable = true;
     user = username;
@@ -164,7 +164,7 @@
       # Not in nixpkgs (checked 2026-09-01); skills + nightlight migrated out.
       "chrome-cli"
       # iMessage CLI for agents (read chat.db, send via Messages.app) — not in
-      # nixpkgs. Needs TCC grants, see MANUAL-macbook-air.md.
+      # nixpkgs. Needs TCC grants (tcc-grants snapshot step below).
       "steipete/tap/imsg"
     ];
     casks = [
