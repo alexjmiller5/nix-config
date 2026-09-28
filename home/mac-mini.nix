@@ -38,6 +38,10 @@ let
     # in agent-config/skills) - same pull-only refresh, anonymous auth.
     cd "$HOME/.config/agent-config-public"
     git pull --ff-only --quiet origin main
+    # Private ssh host blocks (programs.ssh Include): a new peer alias must
+    # land here too, or ssh cannot resolve it on this machine.
+    cd "$HOME/.config/nix-secrets"
+    git pull --ff-only --quiet origin main
   '';
 in
 {
