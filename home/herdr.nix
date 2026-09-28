@@ -64,11 +64,6 @@ in
 
   programs.herdr = {
     enable = true;
-    # Collapsed sidebar with saved machines: number the agent rows (upstream
-    # prints the machine's initial instead, so every row reads "L" or "2").
-    package = pkgs.herdr.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ ../pkgs/herdr-collapsed-agent-numbers.patch ];
-    });
     settings = lib.mkDefault {
       onboarding = false;
       session.resume_agents_on_restore = true;
