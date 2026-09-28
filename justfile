@@ -1,9 +1,9 @@
-# Deploy the mac-mini config from THIS laptop — no clone on the Mini.
-# Copies this flake + its inputs into the Mini's nix store (via ssh://, so it uses
-# your ~/.ssh/config + 1Password agent), then runs the Mini's OWN darwin-rebuild for
-# a correct activation (passwordless via the NOPASSWD rule in darwin-base.nix). Deploys COMMITTED
-# state (commit + push first if you want the change on GitHub too).
-deploy host="mac-mini-tailscale":
+# Deploy a host's config to it from the OTHER machine (the switch-* aliases
+# pick this or a local switch by where they run). Copies this flake + its inputs
+# into the target's nix store (via ssh://, so it uses ~/.ssh/config), then runs
+# the target's OWN darwin-rebuild (passwordless via the NOPASSWD rule in
+# darwin-base.nix). Deploys the working tree, not GitHub: commit + push too.
+deploy host="mac-mini-tailscale" attr="mac-mini":
     #!/usr/bin/env bash
     set -euo pipefail
     just manual
@@ -11,10 +11,11 @@ deploy host="mac-mini-tailscale":
     flake="$(nix flake archive --to "ssh://{{host}}" --json \
       | /usr/bin/python3 -c 'import json,sys;print(json.load(sys.stdin)["path"])')"
     echo "→ activating on {{host}} …"
-    ssh -t "{{host}}" "sudo /run/current-system/sw/bin/darwin-rebuild switch --flake '$flake#mac-mini'"
+    ssh -t "{{host}}" "sudo /run/current-system/sw/bin/darwin-rebuild switch --flake '$flake#{{attr}}'"
 
-# Apply locally — only if you're actually ON the Mini with a checkout (you shouldn't need this).
+# Apply the mini's config ON the mini (the switch-mini alias there).
 switch:
+    just manual
     sudo darwin-rebuild switch --flake .#mac-mini
 
 # Apply the laptop's config ON the laptop. Works before nix-darwin is installed:

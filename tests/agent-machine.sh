@@ -21,5 +21,15 @@ for pair in macbook-air:macbook mac-mini:mini; do
   envextra=$(nix eval --raw ".#darwinConfigurations.$host.config.home-manager.users" \
     --apply "users: (builtins.head (builtins.attrValues users)).programs.zsh.envExtra")
   case "$envextra" in *"export AGENT_MACHINE=$profile"*) ;; *) fail "$host .zshenv lacks AGENT_MACHINE";; esac
+  # The switch-* aliases apply their host locally on that host and over ssh
+  # (justfile deploy) from the other one: no machine sshes into itself.
+  aliases=$(nix eval --raw ".#darwinConfigurations.$host.config.home-manager.users" \
+    --apply "users: let a = (builtins.head (builtins.attrValues users)).programs.zsh.shellAliases; in
+      a.switch-macbook + \"|\" + a.switch-mini")
+  case "$host:$aliases" in
+    "macbook-air:"*" switch-laptop|"*" deploy") ;;
+    "mac-mini:"*" deploy macbook-air-tailscale macbook-air|"*" switch") ;;
+    *) fail "$host switch aliases: $aliases";;
+  esac
 done
 echo "agent-machine: all checks passed"
