@@ -137,6 +137,16 @@ in
           }
         ];
       }
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${hooksDir}/machine-context.py";
+            timeout = 10;
+            statusMessage = "Loading this machine's capability sheet";
+          }
+        ];
+      }
     ];
 
     hooks.PermissionRequest = [
