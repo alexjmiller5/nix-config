@@ -524,6 +524,22 @@ in
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    herdr-mini-machine = {
+      title = "Herdr saved machine: the mini";
+      owner = "herdr";
+      body = ''
+        Once, from a laptop terminal: `herdr machine add mac-mini-tailscale --label Mini`.
+        Herdr starts the mini's server over ssh (keep it that way: an ssh-spawned
+        server inherits the mini's `sshd-keygen-wrapper` TCC grants; a launchd
+        server would not) and saves the profile in its client state. The sidebar
+        then shows Local and Mini; agents on the mini report state and get the
+        mini's capability sheet. After a mini reboot, if the Mini row shows
+        Attention, run `herdr --remote mac-mini-tailscale` once and restart the
+        client. Image handoff into a mini pane is ctrl+v (clipboard image), not
+        drag-and-drop.
+      '';
+      verify = "herdr machine list --json | jq -e 'any(.[]; .label == \"Mini\")' >/dev/null";
+    };
     menu-bar-order = {
       title = "Third-party menu bar icon order";
       owner = "menu-bar";
