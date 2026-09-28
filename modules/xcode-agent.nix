@@ -10,6 +10,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -58,7 +59,8 @@ in
           over Screen Sharing. `masApps` installs Xcode on the next switch
           (about 12 GB; the download runs inside the switch).
         '';
-        verify = "mas account >/dev/null";
+        # `mas` is on nix-darwin's brew-bundle PATH, not on the user's.
+        verify = "${pkgs.mas}/bin/mas account >/dev/null";
       };
 
       xcode-first-launch = {
