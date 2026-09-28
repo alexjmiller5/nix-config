@@ -50,16 +50,18 @@ in
 
     manual.steps = {
       app-store-signin = {
-        title = "Sign the machine into the App Store";
+        title = "Sign into the App Store and install Xcode from it";
         owner = "xcode-agent";
         desktop = true;
         body = ''
-          App Store app → Sign In with the owner's Apple ID (password + 2FA)
-          over Screen Sharing. `masApps` installs Xcode on the next switch
-          (about 12 GB; the download runs inside the switch).
+          Over Screen Sharing: App Store app → Sign In with the owner's Apple
+          ID (password + 2FA), then search Xcode → Get (about 12 GB). The
+          `masApps` entry owns it from then on (updates, zap protection), but
+          it cannot do the first install: App Store installs need root since
+          mas 4 and the switch runs `brew bundle` as the user with no tty, so
+          `mas install` fails with "sudo: a password is required" until the
+          app exists.
         '';
-        # mas 7 has no sign-in query any more; the sign-in is proven by its
-        # effect: masApps could install Xcode.
         verify = "test -d /Applications/Xcode.app";
       };
 
