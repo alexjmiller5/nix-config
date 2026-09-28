@@ -44,6 +44,11 @@
   # adopt it on first activation instead of erroring.
   nix-homebrew.autoMigrate = true;
 
+  # Remote Login: the mini's agent shells reach this laptop (one-off commands,
+  # Herdr agents on this machine) while it is awake. Apple's signed sshd is
+  # accepted by the firewall's built-in-software rule (modules/macos-defaults.nix).
+  services.openssh.enable = true;
+
   # Tailscale runs via the GUI app (tailscale-app cask below), unlike the
   # mini's headless tailscaled.
 
@@ -430,6 +435,23 @@
         still readable (the verify below); an EPERM means per-site capture is over - reassess then.
       '';
       verify = "ls \"$(getconf DARWIN_USER_DIR)com.apple.ScreenTimeAgent/Store/Library/com.apple.DeviceActivity/Cloud\" >/dev/null";
+    };
+    remote-login-agents = {
+      title = "Screen and hands for ssh-spawned agents";
+      owner = "openssh";
+      desktop = true;
+      body = ''
+        Every process the mini's agents spawn here over ssh is attributed by TCC
+        to `/usr/libexec/sshd-keygen-wrapper`. Grant that one binary: System
+        Settings → Privacy & Security → **Screen & System Audio Recording** →
+        \[+] → ⌘⇧G → `/usr/libexec/sshd-keygen-wrapper`, toggle on; same under
+        **Accessibility**. Then from the mini run
+        `ssh macbook-air-tailscale osascript -e 'tell application "System Events" to get name of every process'`
+        once and click **Allow** on the "sshd-keygen-wrapper wants to control
+        System Events" dialog on this screen. Refresh the TCC snapshot afterwards
+        (`just snapshot tcc`).
+      '';
+      verify = "ssh -o BatchMode=yes -o ConnectTimeout=5 macbook-air-tailscale 'screencapture -x -t jpg /tmp/tcc-probe.jpg && sips -g pixelWidth /tmp/tcc-probe.jpg | grep -q pixelWidth'";
     };
     tcc-grants = {
       title = "TCC grants";

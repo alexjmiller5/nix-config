@@ -6,8 +6,9 @@
 }:
 
 # User launchd agents (laptop): agent-config sync, claude-code updater, and
-# login items as RunAtLoad agents (no TCC prompts, fully declarative — the
-# System Settings login-item list should be emptied by hand, see MANUAL-macbook-air.md).
+# login items as RunAtLoad agents (no TCC prompts, fully declarative - the
+# System Settings login-item list stays empty; the login-items-empty manual
+# step below covers the one-time clear).
 let
   # Commit → pull --rebase → push for the agent-config working clone.
   # Robot commits are unsigned; remote sync uses the enrolled operator auth.
@@ -164,6 +165,8 @@ let
   };
 in
 {
+  imports = [ ../modules/manual-steps.nix ];
+
   launchd.agents = {
     agent-config-sync = {
       enable = true;
@@ -263,4 +266,18 @@ in
         "Spotify"
       ]
   );
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  manual.steps.login-items-empty = {
+    title = "Empty the System Settings login-item list";
+    owner = "agents";
+    desktop = true;
+    body = ''
+      Login items are declared here as RunAtLoad launchd agents, so the native
+      list (System Settings → General → Login Items & Extensions → Open at Login)
+      must be empty - remove anything an app installer added, or it launches twice.
+    '';
+    verify = "[ -z \"$(osascript -e 'tell application \"System Events\" to get the name of every login item')\" ]";
+  };
+
 }

@@ -43,4 +43,6 @@
   # Agent-shell key for the mini, served by agent-ssh-agent.nix's socket (the
   # private host block selects it under `Match ... exec` on AGENT_SHELL).
   home.file.".ssh/agent_mac_mini.pub".source = ../dotfiles/ssh/agent_mac_mini.pub;
+  # Agent-shell key for the laptop (mini agents reaching it), same mechanism.
+  home.file.".ssh/agent_macbook_air.pub".source = ../dotfiles/ssh/agent_macbook_air.pub;
 }

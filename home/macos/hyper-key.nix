@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.macos.hyperKey;
   ids = lib.splitString "-" cfg.keyboardKey;

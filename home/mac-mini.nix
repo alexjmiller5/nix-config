@@ -48,6 +48,7 @@ in
     shared-album-reminders.homeModules.default
     ./common.nix
     ./agent-machine.nix
+    ./agent-ssh-agent.nix
     ./ai-agent.nix
     ./claude-rc.nix
     ./dev-tools.nix
@@ -71,6 +72,13 @@ in
 
   # Capability sheet this machine's agent sessions load (home/agent-machine.nix).
   agentMachine.profile = lib.mkDefault "mini";
+
+  # Agent shells ssh to the laptop with a dedicated key held only in this
+  # agent's memory (home/agent-ssh-agent.nix). Item: "AI Agent MacBook Air SSH Key".
+  agentSshAgent = {
+    keyOpRefs = [ "op://4eeyrkqibibn7k4j6rz2fbzvxm/2tq2nia4zgchatdagar24eyg2e/private key" ];
+    tokenFile = "${config.home.homeDirectory}/.local/state/op/agent-sa-token";
+  };
 
   # The agent Chrome (hosts/mac-mini.nix services.agent-chrome) is local here:
   # chrome-control drives 127.0.0.1:9222 directly, no ssh forward.

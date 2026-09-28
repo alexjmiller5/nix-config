@@ -64,6 +64,18 @@ in
     tokenFile = "${config.home.homeDirectory}/.local/state/op/agent-sa-token";
   };
 
+  # Inbound ssh from the mini's agent shells: public half of
+  # "AI Agent MacBook Air SSH Key" (private half in the AI Agent vault, served
+  # on the mini by home/agent-ssh-agent.nix). A real file, not home.file -
+  # macOS sshd rejects an authorized_keys symlinked into /nix/store.
+  home.activation.installAuthorizedKeys = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    rm -f "$HOME/.ssh/authorized_keys"
+    echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJiXPWpPMs7jNtXA0yrD9DP5/zmc3GQ0WZq4o5ZYWgY ai-agent-macbook-air' > "$HOME/.ssh/authorized_keys"
+    chmod 600 "$HOME/.ssh/authorized_keys"
+  '';
+
   # Local trial on the laptop. The exported module remains opt-in on other
   # hosts; the mini keeps direct SA/desktop auth and needs no Docker runtime.
   opConnect = {
