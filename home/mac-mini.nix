@@ -84,6 +84,15 @@ in
     tokenFile = "${config.home.homeDirectory}/.local/state/op/agent-sa-token";
   };
 
+  # Local Connect for this machine's agent reads (home/op-connect.nix), its own
+  # server and token: routine reads never touch the account SA quota.
+  opConnect = {
+    enable = true;
+    vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
+    credentialsItemId = "5c5nayec7aqs6dai5l4amj725a";
+    tokenOpRef = "op://4eeyrkqibibn7k4j6rz2fbzvxm/uyrwaqz6v5k7z5py7d5u7fmp2u/credential";
+  };
+
   # The agent Chrome (hosts/mac-mini.nix services.agent-chrome) is local here:
   # chrome-control drives 127.0.0.1:9222 directly, no ssh forward.
   home.sessionVariables.CHROME_CONTROL_HOST = "local";
