@@ -16,5 +16,10 @@ for pair in macbook-air:macbook mac-mini:mini; do
   [ "$var" = "$profile" ] || fail "$host AGENT_MACHINE is $var"
   case "$dir" in */.config/agent-config/machines) ;; *) fail "$host sheetsDir is $dir";; esac
   case "$link" in *$profile.md) ;; *) fail "$host links $link";; esac
+  # Herdr panes and ssh commands are non-login shells: the variable must come
+  # from .zshenv (programs.zsh.envExtra), not only from login-time session vars.
+  envextra=$(nix eval --raw ".#darwinConfigurations.$host.config.home-manager.users" \
+    --apply "users: (builtins.head (builtins.attrValues users)).programs.zsh.envExtra")
+  case "$envextra" in *"export AGENT_MACHINE=$profile"*) ;; *) fail "$host .zshenv lacks AGENT_MACHINE";; esac
 done
 echo "agent-machine: all checks passed"

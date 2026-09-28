@@ -28,6 +28,9 @@ in
     xdg.configFile."agent-machine/AGENTS.md".source =
       config.lib.file.mkOutOfStoreSymlink "${cfg.sheetsDir}/${cfg.profile}.md";
     # For scripts that branch on the machine (hooks read the symlink instead).
+    # Session vars alone reach only login shells; Herdr panes and ssh commands
+    # are non-login, so .zshenv exports it too.
     home.sessionVariables.AGENT_MACHINE = cfg.profile;
+    programs.zsh.envExtra = lib.mkAfter "export AGENT_MACHINE=${cfg.profile}\n";
   };
 }
