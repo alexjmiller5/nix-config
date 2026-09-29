@@ -44,6 +44,8 @@ in
     args = [ "mcpbridge" ];
   };
 
+  # A store symlink inside the agent-config clone: its target changes on every
+  # rebuild, so agent-config's .gitignore lists it with the other plugin links.
   home.file.".config/agent-config/skills/apple".source = plugin;
 
   # `xcrun agent plugin path` materializes Apple's packaged plugin (skills in
