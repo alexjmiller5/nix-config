@@ -36,6 +36,27 @@ in
     # sign-in is the manual step below.
     homebrew.masApps.Xcode = 497799835;
 
+    # Activation runs as root, so Xcode's license and first-launch component
+    # install are codified here instead of a manual `sudo xcodebuild` step.
+    # preActivation runs before the Homebrew phase, which refuses to run at
+    # all while an installed Xcode's license is unaccepted (every switch used
+    # to die at "Homebrew bundle..." after the App Store install). Both
+    # xcodebuild checks exit 69 while pending and 0 once done.
+    system.activationScripts.preActivation.text = lib.mkAfter ''
+      if [ -d /Applications/Xcode.app ]; then
+        /usr/bin/xcode-select -p 2>/dev/null | /usr/bin/grep -q '^/Applications/Xcode.app/' \
+          || /usr/bin/xcode-select -s /Applications/Xcode.app/Contents/Developer
+        if ! /usr/bin/xcodebuild -license check >/dev/null 2>&1; then
+          echo "xcode-agent: accepting the Xcode license"
+          /usr/bin/xcodebuild -license accept
+        fi
+        if ! /usr/bin/xcodebuild -checkFirstLaunchStatus >/dev/null 2>&1; then
+          echo "xcode-agent: installing Xcode's first-launch components"
+          /usr/bin/xcodebuild -runFirstLaunch
+        fi
+      fi
+    '';
+
     # One-time root switch Apple documents as `sudo xcrun mcp-server enable`;
     # idempotent, and a no-op until Xcode 27 is the selected developer dir.
     system.activationScripts.postActivation.text = lib.mkAfter ''
@@ -65,24 +86,6 @@ in
         verify = "test -d /Applications/Xcode.app";
       };
 
-      xcode-first-launch = {
-        title = "Accept the Xcode license and install its components";
-        owner = "xcode-agent";
-        body = ''
-          Do this right after the App Store install: Homebrew refuses to run
-          at all while an installed Xcode's license is unaccepted, so every
-          later switch fails at "Homebrew bundle..." until it is. Over ssh
-          (admin password needed once):
-
-          ```bash
-          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-          sudo xcodebuild -license accept
-          xcodebuild -runFirstLaunch
-          ```
-        '';
-        verify = "xcodebuild -version 2>/dev/null | grep -q 'Xcode 27'";
-        redo = "after every major Xcode update";
-      };
 
       ios-simulator-runtime = {
         title = "Download the iOS simulator runtime";
