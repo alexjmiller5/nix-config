@@ -150,19 +150,25 @@ in
       };
 
       xcode-mcp-agent-grant = {
-        title = "Grant the coding agent access through Xcode's MCP server";
+        title = "Approve the coding agents in Xcode's MCP server";
         owner = "xcode-agent";
-        desktop = true;
         body = ''
-          The first Xcode MCP call from an agent (`xcrun mcpbridge`, declared
-          in home/apple-agent.nix) pops an approval sheet on this display.
-          Grant the `claude` binary - Xcode identifies an agent by its code
-          signature, so approve the agent itself, never a wrapper such as
-          `timeout` - for `~/Desktop/coding`, so every repo is covered and no
-          per-project prompt follows. Unsigned binaries only get 24-hour
-          grants.
+          Headless mode and the folder grant come from activation; approving
+          WHO may use them stays human. An agent's first workspace call is
+          refused and recorded; list and approve it (admin password, ssh with
+          a tty is enough):
+
+          ```bash
+          xcrun mcp-server status          # Pending approvals: agent <id>: <name> - signed <team> <identifier>
+          sudo xcrun mcp-server approve <id>
+          ```
+
+          Approval follows the code signature, so one approval of a signed
+          agent (Claude Code, Codex) covers every session and version; an
+          unsigned binary only gets 24 hours. Never approve a wrapper such
+          as `timeout` in the agent's place.
         '';
-        verify = "xcrun mcp-server status 2>/dev/null | grep -q 'Permission: enabled'";
+        verify = "xcrun mcp-server status 2>/dev/null | grep -q 'Permitted agents'";
       };
     };
   };
