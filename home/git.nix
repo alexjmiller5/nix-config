@@ -20,6 +20,17 @@
     # Ongoing GitHub HTTPS auth, including companion-repo sync, uses the
     # operator gh wrapper. Machine bootstrap never installs a Git helper.
     settings.credential."https://github.com".helper = lib.mkDefault "!gh auth git-credential";
+
+    # GitHub auth is the gh wrapper above, on every host and in every shell.
+    # SSH to github.com is not: the only authentication key on the account is
+    # served by the 1Password DESKTOP agent, which the headless mini does not
+    # run, so an ssh-form remote there fails "Permission denied (publickey)".
+    # Rewriting the transport keeps that true of a remote nobody curated - a
+    # fresh clone from an ssh URL included - without touching any remote.
+    settings.url."https://github.com/".insteadOf = [
+      "git@github.com:"
+      "ssh://git@github.com/"
+    ];
   };
 
   # Syntax-highlighted pager for git diff/log/show/blame

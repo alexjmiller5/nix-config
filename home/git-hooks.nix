@@ -7,7 +7,11 @@
 # of silently dropping it. The scan key is read from the AI Agent vault at
 # commit time through the same auth seams as op-wrappers.nix; with no auth
 # source at all the hook fails closed (`git commit --no-verify` is the escape
-# hatch for an offline commit). Shared by both hosts.
+# hatch for an offline commit). A flagged commit has one sanctioned exit,
+# printed by the hook itself: FALSE_POSITIVE="<what the value is>" passes
+# heuristic findings only, never a known credential format, and hands the
+# committer the follow-up (close the incident, archive the alert email).
+# Shared by both hosts.
 let
   ggshield = pkgs.ggshield.overridePythonAttrs (old: {
     # Windows-only path test; it asserts on a mock call count and fails on darwin.

@@ -28,6 +28,7 @@
   services.xcode-agent = {
     enable = true;
     user = username;
+    allowedFolders = [ "/Users/${username}/Desktop/coding" ];
   };
 
   # Headless tailscaled (no GUI app). One-time join after first switch:

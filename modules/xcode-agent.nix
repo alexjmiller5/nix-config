@@ -29,6 +29,13 @@ in
       type = lib.types.str;
       description = "Login user whose keychain, Xcode account and agent sessions this serves.";
     };
+
+    allowedFolders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "/Users/me/code" ];
+      description = "Folders (with their subfolders) headless Xcode may serve workspaces from, granted at activation so no per-project prompt appears.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -62,8 +69,19 @@ in
     system.activationScripts.postActivation.text = lib.mkAfter ''
       ${xcodeMajor}
       if [ "$(xcode_major)" -ge 27 ]; then
-        /usr/bin/xcrun mcp-server enable >/dev/null 2>&1 \
-          || echo "xcode-agent: xcrun mcp-server enable failed (run it by hand)"
+        # mcp-server refuses plain root: it records WHICH user the headless
+        # server belongs to from sudo's variables, so supply them.
+        mcp_server() {
+          SUDO_USER=${lib.escapeShellArg cfg.user} \
+          SUDO_UID=$(/usr/bin/id -u ${lib.escapeShellArg cfg.user}) \
+          SUDO_GID=$(/usr/bin/id -g ${lib.escapeShellArg cfg.user}) \
+            /usr/bin/xcrun mcp-server "$@" 2>&1 | /usr/bin/sed "s/^/xcode-agent: $1: /" || true
+        }
+        mcp_server enable
+        ${lib.concatMapStringsSep "\n" (
+          f: "mcp_server allow-folder --always ${lib.escapeShellArg f}"
+        ) cfg.allowedFolders}
+        mcp_server status
       else
         echo "xcode-agent: Xcode 27 not installed yet, skipping mcp-server enable"
       fi
@@ -85,7 +103,6 @@ in
         '';
         verify = "test -d /Applications/Xcode.app";
       };
-
 
       ios-simulator-runtime = {
         title = "Download the iOS simulator runtime";
@@ -145,7 +162,7 @@ in
           per-project prompt follows. Unsigned binaries only get 24-hour
           grants.
         '';
-        verify = "xcrun mcp-server status 2>/dev/null | grep -qi running";
+        verify = "xcrun mcp-server status 2>/dev/null | grep -q 'Permission: enabled'";
       };
     };
   };
