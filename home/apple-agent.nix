@@ -1,7 +1,7 @@
 # Agents on an Xcode 27 host: Apple's Xcode MCP server (`xcrun mcpbridge`,
 # reached through the headless `xcrun mcp-server` daemon that
-# modules/xcode-agent.nix enables) and Apple's own agent skills, served from
-# the export a human step produces (below).
+# modules/xcode-agent.nix enables) and Apple's own agent skills, materialized
+# from the installed Xcode at every switch.
 #
 # Import this only where Xcode 27 lives. On Xcode 26.x `mcpbridge` needs a
 # windowed Xcode and there is no `xcrun agent`, so the laptop (Xcode 26.3
@@ -18,10 +18,11 @@ let
   manifest = {
     name = "apple";
     version = "1.0.0";
-    description = "Apple's Xcode agent skills, exported from the installed Xcode";
+    description = "Apple's Xcode agent skills, materialized from the installed Xcode";
   };
   # Same shape as home/mcp.nix: a plugin dir Claude/Codex auto-load from the
-  # shared skills dir as `apple@skills-dir`; `skills` points at the export.
+  # shared skills dir as `apple@skills-dir`; `skills` is a state symlink that
+  # activation points at the materialized plugin.
   plugin = pkgs.linkFarm "apple-skills-plugin" [
     {
       name = ".claude-plugin/plugin.json";
@@ -38,8 +39,6 @@ let
   ];
 in
 {
-  imports = [ ../modules/manual-steps.nix ];
-
   programs.mcp.servers.xcode = {
     command = "xcrun";
     args = [ "mcpbridge" ];
@@ -47,26 +46,29 @@ in
 
   home.file.".config/agent-config/skills/apple".source = plugin;
 
-  # The export is a human step: `xcrun agent skills export` runs inside a
-  # windowed Xcode on an unlocked desktop. From activation it hung at the
-  # lock screen and left that Xcode running, and a running windowed Xcode
-  # shadows the headless server: every MCP call then waits forever.
-  manual.steps.apple-skills-export = {
-    title = "Export Apple's agent skills from Xcode";
-    owner = "xcode-agent";
-    desktop = true;
-    body = ''
-      From a terminal on the unlocked desktop (Screen Sharing):
-
-      ```bash
-      xcrun agent skills export --output-dir ${skillsDir} --replace-existing
-      osascript -e 'tell application "Xcode" to quit'
-      ```
-
-      Quit Xcode afterwards: while a windowed Xcode runs, `xcrun mcpbridge`
-      talks to it instead of the headless server and agents hang.
-    '';
-    verify = "test -f ${skillsDir}/swiftui-specialist/SKILL.md";
-    redo = "after every major Xcode update";
-  };
+  # `xcrun agent plugin path` materializes Apple's packaged plugin (skills in
+  # the open Agent Skills format) under ~/Library/Developer/Xcode, keyed by
+  # the Xcode build, without launching Xcode. Re-pointing the state symlink
+  # at every switch keeps the skills in step with the installed Xcode.
+  # Never `xcrun agent skills export` here: it launches a windowed Xcode,
+  # which hangs on a locked display and shadows the headless MCP server.
+  # ponytail: the Claude format serves both agents through the shared skills
+  # dir (three skills differ slightly in the Codex format); materialize the
+  # codex format into programs.codex.plugins if that ever matters.
+  home.activation.linkAppleSkills = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    major=$(/usr/bin/xcodebuild -version 2>/dev/null | /usr/bin/awk 'NR==1{split($2,v,"."); print v[1]+0}')
+    if [ "''${major:-0}" -ge 27 ]; then
+      if plugin=$(${pkgs.coreutils}/bin/timeout 60 /usr/bin/xcrun agent plugin path --plugin-format claude 2>/dev/null) \
+        && [ -d "$plugin/skills" ]; then
+        [ -d ${lib.escapeShellArg skillsDir} ] && [ ! -L ${lib.escapeShellArg skillsDir} ] \
+          && /bin/rmdir ${lib.escapeShellArg skillsDir} 2>/dev/null || true
+        /bin/mkdir -p "$(/usr/bin/dirname ${lib.escapeShellArg skillsDir})"
+        /bin/ln -sfn "$plugin/skills" ${lib.escapeShellArg skillsDir}
+      else
+        echo "apple-agent: xcrun agent plugin path failed; Apple's skills keep their previous version"
+      fi
+    else
+      echo "apple-agent: Xcode 27 not installed, skipping Apple's skills"
+    fi
+  '';
 }
