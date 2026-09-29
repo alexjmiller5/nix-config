@@ -50,8 +50,10 @@ in
     major=$(/usr/bin/xcodebuild -version 2>/dev/null | /usr/bin/awk 'NR==1{split($2,v,"."); print v[1]+0}')
     if [ "''${major:-0}" -ge 27 ]; then
       /bin/mkdir -p ${lib.escapeShellArg skillsDir}
-      if ! /usr/bin/xcrun agent skills export --output-dir ${lib.escapeShellArg skillsDir} >/dev/null 2>&1; then
-        echo "apple-agent: xcrun agent skills export failed; run it by hand (see MANUAL)"
+      # Bounded: on a host where mcpbridge waits for an Xcode approval the export
+      # would otherwise hang the whole switch.
+      if ! ${pkgs.coreutils}/bin/timeout 120 /usr/bin/xcrun agent skills export --output-dir ${lib.escapeShellArg skillsDir} >/dev/null 2>&1; then
+        echo "apple-agent: xcrun agent skills export failed or timed out; run it by hand (see MANUAL)"
       fi
     else
       echo "apple-agent: Xcode 27 not installed, skipping skills export"
