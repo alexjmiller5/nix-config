@@ -6,9 +6,8 @@
 # replaces .git/hooks wholesale, so the script chains a repo's own hook instead
 # of silently dropping it. The scan key is read from the AI Agent vault at
 # commit time through the same auth seams as op-wrappers.nix; with no auth
-# source at all the hook fails closed. Agents cannot switch it off: the
-# git-hook-bypass PreToolUse guard in agent-config denies the flags that
-# would. Shared by both hosts.
+# source at all the hook fails closed (`git commit --no-verify` is the escape
+# hatch for an offline commit). Shared by both hosts.
 let
   ggshield = pkgs.ggshield.overridePythonAttrs (old: {
     # Windows-only path test; it asserts on a mock call count and fails on darwin.

@@ -29,8 +29,7 @@ routing table and workflow; this file is the in-repo map.
   `git-signing.nix` (shared signing settings, `.agents/skills` signer),
   `git-hooks.nix` (global `core.hooksPath` pre-commit: ggshield scans every
   staged change with GitGuardian's detectors using the AI Agent vault scan
-  key read at commit time; fails closed without auth (agent-config's
-  `git-hook-bypass` PreToolUse guard denies agents the skip flags), chains a repo's own
+  key read at commit time; fails closed without auth, chains a repo's own
   `.git/hooks/pre-commit`; body in `git-pre-commit.sh`, test in
   `tests/git-hooks.sh`),
   `mcp.nix` (one `programs.mcp.servers` registry generates the native MCP
