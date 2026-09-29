@@ -8,7 +8,7 @@ if [ -z "${GITGUARDIAN_API_KEY:-}" ] && op_has_auth; then
   export GITGUARDIAN_API_KEY
 fi
 if [ -z "${GITGUARDIAN_API_KEY:-}" ]; then
-  echo "pre-commit: no GitGuardian credential reachable - refusing to commit unscanned changes (git commit --no-verify to bypass)" >&2
+  echo "pre-commit: no GitGuardian credential reachable - refusing to commit unscanned changes. Restore 1Password auth and commit again; skipping this scan is the user's call, never an agent's" >&2
   exit 1
 fi
 ggshield secret scan pre-commit --no-check-for-updates "$@"
