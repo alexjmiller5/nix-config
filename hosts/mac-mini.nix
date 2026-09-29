@@ -29,6 +29,17 @@
     enable = true;
     user = username;
     allowedFolders = [ "/Users/${username}/Desktop/coding" ];
+    # `codesign -dv <binary>` prints both values.
+    approvedAgents = [
+      {
+        team = "Q6L2SF6YDW";
+        identifier = "com.anthropic.claude-code";
+      }
+      {
+        team = "2DC432GLL2";
+        identifier = "codex";
+      }
+    ];
   };
 
   # Headless tailscaled (no GUI app). One-time join after first switch:

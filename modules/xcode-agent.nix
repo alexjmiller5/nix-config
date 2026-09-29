@@ -10,6 +10,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
@@ -20,6 +21,30 @@ let
       /usr/bin/xcodebuild -version 2>/dev/null | /usr/bin/awk 'NR==1{split($2,v,"."); print v[1]+0}'
     }
   '';
+  # Approves the PENDING agent requests whose code signature is declared in
+  # `approvedAgents`, and nothing else: no arguments, so a caller cannot
+  # approve an id of its choosing. Xcode records a request when an agent's
+  # first workspace call is refused; run this, then the agent retries.
+  approve = pkgs.writeShellScriptBin "xcode-agent-approve" ''
+    set -euo pipefail
+    [ "$(/usr/bin/id -u)" -eq 0 ] || { echo "xcode-agent-approve: run with sudo" >&2; exit 1; }
+    # mcp-server records which user the headless server belongs to from
+    # sudo's variables; activation runs as plain root, so supply them.
+    export SUDO_USER="''${SUDO_USER:-${cfg.user}}"
+    export SUDO_UID="''${SUDO_UID:-$(/usr/bin/id -u ${lib.escapeShellArg cfg.user})}"
+    export SUDO_GID="''${SUDO_GID:-$(/usr/bin/id -g ${lib.escapeShellArg cfg.user})}"
+    trusted=${lib.escapeShellArg (builtins.toJSON cfg.approvedAgents)}
+    ids=$(/usr/bin/xcrun mcp-server status --format json 2>/dev/null \
+      | ${pkgs.jq}/bin/jq -r --argjson trusted "$trusted" '
+          .permission.pendingAgentApprovals[]?
+          | (.subject.agent._0.trust.signed // empty) as $s
+          | select(any($trusted[]; .team == $s.teamIdentifier and .identifier == $s.signingIdentifier))
+          | .id' || true)
+    [ -n "$ids" ] || { echo "xcode-agent-approve: no pending request from a declared agent"; exit 0; }
+    for id in $ids; do
+      /usr/bin/xcrun mcp-server approve --always "$id" 2>&1 | /usr/bin/sed 's/^/xcode-agent-approve: /'
+    done
+  '';
 in
 {
   options.services.xcode-agent = {
@@ -28,6 +53,31 @@ in
     user = lib.mkOption {
       type = lib.types.str;
       description = "Login user whose keychain, Xcode account and agent sessions this serves.";
+    };
+
+    approvedAgents = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            team = lib.mkOption {
+              type = lib.types.str;
+              description = "Apple team identifier the agent binary is signed by.";
+            };
+            identifier = lib.mkOption {
+              type = lib.types.str;
+              description = "Code-signing identifier of the agent binary.";
+            };
+          };
+        }
+      );
+      default = [ ];
+      example = [
+        {
+          team = "Q6L2SF6YDW";
+          identifier = "com.anthropic.claude-code";
+        }
+      ];
+      description = "Code signatures trusted to use Xcode's MCP server. Their pending requests are approved (durably) at activation and by `sudo xcode-agent-approve`, which the user may run without a password.";
     };
 
     allowedFolders = lib.mkOption {
@@ -81,10 +131,18 @@ in
         ${lib.concatMapStringsSep "\n" (
           f: "mcp_server allow-folder --always ${lib.escapeShellArg f}"
         ) cfg.allowedFolders}
+        ${lib.optionalString (cfg.approvedAgents != [ ]) "${approve}/bin/xcode-agent-approve || true"}
         mcp_server status
       else
         echo "xcode-agent: Xcode 27 not installed yet, skipping mcp-server enable"
       fi
+    '';
+
+    # The sanctioned exit for an agent whose first call was refused: approve
+    # declared signatures only, no password, no switch.
+    environment.systemPackages = lib.mkIf (cfg.approvedAgents != [ ]) [ approve ];
+    security.sudo.extraConfig = lib.mkIf (cfg.approvedAgents != [ ]) ''
+      ${cfg.user} ALL=(root) NOPASSWD: /run/current-system/sw/bin/xcode-agent-approve
     '';
 
     manual.steps = {
@@ -150,25 +208,23 @@ in
       };
 
       xcode-mcp-agent-grant = {
-        title = "Approve the coding agents in Xcode's MCP server";
+        title = "Approve an agent that is not declared in approvedAgents";
         owner = "xcode-agent";
         body = ''
-          Headless mode and the folder grant come from activation; approving
-          WHO may use them stays human. An agent's first workspace call is
-          refused and recorded; list and approve it (admin password, ssh with
-          a tty is enough):
+          Declared signatures (`services.xcode-agent.approvedAgents`) need no
+          human: an agent whose first workspace call was refused runs `sudo
+          xcode-agent-approve` (passwordless) and retries. Anything else -
+          an unsigned binary, a new agent - is approved by hand, or added to
+          the option:
 
           ```bash
           xcrun mcp-server status          # Pending approvals: agent <id>: <name> - signed <team> <identifier>
-          sudo xcrun mcp-server approve <id>
+          sudo xcrun mcp-server approve --always <id>
           ```
 
-          Approval follows the code signature, so one approval of a signed
-          agent (Claude Code, Codex) covers every session and version; an
-          unsigned binary only gets 24 hours. Never approve a wrapper such
+          Unsigned binaries only get 24 hours. Never approve a wrapper such
           as `timeout` in the agent's place.
         '';
-        verify = "xcrun mcp-server status 2>/dev/null | grep -q 'Permitted agents'";
       };
     };
   };
