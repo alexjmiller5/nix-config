@@ -46,7 +46,17 @@ in
     ./agents.nix
     ./ssh.nix
     ./agent-ssh-agent.nix
+    ./herdr-takeover.nix
   ];
+
+  # The mini's Claude sessions are mirrored here every minute; `herdr-takeover`
+  # resumes them in this Herdr while the mini is down (home/herdr-takeover.nix).
+  # AGENT_SHELL selects the unattended agent ssh identity for the mini (ssh.nix).
+  herdrTakeover = {
+    enable = true;
+    host = "mac-mini-tailscale";
+    environment.AGENT_SHELL = "herdr-takeover";
+  };
 
   # Desktop preferences are useful on the laptop; the headless mini consumes
   # only the shared Finder baseline from common.nix.

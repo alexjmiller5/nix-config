@@ -140,7 +140,7 @@ in
       serviceAccountTokenFile = lib.mkDefault cfg.serviceAccountTokenFile;
       connect = {
         inherit (cfg) vaultId stateDirectory serviceAccountTokenFile;
-        helper = toString ../scripts/op-connect.py;
+        helper = "${../scripts/op-connect.py}";
         host = "http://127.0.0.1:${toString cfg.port}";
       };
     };

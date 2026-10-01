@@ -98,6 +98,13 @@ routing table and workflow; this file is the in-repo map.
   write their own 2-3 word task names without separate model calls.
   The packaged `herdr.auto-title.start` action can start it in a live server;
   check plugin logs first to avoid starting a duplicate),
+  `herdr-takeover.nix` (laptop: a launchd job mirrors the mini's
+  `~/.claude/projects` transcripts and Herdr `session.json` every minute over
+  the unattended agent ssh identity; `herdr-takeover [--dry-run]` recreates
+  every mirrored Claude tab in the laptop's Herdr with `claude --resume` while
+  the mini is down - the mini resumes the same sessions when it returns, so
+  one fork gets closed by hand; script in `scripts/herdr-takeover.py`, test in
+  `tests/herdr-takeover.py`),
   `agents.nix` (launchd: companion-repo sync (agent-config + agent-config-public), weekly updates, login items;
   both hosts' repo-sync jobs set `AGENT_SHELL=repo-sync` so the gh wrapper
   uses the independently enrolled AI Agent token without shell startup; the

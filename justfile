@@ -48,6 +48,7 @@ check:
     bash tests/posthog-auth.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
+    python3 tests/herdr-takeover.py
 
 # Render MANUAL-<host>.md from the declared manual.steps; rewrites only when the body changed
 manual:

@@ -204,6 +204,7 @@
         apple-agent = ./home/apple-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         herdr = ./home/herdr.nix;
+        herdr-takeover = ./home/herdr-takeover.nix;
         agent-config-links = ./home/agent-config-links.nix;
         mcp = ./home/mcp.nix;
         # claude-plugins needs the consumer to pass claude-plugins-official,
