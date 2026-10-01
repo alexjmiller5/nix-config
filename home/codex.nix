@@ -195,4 +195,20 @@ in
       }
     ];
   };
+
+  # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
+  manual.steps.codex-login = {
+    title = "Sign into Codex";
+    owner = "codex";
+    body = ''
+      `codex login` (the ChatGPT-subscription seat), run in the kind of session
+      Codex will use: on a headless Mac, `codex login --device-auth` in an agent
+      pane over ssh. `cli_auth_credentials_store = "auto"` stores it in the login
+      Keychain where the session can reach it, else in Codex's own 0600
+      `~/.codex/auth.json` (ssh-descended sessions see the Keychain as locked).
+      Neither the operator token nor a Nix rebuild recreates it, and it is never
+      copied into 1Password (the 1password skill says why).
+    '';
+    verify = "codex login status";
+  };
 }

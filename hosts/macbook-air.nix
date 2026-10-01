@@ -236,15 +236,6 @@
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
-    codex-login = {
-      title = "Sign into Codex";
-      owner = "codex";
-      body = ''
-        `codex login` (the ChatGPT-subscription seat). Its auth lives in the login Keychain
-        (`cli_auth_credentials_store = "keyring"`); neither the operator token nor a Nix rebuild recreates it.
-      '';
-      verify = "codex login status";
-    };
     claude-in-chrome-login = {
       title = "Sign into Claude in Chrome";
       owner = "claude-in-chrome";
