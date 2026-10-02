@@ -46,6 +46,12 @@
   #   sudo tailscale up --auth-key=<oauth-minted key, tag:oauth-generated> --hostname=mac-mini
   services.tailscale.enable = true;
 
+  # Wi-Fi is this box's only uplink and sometimes degrades to near-total
+  # packet loss while staying associated; the watchdog power-cycles it
+  # (modules/wifi-watchdog.nix). Mini only: on the laptop, captive portals
+  # and travel networks would trip it.
+  services.wifi-watchdog.enable = true;
+
   # trusted = true feeds Homebrew's tap-trust store at activation.
   homebrew.taps = [
     {

@@ -143,7 +143,10 @@ routing table and workflow; this file is the in-repo map.
   and launch-context access are ready
 * `modules/` — darwin modules: `darwin-base.nix` + `macos-defaults.nix`
   (both injected for every host by mkHost), `chrome-policy.nix` (declared
-  extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import)
+  extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import),
+  `wifi-watchdog.nix` (root daemon power-cycling Wi-Fi when the gateway
+  answers <15/20 pings over it; enabled on the mini only; logs to
+  `/var/log/wifi-watchdog.log`; test `tests/wifi-watchdog.sh`)
 * `snapshots/<host>/` - committed read-only captures of state nix cannot own
   (TCC grants, Chrome UI prefs); `scripts/capture-snapshot` produces them,
   `just snapshot <name> [host]` refreshes one, and the matching `snapshot`

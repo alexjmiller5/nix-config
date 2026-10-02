@@ -49,6 +49,7 @@ check:
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
     python3 tests/herdr-takeover.py
+    bash tests/wifi-watchdog.sh
 
 # Render MANUAL-<host>.md from the declared manual.steps; rewrites only when the body changed
 manual:
