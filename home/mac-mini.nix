@@ -63,11 +63,21 @@ in
     ./aliases/infra.nix
     ./ssh.nix
     ./spotify-player.nix
+    # Headless: no idle screen saver, so the desktop agents drive never locks.
+    ./macos/screensaver.nix
+    ./heartbeat.nix
   ];
 
   # Apple-bound daily job belongs only on the mini. The task writer awaits
   # the migrated Life task catalog, so importing its module creates no job.
   services.shared-album-reminders.enable = false;
+
+  # healthchecks.io check "mac-mini" (account: the primary Gmail, API key in
+  # the AI Agent vault) emails when these pings stop for 5 minutes.
+  services.heartbeat = {
+    enable = true;
+    urlFile = "${config.home.homeDirectory}/.config/nix-secrets/heartbeat/mac-mini";
+  };
 
   # No 1P desktop app here — outbound ssh uses the default agent socket
   # (SSH_AUTH_SOCK), so a laptop agent forwarded over `ssh -A` serves the

@@ -119,8 +119,13 @@ routing table and workflow; this file is the in-repo map.
   Nix never populates or refreshes this file. Claude/Codex subscription login
   remains native app state, separate from operator tool credentials.
   Host-layer sibling = `claude-code` + `notion-cli` casks),
-  `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs}.nix`
-  (activation-script defaults by concern, each exported via `homeModules`),
+  `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs,screensaver}.nix`
+  (activation-script defaults by concern, each exported via `homeModules`;
+  `screensaver.nix` keeps the idle screen saver, and so the idle lock, off
+  and is imported only on the headless mini),
+  `heartbeat.nix` (`services.heartbeat`: a launchd ping to a dead-man's-switch
+  URL read from a file; the mini pings its healthchecks.io check from
+  nix-secrets `heartbeat/mac-mini`),
   `macos/finder.nix` owns the shared Finder baseline and nested list defaults.
   Window controls are implemented by Hammerspoon; the exported
   `macos-window-management` module declares native Control-arrow navigation

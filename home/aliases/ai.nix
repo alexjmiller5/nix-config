@@ -1,13 +1,14 @@
 # AI agent / Claude Code aliases. The op-* scripts resolve through
 # ~/.claude/skills (a symlink into the agent-config repo).
-{ config, lib, ... }:
+{ ... }:
 
 {
   programs.zsh.shellAliases = {
     cdx = "codex";
-    # The herdr function (home/zsh/functions.zsh) opens the window and closes
-    # the tab it was typed in, so hdr routes through it rather than the wrapper.
-    hdr = lib.mkIf config.programs.ghostty.enable "herdr";
+    # The herdr function (home/zsh/functions.zsh) opens the Ghostty window and
+    # closes the tab where Ghostty exists, and attaches in place elsewhere (an
+    # ssh/Moshi shell on the mini), so hdr routes through it on every host.
+    hdr = "herdr";
     # Claude's default model lives in agent-config's claude/settings.json.
     cc = "claude";
     claude-max = "claude --effort max";

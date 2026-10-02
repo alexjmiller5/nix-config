@@ -14,8 +14,8 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 
 ## Herdr in Ghostty
 
-Run `hdr` (an alias for `herdr-window`) from a project directory to open a dedicated Ghostty
-window. Hammerspoon (`herdrHotkeys.lua`) gives that window macOS-style shortcuts,
+Run `hdr` (the `herdr` shell function) from a project directory to open a dedicated Ghostty
+window; in an ssh or Moshi shell on the mini it attaches to Herdr in place. Hammerspoon (`herdrHotkeys.lua`) gives that window macOS-style shortcuts,
 typing Herdr's ctrl+b prefix for each one:
 
 | Shortcut | Action |

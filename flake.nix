@@ -232,6 +232,8 @@
         macos-nightlight = ./home/macos/nightlight.nix;
         macos-chrome-remote-debugging = ./home/macos/chrome-remote-debugging.nix;
         macos-notification-prefs = ./home/macos/notification-prefs.nix;
+        macos-screensaver = ./home/macos/screensaver.nix;
+        heartbeat = ./home/heartbeat.nix;
       };
     };
 }
