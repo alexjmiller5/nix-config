@@ -68,6 +68,13 @@ in
     ./heartbeat.nix
   ];
 
+  # Continuous archival runs only on the always-on mini. The laptop does not
+  # run a second consumer. Runtime enrollment precedes service activation.
+  programs.page-archiver = {
+    enable = true;
+    service.enable = false;
+  };
+
   # Apple-bound daily job belongs only on the mini. The task writer awaits
   # the migrated Life task catalog, so importing its module creates no job.
   services.shared-album-reminders.enable = false;
