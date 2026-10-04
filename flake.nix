@@ -59,7 +59,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     page-archiver = {
-      url = "github:alexjmiller5/page-archiver/feat/durable-runner";
+      url = "github:alexjmiller5/page-archiver";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Shared album reminder module, imported only by the mini profile.

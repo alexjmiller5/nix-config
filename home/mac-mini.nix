@@ -69,10 +69,20 @@ in
   ];
 
   # Continuous archival runs only on the always-on mini. The laptop does not
-  # run a second consumer. Runtime enrollment precedes service activation.
+  # run a second consumer; the app's dedicated credential lives in Keychain.
   programs.page-archiver = {
     enable = true;
-    service.enable = false;
+    service.enable = true;
+    settings = {
+      hub_url = "https://life-data.nqipomyrjb.workers.dev";
+      subscription_id = "1521a54f-65ac-47d1-832d-1a4d5959dd66";
+      capture_table = "page_captures";
+      artifact_prefix = "captures/pages/";
+      credential_command = [
+        "/usr/bin/security" "find-generic-password"
+        "-s" "page-archiver.hub" "-a" "4947e554-dd02-4d66-9046-3cbc1a4b3a67" "-w"
+      ];
+    };
   };
 
   # Apple-bound daily job belongs only on the mini. The task writer awaits

@@ -322,16 +322,15 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1791055459,
+        "lastModified": 1791133672,
         "narHash": "sha256-s+3nl6SXOG3Pi0wIbdesi777IvJvPUYBUsXRmqy6++E=",
         "owner": "alexjmiller5",
         "repo": "page-archiver",
-        "rev": "159d2e730aba4acecae28b7ac767f60fbbcf8849",
+        "rev": "810a92c6a6d5482e9e7ba9e4623a251a18836655",
         "type": "github"
       },
       "original": {
         "owner": "alexjmiller5",
-        "ref": "feat/durable-runner",
         "repo": "page-archiver",
         "type": "github"
       }
