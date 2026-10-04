@@ -140,7 +140,11 @@ routing table and workflow; this file is the in-repo map.
   functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`. The mini alone imports
   Shared Album Reminders; it stays disabled until its Life task integration
-  and launch-context access are ready
+  and launch-context access are ready. Page Archiver is enabled only on the
+  mini; its background service uses a dedicated hub subscription and a
+  consumer credential in the login Keychain through Apple security. Enrollment
+  uses the mini desktop session; SSH shells cannot access its Keychain. The
+  laptop runs no second consumer
 * `modules/` — darwin modules: `darwin-base.nix` + `macos-defaults.nix`
   (both injected for every host by mkHost), `chrome-policy.nix` (declared
   extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import),
