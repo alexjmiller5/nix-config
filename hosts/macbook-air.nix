@@ -207,6 +207,7 @@
       "alexjmiller5/tap/receptor"
       # From alexjmiller5/tap — Offline Shazam's Mac app, released by its CI.
       "alexjmiller5/tap/offline-shazam"
+      "alexjmiller5/tap/life-ui"
       "repobar"
       "slack"
       "spotify"
