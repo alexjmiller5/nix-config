@@ -78,6 +78,7 @@ in
       subscription_id = "1521a54f-65ac-47d1-832d-1a4d5959dd66";
       capture_table = "page_captures";
       artifact_prefix = "captures/pages/";
+      max_artifact_bytes = 128 * 1024 * 1024;
       credential_command = [
         "/usr/bin/security" "find-generic-password"
         "-s" "page-archiver.hub" "-a" "4947e554-dd02-4d66-9046-3cbc1a4b3a67" "-w"
