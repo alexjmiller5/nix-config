@@ -330,12 +330,13 @@
       desktop = true;
       body = ''
         Load-unpacked extensions - Developer mode ON, then Load
-        unpacked for each: bypass-paywalls et al from
-        `~/Desktop/coding/built-from-source`, and own `chrome-extension`-template
-        projects from their repo's `extension/` dir (upcoming:
-        bookmark-extension-sync). NOTE the default-deny policy blocks Load-unpacked
+        unpacked for each from its installed package. Bookmark Mirror is at
+        `~/.local/share/bookmark-mirror`; enter the hub endpoint and a dedicated
+        bookmark-scoped credential in its Settings on each new browser profile.
+        Never load a daily-use extension from a development checkout.
+        NOTE the default-deny policy blocks Load-unpacked
         wholesale - loading a new unpacked extension needs the AIRLOCK (lockdown
-        flag) in `hosts/macbook-air.nix`, and its path-derived ID needs an
+        flag) in `hosts/macbook-air-chrome-policy.nix`, and its extension ID needs an
         `allowed` entry to stay alive once re-locked (both documented at the flag).
         Store extensions and PWAs need NO manual steps -
         installed by the Chrome policy plist (`ExtensionSettings` +

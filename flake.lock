@@ -33,11 +33,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791221015,
-        "narHash": "sha256-uVWZTPmbKULXj5Pz72pqG1LWFiat6x73FsgRh2vUcMk=",
+        "lastModified": 1791223292,
+        "narHash": "sha256-+uq0f5Zjl6Cac/VmBqR4MsXm8fpCZ2Uug6bHRut+xgo=",
         "owner": "alexjmiller5",
         "repo": "bookmark-mirror",
-        "rev": "f331ebf2c07439a28944caa41135f954da2cbe8c",
+        "rev": "fbe49e3b12bcf34b33bf1bb6c2f8d852ca1f2791",
         "type": "github"
       },
       "original": {
