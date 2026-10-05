@@ -148,6 +148,9 @@ routing table and workflow; this file is the in-repo map.
 * `modules/` — darwin modules: `darwin-base.nix` + `macos-defaults.nix`
   (both injected for every host by mkHost), `chrome-policy.nix` (declared
   extension set + PWAs, laptop-only import), `notunes.nix` (laptop-only import),
+  `xcode-agent.nix` (Xcode build host setup, headless MCP grants and Apple's
+  bundled WWDR public intermediates in the System keychain; private signing
+  material belongs to disposable build keychains, not Nix activation),
   `wifi-watchdog.nix` (root daemon power-cycling Wi-Fi when the gateway
   answers <15/20 pings over it; enabled on the mini only; logs to
   `/var/log/wifi-watchdog.log`; test `tests/wifi-watchdog.sh`)

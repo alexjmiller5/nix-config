@@ -111,6 +111,21 @@ in
           echo "xcode-agent: installing Xcode's first-launch components"
           /usr/bin/xcodebuild -runFirstLaunch
         fi
+        # SSH's dynamic search list can contain only the System keychain.
+        # codesign must find the issuer there even when its private key is
+        # in an explicitly unlocked temporary keychain. Import Apple's
+        # bundled public intermediates, preserving the system trust policy.
+        resources=/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources
+        for certificate in "$resources"/AppleWWDR*.cer; do
+          [ -f "$certificate" ] || continue
+          fingerprint=$(/usr/bin/openssl x509 -inform DER -in "$certificate" -noout -fingerprint -sha1 \
+            | /usr/bin/sed 's/.*=//; s/://g')
+          if ! /usr/bin/security find-certificate -a -Z /Library/Keychains/System.keychain \
+            | /usr/bin/grep -F "SHA-1 hash: $fingerprint" >/dev/null; then
+            echo "xcode-agent: installing $(/usr/bin/basename "$certificate") signing intermediate"
+            /usr/bin/security import "$certificate" -k /Library/Keychains/System.keychain
+          fi
+        done
       fi
     '';
 
@@ -176,35 +191,54 @@ in
       };
 
       xcode-account = {
-        title = "Sign Xcode into the developer team";
+        title = "Enable Xcode automatic development signing (optional)";
         owner = "xcode-agent";
         desktop = true;
         body = ''
-          Xcode → Settings → Accounts → add the developer Apple ID. Debug
-          automatic signing (`just build`, readable device logs) needs it;
-          Release Ad Hoc signing does not.
+          For Debug device builds and readable device logs: over Screen
+          Sharing, open Xcode → Settings → Apple Accounts → add the
+          developer Apple ID and complete 2FA. Select the team → Manage
+          Certificates → create an Apple Development certificate if none
+          is installed. This is native account state, repeated after machine
+          replacement or session expiry; Nix never restores it.
+
+          Sign-in alone does not make the login keychain accessible to SSH
+          builds. Verify a real signed Debug build from the agent's shell
+          before calling remote development signing ready. Simulator tests
+          and Ad Hoc distribution with supplied signing material need no
+          Xcode account sign-in.
+
+          Quit Xcode after setup, then run `xcrun mcp-server stop` so the
+          windowed app does not shadow the agents' headless Xcode server.
         '';
+        redo = "after replacing this Mac or when Xcode requests reauthentication";
       };
 
       apple-distribution-cert = {
-        title = "Import the Apple Distribution certificate into the login keychain";
+        title = "Provide Ad Hoc signing material for a release build";
         owner = "xcode-agent";
         body = ''
-          Release Ad Hoc builds (`just deploy`) sign with this identity. The
-          certificate lives in the Apple Signing vault; on the mini open an
-          `op-unlock request "Apple Distribution cert import"` window first.
+          Use the owning app's manual release workflow in CI. For an
+          explicitly needed local Ad Hoc build, the ios-app template's
+          `scripts/sign-ios.py --project <App>.xcodeproj --scheme <App>
+          --output <private-output-directory>` accepts
+          `IOS_CERTIFICATE_P12_BASE64`, `IOS_CERTIFICATE_PASSWORD`, and
+          `IOS_PROFILE_BASE64` through the environment from the configured
+          secret manager. `IOS_DEVICE_ID` optionally verifies the intended
+          registered device.
 
-          ```bash
-          op-personal read "op://xxbixvqoaicfykrbte6oh57ahq/fjlhndynlojmvcvhcei6qblsxm/p12_base64" \
-            | base64 -d > "$TMPDIR/dist.p12"
-          security import "$TMPDIR/dist.p12" -k ~/Library/Keychains/login.keychain-db \
-            -P "$(op-personal read 'op://xxbixvqoaicfykrbte6oh57ahq/fjlhndynlojmvcvhcei6qblsxm/password')" \
-            -T /usr/bin/codesign
-          rm -f "$TMPDIR/dist.p12"
-          ```
+          The helper unlocks a disposable keychain, configures codesign
+          access, verifies the exported IPA, and removes the certificate,
+          profile and keychain on exit. Nix installs Xcode's public WWDR
+          intermediate certificates into the System keychain; it never
+          installs private signing keys or changes certificate trust.
+          No persistent login-keychain import or Xcode sign-in is needed.
+          Confirm an actual signed archive/export, not just an identity
+          listed by `security find-identity`. A plain local `just deploy`
+          may still expect a preinstalled identity: use its signing helper
+          instead when running remotely.
         '';
-        verify = "security find-identity -v -p codesigning | grep -q 'Apple Distribution'";
-        redo = "when `apple-signing renew-distribution` rotates the certificate";
+        redo = "provide current signing material for each release; renew expired certificates and profiles";
       };
 
       xcode-mcp-agent-grant = {
