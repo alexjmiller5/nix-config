@@ -79,6 +79,7 @@ in
       capture_table = "page_captures";
       artifact_prefix = "captures/pages/";
       max_artifact_bytes = 128 * 1024 * 1024;
+      max_screenshot_pixels = 100000000;
       credential_command = [
         "/usr/bin/security" "find-generic-password"
         "-s" "page-archiver.hub" "-a" "4947e554-dd02-4d66-9046-3cbc1a4b3a67" "-w"
