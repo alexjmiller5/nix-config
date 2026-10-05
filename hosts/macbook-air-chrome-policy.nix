@@ -24,7 +24,7 @@ let
   #   2. chrome://extensions → Load unpacked (and add the path-derived ID
   #      as an `allowed` entry below so it survives re-lock)
   #   3. lockdown = true → switch → restart Chrome
-  lockdown = true;
+  lockdown = false;
   webstore = "https://clients2.google.com/service/update2/crx";
   normal = {
     installation_mode = "normal_installed";
@@ -62,6 +62,7 @@ in
           # "gighmmpiobklfepjocnamgkkbiglidom" = normal; # AdBlock (off — uncomment to install)
           # "efaidnbmnnnibpcajpcglclefindmkaj" = normal; # Adobe Acrobat (off — uncomment to install)
           "kfaknphcidikmjhmmfmphghhlcoknflj" = normal; # Amazon Unsponsor
+          "ppchfondnjmehpmbojbipkfefnicnfbp" = allowed; # Bookmark Mirror
           "kagpmnfgpdecdkbhongbgkgppnpimime" = normal; # Bookmarks Exporter
           "iiikidmnimlpahbeknmkeonmemajpccj" = normal; # Button Stealer
           # "cbhilkcodigmigfbnphipnnmamjfkipp" = normal; # Calendly (off — uncomment to install)

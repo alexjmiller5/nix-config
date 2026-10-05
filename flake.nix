@@ -58,6 +58,10 @@
       url = "github:alexjmiller5/life-data";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    bookmark-mirror = {
+      url = "github:alexjmiller5/bookmark-mirror";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     page-archiver = {
       url = "github:alexjmiller5/page-archiver";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -130,6 +134,7 @@
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "backup";
               home-manager.sharedModules = [
+                inputs.bookmark-mirror.homeModules.default
                 inputs.life-data.homeModules.default
                 inputs.people-sync.homeModules.default
                 inputs.page-archiver.homeModules.default

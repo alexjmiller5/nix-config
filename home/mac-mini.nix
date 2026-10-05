@@ -82,6 +82,7 @@ in
       max_screenshot_pixels = 200000000;
       min_screenshot_scale = 0.5;
       retain_partial = true;
+      browser_headless = false;
       credential_command = [
         "/usr/bin/security" "find-generic-password"
         "-s" "page-archiver.hub" "-a" "4947e554-dd02-4d66-9046-3cbc1a4b3a67" "-w"

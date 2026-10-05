@@ -26,6 +26,26 @@
         "type": "github"
       }
     },
+    "bookmark-mirror": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791221015,
+        "narHash": "sha256-uVWZTPmbKULXj5Pz72pqG1LWFiat6x73FsgRh2vUcMk=",
+        "owner": "alexjmiller5",
+        "repo": "bookmark-mirror",
+        "rev": "f331ebf2c07439a28944caa41135f954da2cbe8c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "bookmark-mirror",
+        "type": "github"
+      }
+    },
     "brew-src": {
       "flake": false,
       "locked": {
@@ -322,11 +342,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1791216890,
-        "narHash": "sha256-kQW6QTZd7vheQakZJlNSsemeizvEy9CXuQiBKeQooq4=",
+        "lastModified": 1791221368,
+        "narHash": "sha256-fb/osFXw1ng84L6CKK+xz+Mu/wM8URSyGAiHT2ISO6U=",
         "owner": "alexjmiller5",
         "repo": "page-archiver",
-        "rev": "d9ca4cb5d62884df3ffe90cff9372df360bcf593",
+        "rev": "7ccd84d9e724d15241ca267b70ad9b494de1f555",
         "type": "github"
       },
       "original": {
@@ -456,6 +476,7 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
+        "bookmark-mirror": "bookmark-mirror",
         "callhistory-backup": "callhistory-backup",
         "cherri": "cherri",
         "claude-plugin-ponytail": "claude-plugin-ponytail",

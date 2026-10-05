@@ -22,6 +22,9 @@ let
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
 in
 {
+  # The personal browser lives on the laptop; the mini only runs agent Chrome.
+  programs.bookmark-mirror.enable = true;
+
   imports = [
     ./common.nix
     ./agent-machine.nix
