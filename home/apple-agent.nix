@@ -50,28 +50,31 @@ in
 
   # A store symlink inside the agent-config clone: its target changes on every
   # rebuild, so agent-config's .gitignore lists it with the other plugin links.
-  home.file = {
-    ".config/agent-config/skills/apple".source = plugin;
-  }
-  // lib.mapAttrs' (
-    name: description:
-    lib.nameValuePair "${config.programs.pi-coding-agent.configDir}/skills/${name}/SKILL.md" (
-      lib.mkIf config.programs.pi-coding-agent.enable {
-        # Pi caps discovery descriptions at 1024 characters. Load Apple's complete
-        # current guidance and references without modifying Xcode's plugin files.
-        text = ''
-          ---
-          name: ${name}
-          description: ${builtins.toJSON description}
-          ---
+  home.file.".config/agent-config/skills/apple".source = plugin;
 
-          Read `${skillsDir}/${name}/SKILL.md` before doing this task.
-          Follow the complete instructions there and resolve every relative
-          reference from `${skillsDir}/${name}/`.
-        '';
-      }
-    )
-  ) piSkillDescriptions;
+  # Manage the directory as one link so activation replaces an existing skills
+  # symlink instead of following it and writing into a shared source directory.
+  home.file."${config.programs.pi-coding-agent.configDir}/skills" =
+    lib.mkIf config.programs.pi-coding-agent.enable
+      {
+        source = pkgs.linkFarm "pi-apple-skills" (
+          lib.mapAttrsToList (name: description: {
+            name = "${name}/SKILL.md";
+            # Pi caps discovery descriptions at 1024 characters. Load Apple's complete
+            # current guidance and references without modifying Xcode's plugin files.
+            path = pkgs.writeText "${name}-SKILL.md" ''
+              ---
+              name: ${name}
+              description: ${builtins.toJSON description}
+              ---
+
+              Read `${skillsDir}/${name}/SKILL.md` before doing this task.
+              Follow the complete instructions there and resolve every relative
+              reference from `${skillsDir}/${name}/`.
+            '';
+          }) piSkillDescriptions
+        );
+      };
 
   # `xcrun agent plugin path` materializes Apple's packaged plugin (skills in
   # the open Agent Skills format) under ~/Library/Developer/Xcode, keyed by
