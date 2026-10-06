@@ -35,7 +35,9 @@ routing table and workflow; this file is the in-repo map.
   `.git/hooks/pre-commit`; body in `git-pre-commit.sh`, test in
   `tests/git-hooks.sh`),
   `mcp.nix` (one `programs.mcp.servers` registry generates the native MCP
-  plugin loaded by both Claude and Codex; direct Codex MCP entries stay app-owned),
+  plugin loaded by Claude and Codex and Pi's native MCP config; the NixOS
+  server is a pinned flake package built with the system, so connecting does
+  not fetch/build dependencies; direct Codex MCP entries stay app-owned),
   `op-wrappers.nix` (the op-authed CLI shadow family: gh, modal, gog, wacli,
   wrangler, gcloud, ntn, posthog-cli - AI Agent vault creds in every context, read per call
   so nothing credential-shaped touches disk. Every op call in the family sits

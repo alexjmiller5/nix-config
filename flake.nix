@@ -72,6 +72,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.life-data.follows = "life-data";
     };
+    # Build the shared MCP server with the system, never during an agent's
+    # connection timeout window.
+    mcp-nixos = {
+      url = "github:utensils/mcp-nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
     # Pi's upstream flake carries its current runtime and model catalog.
     pi = {
       url = "github:earendil-works/pi/v1.0.3";
@@ -164,6 +171,7 @@
                 inherit (inputs)
                   cherri
                   pi
+                  mcp-nixos
                   pi-calm
                   pi-web-access
                   pi-fast-mode
@@ -242,6 +250,7 @@
         agent-config-links = ./home/agent-config-links.nix;
         # needs pi, pi-calm, pi-web-access and pi-fast-mode inputs
         pi = ./home/pi.nix;
+        # needs mcp-nixos in extraSpecialArgs
         mcp = ./home/mcp.nix;
         # claude-plugins needs the consumer to pass claude-plugins-official,
         # claude-plugin-superpowers and claude-plugin-ponytail via extraSpecialArgs

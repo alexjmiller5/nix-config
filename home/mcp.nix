@@ -4,6 +4,7 @@
   config,
   lib,
   pkgs,
+  mcp-nixos,
   ...
 }:
 let
@@ -41,12 +42,7 @@ in
   programs.mcp = {
     enable = true;
     servers.nixos = {
-      command = "nix";
-      args = [
-        "run"
-        "github:utensils/mcp-nixos"
-        "--"
-      ];
+      command = lib.getExe mcp-nixos.packages.${pkgs.stdenv.hostPlatform.system}.default;
     };
   };
   programs.codex.plugins = lib.mkIf config.programs.codex.enable [ plugin ];
