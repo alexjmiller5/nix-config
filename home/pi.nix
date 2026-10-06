@@ -48,6 +48,9 @@ in
       # Use the applications' own idempotent adapters. Neither changes titles.
       home.activation.piIntegrations = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
         ${lib.optionalString config.programs.herdr.enable "run ${lib.getExe config.programs.herdr.package} integration install pi"}
+        ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+        ''}
         if command -v moshi-hook >/dev/null; then
           run moshi-hook install --target pi
         fi
