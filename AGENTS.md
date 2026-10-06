@@ -203,6 +203,12 @@ routing table and workflow; this file is the in-repo map.
   SIP, sign-ins, bootstrap order), including Life browser enrollment, desktop
   Keychain setup and verification after replacing a machine.
 
+Receptor on the laptop uses its app-owned flake package and Darwin module.
+`programs.receptor.migrateFromHomebrew` guards an app-only cask removal before
+normal Homebrew activation; quit Receptor after preserving drafts before a
+switch that transitions an existing cask. The installed app is exposed through
+`/Applications/Nix Apps/Receptor.app`. The mini does not enable Receptor.
+
 ## Conventions
 
 * **Two-machine parity rule**: every change to a host file or per-host home

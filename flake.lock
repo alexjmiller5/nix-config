@@ -608,6 +608,26 @@
         "type": "github"
       }
     },
+    "receptor": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791316735,
+        "narHash": "sha256-C5UFk/hWFFlKLqEPuKY97aLlA+N7xe95vviSThtl5kE=",
+        "owner": "alexjmiller5",
+        "repo": "receptor",
+        "rev": "0e7e603498669546c4001c2450f5a9cbb3e92937",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "receptor",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -631,6 +651,7 @@
         "pi-calm": "pi-calm",
         "pi-fast-mode": "pi-fast-mode",
         "pi-web-access": "pi-web-access",
+        "receptor": "receptor",
         "screentime-backup": "screentime-backup",
         "screentime-dashboard": "screentime-dashboard",
         "shared-album-reminders": "shared-album-reminders",

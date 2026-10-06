@@ -58,6 +58,10 @@
       url = "github:alexjmiller5/life-data";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    receptor = {
+      url = "github:alexjmiller5/receptor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     bookmark-mirror = {
       url = "github:alexjmiller5/bookmark-mirror";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -146,6 +150,7 @@
             inputs.screentime-dashboard.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
+            inputs.receptor.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {

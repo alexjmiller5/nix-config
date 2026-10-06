@@ -30,8 +30,8 @@
   ];
 
   # The laptop's ONE agenix secret: the macbook-air-machine 1P service-account
-  # token (read-only on the "MacBook Air" vault). Every other secret lives in
-  # that vault, fetched at runtime via op read — see secrets/secrets.nix.
+  # token (read-only on the "MacBook Air" vault), used only by explicit initial
+  # bootstrap commands; see secrets/secrets.nix.
   age.secrets.machine-sa = {
     file = ../secrets/machine-sa-laptop.age;
     owner = username;
@@ -148,6 +148,12 @@
     { app = "/System/Applications/Utilities/Screen Sharing.app"; }
   ];
 
+  # Signed release bytes and the guarded app-only cask transition are app-owned.
+  programs.receptor = {
+    enable = true;
+    migrateFromHomebrew = true;
+  };
+
   # Brew-ONLY leftovers — everything available in nixpkgs migrated to
   # home/macbook-air.nix home.packages on 2026-08-10 (dep cruft and the
   # unused ruby managers dropped outright; brew auto-keeps real deps).
@@ -156,7 +162,7 @@
     # it brew ignores the tap's formulae/casks entirely.
     taps = [
       # Alex's personal cask tap — apps released by their repos' CI
-      # (receptor, ...).
+      # (cochlea, life-ui).
       {
         name = "alexjmiller5/tap";
         trusted = true;
@@ -202,10 +208,6 @@
       "pearcleaner"
       "processing"
       "raycast"
-      # From alexjmiller5/tap — released + notarized by receptor's CI.
-      # Replaces the DerivedData rm-cp-codesign flow. Fully qualified to
-      # avoid any future homebrew/cask collision.
-      "alexjmiller5/tap/receptor"
       # From alexjmiller5/tap - Cochlea's Mac app, released by its CI.
       "alexjmiller5/tap/cochlea"
       "alexjmiller5/tap/life-ui"
