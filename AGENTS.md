@@ -74,7 +74,9 @@ routing table and workflow; this file is the in-repo map.
   side),
   `pi.nix` (Pi CLI via its upstream flake, Calm, web access, Codex fast mode
   and Rosé Pine Moon; writable settings and the hook adapter come from
-  agent-config/pi, with shared AGENTS.md, skills and the native MCP registry;
+  agent-config/pi, with shared AGENTS.md, native ~/.agents/skills discovery
+  and the native MCP registry; apple-agent adds short Pi discovery summaries
+  pointing to the original Apple instructions;
   activation installs the native Herdr and Moshi Pi adapters),
   `codex.nix` (Codex CLI - the ChatGPT-subscription seat; skills and
   AGENTS.md are left to `agent-config-links.nix` so both stay editable

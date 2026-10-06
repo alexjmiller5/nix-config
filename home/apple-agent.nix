@@ -20,6 +20,10 @@ let
     version = "1.0.0";
     description = "Apple's Xcode agent skills, materialized from the installed Xcode";
   };
+  piSkillDescriptions = {
+    app-intents-specialist = "Use when writing, reviewing, refactoring or debugging App Intents, entities, queries, enums, parameters, dependencies, results, donation, localization, shortcut phrases, URL representations, widget or control configuration. Apple's authoritative evergreen guidance. For iOS 26/27 API adoption, use app-intents-whats-new-27.";
+    app-intents-whats-new-27 = "Use when adopting or migrating iOS 26/27 App Intents APIs or asking what changed: execution modes, foreground continuation, cancellation, long-running intents, choice prompts, interactive snippets, Visual Intelligence, onscreen entities, Spotlight indexing, computed/deferred properties, schemas, relevant entities, cross-device ownership, system shortcuts, AppIntentsTesting, entity collections and union values. Covers corresponding macOS/watchOS/tvOS/visionOS releases.";
+  };
   # Same shape as home/mcp.nix: a plugin dir Claude/Codex auto-load from the
   # shared skills dir as `apple@skills-dir`; `skills` is a state symlink that
   # activation points at the materialized plugin.
@@ -46,7 +50,28 @@ in
 
   # A store symlink inside the agent-config clone: its target changes on every
   # rebuild, so agent-config's .gitignore lists it with the other plugin links.
-  home.file.".config/agent-config/skills/apple".source = plugin;
+  home.file = {
+    ".config/agent-config/skills/apple".source = plugin;
+  }
+  // lib.mapAttrs' (
+    name: description:
+    lib.nameValuePair "${config.programs.pi-coding-agent.configDir}/skills/${name}/SKILL.md" (
+      lib.mkIf config.programs.pi-coding-agent.enable {
+        # Pi caps discovery descriptions at 1024 characters. Load Apple's complete
+        # current guidance and references without modifying Xcode's plugin files.
+        text = ''
+          ---
+          name: ${name}
+          description: ${builtins.toJSON description}
+          ---
+
+          Read `${skillsDir}/${name}/SKILL.md` before doing this task.
+          Follow the complete instructions there and resolve every relative
+          reference from `${skillsDir}/${name}/`.
+        '';
+      }
+    )
+  ) piSkillDescriptions;
 
   # `xcrun agent plugin path` materializes Apple's packaged plugin (skills in
   # the open Agent Skills format) under ~/Library/Developer/Xcode, keyed by

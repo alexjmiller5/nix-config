@@ -27,7 +27,8 @@ in
     (lib.mkIf cfg.enable {
       home.file = {
         "${cfg.configDir}/AGENTS.md".source = link "${agentConfig}/AGENTS.md";
-        "${cfg.configDir}/skills".source = link "${agentConfig}/skills";
+        # Pi discovers the shared ~/.agents/skills natively. Its own skills
+        # directory is reserved for compatibility summaries from other modules.
         # Pi persists model and extension preferences here. The companion repo
         # owns the writable configuration, as it does for the other agents.
         "${cfg.configDir}/settings.json".source = link "${agentConfig}/pi/settings.json";

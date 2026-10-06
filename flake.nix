@@ -81,7 +81,7 @@
     };
     # Pi's upstream flake carries its current runtime and model catalog.
     pi = {
-      url = "github:earendil-works/pi/v1.0.3";
+      url = "github:earendil-works/pi/v1.0.4";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-darwin-x64.follows = "nixpkgs";
     };
