@@ -5,9 +5,7 @@
   ...
 }:
 
-# Codex CLI - the ChatGPT-subscription seat. Claude Code keeps the Claude
-# seat: Anthropic prohibits third-party tools from using Free/Pro/Max OAuth
-# tokens (enforced 2026-04-04), so only the OpenAI half is portable.
+# Codex CLI with its own native ChatGPT subscription enrollment.
 #
 # Deliberately NOT set here:
 #   - skills: Codex reads ~/.agents/skills natively, and agent-config-links.nix

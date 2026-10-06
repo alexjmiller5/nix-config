@@ -70,6 +70,10 @@ routing table and workflow; this file is the in-repo map.
   `claude plugin install` is imperative and `enabledPlugins` never fetches
   anything, so a restored machine got none; git-ignored on the agent-config
   side),
+  `pi.nix` (Pi CLI via its upstream flake, Calm, web access, Codex fast mode
+  and Rosé Pine Moon; writable settings and the hook adapter come from
+  agent-config/pi, with shared AGENTS.md, skills and the native MCP registry;
+  activation installs the native Herdr and Moshi Pi adapters),
   `codex.nix` (Codex CLI - the ChatGPT-subscription seat; skills and
   AGENTS.md are left to `agent-config-links.nix` so both stay editable
   without a rebuild, and `programs.codex.context` stays at its "" default

@@ -373,6 +373,78 @@
         "type": "github"
       }
     },
+    "pi": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "nixpkgs-darwin-x64": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791188470,
+        "narHash": "sha256-2SfC8zEf6emG1sDG1J7hjjSBt+3hFIz1/TcwBLa/hRU=",
+        "owner": "earendil-works",
+        "repo": "pi",
+        "rev": "d78dc83d633229d12f8b79631384c4c2717c399f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "earendil-works",
+        "ref": "v1.0.3",
+        "repo": "pi",
+        "type": "github"
+      }
+    },
+    "pi-calm": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787813381,
+        "narHash": "sha256-HMAoB+4aipZ0aFVTLjAODB2Fi5sVFBufI1P+PP8J7Og=",
+        "owner": "kunchenguid",
+        "repo": "dotfiles",
+        "rev": "9a4a6387d0dd6f4bf9b8a5a732b406916bbbf95d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kunchenguid",
+        "repo": "dotfiles",
+        "type": "github"
+      }
+    },
+    "pi-fast-mode": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791159481,
+        "narHash": "sha256-9UniGfsRHoC6SEbveRSMcRXh/2gUs8qJ3hULQQQvoRg=",
+        "owner": "Jonghakseo",
+        "repo": "pi-extension",
+        "rev": "27d8cfb9bc4b4d27e526ae32de799b0d87e0f01d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Jonghakseo",
+        "repo": "pi-extension",
+        "type": "github"
+      }
+    },
+    "pi-web-access": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791240672,
+        "narHash": "sha256-5Nv3bc7cfWjEBqlbZ1hn37lhzpgTvQwvMmSDv56rFTw=",
+        "owner": "nicobailon",
+        "repo": "pi-web-access",
+        "rev": "3dd4c222a08475bc7cf350e4ad3310ce71ab12e4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nicobailon",
+        "repo": "pi-web-access",
+        "type": "github"
+      }
+    },
     "pyproject-build-systems": {
       "inputs": {
         "nixpkgs": [
@@ -491,6 +563,10 @@
         "nixpkgs": "nixpkgs",
         "page-archiver": "page-archiver",
         "people-sync": "people-sync",
+        "pi": "pi",
+        "pi-calm": "pi-calm",
+        "pi-fast-mode": "pi-fast-mode",
+        "pi-web-access": "pi-web-access",
         "screentime-backup": "screentime-backup",
         "screentime-dashboard": "screentime-dashboard",
         "shared-album-reminders": "shared-album-reminders",

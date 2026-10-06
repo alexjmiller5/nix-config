@@ -87,3 +87,18 @@ home-manager module. Both hosts use its baseline; the laptop enables
 `macos.finder.desktop.enable = true` for its desktop preferences and 32px
 list icons. Values use `mkDefault` and can be overridden by consuming flakes.
 Sidebar selections and iCloud setup are documented in the laptop manual.
+
+## Pi
+
+`home/pi.nix` installs Pi from its pinned upstream flake on both hosts. It
+loads Calm, web access, Codex fast mode and Rosé Pine Moon, plus the shared
+Superpowers and Ponytail integrations. It uses the companion agent-config
+repo's live instructions, skills, writable settings and lifecycle adapter,
+and the same declarative MCP server registry as the other agents.
+
+Run `pi` in Herdr. `/calm` toggles quiet tool rendering; `/codex-fast on`
+requests the priority tier on supported Codex models. `/codex-fast off`
+returns to the normal tier. No terminal-title extension is installed.
+Provider sign-in is native user state; see the generated machine manual.
+App-bundled Codex/Claude tools and plugins are specific to those hosts;
+portable skills and their installed CLI/browser tools remain available.

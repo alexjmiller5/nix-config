@@ -72,6 +72,24 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.life-data.follows = "life-data";
     };
+    # Pi's upstream flake carries its current runtime and model catalog.
+    pi = {
+      url = "github:earendil-works/pi/v1.0.3";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-darwin-x64.follows = "nixpkgs";
+    };
+    pi-calm = {
+      url = "github:kunchenguid/dotfiles";
+      flake = false;
+    };
+    pi-web-access = {
+      url = "github:nicobailon/pi-web-access";
+      flake = false;
+    };
+    pi-fast-mode = {
+      url = "github:Jonghakseo/pi-extension";
+      flake = false;
+    };
     # Claude Code plugins, pinned and loaded in place (see home/claude-plugins.nix).
     # `claude plugin install` is an imperative install that leaves a fresh
     # machine with nothing, so the sources are inputs and ride the weekly bump.
@@ -145,6 +163,10 @@
                 inherit username;
                 inherit (inputs)
                   cherri
+                  pi
+                  pi-calm
+                  pi-web-access
+                  pi-fast-mode
                   nix-vscode-extensions
                   nix-openclaw-tools
                   life-data
@@ -218,6 +240,8 @@
         herdr = ./home/herdr.nix;
         herdr-takeover = ./home/herdr-takeover.nix;
         agent-config-links = ./home/agent-config-links.nix;
+        # needs pi, pi-calm, pi-web-access and pi-fast-mode inputs
+        pi = ./home/pi.nix;
         mcp = ./home/mcp.nix;
         # claude-plugins needs the consumer to pass claude-plugins-official,
         # claude-plugin-superpowers and claude-plugin-ponytail via extraSpecialArgs

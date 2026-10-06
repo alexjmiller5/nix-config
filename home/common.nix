@@ -20,6 +20,7 @@
     ./agent-config-links.nix
     ./claude-plugins.nix
     ./codex.nix
+    ./pi.nix
     ./machine-vault-git.nix
     ./people-sync-operator.nix
   ];
