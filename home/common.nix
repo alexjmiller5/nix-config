@@ -25,6 +25,9 @@
     ./people-sync-operator.nix
   ];
 
+  # Both Macs use the full Finder profile, including desktop preferences.
+  macos.finder.desktop.enable = true;
+
   opAuth.vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
 
   # Life supplies the installed background runner and its CLI toggle.
