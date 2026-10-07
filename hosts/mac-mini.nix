@@ -89,9 +89,13 @@
     "google-chrome"
   ];
 
-  # Flight Mirror reads the mini's local Flighty copy. The laptop already
+  # Flighty Sync reads the mini's local Flighty copy. The laptop already
   # installs Flighty; only the always-on mini will run the nightly mirror.
   homebrew.masApps."Flighty" = 1358823008;
+  services.flighty-sync = {
+    enable = true;
+    user = username;
+  };
 
   # Weekly Apple-data snapshots (Sun 05:00 / 05:05). Each module installs a
   # signed .app + launchd agent; the one manual step per app is a Full Disk
@@ -145,15 +149,18 @@
   manual.steps = {
     flighty-sync = {
       title = "Open Flighty and finish iCloud sync";
-      owner = "flight-mirror";
+      owner = "flighty-sync";
       desktop = true;
       body = ''
-        Open Flighty on this Mac through Screen Sharing. Complete its first-run
+        If activation stops at the App Store administrator prompt, open Terminal
+        through Screen Sharing and run `cd ~/.config/nix-config && just switch`;
+        enter the administrator password when the App Store helper requests it.
+        Then open Flighty on this Mac. Complete its first-run
         screens and any Apple/iCloud sign-in or purchase-restore prompt using
         the same account as the existing Flighty library. Allow its flights
         to finish syncing, then compare the list with a fresh Flighty export.
         Do not create a second account or import the existing flights again.
-        A populated local database proves local availability only; Flight Mirror
+        A populated local database proves local availability only; Flighty Sync
         must separately verify source freshness and Life Data enrollment before
         its nightly sync is considered active.
       '';
@@ -161,6 +168,50 @@
         test -d /Applications/Flighty.app && test -s "$HOME/Library/Containers/com.flightyapp.flighty/Data/Documents/MainFlightyDatabase.db"
       '';
       redo = "After replacing this Mac, signing out of iCloud, or resetting Flighty data.";
+    };
+    flighty-sync-enrollment = {
+      title = "Enroll Flighty Sync and verify a complete run";
+      owner = "flighty-sync";
+      desktop = true;
+      body = ''
+        After Flighty's library has hydrated, use the installed CLI in Terminal:
+        `flighty-sync configure --hub-url https://life-data.nqipomyrjb.workers.dev`,
+        then `flighty-sync inspect` and
+        `flighty-sync verify-export "$HOME/Documents/manual-backups/flighty/FlightyExport-2026-10-07.csv"`.
+        Use a newly exported CSV if the library has changed. For a new machine,
+        copy the official export through the normal user file interface first.
+
+        The Life Data operator must publish the cataloged `flights` table and
+        mint a dedicated `flighty-sync` consumer token with exactly
+        `tables:read:flights,tables:write:flights,files:read:raw/flighty/,files:write:raw/flighty/`.
+        From an enrolled operator terminal, `life token create flighty-sync
+        --scopes "$(flighty-sync scopes)"` prints the token once. Never substitute
+        an operator, full-replica or another consumer's token. Enter it without
+        shell history using:
+
+        ```zsh
+        (
+          read -rs 'flighty_sync_token?Flighty Sync consumer token: ' || exit
+          printf '\n'
+          printf '%s' "$flighty_sync_token" | flighty-sync login --token-stdin
+        )
+        ```
+
+        Login validates the grants and saves the credential in native Keychain.
+        The login Keychain must be accessible to the scheduled user agent.
+        If source access is denied, grant `/Applications/FlightySync.app`
+        Full Disk Access in System Settings, Privacy & Security.
+        Run `flighty-sync doctor`; then kick the installed job with
+        `launchctl kickstart gui/$(id -u)/org.flighty-sync` and inspect
+        `flighty-sync status`. A success must include verified archive readback
+        and matching Life Data rows. Repeat after a known Flighty UI change and
+        verify that iCloud brings it to this mini. Until both checks pass, the
+        nightly 03:30 job is configured but not verified active.
+      '';
+      verify = ''
+        flighty-sync doctor && flighty-sync status | ${pkgs.jq}/bin/jq -e '.state == "success"'
+      '';
+      redo = "After replacing the Mac, resetting Keychain, changing the source or service, or revoking the consumer credential.";
     };
     tcc-grants = {
       title = "TCC grants";

@@ -34,6 +34,10 @@
     enable = true;
   };
 
+  # The generated configuration manual serializes option defaults after dropping
+  # their store context. Use online option lookup; package man pages stay enabled.
+  manual.manpages.enable = false;
+
   home.stateVersion = "25.05";
   home.username = username;
   home.homeDirectory = "/Users/${username}";

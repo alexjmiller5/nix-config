@@ -21,6 +21,7 @@
     shellcheck
     tree
     yq-go
+    whisper-cpp
     # Agent-provider quota windows (Claude, Codex, ...) - see the `quota` skill
     (callPackage ../pkgs/quota-axi.nix { })
   ];

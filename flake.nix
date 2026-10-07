@@ -15,6 +15,10 @@
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     # Weekly Screen Time + call history snapshots (each provides a nix-darwin module).
     screentime-backup.url = "github:alexjmiller5/screentime-backup";
+    flighty-sync = {
+      url = "github:alexjmiller5/flighty-sync";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
     # Screentime Dashboard's ingest job: rebuilds the dashboard's series from
     # the mini's snapshots on request (nix-darwin module + screentime-ingest).
@@ -156,6 +160,7 @@
             inputs.agenix.darwinModules.default
             inputs.screentime-backup.darwinModules.default
             inputs.screentime-dashboard.darwinModules.default
+            inputs.flighty-sync.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
             inputs.receptor.darwinModules.default
