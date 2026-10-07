@@ -135,11 +135,12 @@ routing table and workflow; this file is the in-repo map.
   URL read from a file; the mini pings its healthchecks.io check from
   nix-secrets `heartbeat/mac-mini`),
   `macos/finder.nix` owns the shared Finder baseline and nested list defaults.
+  Both hosts enable the full Finder profile through `home/common.nix`.
   Window controls are implemented by Hammerspoon; the exported
   `macos-window-management` module declares native Control-arrow navigation
   on the laptop. The headless mini does not import desktop interaction settings.
   `macos.finder.desktop.enable` adds desktop-specific preferences and large
-  list icons; enabled on the laptop, disabled on the headless mini. Defaults
+  list icons; enabled on both Macs. Defaults
   use `mkDefault` so other flakes can override individual values. Sidebar
   selections and iCloud enrollment remain native user state. Activation does
   not restart Finder or change per-folder `.DS_Store` settings,

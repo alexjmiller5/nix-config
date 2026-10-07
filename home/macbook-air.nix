@@ -61,10 +61,6 @@ in
     environment.AGENT_SHELL = "herdr-takeover";
   };
 
-  # Desktop preferences are useful on the laptop; the headless mini consumes
-  # only the shared Finder baseline from common.nix.
-  macos.finder.desktop.enable = true;
-
   # The interactive laptop uses Caps as Hyper; the headless mini does not.
   macos.hyperKey.enable = true;
 
