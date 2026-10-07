@@ -184,7 +184,8 @@
         The Life Data operator must publish the cataloged `flights` table and
         mint a dedicated `flighty-sync` consumer token with exactly
         `tables:read:flights,tables:write:flights,files:read:raw/flighty/,files:write:raw/flighty/`.
-        From an enrolled operator terminal, `life token create flighty-sync
+        From an enrolled operator terminal, run `life sync` to publish the
+        local catalog before enrollment. Then `life token create flighty-sync
         --scopes "$(flighty-sync scopes)"` prints the token once. Never substitute
         an operator, full-replica or another consumer's token. Enter it without
         shell history using:
