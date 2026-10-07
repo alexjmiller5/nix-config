@@ -680,11 +680,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790617501,
-        "narHash": "sha256-eS0CB+3kE6cLkDHq+Ez926/Wvw8QytKpTLh5E2uvXZk=",
+        "lastModified": 1791372151,
+        "narHash": "sha256-AeqBTckdMKh1q/qDe1RMexDQo+1XJ/IJX75inXm+vdA=",
         "owner": "alexjmiller5",
         "repo": "screentime-dashboard",
-        "rev": "f337c093549799a5c9e81420e6b9477d841274da",
+        "rev": "a93260c9354a97f8be22337f2e53d166ccfec3fb",
         "type": "github"
       },
       "original": {
