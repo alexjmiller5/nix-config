@@ -66,6 +66,8 @@
   homebrew.brews = [
     # iMessage CLI for operator use. Not in nixpkgs.
     "steipete/tap/imsg"
+    # Native UI batch automation for headless operators; no laptop UI control.
+    "steipete/tap/peekaboo"
     # Moshi (phone terminal) agent daemon: surfaces Claude Code sessions on
     # this Mac in the Moshi app (inbox, waiting-state pushes, diffs). Runs as
     # a brew launchd service. One-time pairing: the moshi-pairing
