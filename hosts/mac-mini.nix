@@ -209,7 +209,8 @@
         The login Keychain must be accessible to the scheduled user agent.
         If source access is denied, grant `/Applications/FlightySync.app`
         Full Disk Access in System Settings, Privacy & Security.
-        Run `flighty-sync doctor`; then kick the installed job with
+        Run `flighty-sync doctor` in the mini desktop Terminal; SSH shells cannot
+        read this native Keychain credential. Then kick the installed job with
         `launchctl kickstart gui/$(id -u)/org.flighty-sync` and inspect
         `flighty-sync status`. A success must include verified archive readback
         and matching Life Data rows. Repeat after a known Flighty UI change and
@@ -217,7 +218,8 @@
         nightly 03:30 job is configured but not verified active.
       '';
       verify = ''
-        flighty-sync doctor && flighty-sync status | ${pkgs.jq}/bin/jq -e '.state == "success"'
+        launchctl print gui/$(id -u)/org.flighty-sync | /usr/bin/grep -q 'last exit code = 0' &&
+        flighty-sync status | ${pkgs.jq}/bin/jq -e '.state == "success"'
       '';
       redo = "After replacing the Mac, resetting Keychain, changing the source or service, or revoking the consumer credential.";
     };
