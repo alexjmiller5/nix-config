@@ -154,11 +154,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791376149,
-        "narHash": "sha256-SuG6eoia5kBcBNvK/epoMnIA+a9yzACv9s7suiPJHNk=",
+        "lastModified": 1791378450,
+        "narHash": "sha256-E8+KUKj/6nobC+6CwHgVS+BLdlmOXT55lgFLBrAVjqs=",
         "owner": "alexjmiller5",
         "repo": "cochlea",
-        "rev": "912e07fc2c5c74a083fdb689ad58fd0f69415631",
+        "rev": "cdcb26545f4d5246370726d73cd4b520850abb1e",
         "type": "github"
       },
       "original": {
@@ -274,11 +274,11 @@
         "tooling": "tooling"
       },
       "locked": {
-        "lastModified": 1791376146,
-        "narHash": "sha256-mDe0AL+53GnPiz5iPFhh3tgIG97yacv86K0zTIoVKNE=",
+        "lastModified": 1791378195,
+        "narHash": "sha256-exq1ZiG7AXtHqpMI5fSaAsJuh+MPjlNBzT5YcynR5Uo=",
         "owner": "alexjmiller5",
         "repo": "life-ui",
-        "rev": "a589c09a68d769b861a0713a4451ae24dd3fbc77",
+        "rev": "5f63ea386e647fb2a45cc613d439dcd60d7bcbc2",
         "type": "github"
       },
       "original": {
