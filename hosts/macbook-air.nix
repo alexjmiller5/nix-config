@@ -142,7 +142,7 @@
     { app = "/Applications/Google Chrome.app"; }
     { app = "/Applications/Notion Calendar.app"; }
     { app = "/Applications/Notion.app"; }
-    { app = "/Applications/LifeUI.app"; }
+    { app = "/Applications/Nix Apps/LifeUI.app"; }
     { app = "/Applications/Claude.app"; }
     { app = "/Users/${username}/Applications/Chrome Apps.localized/Google Maps.app"; }
     { app = "/System/Applications/Utilities/Screen Sharing.app"; }
@@ -150,6 +150,15 @@
 
   # Signed release bytes and the guarded app-only cask transition are app-owned.
   programs.receptor = {
+    enable = true;
+    migrateFromHomebrew = true;
+  };
+
+  programs.life-ui = {
+    enable = true;
+    migrateFromHomebrew = true;
+  };
+  programs.cochlea = {
     enable = true;
     migrateFromHomebrew = true;
   };
@@ -162,7 +171,7 @@
     # it brew ignores the tap's formulae/casks entirely.
     taps = [
       # Alex's personal cask tap — apps released by their repos' CI
-      # (cochlea, life-ui).
+      # Other declared consumers may use this tap.
       {
         name = "alexjmiller5/tap";
         trusted = true;
@@ -208,9 +217,6 @@
       "pearcleaner"
       "processing"
       "raycast"
-      # From alexjmiller5/tap - Cochlea's Mac app, released by its CI.
-      "alexjmiller5/tap/cochlea"
-      "alexjmiller5/tap/life-ui"
       "repobar"
       "slack"
       "spotify"
