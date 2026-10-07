@@ -207,6 +207,8 @@
 
         Login validates the grants and saves the credential in native Keychain.
         The login Keychain must be accessible to the scheduled user agent.
+        Each run opens Flighty in the background to resume native iCloud sync;
+        hydration can finish after the snapshot and appear on the next run.
         If source access is denied, grant `/Applications/FlightySync.app`
         Full Disk Access in System Settings, Privacy & Security.
         Run `flighty-sync doctor` in the mini desktop Terminal; SSH shells cannot
@@ -214,8 +216,9 @@
         `launchctl kickstart gui/$(id -u)/org.flighty-sync` and inspect
         `flighty-sync status`. A success must include verified archive readback
         and matching Life Data rows. Repeat after a known Flighty UI change and
-        verify that iCloud brings it to this mini. Until both checks pass, the
-        nightly 03:30 job is configured but not verified active.
+        verify that iCloud brings it to this mini. A successful installed-context
+        run verifies the nightly 03:30 job. iCloud freshness remains unverified
+        until a known change has propagated from another device.
       '';
       verify = ''
         launchctl print gui/$(id -u)/org.flighty-sync | /usr/bin/grep -q 'last exit code = 0' &&
