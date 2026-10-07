@@ -89,6 +89,10 @@
     "google-chrome"
   ];
 
+  # Flight Mirror reads the mini's local Flighty copy. The laptop already
+  # installs Flighty; only the always-on mini will run the nightly mirror.
+  homebrew.masApps."Flighty" = 1358823008;
+
   # Weekly Apple-data snapshots (Sun 05:00 / 05:05). Each module installs a
   # signed .app + launchd agent; the one manual step per app is a Full Disk
   # Access grant (README §6). Output lands in iCloud-synced ~/Documents.
@@ -139,6 +143,25 @@
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    flighty-sync = {
+      title = "Open Flighty and finish iCloud sync";
+      owner = "flight-mirror";
+      desktop = true;
+      body = ''
+        Open Flighty on this Mac through Screen Sharing. Complete its first-run
+        screens and any Apple/iCloud sign-in or purchase-restore prompt using
+        the same account as the existing Flighty library. Allow its flights
+        to finish syncing, then compare the list with a fresh Flighty export.
+        Do not create a second account or import the existing flights again.
+        A populated local database proves local availability only; Flight Mirror
+        must separately verify source freshness and Life Data enrollment before
+        its nightly sync is considered active.
+      '';
+      verify = ''
+        test -d /Applications/Flighty.app && test -s "$HOME/Library/Containers/com.flightyapp.flighty/Data/Documents/MainFlightyDatabase.db"
+      '';
+      redo = "After replacing this Mac, signing out of iCloud, or resetting Flighty data.";
+    };
     tcc-grants = {
       title = "TCC grants";
       owner = "tcc";
