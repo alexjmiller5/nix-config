@@ -147,6 +147,26 @@
         "type": "github"
       }
     },
+    "cochlea": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791376149,
+        "narHash": "sha256-SuG6eoia5kBcBNvK/epoMnIA+a9yzACv9s7suiPJHNk=",
+        "owner": "alexjmiller5",
+        "repo": "cochlea",
+        "rev": "912e07fc2c5c74a083fdb689ad58fd0f69415631",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "cochlea",
+        "type": "github"
+      }
+    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -243,6 +263,27 @@
       "original": {
         "owner": "alexjmiller5",
         "repo": "life-data",
+        "type": "github"
+      }
+    },
+    "life-ui": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "tooling": "tooling"
+      },
+      "locked": {
+        "lastModified": 1791376146,
+        "narHash": "sha256-mDe0AL+53GnPiz5iPFhh3tgIG97yacv86K0zTIoVKNE=",
+        "owner": "alexjmiller5",
+        "repo": "life-ui",
+        "rev": "a589c09a68d769b861a0713a4451ae24dd3fbc77",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "life-ui",
         "type": "github"
       }
     },
@@ -637,8 +678,10 @@
         "claude-plugin-ponytail": "claude-plugin-ponytail",
         "claude-plugin-superpowers": "claude-plugin-superpowers",
         "claude-plugins-official": "claude-plugins-official",
+        "cochlea": "cochlea",
         "home-manager": "home-manager",
         "life-data": "life-data",
+        "life-ui": "life-ui",
         "mcp-nixos": "mcp-nixos",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
@@ -749,6 +792,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "tooling": {
+      "locked": {
+        "lastModified": 1790480522,
+        "narHash": "sha256-fXrm/q9klVBtVq5rGQ+XpI/dokPuSB15ZK2CZvWxXOk=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8d5d270900d3fc75655ea2d9d248b234f6631439",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8d5d270900d3fc75655ea2d9d248b234f6631439",
         "type": "github"
       }
     },

@@ -58,6 +58,14 @@
       url = "github:alexjmiller5/life-data";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    life-ui = {
+      url = "github:alexjmiller5/life-ui";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    cochlea = {
+      url = "github:alexjmiller5/cochlea";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     receptor = {
       url = "github:alexjmiller5/receptor";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -151,6 +159,8 @@
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
             inputs.receptor.darwinModules.default
+            inputs.life-ui.darwinModules.default
+            inputs.cochlea.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {
