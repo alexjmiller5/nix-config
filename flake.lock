@@ -746,11 +746,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789257210,
-        "narHash": "sha256-RsJeWg5TDIIev+WJGcQupn2AFUbbW4PNFTd41UQs/X4=",
+        "lastModified": 1791378549,
+        "narHash": "sha256-SVh5HdJZ8yn+DUlOB4hUgnJDHerEbvnU4FuL17Q3BwA=",
         "owner": "alexjmiller5",
         "repo": "shared-album-reminders",
-        "rev": "b986e8330c96e70e0b8ebe96567e5dd53cdc827c",
+        "rev": "4b302d6858413f1b649a69c7a5b458b2a2390cf1",
         "type": "github"
       },
       "original": {

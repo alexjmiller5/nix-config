@@ -90,9 +90,8 @@ in
     };
   };
 
-  # Apple-bound daily job belongs only on the mini. The task writer awaits
-  # the migrated Life task catalog, so importing its module creates no job.
-  services.shared-album-reminders.enable = false;
+  # Photos discovery runs only on the mini; the app owns its baseline and enrollment.
+  services.shared-album-reminders.enable = true;
 
   # healthchecks.io check "mac-mini" (account: the primary Gmail, API key in
   # the AI Agent vault) emails when these pings stop for 5 minutes.
@@ -287,6 +286,23 @@ in
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    shared-album-reminders-access = {
+      title = "Shared Album Reminders Photos access and enrollment";
+      owner = "shared-album-reminders";
+      desktop = true;
+      body = ''
+        Preserve the app's XDG baseline/adoption state when replacing the machine.
+        Enroll its independently minted Life credential using the installed app's
+        `--enroll-token` interface from the logged-in desktop. Run the installed
+        job in dry-run mode, then approve the Photos library prompt in Screen Sharing.
+        macOS may identify the Nix launcher as `bash`; the permission covers the
+        library although the app reads only shared-album metadata.
+        Verify the launchd job `org.shared-album-reminders.daily` exits 0 and its
+        log reports checked deduplication before disabling dry-run mode.
+      '';
+      verify = "launchctl print gui/$(id -u)/org.shared-album-reminders.daily | grep -q 'last exit code = 0'";
+      redo = "on replacement machines, credential revocation, or a changed launcher identity";
+    };
     people-sync-sessions = {
       title = "People Sync browser sessions";
       owner = "people-sync";
