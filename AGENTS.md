@@ -204,6 +204,10 @@ routing table and workflow; this file is the in-repo map.
   SIP, sign-ins, bootstrap order), including Life browser enrollment, desktop
   Keychain setup and verification after replacing a machine.
 
+Flighty on the mini remains declared in masApps. The Brewfile skips reinstallation
+when its native App Store receipt exists, so missing Spotlight metadata does not
+block activation. A missing app is still installed normally.
+
 Receptor on the laptop uses its app-owned flake package and Darwin module.
 `programs.receptor.migrateFromHomebrew` guards an app-only cask removal before
 normal Homebrew activation; quit Receptor after preserving drafts before a

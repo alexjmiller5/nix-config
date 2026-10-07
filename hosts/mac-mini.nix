@@ -92,6 +92,13 @@
   # Flighty Sync reads the mini's local Flighty copy. The laptop already
   # installs Flighty; only the always-on mini will run the nightly mirror.
   homebrew.masApps."Flighty" = 1358823008;
+  # MAS relies on Spotlight; the App Store receipt also proves installation.
+  # Keep the declaration so a replacement Mac still installs Flighty.
+  homebrew.extraConfig = ''
+    if File.file?("/Applications/Flighty.app/Contents/_MASReceipt/receipt")
+      ENV["HOMEBREW_BUNDLE_MAS_SKIP"] = [ENV["HOMEBREW_BUNDLE_MAS_SKIP"], "1358823008"].compact.join(" ")
+    end
+  '';
   services.flighty-sync = {
     enable = true;
     user = username;
