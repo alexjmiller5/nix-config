@@ -276,11 +276,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791480866,
-        "narHash": "sha256-JKedHBJWWiLeJN2c7n9+C7JGFPO6nPglAo+kCBInEXk=",
+        "lastModified": 1791487919,
+        "narHash": "sha256-nmGMz3nCqk1C+ROFDv83WlLThwxRIZjK93TsvH7uIps=",
         "owner": "alexjmiller5",
         "repo": "life-data",
-        "rev": "966a6757e3cba101f211d6308f107561cffc0139",
+        "rev": "479bd713c47c11f9fd29c83fc08b9b89d150441a",
         "type": "github"
       },
       "original": {
@@ -297,11 +297,11 @@
         "tooling": "tooling"
       },
       "locked": {
-        "lastModified": 1791393767,
-        "narHash": "sha256-cXdxCtgzf0wn7Uv5IZCnvub3PaetVcZ8S8rkETKyecs=",
+        "lastModified": 1791487240,
+        "narHash": "sha256-Pf9xo7lVlBJChIXVQZ2HJ7dtMRzWXKw0RVEORXRYWi8=",
         "owner": "alexjmiller5",
         "repo": "life-ui",
-        "rev": "9afd08cf6af087a7c0a57f68888c0f797c2b9b52",
+        "rev": "0e7262cf3d4913d440713a055ea9d41fa8f3dffe",
         "type": "github"
       },
       "original": {
