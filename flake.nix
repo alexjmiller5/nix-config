@@ -82,6 +82,12 @@
       url = "github:alexjmiller5/page-archiver";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Media Center's YouTube offline job (sub-flake, nix-darwin module): keeps
+    # requested videos as offline copies in Life Data by long-polling the hub.
+    media-center-youtube-offline = {
+      url = "github:alexjmiller5/media-center?dir=jobs/youtube-offline";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Shared album reminder module, imported only by the mini profile.
     shared-album-reminders = {
       url = "github:alexjmiller5/shared-album-reminders";
@@ -161,6 +167,7 @@
             inputs.agenix.darwinModules.default
             inputs.screentime-backup.darwinModules.default
             inputs.screentime-dashboard.darwinModules.default
+            inputs.media-center-youtube-offline.darwinModules.default
             inputs.flighty-sync.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default

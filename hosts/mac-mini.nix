@@ -122,6 +122,19 @@
     user = username;
     url = "https://screentime-dashboard.nqipomyrjb.workers.dev";
   };
+  # Media Center YouTube offline copies. A subscription has exactly one
+  # consumer, so only this always-on Mac runs it (the laptop never does). The
+  # job's own hub token lives in the login Keychain (manual step below).
+  services.media-center.youtube-offline = {
+    enable = true;
+    user = username;
+    hubUrl = "https://life-data.nqipomyrjb.workers.dev";
+    subscriptionId = "0b06361f-3efa-422c-ae97-1d671f700d3c";
+    credentialCommand = [
+      "/usr/bin/security" "find-generic-password"
+      "-s" "media-center.youtube-offline" "-a" "hub" "-w"
+    ];
+  };
   services.callhistory-backup = {
     enable = true;
     user = username;
@@ -255,6 +268,25 @@
         `backup OK` lines (a `cannot read` line means the grant is missing).
       '';
       verify = "grep -q 'backup OK' ~/Library/Logs/screentime-backup.log && grep -q 'backup OK' ~/Library/Logs/callhistory-backup.log";
+    };
+    media-center-youtube-offline = {
+      title = "Media Center YouTube offline hub credential";
+      owner = "media-center";
+      desktop = true;
+      body = ''
+        The job's own Life Data token (operator copy: `Media Center YouTube Offline
+        Life Data Token` in the Media Center vault) must be in the login Keychain as
+        service `media-center.youtube-offline`, account `hub`. SSH sessions cannot
+        write the Keychain: from the desktop session (a terminal over Screen Sharing,
+        or a one-shot launchd job in `gui/$(id -u)`), pipe
+        `add-generic-password -A -U -s media-center.youtube-offline -a hub -w <token>`
+        into `security -i` on stdin. Then
+        `launchctl kickstart -k gui/$(id -u)/com.alexmiller.media-center.youtube-offline`
+        and check `~/.local/state/media-center/youtube-offline/youtube-offline.log`
+        for a `watching` line without `hub` warnings.
+      '';
+      verify = "security find-generic-password -s media-center.youtube-offline -a hub >/dev/null";
+      redo = "On a replacement Mac (mint a new token, revoke the old one) or after rotating the token.";
     };
     screentime-dashboard-upload = {
       title = "Screentime Dashboard upload device";
