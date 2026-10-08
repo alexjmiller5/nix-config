@@ -28,6 +28,8 @@
   # Determinate on the mini) manage the nix daemon themselves; nix-darwin
   # must not.
   nix.enable = false;
+  # ...so the weekly GC + optimise is modules/nix-gc.nix, not nix.gc.
+  services.nix-gc.enable = lib.mkDefault true;
 
   users.users.${username} = {
     name = username;

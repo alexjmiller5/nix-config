@@ -51,6 +51,7 @@ check:
     bash tests/wait-for-remote.sh
     python3 tests/herdr-takeover.py
     bash tests/wifi-watchdog.sh
+    python3 tests/scratch-sweeper.py
 
 # Render MANUAL-<host>.md from the declared manual.steps; rewrites only when the body changed
 manual:

@@ -157,6 +157,7 @@
             ./modules/chrome-policy.nix
             ./modules/xcode-agent.nix
             ./modules/wifi-watchdog.nix
+            ./modules/nix-gc.nix
             inputs.agenix.darwinModules.default
             inputs.screentime-backup.darwinModules.default
             inputs.screentime-dashboard.darwinModules.default
@@ -243,6 +244,7 @@
         chrome-policy = ./modules/chrome-policy.nix;
         xcode-agent = ./modules/xcode-agent.nix;
         wifi-watchdog = ./modules/wifi-watchdog.nix;
+        nix-gc = ./modules/nix-gc.nix;
       };
 
       # Reusable home-manager modules, for consumption by other flakes
@@ -299,6 +301,7 @@
         macos-notification-prefs = ./home/macos/notification-prefs.nix;
         macos-screensaver = ./home/macos/screensaver.nix;
         heartbeat = ./home/heartbeat.nix;
+        scratch-sweeper = ./home/scratch-sweeper.nix;
       };
     };
 }

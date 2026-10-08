@@ -23,10 +23,13 @@
     ./pi.nix
     ./machine-vault-git.nix
     ./people-sync-operator.nix
+    ./scratch-sweeper.nix
   ];
 
   # Both Macs use the full Finder profile, including desktop preferences.
   macos.finder.desktop.enable = true;
+
+  services.scratch-sweeper.enable = true;
 
   opAuth.vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
 

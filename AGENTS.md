@@ -134,6 +134,12 @@ routing table and workflow; this file is the in-repo map.
   `heartbeat.nix` (`services.heartbeat`: a launchd ping to a dead-man's-switch
   URL read from a file; the mini pings its healthchecks.io check from
   nix-secrets `heartbeat/mac-mini`),
+  `scratch-sweeper.nix` (`services.scratch-sweeper`, both hosts: daily
+  launchd sweep of Chrome's per-launch bundle clones that killed Chromes
+  leave in the user temp dir's sibling `X` dir, and Xcode DerivedData
+  entries idle for `derivedDataMaxAgeDays`; log
+  `~/Library/Logs/scratch-sweeper.log`; script `scratch-sweeper.py`
+  (`--dry-run`), test `tests/scratch-sweeper.py`),
   `macos/finder.nix` owns the shared Finder baseline and nested list defaults.
   Both hosts enable the full Finder profile through `home/common.nix`.
   Window controls are implemented by Hammerspoon; the exported
@@ -162,7 +168,12 @@ routing table and workflow; this file is the in-repo map.
   material belongs to disposable build keychains, not Nix activation),
   `wifi-watchdog.nix` (root daemon power-cycling Wi-Fi when the gateway
   answers <15/20 pings over it; enabled on the mini only; logs to
-  `/var/log/wifi-watchdog.log`; test `tests/wifi-watchdog.sh`)
+  `/var/log/wifi-watchdog.log`; test `tests/wifi-watchdog.sh`),
+  `nix-gc.nix` (`services.nix-gc`, enabled for both hosts in darwin-base:
+  weekly root daemon `org.nixos.nix-gc` running the installed Nix's
+  `nix-collect-garbage --delete-older-than 14d` then `nix-store --optimise`;
+  nix-darwin's own `nix.gc`/`nix.optimise` assert `nix.enable`, which is
+  false here; logs to `/var/log/nix-gc.log`)
 * `snapshots/<host>/` - committed read-only captures of state nix cannot own
   (TCC grants, Chrome UI prefs); `scripts/capture-snapshot` produces them,
   `just snapshot <name> [host]` refreshes one, and the matching `snapshot`
