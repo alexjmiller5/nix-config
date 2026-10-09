@@ -21,6 +21,11 @@
   power.sleep.computer = "never";
   power.sleep.display = "never";
   power.restartAfterPowerFailure = true;
+  # Boot straight to the desktop (FileVault is off): agents need the console
+  # session, its launchd agents and Keychain without a human at the login
+  # window. The password half is the autologin manual step below. The laptop
+  # keeps the login window.
+  system.defaults.loginwindow.autoLoginUser = username;
 
   # Apple build host for agents: Xcode 27 (App Store), Apple's headless MCP
   # server, simulators. The laptop stays on Xcode 26.3 until its macOS passes
@@ -178,6 +183,34 @@
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    autologin = {
+      title = "Auto-login password";
+      owner = "loginwindow";
+      desktop = true;
+      body = ''
+        Nix sets `autoLoginUser`; macOS also needs the password in
+        `/etc/kcpassword`. In a terminal on the mini (Screen Sharing), run
+        `sudo sysadminctl -autologin set -userName ${username} -password -`;
+        `-` makes it prompt for the account password instead of taking it as an
+        argument.
+      '';
+      verify = "defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser | grep -qx ${username} && test -e /etc/kcpassword";
+      redo = "After changing the account password, or on a replacement Mac.";
+    };
+    screen-lock-off = {
+      title = "No password after screen saver or display sleep";
+      owner = "loginwindow";
+      desktop = true;
+      body = ''
+        With a screen lock delay set, the screen locks again after a reboot's
+        auto-login and whenever a Screen Sharing session that started on a
+        locked screen disconnects. In a terminal on the mini (Screen Sharing),
+        run `sysadminctl -screenLock off -password -` (prompts for the account
+        password).
+      '';
+      verify = "sysadminctl -screenLock status 2>&1 | grep -q 'screenLock is off'";
+      redo = "On a replacement Mac.";
+    };
     flighty-sync = {
       title = "Open Flighty and finish iCloud sync";
       owner = "flighty-sync";
