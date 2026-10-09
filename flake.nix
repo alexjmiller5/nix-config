@@ -62,8 +62,8 @@
       url = "github:alexjmiller5/soma";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    life-ui = {
-      url = "github:alexjmiller5/life-ui";
+    iris = {
+      url = "github:alexjmiller5/iris";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     cochlea = {
@@ -179,7 +179,7 @@
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
             inputs.receptor.darwinModules.default
-            inputs.life-ui.darwinModules.default
+            inputs.iris.darwinModules.default
             inputs.cochlea.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {

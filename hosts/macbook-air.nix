@@ -142,7 +142,7 @@
     { app = "/Applications/Google Chrome.app"; }
     { app = "/Applications/Notion Calendar.app"; }
     { app = "/Applications/Notion.app"; }
-    { app = "/Applications/Nix Apps/LifeUI.app"; }
+    { app = "/Applications/Nix Apps/Iris.app"; }
     { app = "/Applications/Claude.app"; }
     { app = "/Users/${username}/Applications/Chrome Apps.localized/Google Maps.app"; }
     { app = "/System/Applications/Utilities/Screen Sharing.app"; }
@@ -154,10 +154,7 @@
     migrateFromHomebrew = true;
   };
 
-  programs.life-ui = {
-    enable = true;
-    migrateFromHomebrew = true;
-  };
+  programs.iris.enable = true;
   programs.cochlea = {
     enable = true;
     migrateFromHomebrew = true;

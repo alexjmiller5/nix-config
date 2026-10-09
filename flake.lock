@@ -269,7 +269,7 @@
         "type": "github"
       }
     },
-    "life-ui": {
+    "iris": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
@@ -277,16 +277,16 @@
         "tooling": "tooling"
       },
       "locked": {
-        "lastModified": 1791511264,
-        "narHash": "sha256-TttQVy6nR5ooTDi1BF65rqDsedUh6dghfGAXgmt9MJc=",
+        "lastModified": 1791573357,
+        "narHash": "sha256-K7Z9lDnN/njnM/itij/Z7Qnq4rbJjZ/IELM9gnkXGVw=",
         "owner": "alexjmiller5",
-        "repo": "life-ui",
-        "rev": "e3f4e5bc12a7173a045c0e295d227ad12fd738dd",
+        "repo": "iris",
+        "rev": "0dec5ffaccbfc0274d7259f72a959bb753605c5a",
         "type": "github"
       },
       "original": {
         "owner": "alexjmiller5",
-        "repo": "life-ui",
+        "repo": "iris",
         "type": "github"
       }
     },
@@ -831,7 +831,7 @@
         "cochlea": "cochlea",
         "flighty-sync": "flighty-sync",
         "home-manager": "home-manager",
-        "life-ui": "life-ui",
+        "iris": "iris",
         "mcp-nixos": "mcp-nixos",
         "media-center-youtube-offline": "media-center-youtube-offline",
         "networth-host": "networth-host",
@@ -919,11 +919,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791547045,
-        "narHash": "sha256-Ey1jG8eiTX+UWNHOyHw2zE6RrxxjgUwwcklKQRElekI=",
+        "lastModified": 1791573320,
+        "narHash": "sha256-yJKp0Jmt7S/TCGwIGNieEnhJPhH9w6nJBn+zzkFBlJo=",
         "owner": "alexjmiller5",
         "repo": "soma",
-        "rev": "1950bdb22ad8965bcee776ef4051f1665b590aeb",
+        "rev": "5f530313041959b9269ac004b606fd5bd4f42e99",
         "type": "github"
       },
       "original": {
