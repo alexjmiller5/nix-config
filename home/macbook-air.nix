@@ -111,9 +111,6 @@ in
   # Where agents run their browser: the mini's shared agent Chrome
   # (hosts/mac-mini.nix services.agent-chrome), never this laptop's - the
   # chrome-control skill reads this and drives it over an ssh port-forward.
-  # Media Center (home module from its flake). Laptop only: the mini is
-  # headless and nobody reads feeds there.
-  programs.media-center.enable = true;
   home.sessionVariables.CHROME_CONTROL_HOST = "mac-mini-tailscale";
   # Review pages go to the mini's Verdict server (hosts/mac-mini.nix).
   home.sessionVariables.VERDICT_URL = "http://mac-mini.tailee59b5.ts.net:7071";
@@ -468,8 +465,12 @@ in
   '';
 
   home.packages = [
-    # The Verdict CLI (the server runs on the mini).
-    verdict.packages.${pkgs.stdenv.hostPlatform.system}.default
+    # The Verdict CLI only (the server runs on the mini): its venv also ships
+    # python3, which would collide with the toolbox python3.
+    (pkgs.runCommand "verdict-cli" { } ''
+      mkdir -p $out/bin
+      ln -s ${verdict.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/verdict $out/bin/verdict
+    '')
     # Laptop-only leftovers — the portable dev toolbox lives in
     # home/dev-tools.nix (shared with the mini). What stays here: the Apple
     # build chain pieces the mini does not need (fastlane, device tools), GUI

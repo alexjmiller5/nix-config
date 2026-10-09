@@ -193,6 +193,7 @@
             inputs.receptor.darwinModules.default
             inputs.iris.darwinModules.default
             inputs.cochlea.darwinModules.default
+            inputs.media-center.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {
@@ -210,8 +211,6 @@
                 inputs.soma.homeModules.default
                 inputs.people-sync.homeModules.default
                 inputs.page-archiver.homeModules.default
-                # Media Center ships a home module (programs.media-center).
-                inputs.media-center.homeModules.default
               ];
               # Explicit per-input args (not `inherit inputs`) on purpose: each
               # exported homeModule documents exactly what a consumer must pass.
