@@ -1191,11 +1191,11 @@
         "uv2nix": "uv2nix_5"
       },
       "locked": {
-        "lastModified": 1791578756,
-        "narHash": "sha256-nliYZDPAHnbDu2SodfjZo9qNvjYPt+uiVcrzH7oo01Y=",
+        "lastModified": 1791581420,
+        "narHash": "sha256-NivSGWQVAIinwhErl2ij6s1h32qH2YCB7UN2/GNMgTA=",
         "owner": "alexjmiller5",
         "repo": "verdict",
-        "rev": "2fbb190e670772d3d07f6205dc235e5ae1c03b67",
+        "rev": "8c26ef74ccecc09823173e883a28a3e0e313b69b",
         "type": "github"
       },
       "original": {
