@@ -357,6 +357,28 @@
         "type": "github"
       }
     },
+    "networth-host": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "dir": "host",
+        "lastModified": 1791508326,
+        "narHash": "sha256-IyCu1baVgolmYcnAxLKdnFWABuZNy5fF0/xjamlwlA0=",
+        "owner": "alexjmiller5",
+        "repo": "networth",
+        "rev": "dc052607476137a614cf5d48d256d22221779d3d",
+        "type": "github"
+      },
+      "original": {
+        "dir": "host",
+        "owner": "alexjmiller5",
+        "repo": "networth",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -833,6 +855,7 @@
         "life-ui": "life-ui",
         "mcp-nixos": "mcp-nixos",
         "media-center-youtube-offline": "media-center-youtube-offline",
+        "networth-host": "networth-host",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nix-openclaw-tools": "nix-openclaw-tools",

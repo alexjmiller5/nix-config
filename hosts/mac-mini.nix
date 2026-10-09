@@ -135,6 +135,15 @@
       "-s" "media-center.youtube-offline" "-a" "hub" "-w"
     ];
   };
+  # Networth finance reviews started from the dashboard land here as Herdr
+  # tabs. Outbound long poll only; the host credential is in the login
+  # Keychain (manual step below).
+  services.networth-host = {
+    enable = true;
+    user = username;
+    url = "https://networth.nqipomyrjb.workers.dev";
+    herdrWorkspace = "w1";
+  };
   services.callhistory-backup = {
     enable = true;
     user = username;
@@ -287,6 +296,24 @@
       '';
       verify = "security find-generic-password -s media-center.youtube-offline -a hub >/dev/null";
       redo = "On a replacement Mac (mint a new token, revoke the old one) or after rotating the token.";
+    };
+    networth-host-enroll = {
+      title = "Networth finance host enrollment";
+      owner = "networth";
+      desktop = true;
+      body = ''
+        Enroll from the login session (the Keychain is locked over ssh): either a
+        desktop terminal over Screen Sharing running `networth-host enroll --label
+        "Mac mini"`, or a one-shot `launchctl submit -l networth-enroll -o <log>
+        -e <log> -- /run/current-system/sw/bin/networth-host enroll --label "Mac
+        mini"` and read the approval link from the log. Open the link in a browser
+        signed in to the Networth site, match the code and approve. Then
+        `launchctl kickstart -k gui/$(id -u)/networth-host` and check
+        `~/.local/state/networth-host/networth-host.log` for `polling`.
+        Revoke a replaced host on the site's Widgets page.
+      '';
+      verify = "test -s ~/.local/state/networth-host/enrollment.json";
+      redo = "on a replacement machine (revoke the old host on /widgets)";
     };
     screentime-dashboard-upload = {
       title = "Screentime Dashboard upload device";

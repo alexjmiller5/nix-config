@@ -88,6 +88,12 @@
       url = "github:alexjmiller5/media-center?dir=jobs/youtube-offline";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Networth finance host (sub-flake, nix-darwin module): long-polls the
+    # Networth site for finance review runs and launches an agent in Herdr.
+    networth-host = {
+      url = "github:alexjmiller5/networth?dir=host";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Shared album reminder module, imported only by the mini profile.
     shared-album-reminders = {
       url = "github:alexjmiller5/shared-album-reminders";
@@ -168,6 +174,7 @@
             inputs.screentime-backup.darwinModules.default
             inputs.screentime-dashboard.darwinModules.default
             inputs.media-center-youtube-offline.darwinModules.default
+            inputs.networth-host.darwinModules.default
             inputs.flighty-sync.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.sticker-sync.darwinModules.default
