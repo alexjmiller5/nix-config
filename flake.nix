@@ -20,6 +20,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
+    # Verdict review server (nix-darwin module) on the mini; the laptop only
+    # gets its CLI.
+    verdict = {
+      url = "github:alexjmiller5/verdict";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Screentime Dashboard's ingest job: rebuilds the dashboard's series from
     # the mini's snapshots on request (nix-darwin module + screentime-ingest).
     screentime-dashboard = {
@@ -182,11 +188,11 @@
             inputs.networth-host.darwinModules.default
             inputs.flighty-sync.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
+            inputs.verdict.darwinModules.default
             inputs.sticker-sync.darwinModules.default
             inputs.receptor.darwinModules.default
             inputs.iris.darwinModules.default
             inputs.cochlea.darwinModules.default
-            inputs.media-center.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {
@@ -204,6 +210,8 @@
                 inputs.soma.homeModules.default
                 inputs.people-sync.homeModules.default
                 inputs.page-archiver.homeModules.default
+                # Media Center ships a home module (programs.media-center).
+                inputs.media-center.homeModules.default
               ];
               # Explicit per-input args (not `inherit inputs`) on purpose: each
               # exported homeModule documents exactly what a consumer must pass.
@@ -220,6 +228,7 @@
                   nix-openclaw-tools
                   soma
                   shared-album-reminders
+                  verdict
                   claude-plugins-official
                   claude-plugin-superpowers
                   claude-plugin-ponytail

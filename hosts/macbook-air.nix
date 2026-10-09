@@ -159,9 +159,6 @@
     enable = true;
     migrateFromHomebrew = true;
   };
-  # Laptop only: the mini is headless and nobody reads feeds there.
-  programs.media-center.enable = true;
-
   # Brew-ONLY leftovers — everything available in nixpkgs migrated to
   # home/macbook-air.nix home.packages on 2026-08-10 (dep cruft and the
   # unused ruby managers dropped outright; brew auto-keeps real deps).
