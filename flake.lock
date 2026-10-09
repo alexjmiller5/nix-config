@@ -236,11 +236,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1791400103,
-        "narHash": "sha256-P+YHBwxkFL44adrONEYkyCozOeqXYmmUkTO3AJ8nKRA=",
+        "lastModified": 1791553067,
+        "narHash": "sha256-olJgRY5I/Ngx8wCwmipVkbXCRZIpy4XFA3VuA3pEKcw=",
         "owner": "alexjmiller5",
         "repo": "flighty-sync",
-        "rev": "6facb041ade167b75ab0cd5a4d1b76dcdf8e5001",
+        "rev": "ec85f785ad874f6da62e33f83744b085e2dd8aec",
         "type": "github"
       },
       "original": {
