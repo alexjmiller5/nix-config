@@ -28,7 +28,7 @@
     };
     # Weekly iMessage sticker sync into Documents (nix-darwin module).
     sticker-sync.url = "github:alexjmiller5/sticker-sync";
-    # Daily social-profile scraping into life-data on the mini (nix-darwin module).
+    # Daily social-profile scraping into Soma on the mini (nix-darwin module).
     people-sync.url = "github:alexjmiller5/people-sync";
     # age-encrypted secrets, decrypted at activation via the host SSH key.
     # darwin + home-manager follows: without them agenix pins its own copies
@@ -56,10 +56,10 @@
       url = "github:openclaw/nix-openclaw-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # life-data — schema-agnostic personal data store; ships its own
+    # soma — schema-agnostic personal data store; ships its own
     # home-manager module (wired via sharedModules), enabled in home/common.nix.
-    life-data = {
-      url = "github:alexjmiller5/life-data";
+    soma = {
+      url = "github:alexjmiller5/soma";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     life-ui = {
@@ -83,7 +83,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Media Center's YouTube offline job (sub-flake, nix-darwin module): keeps
-    # requested videos as offline copies in Life Data by long-polling the hub.
+    # requested videos as offline copies in Soma by long-polling the hub.
     media-center-youtube-offline = {
       url = "github:alexjmiller5/media-center?dir=jobs/youtube-offline";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -98,7 +98,7 @@
     shared-album-reminders = {
       url = "github:alexjmiller5/shared-album-reminders";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.life-data.follows = "life-data";
+      inputs.soma.follows = "soma";
     };
     # Build the shared MCP server with the system, never during an agent's
     # connection timeout window.
@@ -195,7 +195,7 @@
               home-manager.backupFileExtension = "backup";
               home-manager.sharedModules = [
                 inputs.bookmark-mirror.homeModules.default
-                inputs.life-data.homeModules.default
+                inputs.soma.homeModules.default
                 inputs.people-sync.homeModules.default
                 inputs.page-archiver.homeModules.default
               ];
@@ -212,7 +212,7 @@
                   pi-fast-mode
                   nix-vscode-extensions
                   nix-openclaw-tools
-                  life-data
+                  soma
                   shared-album-reminders
                   claude-plugins-official
                   claude-plugin-superpowers

@@ -74,7 +74,7 @@ in
     enable = true;
     service.enable = true;
     settings = {
-      hub_url = "https://life-data.nqipomyrjb.workers.dev";
+      hub_url = "https://soma.nqipomyrjb.workers.dev";
       subscription_id = "1521a54f-65ac-47d1-832d-1a4d5959dd66";
       capture_table = "page_captures";
       artifact_prefix = "captures/pages/";
@@ -292,7 +292,7 @@ in
       desktop = true;
       body = ''
         Preserve the app's XDG baseline/adoption state when replacing the machine.
-        Enroll its independently minted Life credential using the installed app's
+        Enroll its independently minted Soma credential using the installed app's
         `--enroll-token` interface from the logged-in desktop. Run the installed
         job in dry-run mode, then approve the Photos library prompt in Screen Sharing.
         macOS may identify the Nix launcher as `bash`; the permission covers the
@@ -315,8 +315,8 @@ in
         Notion, inject `~/.config/people-sync/operator.env` through desktop-auth
         `op run`, using `op-unlock` for direct mini operator access. From the laptop,
         forward only those three app values over SSH stdin, never an operator or
-        CI service-account token. Life's background runner syncs local table rows
-        separately using its own enrolled credential. Do not run `life sync` inside
+        CI service-account token. Soma's background runner syncs local table rows
+        separately using its own enrolled credential. Do not run `soma sync` inside
         People Sync's file-token environment.
       '';
       redo = "after session expiry";

@@ -133,7 +133,7 @@
   services.media-center.youtube-offline = {
     enable = true;
     user = username;
-    hubUrl = "https://life-data.nqipomyrjb.workers.dev";
+    hubUrl = "https://soma.nqipomyrjb.workers.dev";
     subscriptionId = "0b06361f-3efa-422c-ae97-1d671f700d3c";
     credentialCommand = [
       "/usr/bin/security" "find-generic-password"
@@ -225,7 +225,7 @@
         to finish syncing, then compare the list with a fresh Flighty export.
         Do not create a second account or import the existing flights again.
         A populated local database proves local availability only; Flighty Sync
-        must separately verify source freshness and Life Data enrollment before
+        must separately verify source freshness and Soma enrollment before
         its nightly sync is considered active.
       '';
       verify = ''
@@ -239,17 +239,17 @@
       desktop = true;
       body = ''
         After Flighty's library has hydrated, use the installed CLI in Terminal:
-        `flighty-sync configure --hub-url https://life-data.nqipomyrjb.workers.dev`,
+        `flighty-sync configure --hub-url https://soma.nqipomyrjb.workers.dev`,
         then `flighty-sync inspect` and
         `flighty-sync verify-export "$HOME/Documents/manual-backups/flighty/FlightyExport-2026-10-07.csv"`.
         Use a newly exported CSV if the library has changed. For a new machine,
         copy the official export through the normal user file interface first.
 
-        The Life Data operator must publish the cataloged `flights` table and
+        The Soma operator must publish the cataloged `flights` table and
         mint a dedicated `flighty-sync` consumer token with exactly
         `tables:read:flights,tables:write:flights,files:read:raw/flighty/,files:write:raw/flighty/`.
-        From an enrolled operator terminal, run `life sync` to publish the
-        local catalog before enrollment. Then `life token create flighty-sync
+        From an enrolled operator terminal, run `soma sync` to publish the
+        local catalog before enrollment. Then `soma token create flighty-sync
         --scopes "$(flighty-sync scopes)"` prints the token once. Never substitute
         an operator, full-replica or another consumer's token. Enter it without
         shell history using:
@@ -272,7 +272,7 @@
         read this native Keychain credential. Then kick the installed job with
         `launchctl kickstart gui/$(id -u)/org.flighty-sync` and inspect
         `flighty-sync status`. A success must include verified archive readback
-        and matching Life Data rows. Repeat after a known Flighty UI change and
+        and matching Soma rows. Repeat after a known Flighty UI change and
         verify that iCloud brings it to this mini. A successful installed-context
         run verifies the nightly 03:30 job. iCloud freshness remains unverified
         until a known change has propagated from another device.
@@ -316,8 +316,8 @@
       owner = "media-center";
       desktop = true;
       body = ''
-        The job's own Life Data token (operator copy: `Media Center YouTube Offline
-        Life Data Token` in the Media Center vault) must be in the login Keychain as
+        The job's own Soma token (operator copy: `Media Center YouTube Offline
+        Soma Token` in the Media Center vault) must be in the login Keychain as
         service `media-center.youtube-offline`, account `hub`. SSH sessions cannot
         write the Keychain: from the desktop session (a terminal over Screen Sharing,
         or a one-shot launchd job in `gui/$(id -u)`), pipe

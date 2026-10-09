@@ -269,26 +269,6 @@
         "type": "github"
       }
     },
-    "life-data": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1791499444,
-        "narHash": "sha256-tjIp3M1M2zIyoKEtTcna0/ONBy+b1OBMaxPb4bGCyKw=",
-        "owner": "alexjmiller5",
-        "repo": "life-data",
-        "rev": "f29d04eb625cda7b33901d0ff5f80aab7aecd864",
-        "type": "github"
-      },
-      "original": {
-        "owner": "alexjmiller5",
-        "repo": "life-data",
-        "type": "github"
-      }
-    },
     "life-ui": {
       "inputs": {
         "nixpkgs": [
@@ -343,11 +323,11 @@
       },
       "locked": {
         "dir": "jobs/youtube-offline",
-        "lastModified": 1791494939,
-        "narHash": "sha256-zp+v56+xsSqHt+kKOeEzRd2FSFw5/RooEPVj+DduhMY=",
+        "lastModified": 1791551300,
+        "narHash": "sha256-MMTydyrRMO9vKwW3gJ9arJLKDq4rMNkXiFpcXmcttQk=",
         "owner": "alexjmiller5",
         "repo": "media-center",
-        "rev": "612b8822ac6f96fa4292fb808becde3059c95a81",
+        "rev": "8b2154df1cf2577b8f172e0055efa7d364113f0b",
         "type": "github"
       },
       "original": {
@@ -534,11 +514,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1791238416,
-        "narHash": "sha256-8IfWyCtOgAP0OYum2v3qGZdlpMythBemvnnpMZejhQ4=",
+        "lastModified": 1791551531,
+        "narHash": "sha256-9T6fGI/WNk4MvbLt9HGOS/wc6vDfNIhosJRoSd9AmJk=",
         "owner": "alexjmiller5",
         "repo": "people-sync",
-        "rev": "5fd91de928f1bbe38ba71e47aa475b80ed407361",
+        "rev": "2309c32d6f5aeb1c472ac7c95aa8054a7a6638a7",
         "type": "github"
       },
       "original": {
@@ -851,7 +831,6 @@
         "cochlea": "cochlea",
         "flighty-sync": "flighty-sync",
         "home-manager": "home-manager",
-        "life-data": "life-data",
         "life-ui": "life-ui",
         "mcp-nixos": "mcp-nixos",
         "media-center-youtube-offline": "media-center-youtube-offline",
@@ -871,6 +850,7 @@
         "screentime-backup": "screentime-backup",
         "screentime-dashboard": "screentime-dashboard",
         "shared-album-reminders": "shared-album-reminders",
+        "soma": "soma",
         "sticker-sync": "sticker-sync"
       }
     },
@@ -911,24 +891,44 @@
     },
     "shared-album-reminders": {
       "inputs": {
-        "life-data": [
-          "life-data"
-        ],
         "nixpkgs": [
           "nixpkgs"
+        ],
+        "soma": [
+          "soma"
         ]
       },
       "locked": {
-        "lastModified": 1791378549,
-        "narHash": "sha256-SVh5HdJZ8yn+DUlOB4hUgnJDHerEbvnU4FuL17Q3BwA=",
+        "lastModified": 1791550925,
+        "narHash": "sha256-3nm4wHyRwSP0xmULX+3JquDC3bNQSkIwo7Da2xdQDkE=",
         "owner": "alexjmiller5",
         "repo": "shared-album-reminders",
-        "rev": "4b302d6858413f1b649a69c7a5b458b2a2390cf1",
+        "rev": "d7eea91aac9fe92beebd2b7aa300ba7de6754ba1",
         "type": "github"
       },
       "original": {
         "owner": "alexjmiller5",
         "repo": "shared-album-reminders",
+        "type": "github"
+      }
+    },
+    "soma": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791547045,
+        "narHash": "sha256-Ey1jG8eiTX+UWNHOyHw2zE6RrxxjgUwwcklKQRElekI=",
+        "owner": "alexjmiller5",
+        "repo": "soma",
+        "rev": "1950bdb22ad8965bcee776ef4051f1665b590aeb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "soma",
         "type": "github"
       }
     },
