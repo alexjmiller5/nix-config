@@ -304,9 +304,12 @@
       body = ''
         Enroll from the login session (the Keychain is locked over ssh): either a
         desktop terminal over Screen Sharing running `networth-host enroll --label
-        "Mac mini"`, or a one-shot `launchctl submit -l networth-enroll -o <log>
-        -e <log> -- /run/current-system/sw/bin/networth-host enroll --label "Mac
-        mini"` and read the approval link from the log. Open the link in a browser
+        "Mac mini"`, or a one-shot job that removes itself (launchd restarts a
+        submitted job, and a second enroll replaces the approved credential):
+        `launchctl submit -l networth-enroll -o <log> -e <log> -- /bin/sh -c
+        '/run/current-system/sw/bin/networth-host enroll --label "Mac mini";
+        launchctl remove networth-enroll'`, then read the approval link from the
+        log. Open the link in a browser
         signed in to the Networth site, match the code and approve. Then
         `launchctl kickstart -k gui/$(id -u)/networth-host` and check
         `~/.local/state/networth-host/networth-host.log` for `polling`.
