@@ -159,6 +159,8 @@
     enable = true;
     migrateFromHomebrew = true;
   };
+  # Laptop only: the mini is headless and nobody reads feeds there.
+  programs.media-center.enable = true;
 
   # Brew-ONLY leftovers — everything available in nixpkgs migrated to
   # home/macbook-air.nix home.packages on 2026-08-10 (dep cruft and the
@@ -243,6 +245,19 @@
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    media-center-enroll = {
+      title = "Enroll Media Center";
+      owner = "media-center";
+      desktop = true;
+      body = ''
+        Open `/Applications/Nix Apps/MediaCenter.app`, enter the Soma HTTPS
+        address, approve in the browser page it opens and verify the device
+        code. The app keeps its own
+        device credential in the Data Protection Keychain; a replacement Mac
+        enrolls again.
+      '';
+      redo = "after replacing the Mac or revoking the device in Soma";
+    };
     claude-in-chrome-login = {
       title = "Sign into Claude in Chrome";
       owner = "claude-in-chrome";

@@ -204,9 +204,10 @@
       body = ''
         With a screen lock delay set, the screen locks again after a reboot's
         auto-login and whenever a Screen Sharing session that started on a
-        locked screen disconnects. In a terminal on the mini (Screen Sharing),
-        run `sysadminctl -screenLock off -password -` (prompts for the account
-        password).
+        locked screen disconnects. Over Screen Sharing: System Settings >
+        Lock Screen > "Require password after screen saver begins or display
+        is turned off" > Never. (`sysadminctl -screenLock off -password -`
+        does not prompt; it only accepts the password as an argument.)
       '';
       verify = "sysadminctl -screenLock status 2>&1 | grep -q 'screenLock is off'";
       redo = "On a replacement Mac.";

@@ -312,6 +312,26 @@
         "type": "github"
       }
     },
+    "media-center": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791573278,
+        "narHash": "sha256-DDNYo/VHMXSTQ6pPPs6j/7w1KOUN7N/JS6/0clljYBM=",
+        "owner": "alexjmiller5",
+        "repo": "media-center",
+        "rev": "7041b676b3c8f4cce68852ab4b1b04221debbe81",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "media-center",
+        "type": "github"
+      }
+    },
     "media-center-youtube-offline": {
       "inputs": {
         "nixpkgs": [
@@ -833,6 +853,7 @@
         "home-manager": "home-manager",
         "iris": "iris",
         "mcp-nixos": "mcp-nixos",
+        "media-center": "media-center",
         "media-center-youtube-offline": "media-center-youtube-offline",
         "networth-host": "networth-host",
         "nix-darwin": "nix-darwin",

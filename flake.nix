@@ -82,6 +82,11 @@
       url = "github:alexjmiller5/page-archiver";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Media Center's signed Mac app (nix-darwin module, laptop only).
+    media-center = {
+      url = "github:alexjmiller5/media-center";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Media Center's YouTube offline job (sub-flake, nix-darwin module): keeps
     # requested videos as offline copies in Soma by long-polling the hub.
     media-center-youtube-offline = {
@@ -181,6 +186,7 @@
             inputs.receptor.darwinModules.default
             inputs.iris.darwinModules.default
             inputs.cochlea.darwinModules.default
+            inputs.media-center.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {
