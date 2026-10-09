@@ -297,11 +297,11 @@
         "tooling": "tooling"
       },
       "locked": {
-        "lastModified": 1791502039,
-        "narHash": "sha256-7GpQxPL2HvZZzhQCow14JAyZmgP2QmgswvUqq8m0S2E=",
+        "lastModified": 1791511264,
+        "narHash": "sha256-TttQVy6nR5ooTDi1BF65rqDsedUh6dghfGAXgmt9MJc=",
         "owner": "alexjmiller5",
         "repo": "life-ui",
-        "rev": "62a469bbf2b34e1ec487ccfc9db7ae4e7a5958cb",
+        "rev": "e3f4e5bc12a7173a045c0e295d227ad12fd738dd",
         "type": "github"
       },
       "original": {
