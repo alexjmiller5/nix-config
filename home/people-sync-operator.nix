@@ -5,6 +5,8 @@
 # from operator.env (ID-based op refs); no secret value is evaluated by Nix,
 # and the login credential commands stay unset (sites are signed into by hand
 # in the shared Chrome).
+# SOMA_COMM_HUB_TOKEN (People Sync Soma Hub Token, full scope) is read only by
+# `people-sync comm`; every other command keeps the file-scoped SOMA_HUB_TOKEN.
 {
   programs.people-sync = {
     enable = true;
@@ -38,5 +40,6 @@
     SOMA_HUB_URL=op://ug25zl4cfxnyk7rnwkyhea752i/5xs6y3x5sxkhmvbjlredlpk7oi/SOMA_HUB_URL
     SOMA_HUB_TOKEN=op://ug25zl4cfxnyk7rnwkyhea752i/5xs6y3x5sxkhmvbjlredlpk7oi/SOMA_HUB_TOKEN
     NOTION_API_TOKEN=op://ug25zl4cfxnyk7rnwkyhea752i/5xs6y3x5sxkhmvbjlredlpk7oi/NOTION_API_TOKEN
+    SOMA_COMM_HUB_TOKEN=op://ug25zl4cfxnyk7rnwkyhea752i/zo2abyixdjzmddj3u2sykzgou4/credential
   '';
 }
