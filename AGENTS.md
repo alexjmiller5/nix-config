@@ -225,6 +225,12 @@ normal Homebrew activation; quit Receptor after preserving drafts before a
 switch that transitions an existing cask. The installed app is exposed through
 `/Applications/Nix Apps/Receptor.app`. The mini does not enable Receptor.
 
+Media Center on the laptop uses its app-owned flake package and Darwin module
+(`programs.media-center.enable`), installing the signed release unmodified as
+`/Applications/Nix Apps/MediaCenter.app`; its `media-center-enroll` manual step
+covers the app's own browser enrollment. No cask is declared. The mini does
+not enable it.
+
 ## Conventions
 
 * **Two-machine parity rule**: every change to a host file or per-host home
