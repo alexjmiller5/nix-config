@@ -2,7 +2,7 @@
 
 The grant lists themselves are snapshot steps in MANUAL-<host>.md.
 
-Snapshot verified against the system TCC db 2026-08-13. Audit anytime with:
+Snapshot verified against the system TCC db 2026-10-10. Audit anytime with:
 
 ```Shell
 sudo sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \

@@ -160,6 +160,16 @@
     publicUrl = "http://mac-mini.tailee59b5.ts.net:7071";
     label = "com.alexmiller.verdict";
   };
+  # Find My friends -> soma stream friend_city_checks, one city-grade check per
+  # resolved friend every 10 minutes. Reads the console's Find My window, so it
+  # needs the unlocked session (screen-lock-off) and its own Accessibility
+  # grant; the append-only hub token is in the login Keychain (manual steps).
+  services.friend-location-collector = {
+    enable = true;
+    user = username;
+    hubUrl = "https://soma.nqipomyrjb.workers.dev";
+    tokenCommand = "/usr/bin/security find-generic-password -s friend-location-collector -a soma-hub -w";
+  };
   services.callhistory-backup = {
     enable = true;
     user = username;
@@ -217,8 +227,13 @@
         auto-login and whenever a Screen Sharing session that started on a
         locked screen disconnects. Over Screen Sharing: System Settings >
         Lock Screen > "Require password after screen saver begins or display
-        is turned off" > Never. (`sysadminctl -screenLock off -password -`
-        does not prompt; it only accepts the password as an argument.)
+        is turned off" > Never. Or, in any terminal on the mini with a TTY
+        (ssh included): `sysadminctl -screenLock off -password -`,
+        which prompts for the account password (without a TTY it only
+        prints "Password is required!"). The setting is the keybag grace
+        period, so it always needs the password: the `com.apple.screensaver`
+        `askForPassword` / `askForPasswordDelay` keys (either domain) and
+        loginwindow `DisableScreenLock` do not change it.
       '';
       verify = "sysadminctl -screenLock status 2>&1 | grep -q 'screenLock is off'";
       redo = "On a replacement Mac.";
@@ -323,6 +338,54 @@
       '';
       verify = "grep -q 'backup OK' ~/Library/Logs/screentime-backup.log && grep -q 'backup OK' ~/Library/Logs/callhistory-backup.log";
     };
+    friend-location-collector-accessibility = {
+      title = "Accessibility for the Find My collector";
+      owner = "friend-location-collector";
+      desktop = true;
+      body = ''
+        Over Screen Sharing: System Settings > Privacy & Security > Accessibility,
+        switch on FriendLocationCollector (its first run adds it to the list; if it
+        is missing, + and pick `/Applications/FriendLocationCollector.app`). The
+        grant survives rebuilds: activation re-signs the app with the same
+        `friend-location-collector-signing` identity in the System keychain.
+      '';
+      verify = "test -s $HOME/Library/Logs/friend-location-collector/collector.log && ! tail -n 1 $HOME/Library/Logs/friend-location-collector/collector.log | grep -q Accessibility";
+      redo = "On a replacement Mac, or after that signing identity is removed from the System keychain.";
+    };
+    friend-location-collector-token = {
+      title = "Find My collector hub token";
+      owner = "friend-location-collector";
+      desktop = true;
+      body = ''
+        The collector's own Soma token, granted exactly
+        `streams:append:friend_city_checks` (operator copy: `People Sync Friend
+        Location Collector Hub Token` in the People Sync vault), must be in the
+        login Keychain as service `friend-location-collector`, account
+        `soma-hub`. SSH sessions cannot write the Keychain: from the desktop
+        session (a terminal over Screen Sharing, or a one-shot launchd job in
+        `gui/$(id -u)` that removes itself), pipe
+        `add-generic-password -A -U -s friend-location-collector -a soma-hub -w <token>`
+        into `security -i` on stdin. Then
+        `launchctl kickstart -k gui/$(id -u)/com.alexmiller.friend-location-collector`
+        and check that the last line of
+        `~/Library/Logs/friend-location-collector/collector.log` has `appended`
+        and no `error`.
+      '';
+      verify = "security find-generic-password -s friend-location-collector -a soma-hub >/dev/null";
+      redo = "On a replacement Mac (mint a new token, revoke the old one) or after rotating the token.";
+    };
+    friend-location-collector-handles = {
+      title = "Find My collector handle map";
+      owner = "friend-location-collector";
+      body = ''
+        `~/.local/state/friend-location-collector/handles.json` (0600) maps each
+        Find My `source_handle_key` to a person id; rows without an entry are
+        counted as `unresolved` in the collector log and never written. An agent
+        builds it (procedure: the `soma-map` skill, stream `friend_city_checks`).
+      '';
+      verify = "test -s $HOME/.local/state/friend-location-collector/handles.json";
+      redo = "When the collector log reports unresolved rows, or on a replacement Mac.";
+    };
     media-center-youtube-offline = {
       title = "Media Center YouTube offline hub credential";
       owner = "media-center";
@@ -392,7 +455,9 @@
         attributed by TCC to `/usr/libexec/sshd-keygen-wrapper`, so grant that ONE
         binary, via Screen Sharing: System Settings → Privacy & Security →
         **Screen Recording** → \[+] → ⌘⇧G → `/usr/libexec/sshd-keygen-wrapper`,
-        toggle on; same under **Accessibility**. Then from an ssh shell run
+        toggle on; same under **Accessibility** and **Full Disk Access** (imsg,
+        the WhatsApp database, the people-sync Apple ingest and
+        `capture-snapshot tcc` read protected files through it). Then from an ssh shell run
         `osascript -e 'tell application "System Events" to get name of every process'`
         once and click **Allow** on the "sshd-keygen-wrapper wants to control
         System Events" dialog that appears on the mini's display. Verify:
@@ -403,7 +468,11 @@
         dialogs themselves; only these grants and anything asking for the admin
         password stay human.
       '';
-      verify = "screencapture -x /tmp/manual-check.png && file /tmp/manual-check.png | grep -q PNG";
+      verify = ''
+        screencapture -x /tmp/manual-check.png && file /tmp/manual-check.png | grep -q PNG &&
+        osascript -e 'tell application "System Events" to get UI elements enabled' | grep -qx true &&
+        /usr/bin/sqlite3 -readonly "/Library/Application Support/com.apple.TCC/TCC.db" 'select 1' >/dev/null
+      '';
     };
     moshi-pairing = {
       title = "Moshi pairing";

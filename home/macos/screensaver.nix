@@ -6,8 +6,8 @@
 # never starts on idle. It lives in the ByHost domain, which
 # system.defaults.CustomUserPreferences can't target, hence the user-context
 # activation script (same pattern as menu-bar.nix). The password requirement
-# itself stays on: a manual lock (ctrl-cmd-Q) or a manually started screen
-# saver still locks.
+# itself is not declarable (the legacy askForPassword default is ignored); the
+# host's screen-lock-off manual step sets it to Never.
 let
   idleTime = toString config.macos.screensaver.idleTime;
 in

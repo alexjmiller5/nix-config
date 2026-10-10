@@ -88,6 +88,12 @@
       url = "github:alexjmiller5/page-archiver";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Find My friend-city collector (nix-darwin module, mini only): appends
+    # city-grade checks to the soma stream friend_city_checks.
+    findmy-cli = {
+      url = "github:alexjmiller5/findmy-cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Media Center's signed Mac app (nix-darwin module, laptop only).
     media-center = {
       url = "github:alexjmiller5/media-center";
@@ -194,6 +200,7 @@
             inputs.iris.darwinModules.default
             inputs.cochlea.darwinModules.default
             inputs.media-center.darwinModules.default
+            inputs.findmy-cli.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {

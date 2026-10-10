@@ -188,6 +188,26 @@
         "type": "github"
       }
     },
+    "findmy-cli": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791582186,
+        "narHash": "sha256-8Z905JVbIh9uieZGjzDtNlEnf88oVIeas6CfF6Otr5c=",
+        "owner": "alexjmiller5",
+        "repo": "findmy-cli",
+        "rev": "a10b4db673e9093f21b9b439e5039f44ba90860a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "findmy-cli",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -899,6 +919,7 @@
         "claude-plugin-superpowers": "claude-plugin-superpowers",
         "claude-plugins-official": "claude-plugins-official",
         "cochlea": "cochlea",
+        "findmy-cli": "findmy-cli",
         "flighty-sync": "flighty-sync",
         "home-manager": "home-manager",
         "iris": "iris",
