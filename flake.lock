@@ -1012,11 +1012,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791774081,
-        "narHash": "sha256-eD8RwqKgxlJHqKYVSmzQtRikofRM+Q/X4l5PHpRrsSY=",
+        "lastModified": 1791783494,
+        "narHash": "sha256-fbcMJIzHz0pPS4O2NvFUCNZ8OvuIkHlFlbA1zF73lOQ=",
         "owner": "alexjmiller5",
         "repo": "soma",
-        "rev": "a2bcf448391cdaa54d668d92a42f6a9272a6cf25",
+        "rev": "acb18ef813dfe7177ae156c557097fca5b461a8a",
         "type": "github"
       },
       "original": {
