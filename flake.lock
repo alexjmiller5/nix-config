@@ -385,11 +385,11 @@
       },
       "locked": {
         "dir": "host",
-        "lastModified": 1791508326,
-        "narHash": "sha256-IyCu1baVgolmYcnAxLKdnFWABuZNy5fF0/xjamlwlA0=",
+        "lastModified": 1791775136,
+        "narHash": "sha256-1QUktDT/iODY0eGFL4r+/YGNL4HuybcRB48VfLfQe78=",
         "owner": "alexjmiller5",
         "repo": "networth",
-        "rev": "dc052607476137a614cf5d48d256d22221779d3d",
+        "rev": "bb44b0f0bed3b989d753a6de1fabfbf27d5190f6",
         "type": "github"
       },
       "original": {

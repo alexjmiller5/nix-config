@@ -421,10 +421,10 @@
         signed in to the Networth site, match the code and approve. Then
         `launchctl kickstart -k gui/$(id -u)/networth-host` and check
         `~/.local/state/networth-host/networth-host.log` for `polling`.
-        Revoke a replaced host on the site's Widgets page.
+        Revoke a replaced host on the site's Hosts page.
       '';
       verify = "test -s ~/.local/state/networth-host/enrollment.json";
-      redo = "on a replacement machine (revoke the old host on /widgets)";
+      redo = "on a replacement machine (revoke the old host on /hosts)";
     };
     screentime-dashboard-upload = {
       title = "Screentime Dashboard upload device";
