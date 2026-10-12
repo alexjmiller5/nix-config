@@ -154,7 +154,7 @@ routing table and workflow; this file is the in-repo map.
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`. The mini alone imports
-  Shared Album Reminders; it stays disabled until its Life task integration
+  Shared Album Reminders; it stays disabled until its Soma task integration
   and launch-context access are ready. Page Archiver is enabled only on the
   mini; its background service uses a dedicated hub subscription and a
   consumer credential in the login Keychain through Apple security. Enrollment
@@ -198,7 +198,7 @@ routing table and workflow; this file is the in-repo map.
   and recovery through their supported interfaces. Git uses the machine
   vault only through the explicit initial bootstrap command. Routine pulls,
   pushes and switches do not invoke its credential helper.
-  Life background sync imports its own device token once into Keychain via
+  Soma background sync imports its own device token once into Keychain via
   the installed CLI. Edit = recreate-not-decrypt (see
   `secrets/secrets.nix` header); no master key exists.
   Screentime ingest enrolls through its own browser approval and Keychain;
@@ -212,7 +212,7 @@ routing table and workflow; this file is the in-repo map.
   `manual.steps` (modules/manual-steps.nix; declare a step next to the module that
   needs it, verify it with `manual-check` on the machine; bootstrap prose lives in
   docs/manual/<host>-bootstrap.md) - steps outside Nix (TCC,
-  SIP, sign-ins, bootstrap order), including Life browser enrollment, desktop
+  SIP, sign-ins, bootstrap order), including Soma browser enrollment, desktop
   Keychain setup and verification after replacing a machine.
 
 Flighty on the mini remains declared in masApps. The Brewfile skips reinstallation
