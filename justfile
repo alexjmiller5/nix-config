@@ -48,6 +48,7 @@ check:
     python3 tests/op-connect.py
     bash tests/op-connect-startup.sh
     bash tests/posthog-auth.sh
+    bash tests/gog-access-token.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
     python3 tests/herdr-takeover.py

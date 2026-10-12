@@ -29,6 +29,21 @@ let
   # lags months behind at gog's weekly cadence.
   gogcliPkg = nix-openclaw-tools.packages.${pkgs.stdenv.hostPlatform.system}.gogcli;
   posthogCli = pkgs.callPackage ../pkgs/posthog-cli.nix { };
+  # Prints a valid Google access token for gog's OAuth client (logic and cache
+  # notes in gog-access-token.sh); the gog wrapper below is its first client.
+  gogAccessToken = pkgs.writeShellApplication {
+    name = "gog-access-token";
+    runtimeInputs = [
+      config.opConnect.cliPackage
+      pkgs.jq
+      pkgs.curl
+    ];
+    text = ''
+      ${builtins.readFile ./agent-detect.sh}
+      ${builtins.readFile ./agent-op-env.sh}
+      ${builtins.readFile ./gog-access-token.sh}
+    '';
+  };
   # wacli (WhatsApp linked-device CLI) from its GitHub release — not in
   # nixpkgs or nix-openclaw-tools. Installed under libexec on purpose: the
   # `wacli` on PATH must be the wrapper below, never the raw binary.
@@ -125,70 +140,26 @@ in
     })
 
     # gog (Google CLI), wrapped with 1P-ONLY credential storage: gog itself
-    # never sees a refresh token. The wrapper owns the OAuth refresh: the
-    # "AI Agent Gog Token Export" item holds the refresh token (credential
-    # field, `gog auth tokens export` JSON) plus a cached
-    # access_token/expires_at pair the wrapper writes back after each
-    # refresh; "AI Agent Gog OAuth Client" holds the client JSON. Fast path
-    # (access token still valid) = ONE op call, no Google round-trip; slow
-    # path (~hourly) = curl refresh + 1P writeback. gog runs in
-    # --access-token mode throughout (bypasses stored tokens). The macOS
-    # keychain backend stays banned: structurally broken for nix binaries
-    # (adhoc-signed, store path changes each rebuild → ACL prompt flood).
-    # Caller-set GOG_ACCESS_TOKEN or GOG_HOME bypasses everything (the
-    # consent bootstrap uses GOG_HOME; see the gog skill).
+    # never sees a refresh token. gog-access-token (below) owns the OAuth
+    # refresh and its cache; gog runs in --access-token mode throughout
+    # (bypasses stored tokens). The macOS keychain backend stays banned:
+    # structurally broken for nix binaries (adhoc-signed, store path changes
+    # each rebuild → ACL prompt flood). Caller-set GOG_ACCESS_TOKEN or GOG_HOME
+    # bypasses everything (the consent bootstrap uses GOG_HOME; see the gog
+    # skill). Without a token gog runs anyway and reports its own auth error.
     (pkgs.writeShellApplication {
       name = "gog";
-      runtimeInputs = [
-        config.opConnect.cliPackage
-        pkgs.jq
-        pkgs.curl
-      ];
+      runtimeInputs = [ gogAccessToken ];
       text = ''
-        if [ -n "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ]; then
-          exec ${gogcliPkg}/bin/gog "$@"
-        fi
-        ${builtins.readFile ./agent-detect.sh}
-        ${builtins.readFile ./agent-op-env.sh}
-        item=""
-        if op_has_auth; then
-          item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json)"
-        fi
-        if [ -n "$item" ]; then
-          at="$(jq -r '[.fields[] | select(.label == "access_token")][0].value // empty' <<<"$item")"
-          exp="$(jq -r '[.fields[] | select(.label == "expires_at")][0].value // empty' <<<"$item")"
-          case "$exp" in ("" | *[!0-9]*) exp=0 ;; esac
-          now="$(date +%s)"
-          if [ -n "$at" ] && [ "$now" -lt "$((exp - 60))" ]; then
-            export GOG_ACCESS_TOKEN="$at"
-            exec ${gogcliPkg}/bin/gog "$@"
-          fi
-          # Access token missing/expired: refresh it ourselves and cache it
-          # back into the item. Secrets travel via stdin, never argv.
-          rt="$(jq -r '[.fields[] | select(.id == "credential")][0].value // empty' <<<"$item" | jq -r '.refresh_token // empty')"
-          client="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/4x66lrvreiljbmepa6esgkyu2e/credential')"
-          cid="$(jq -r '.installed.client_id // .web.client_id // empty' <<<"$client" 2>/dev/null || true)"
-          csec="$(jq -r '.installed.client_secret // .web.client_secret // empty' <<<"$client" 2>/dev/null || true)"
-          if [ -n "$rt" ] && [ -n "$cid" ]; then
-            resp="$(printf 'grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s' "$cid" "$csec" "$rt" \
-              | curl -s --max-time 30 --data @- https://oauth2.googleapis.com/token || true)"
-            at="$(jq -r '.access_token // empty' <<<"$resp" 2>/dev/null || true)"
-            expin="$(jq -r '.expires_in // 3600' <<<"$resp" 2>/dev/null || echo 3600)"
-            if [ -n "$at" ]; then
-              op item edit jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm \
-                --tags "$(jq -r '(.tags // []) | join(",")' <<<"$item")" "access_token[concealed]=$at" "expires_at[text]=$((now + expin))" >/dev/null 2>&1 || true
-              export GOG_ACCESS_TOKEN="$at"
-            else
-              # invalid_grant = refresh token revoked (password change / 6mo
-              # idle / consent withdrawn) → human re-consent is the only fix.
-              err="$(jq -r '.error // empty' <<<"$resp" 2>/dev/null || true)"
-              echo "gog wrapper: token refresh failed (''${err:-no response from Google}) — refresh token likely revoked. Fix: Alex runs \`gog-auth-bootstrap\` in his own terminal (alias; script in the gog skill)." >&2
-            fi
-          fi
+        if [ -z "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ] && at="$(gog-access-token)"; then
+          export GOG_ACCESS_TOKEN="$at"
         fi
         exec ${gogcliPkg}/bin/gog "$@"
       '';
     })
+    # Also on PATH for clients that call Google APIs gog does not wrap
+    # (people-sync's contact photos).
+    gogAccessToken
 
     # wacli (WhatsApp CLI, tier 2 of the whatsapp skill) with the linked-device
     # SESSION in 1Password, so one pairing serves every machine. A WhatsApp
