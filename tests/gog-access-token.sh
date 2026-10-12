@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# gog-access-token without 1Password or Google: op and curl are shell stubs that
-# log their argv and stdin, so the test also proves no secret reaches argv.
+# The gog wrapper's token step (home/gog-access-token.sh) without 1Password or Google:
+# op and curl are shell stubs that log their argv and stdin, so the test also proves no
+# secret reaches argv.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 work="$(mktemp -d)"

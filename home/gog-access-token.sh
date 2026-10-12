@@ -1,6 +1,7 @@
-# Print a Google OAuth access token for gog's client on stdout. The "AI Agent Gog
-# Token Export" item holds the refresh token (credential field, `gog auth tokens
-# export` JSON) plus a cached access_token/expires_at pair written back after each
+# The gog wrapper's token step (op-wrappers.nix runs it by store path; it is not a
+# command on PATH): print a Google OAuth access token for gog's client on stdout. The
+# "AI Agent Gog Token Export" item holds the refresh token (credential field, `gog auth
+# tokens export` JSON) plus a cached access_token/expires_at pair written back after each
 # refresh; "AI Agent Gog OAuth Client" holds the client JSON. Fast path (cached token
 # still valid for a minute) = ONE op call, no Google round-trip; slow path (~hourly) =
 # curl refresh + 1P writeback. Secrets travel via stdin and the environment, never
@@ -10,7 +11,7 @@ if op_has_auth; then
   item="$(op item get jjc6xu22cew46e6zpyfdsdjv3e --vault 4eeyrkqibibn7k4j6rz2fbzvxm --format json || true)"
 fi
 if [ -z "$item" ]; then
-  echo "gog-access-token: no 1Password auth to read the gog token item" >&2
+  echo "gog wrapper: no 1Password auth to read the gog token item" >&2
   exit 1
 fi
 at="$(jq -r '[.fields[] | select(.label == "access_token")][0].value // empty' <<<"$item")"
@@ -26,7 +27,7 @@ client="$(op read 'op://4eeyrkqibibn7k4j6rz2fbzvxm/4x66lrvreiljbmepa6esgkyu2e/cr
 cid="$(jq -r '.installed.client_id // .web.client_id // empty' <<<"$client" 2>/dev/null || true)"
 csec="$(jq -r '.installed.client_secret // .web.client_secret // empty' <<<"$client" 2>/dev/null || true)"
 if [ -z "$rt" ] || [ -z "$cid" ]; then
-  echo "gog-access-token: no refresh token or OAuth client in 1Password - Alex runs \`gog-auth-bootstrap\` in his own terminal" >&2
+  echo "gog wrapper: no refresh token or OAuth client in 1Password - Alex runs \`gog-auth-bootstrap\` in his own terminal" >&2
   exit 1
 fi
 resp="$(printf 'grant_type=refresh_token&client_id=%s&client_secret=%s&refresh_token=%s' "$cid" "$csec" "$rt" \

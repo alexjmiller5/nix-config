@@ -14,9 +14,6 @@
     # home/mac-mini.nix overrides this with the local port.
     endpoint = lib.mkDefault "127.0.0.1:9223";
     notion.peopleDataSource = "1a803953-a8af-80ab-824d-000bfe407316";
-    # `port google` copies Apple card photos through the People API with the
-    # same Google OAuth grant gog uses (op-wrappers.nix).
-    googleTokenCommand = "gog-access-token";
     # Notion DBs relating to People, checked by `reconcile merge` (property
     # IDs, not names, so a rename cannot silently disable the check).
     notion.relations = {

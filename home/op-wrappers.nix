@@ -29,8 +29,9 @@ let
   # lags months behind at gog's weekly cadence.
   gogcliPkg = nix-openclaw-tools.packages.${pkgs.stdenv.hostPlatform.system}.gogcli;
   posthogCli = pkgs.callPackage ../pkgs/posthog-cli.nix { };
-  # Prints a valid Google access token for gog's OAuth client (logic and cache
-  # notes in gog-access-token.sh); the gog wrapper below is its first client.
+  # The gog wrapper's token step: prints a valid Google access token for gog's
+  # OAuth client (logic and cache notes in gog-access-token.sh). Run only by
+  # store path from the gog wrapper, never put on PATH.
   gogAccessToken = pkgs.writeShellApplication {
     name = "gog-access-token";
     runtimeInputs = [
@@ -140,7 +141,7 @@ in
     })
 
     # gog (Google CLI), wrapped with 1P-ONLY credential storage: gog itself
-    # never sees a refresh token. gog-access-token (below) owns the OAuth
+    # never sees a refresh token. gogAccessToken (above) owns the OAuth
     # refresh and its cache; gog runs in --access-token mode throughout
     # (bypasses stored tokens). The macOS keychain backend stays banned:
     # structurally broken for nix binaries (adhoc-signed, store path changes
@@ -149,17 +150,13 @@ in
     # skill). Without a token gog runs anyway and reports its own auth error.
     (pkgs.writeShellApplication {
       name = "gog";
-      runtimeInputs = [ gogAccessToken ];
       text = ''
-        if [ -z "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ] && at="$(gog-access-token)"; then
+        if [ -z "''${GOG_ACCESS_TOKEN:-}''${GOG_HOME:-}" ] && at="$(${gogAccessToken}/bin/gog-access-token)"; then
           export GOG_ACCESS_TOKEN="$at"
         fi
         exec ${gogcliPkg}/bin/gog "$@"
       '';
     })
-    # Also on PATH for clients that call Google APIs gog does not wrap
-    # (people-sync's contact photos).
-    gogAccessToken
 
     # wacli (WhatsApp CLI, tier 2 of the whatsapp skill) with the linked-device
     # SESSION in 1Password, so one pairing serves every machine. A WhatsApp
