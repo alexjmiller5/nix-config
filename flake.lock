@@ -1212,11 +1212,11 @@
         "uv2nix": "uv2nix_5"
       },
       "locked": {
-        "lastModified": 1791828305,
-        "narHash": "sha256-y2Iwsw1BXKMB4jTjL9TyOkHW4YjpxWzBMkWZfHWO3U8=",
+        "lastModified": 1791845310,
+        "narHash": "sha256-MKBVoqBnGBhHbj2kPuqtY9LvY0kVqkCPdCZ0n+CyY38=",
         "owner": "alexjmiller5",
         "repo": "verdict",
-        "rev": "78f572af8ff2ed5a305c14eef0cd0bc1eb816cea",
+        "rev": "699fe7533f069676053044d99ccc9cf01773debf",
         "type": "github"
       },
       "original": {
