@@ -38,6 +38,7 @@ check:
     /usr/bin/ruby tests/flighty-install.rb
     python3 tests/finder-defaults.py
     bash tests/agent-detect.sh
+    bash tests/capture-snapshot-tcc.sh
     bash tests/agent-machine.sh
     bash tests/claude-json-seed.sh
     bash tests/op-auth-guard.sh

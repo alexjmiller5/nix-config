@@ -9,14 +9,33 @@
 # Exit 3 = cannot capture in this context (e.g. no Full Disk Access); exit 2 = usage.
 set -euo pipefail
 
+# A row whose app is gone (bundle id Spotlight cannot find, client path that no
+# longer exists) grants nothing, and with SIP on the system db refuses even a
+# sudo DELETE from a Full Disk Access shell, so it is not drift. Apple clients
+# are kept as listed.
+# ponytail: Spotlight does not index helper bundles nested inside an app; if a
+# live helper's grant ever drops out, resolve the client through LaunchServices.
+live_grants() {
+  local service client
+  while IFS='|' read -r service client; do
+    case "$client" in
+      /*) [ -e "$client" ] || continue ;;
+      com.apple.*) ;;
+      *) [ -n "$(mdfind "kMDItemCFBundleIdentifier == '$client'" 2>/dev/null | head -1)" ] || continue ;;
+    esac
+    printf '%s|%s\n' "$service" "$client"
+  done
+}
+
 capture_tcc() {
-  local db="/Library/Application Support/com.apple.TCC/TCC.db"
+  local db="${CAPTURE_SNAPSHOT_TCC_DB:-/Library/Application Support/com.apple.TCC/TCC.db}"
   # Version-keyed client paths (nix store hashes, Homebrew Cellar versions)
   # re-key on every bump; normalize them so a bump is not drift.
   /usr/bin/sqlite3 -readonly "$db" "SELECT service, client FROM access WHERE auth_value > 0 AND service IN
     ('kTCCServiceAccessibility','kTCCServiceListenEvent','kTCCServiceScreenCapture',
      'kTCCServiceSystemPolicyAllFiles','kTCCServiceCalendar','kTCCServiceAddressBook',
      'kTCCServiceMicrophone');" 2>/dev/null \
+    | live_grants \
     | sed -E 's#/nix/store/[a-z0-9]{32}-([^/]+)-[0-9][^/]*/#/nix/store/*-\1-*/#; s#/nix/store/[a-z0-9]{32}-#/nix/store/*-#; s#(/opt/homebrew/Cellar/[^/]+/)[^/]+/#\1*/#' \
     | sort -u \
     || { echo "capture-snapshot: cannot read $db (the shell needs Full Disk Access)" >&2; return 3; }
