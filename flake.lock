@@ -154,11 +154,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791754994,
-        "narHash": "sha256-x7UBjai/QgrAz1c1TYNJWxFd1ttH+SQd+euyLFvm61o=",
+        "lastModified": 1791843834,
+        "narHash": "sha256-o/ze0v1EMsQ5cRojSqCJ7xrGg6MFuijjttkYO3HeDjY=",
         "owner": "alexjmiller5",
         "repo": "cochlea",
-        "rev": "92f3ae70c45b732b15567569f5a3f8adcb0cdf6c",
+        "rev": "7b9c409c666686969a53fb3ea073cacc21c05532",
         "type": "github"
       },
       "original": {
