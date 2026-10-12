@@ -150,14 +150,13 @@
     herdrWorkspace = "w1";
   };
   # Verdict review pages: agents publish, Alex answers in the browser. Bound
-  # to the tailnet interface only, so no auth code; agents on either Mac
-  # reach it through VERDICT_URL (exported here by publicUrl).
+  # to the tailnet interface only, so no auth code; agents on both Macs reach
+  # it through VERDICT_URL (programs.verdict in home/common.nix).
   services.verdict = {
     enable = true;
     user = username;
     bind = "100.102.180.37";
     port = 7071;
-    publicUrl = "http://mac-mini.tailee59b5.ts.net:7071";
     label = "com.alexmiller.verdict";
   };
   # Find My friends -> soma stream friend_city_checks, one city-grade check per

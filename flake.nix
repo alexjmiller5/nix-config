@@ -20,8 +20,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     callhistory-backup.url = "github:alexjmiller5/callhistory-backup";
-    # Verdict review server (nix-darwin module) on the mini; the laptop only
-    # gets its CLI.
+    # Verdict: the review server (nix-darwin module) on the mini, the CLI
+    # (home module) on both Macs.
     verdict = {
       url = "github:alexjmiller5/verdict";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -218,6 +218,7 @@
                 inputs.soma.homeModules.default
                 inputs.people-sync.homeModules.default
                 inputs.page-archiver.homeModules.default
+                inputs.verdict.homeModules.default
               ];
               # Explicit per-input args (not `inherit inputs`) on purpose: each
               # exported homeModule documents exactly what a consumer must pass.
@@ -234,7 +235,6 @@
                   nix-openclaw-tools
                   soma
                   shared-album-reminders
-                  verdict
                   claude-plugins-official
                   claude-plugin-superpowers
                   claude-plugin-ponytail

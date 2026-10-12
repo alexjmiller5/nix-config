@@ -385,11 +385,11 @@
       },
       "locked": {
         "dir": "host",
-        "lastModified": 1791775136,
-        "narHash": "sha256-1QUktDT/iODY0eGFL4r+/YGNL4HuybcRB48VfLfQe78=",
+        "lastModified": 1791782163,
+        "narHash": "sha256-dC27BRFhg3uIC3e4n70lrI4FDKYIIgufHiem9ZvU5E8=",
         "owner": "alexjmiller5",
         "repo": "networth",
-        "rev": "bb44b0f0bed3b989d753a6de1fabfbf27d5190f6",
+        "rev": "70030602e1a751733dd8a207426d55242a5521ce",
         "type": "github"
       },
       "original": {
@@ -1212,11 +1212,11 @@
         "uv2nix": "uv2nix_5"
       },
       "locked": {
-        "lastModified": 1791581420,
-        "narHash": "sha256-NivSGWQVAIinwhErl2ij6s1h32qH2YCB7UN2/GNMgTA=",
+        "lastModified": 1791782606,
+        "narHash": "sha256-UdvFqGTg8KaHuWbczaUFCU5rPLLTAfTRR4afWLW92sU=",
         "owner": "alexjmiller5",
         "repo": "verdict",
-        "rev": "8c26ef74ccecc09823173e883a28a3e0e313b69b",
+        "rev": "ae92397aa357e540123c08329a5d3200333c4828",
         "type": "github"
       },
       "original": {

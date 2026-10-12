@@ -38,6 +38,14 @@
   # configured through `soma background enable` on each device.
   services.soma.enable = true;
 
+  # The Verdict CLI on both Macs, publishing to the mini's server
+  # (hosts/mac-mini.nix services.verdict). The MagicDNS name resolves to the
+  # server's tailnet bind address on the mini too, and review links carry it.
+  programs.verdict = {
+    enable = true;
+    url = "http://mac-mini.tailee59b5.ts.net:7071";
+  };
+
   # The generated configuration manual serializes option defaults after dropping
   # their store context. Use online option lookup; package man pages stay enabled.
   manual.manpages.enable = false;
