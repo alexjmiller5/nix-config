@@ -180,7 +180,7 @@ in
     # function (home/zsh.nix) uses that token when the file exists, so agent
     # sessions read Personal exactly as they do on the laptop. A transient
     # launchd keepalive touches the session every 20 min (op sessions die
-    # after 30 idle minutes) and after N hours (default 6) signs out
+    # after 30 idle minutes) and after N hours (default 24) signs out
     # server-side and deletes the file. No secrets ever touch disk - only the
     # session token, which the sign-out invalidates. One-time prerequisite:
     # `op account add` on this machine (the op-account manual step below). The
@@ -196,13 +196,15 @@ in
         f="$state/personal-session"
         case "''${1:-}" in
           keepalive) # internal: op-unlock keepalive <hours>
-            end=$(( $(date +%s) + ''${2:-6} * 3600 ))
+            end=$(( $(date +%s) + ''${2:-24} * 3600 ))
             while [ "$(date +%s)" -lt "$end" ] && [ -r "$f" ]; do
               sleep 1200
               op --session "$(cat "$f")" whoami >/dev/null 2>&1 || break
             done
             if [ -r "$f" ]; then op --session "$(cat "$f")" signout >/dev/null 2>&1 || true; fi
             rm -f "$f"
+            # submit jobs restart on exit; remove this one so it ends here
+            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
             ;;
           lock)
             /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
@@ -221,7 +223,7 @@ in
             fi
             ;;
           --stdin) # password on stdin (the laptop's Hammerspoon prompt), hours as $2
-            hours="''${2:-6}"
+            hours="''${2:-24}"
             umask 077; mkdir -p "$state"
             /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
             IFS= read -r pw || true
@@ -245,7 +247,7 @@ in
             fi
             ;;
           ""|[0-9]*)
-            hours="''${1:-6}"
+            hours="''${1:-24}"
             umask 077; mkdir -p "$state"
             /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
             # Prompts for the account password on this tty; --raw prints the token.
@@ -257,7 +259,7 @@ in
             echo "unlocked for ''${hours}h - agents can read Personal via op-personal; op-unlock lock to end early"
             ;;
           *)
-            echo "usage: op-unlock [hours=6] | --stdin [hours] | request \"<reason>\" | lock | status" >&2
+            echo "usage: op-unlock [hours=24] | --stdin [hours] | request \"<reason>\" | lock | status" >&2
             exit 1
             ;;
         esac
