@@ -179,90 +179,24 @@ in
     # ~/.local/state/op/personal-session (0600). The op-personal shell
     # function (home/zsh.nix) uses that token when the file exists, so agent
     # sessions read Personal exactly as they do on the laptop. A transient
-    # launchd keepalive touches the session every 20 min (op sessions die
-    # after 30 idle minutes) and after N hours (default 24) signs out
-    # server-side and deletes the file. No secrets ever touch disk - only the
-    # session token, which the sign-out invalidates. One-time prerequisite:
+    # launchd keepalive touches the session every 10 min (op sessions die
+    # after 30 idle minutes), retrying failed checks, and after N hours
+    # (default 24) signs out server-side and deletes the file; why each
+    # window ended goes to ~/.local/state/op/op-unlock.log. No secrets ever
+    # touch disk - only the session token, which the sign-out invalidates.
+    # One-time prerequisite:
     # `op account add` on this machine (the op-account manual step below). The
     # laptop's Hammerspoon (opUnlock.lua) drives --stdin: `request` drops the
     # reason into a watched file there over ssh, the password travels back over
     # ssh stdin into a pty-driven `op signin`, and no secret is written on
-    # either side.
+    # either side. `request` is a no-op while a window is open. Body in
+    # op-unlock.sh, test in tests/op-unlock.sh.
     (pkgs.writeShellApplication {
       name = "op-unlock";
       runtimeInputs = [ pkgs._1password-cli ];
       text = ''
-        state="$HOME/.local/state/op"
-        f="$state/personal-session"
-        case "''${1:-}" in
-          keepalive) # internal: op-unlock keepalive <hours>
-            end=$(( $(date +%s) + ''${2:-24} * 3600 ))
-            while [ "$(date +%s)" -lt "$end" ] && [ -r "$f" ]; do
-              sleep 1200
-              op --session "$(cat "$f")" whoami >/dev/null 2>&1 || break
-            done
-            if [ -r "$f" ]; then op --session "$(cat "$f")" signout >/dev/null 2>&1 || true; fi
-            rm -f "$f"
-            # submit jobs restart on exit; remove this one so it ends here
-            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
-            ;;
-          lock)
-            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
-            if [ -r "$f" ]; then
-              op --session "$(cat "$f")" signout >/dev/null 2>&1 || true
-              rm -f "$f"; echo "locked"
-            else
-              echo "already locked"
-            fi
-            ;;
-          status)
-            if [ -r "$f" ] && op --session "$(cat "$f")" whoami >/dev/null 2>&1; then
-              echo "unlocked (session file $(stat -f %Sm "$f"))"
-            else
-              rm -f "$f"; echo "locked"
-            fi
-            ;;
-          --stdin) # password on stdin (the laptop's Hammerspoon prompt), hours as $2
-            hours="''${2:-24}"
-            umask 077; mkdir -p "$state"
-            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
-            IFS= read -r pw || true
-            if ! OP_BIN="$(command -v op)" OP_PW="$pw" /usr/bin/expect -f ${../scripts/op-signin-pty.exp} > "$f.tmp"; then
-              rm -f "$f.tmp"; unset pw; exit 1
-            fi
-            unset pw
-            mv "$f.tmp" "$f"
-            /bin/launchctl submit -l com.alexmiller.op-unlock -- "$0" keepalive "$hours"
-            echo "unlocked for ''${hours}h"
-            ;;
-          request) # ask the owner, on the laptop, to open a window
-            reason=$(printf '%s' "''${2:-an agent needs a vault outside AI Agent}" | tr -c 'A-Za-z0-9 ._:/()-' ' ' | cut -c1-160)
-            # A watched file, not `hs -c`: an hs client spawned from an ssh
-            # session wedges Hammerspoon's IPC port (opUnlock.lua watches the dir).
-            if AGENT_SHELL="''${AGENT_SHELL:-claude}" ssh -o BatchMode=yes -o ConnectTimeout=5 macbook-air-tailscale \
-                "mkdir -p ~/.local/state/op-unlock && printf '%s' '$reason' > ~/.local/state/op-unlock/request" >/dev/null 2>&1; then
-              echo "asked on the laptop; run op-unlock status when the vault is next needed"
-            else
-              echo "laptop unreachable: ask the owner to run op-unlock from their phone"
-            fi
-            ;;
-          ""|[0-9]*)
-            hours="''${1:-24}"
-            umask 077; mkdir -p "$state"
-            /bin/launchctl remove com.alexmiller.op-unlock >/dev/null 2>&1 || true
-            # Prompts for the account password on this tty; --raw prints the token.
-            env -u OP_SERVICE_ACCOUNT_TOKEN op signin --raw > "$f.tmp"
-            mv "$f.tmp" "$f"
-            # Transient launchd job, not screen/nohup: macOS kills those with
-            # the ssh session that started them (the phone terminal closing).
-            /bin/launchctl submit -l com.alexmiller.op-unlock -- "$0" keepalive "$hours"
-            echo "unlocked for ''${hours}h - agents can read Personal via op-personal; op-unlock lock to end early"
-            ;;
-          *)
-            echo "usage: op-unlock [hours=24] | --stdin [hours] | request \"<reason>\" | lock | status" >&2
-            exit 1
-            ;;
-        esac
+        signin_exp=${../scripts/op-signin-pty.exp}
+        ${builtins.readFile ./op-unlock.sh}
       '';
     })
   ];
