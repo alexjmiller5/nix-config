@@ -168,6 +168,8 @@
     user = username;
     hubUrl = "https://soma.nqipomyrjb.workers.dev";
     tokenCommand = "/usr/bin/security find-generic-password -s friend-location-collector -a soma-hub -w";
+    # Unattended: restart Find My when it stops refreshing friends.
+    repair = true;
   };
   services.callhistory-backup = {
     enable = true;

@@ -195,11 +195,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791582186,
-        "narHash": "sha256-8Z905JVbIh9uieZGjzDtNlEnf88oVIeas6CfF6Otr5c=",
+        "lastModified": 1791855964,
+        "narHash": "sha256-9QsyHmTQVSgdLm9TUMxzjBKylalsfQDeU1PFXVE2QiQ=",
         "owner": "alexjmiller5",
         "repo": "findmy-cli",
-        "rev": "a10b4db673e9093f21b9b439e5039f44ba90860a",
+        "rev": "57ebe139dd3507d01e6ee405cbd0ff6ab4363bb1",
         "type": "github"
       },
       "original": {
