@@ -164,6 +164,8 @@
       "-s" "agent-dispatch" "-a" "hub" "-w"
     ];
     herdrWorkspace = "w1";
+    # Claude while at least 5% of its quota is left, then Codex.
+    minQuotaPercent = 5;
   };
   # Verdict review pages: agents publish, Alex answers in the browser. Bound
   # to the tailnet interface only, so no auth code; agents on both Macs reach
