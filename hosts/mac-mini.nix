@@ -187,8 +187,9 @@
     # Unattended: restart Find My when it stops refreshing friends.
     repair = true;
   };
-  # Circle nearby alerts: Find My checks + this owner's location -> APNs, sent
-  # from here with Circle's own key. Phones register over the tailnet (owner only).
+  # Circle nearby alerts and same-city hangout reminders: Find My checks + this
+  # owner's location -> APNs, sent from here with Circle's own key. Phones register
+  # over the tailnet (owner only).
   services.circle-push = {
     enable = true;
     user = username;
@@ -199,8 +200,11 @@
     keyId = "S6T4WB56FR";
     checksStream = "friend_city_checks";
     locationStream = "location";
-    peopleTable = "people";
-    peopleNameColumn = "name";
+    bindings = {
+      people = { table = "people"; fields = { id = "id"; name = "name"; deleted = "deleted_at"; hangoutCadence = "hangout_cadence"; }; };
+      locations = { table = "person_locations"; fields = { id = "id"; person = "person_id"; city = "city"; country = "country"; end = "end"; deleted = "deleted_at"; }; };
+      hangouts = { table = "hangouts"; fields = { id = "id"; date = "date"; people = "person_ids"; deleted = "deleted_at"; }; };
+    };
     tailscaleHttpsPort = 8445;
   };
   services.callhistory-backup = {
