@@ -130,7 +130,7 @@
     fi
   '';
 
-  # Dock contents, in order (snapshotted 2026-08-02). The list IS the dock:
+  # Dock contents, in order. The list IS the dock:
   # nix rewrites it on switch, so manual drag-ins don't survive.
   system.defaults.dock.persistent-apps = [
     { app = "/Applications/Spotify.app"; }
@@ -141,7 +141,7 @@
     { app = "/Applications/Visual Studio Code.app"; }
     { app = "/Applications/Google Chrome.app"; }
     { app = "/Applications/Notion Calendar.app"; }
-    { app = "/Applications/Nix Apps/Iris.app"; }
+    { app = "/Users/${username}/Applications/Iris.app"; }
     { app = "/System/Applications/Notes.app"; }
     { app = "/Applications/Claude.app"; }
     { app = "/Users/${username}/Applications/Chrome Apps.localized/Google Maps.app"; }
