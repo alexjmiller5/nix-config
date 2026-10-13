@@ -8,6 +8,7 @@
   ...
 }:
 let
+  rea = pkgs.callPackage ../pkgs/rea.nix { };
   json = pkgs.formats.json { };
   manifest = {
     name = "mcp";
@@ -43,6 +44,10 @@ in
     enable = true;
     servers.nixos = {
       command = lib.getExe mcp-nixos.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    };
+    servers.rea = {
+      command = lib.getExe rea;
+      args = [ "mcp" ];
     };
   };
   programs.codex.plugins = lib.mkIf config.programs.codex.enable [ plugin ];
