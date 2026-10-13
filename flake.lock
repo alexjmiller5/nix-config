@@ -611,11 +611,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1791874514,
-        "narHash": "sha256-iOLtxPRGgPJCHEsTYhv2UwyHhsjR/sCAKIfBnEhi1o0=",
+        "lastModified": 1791874848,
+        "narHash": "sha256-iChleSkBLgYVGOM1jU5KHZWmWQZiWKr37uPj6ZJGhXg=",
         "owner": "alexjmiller5",
         "repo": "people-sync",
-        "rev": "c76a113834b9c03c4f880e62953ae5654ba505eb",
+        "rev": "54b398d4b233480e86427a01dc921b412ba2eff2",
         "type": "github"
       },
       "original": {
