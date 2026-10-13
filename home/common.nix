@@ -41,9 +41,12 @@
   # The Verdict CLI on both Macs, publishing to the mini's server
   # (hosts/mac-mini.nix services.verdict). The MagicDNS name resolves to the
   # server's tailnet bind address on the mini too, and review links carry it.
+  # Every review an agent publishes arms agent-wake (agent-config skill), which
+  # types into the publishing agent's Herdr pane when Done is pressed.
   programs.verdict = {
     enable = true;
     url = "http://mac-mini.tailee59b5.ts.net:7071";
+    publishHook = ''"$HOME/.config/agent-config/skills/agent-wake/scripts/agent-wake" verdict "$VERDICT_REVIEW_ID"'';
   };
 
   # The generated configuration manual serializes option defaults after dropping
