@@ -297,11 +297,11 @@
         "tooling": "tooling"
       },
       "locked": {
-        "lastModified": 1791820319,
-        "narHash": "sha256-hQMoJTRyEZbCEemnPODmMKQu07sZ7xC8z/JmBQ2SXKQ=",
+        "lastModified": 1791851230,
+        "narHash": "sha256-ZTy+SuPiU0g8TC/oad4IqY6BvTuzusDSuHrWFcfDYio=",
         "owner": "alexjmiller5",
         "repo": "iris",
-        "rev": "0123e836bed3f14a5bc4d645034f5ce6d7d743d7",
+        "rev": "14c2664c8fc30751295f57682d47fa2ab99acdaf",
         "type": "github"
       },
       "original": {
