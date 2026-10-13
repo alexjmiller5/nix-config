@@ -187,6 +187,22 @@
     # Unattended: restart Find My when it stops refreshing friends.
     repair = true;
   };
+  # Circle nearby alerts: Find My checks + this owner's location -> APNs, sent
+  # from here with Circle's own key. Phones register over the tailnet (owner only).
+  services.circle-push = {
+    enable = true;
+    user = username;
+    hubUrl = "https://soma.nqipomyrjb.workers.dev";
+    hubTokenCommand = "/usr/bin/security find-generic-password -s circle-push -a soma-hub -w";
+    apnsKeyCommand = "/usr/bin/security find-generic-password -s circle-push -a apns-key -w";
+    teamId = "467A4PRB8F";
+    keyId = "S6T4WB56FR";
+    checksStream = "friend_city_checks";
+    locationStream = "location";
+    peopleTable = "people";
+    peopleNameColumn = "name";
+    tailscaleHttpsPort = 8445;
+  };
   services.callhistory-backup = {
     enable = true;
     user = username;

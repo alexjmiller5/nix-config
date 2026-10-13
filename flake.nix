@@ -94,6 +94,9 @@
       url = "github:alexjmiller5/findmy-cli";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Circle's nearby-alert push service (mini). Keeps its own nixpkgs: the
+    # service needs Swift 6, which this flake's nixpkgs pin does not have yet.
+    circle.url = "github:alexjmiller5/circle";
     # Media Center's signed Mac app (nix-darwin module, laptop only).
     media-center = {
       url = "github:alexjmiller5/media-center";
@@ -208,6 +211,7 @@
             inputs.cochlea.darwinModules.default
             inputs.media-center.darwinModules.default
             inputs.findmy-cli.darwinModules.default
+            inputs.circle.darwinModules.default
             inputs.nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {
