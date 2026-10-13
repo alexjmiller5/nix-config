@@ -111,6 +111,12 @@
       url = "github:alexjmiller5/networth?dir=host";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Agent Dispatch (nix-darwin module, mini only): long-polls the Soma hub
+    # for tasks marked dispatch Requested and opens an agent in a Herdr tab.
+    agent-dispatch = {
+      url = "github:alexjmiller5/agent-dispatch";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Shared album reminder module, imported only by the mini profile.
     shared-album-reminders = {
       url = "github:alexjmiller5/shared-album-reminders";
@@ -192,6 +198,7 @@
             inputs.screentime-dashboard.darwinModules.default
             inputs.media-center-youtube-offline.darwinModules.default
             inputs.networth-host.darwinModules.default
+            inputs.agent-dispatch.darwinModules.default
             inputs.flighty-sync.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.verdict.darwinModules.default

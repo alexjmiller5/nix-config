@@ -149,6 +149,22 @@
     url = "https://networth.nqipomyrjb.workers.dev";
     herdrWorkspace = "w1";
   };
+  # Tasks marked dispatch Requested (Synapse's `ag` keyword) open an agent in
+  # a new Herdr tab here. Outbound long poll on the hub subscription over
+  # tasks.dispatch; the job's own profile token (agent-dispatch-v1) is in the
+  # login Keychain (manual step below). The prompt template is user state at
+  # ~/.config/agent-dispatch/prompt.md (absent = the built-in default).
+  services.agent-dispatch = {
+    enable = true;
+    user = username;
+    hubUrl = "https://soma.nqipomyrjb.workers.dev";
+    subscriptionId = "32f827d5-59d0-47c5-a613-e7df09daba01";
+    credentialCommand = [
+      "/usr/bin/security" "find-generic-password"
+      "-s" "agent-dispatch" "-a" "hub" "-w"
+    ];
+    herdrWorkspace = "w1";
+  };
   # Verdict review pages: agents publish, Alex answers in the browser. Bound
   # to the tailnet interface only, so no auth code; agents on both Macs reach
   # it through VERDICT_URL (programs.verdict in home/common.nix).
@@ -405,6 +421,27 @@
       '';
       verify = "security find-generic-password -s media-center.youtube-offline -a hub >/dev/null";
       redo = "On a replacement Mac (mint a new token, revoke the old one) or after rotating the token.";
+    };
+    agent-dispatch-credential = {
+      title = "Agent Dispatch hub credential";
+      owner = "agent-dispatch";
+      desktop = true;
+      body = ''
+        The job's own Soma token (profile `agent-dispatch-v1`, enrolled headless:
+        `soma login --profile agent-dispatch-v1 --name "Agent Dispatch Mac mini"
+        --start <state>`, approve the printed link, then `soma login --claim
+        <state> --wait`) must be in the login Keychain as service
+        `agent-dispatch`, account `hub`. SSH sessions cannot write the Keychain:
+        from the desktop session (a terminal over Screen Sharing, or a one-shot
+        `launchctl submit` job that removes itself) pipe
+        `add-generic-password -A -U -s agent-dispatch -a hub -w <token>` into
+        `security -i` on stdin. Then
+        `launchctl kickstart -k gui/$(id -u)/com.alexmiller.agent-dispatch` and
+        check `~/.local/state/agent-dispatch/agent-dispatch.log` for a
+        `watching` line without `hub` warnings.
+      '';
+      verify = "security find-generic-password -s agent-dispatch -a hub >/dev/null";
+      redo = "On a replacement Mac (enroll a new token, revoke the old one at <hub>/login/devices).";
     };
     networth-host-enroll = {
       title = "Networth finance host enrollment";
