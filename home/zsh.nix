@@ -34,6 +34,9 @@
 
     # Goes to .zshenv (read by every shell, incl. non-interactive).
     envExtra = ''
+      # Private per-person facts (device ids, profile names) that must not live
+      # in this public repo: an optional env file from the nix-secrets clone.
+      [[ -r "$HOME/.config/nix-secrets/env.sh" ]] && . "$HOME/.config/nix-secrets/env.sh"
       # uv-installed tools
       export PATH="$HOME/.local/bin:$PATH"
       # Homebrew casks (claude, codex, ...) for EVERY shell, not only the
