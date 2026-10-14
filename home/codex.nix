@@ -20,6 +20,12 @@ let
   hooksDir = "${config.home.homeDirectory}/.codex/hooks";
 in
 {
+  imports = [ ./herdr-codex.nix ];
+  programs.herdrCodex = {
+    enable = true;
+    executable = "/opt/homebrew/bin/codex";
+  };
+
   programs.codex = {
     enable = true;
 

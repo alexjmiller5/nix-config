@@ -48,10 +48,20 @@ Ghostty. Preferences
 are managed in `home/herdr.nix`; edit that module rather than saving changes
 in Herdr's settings screen. Closing a client preserves running processes;
 a machine restart restores saved layout and resumes supported Claude/Codex
-conversations captured by the installed SessionStart integrations. Start or
-resume those agents inside Herdr after activation so their IDs are captured.
+conversations captured by Claude's SessionStart integration or Codex's pane-local
+relay. Start or resume those agents inside Herdr so their IDs are captured.
 `python3 tests/herdr-integrations.py` checks the installed hooks against an
 isolated socket. Codex may request review of a changed hook in `/hooks`.
+
+Codex launches inside Herdr use the PATH wrapper from exported
+`homeModules.herdr-codex`. It relays the terminal client's connection to the
+existing shared daemon and registers only thread IDs returned to that client
+by start, resume or fork. Native queue/wake operations and other CLI commands
+pass through. Explicit remote endpoints and `--no-daemon` also pass through.
+`programs.herdrCodex.executable` selects the underlying native executable.
+Codex SessionStart hooks do not report pane identity because their environment
+belongs to the shared daemon. Existing terminals adopt the wrapper on their next launch; no daemon restart
+is needed. `python3 tests/herdr-codex.py` verifies registration selection.
 
 [Auto Title](https://github.com/kryptamine/herdr-auto-title) provides fallback
 tab names from directory and terminal context, capped at 24 columns. Agent names

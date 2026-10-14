@@ -43,24 +43,7 @@ in
     fi
   '';
 
-  home.file.".codex/herdr-agent-state.sh" = lib.mkIf config.programs.codex.enable {
-    source = "${config.programs.herdr.package.src}/src/integration/assets/codex/herdr-agent-state.sh";
-    executable = true;
-  };
-  programs.codex.hooks.SessionStart = lib.mkIf config.programs.codex.enable (
-    lib.mkAfter [
-      {
-        matcher = "*";
-        hooks = [
-          {
-            type = "command";
-            command = "bash ${lib.escapeShellArg "${config.home.homeDirectory}/.codex/herdr-agent-state.sh"} session";
-            timeout = 10;
-          }
-        ];
-      }
-    ]
-  );
+  # Codex registration belongs to the pane-local relay, never daemon hooks.
 
   programs.herdr = {
     enable = true;

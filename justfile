@@ -52,6 +52,7 @@ check:
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
     python3 tests/herdr-takeover.py
+    python3 tests/herdr-codex.py
     bash tests/wifi-watchdog.sh
     bash tests/op-unlock.sh
     python3 tests/scratch-sweeper.py

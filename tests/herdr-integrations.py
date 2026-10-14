@@ -25,7 +25,6 @@ with tempfile.TemporaryDirectory(prefix="herdr-hooks-", dir="/tmp") as directory
 
         for agent, settings in (
             ("claude", Path.home() / ".claude/settings.json"),
-            ("codex", Path.home() / ".codex/hooks.json"),
         ):
             groups = json.loads(settings.read_text())["hooks"]["SessionStart"]
             hooks = [
@@ -58,3 +57,8 @@ with tempfile.TemporaryDirectory(prefix="herdr-hooks-", dir="/tmp") as directory
             assert message["params"]["agent_session_id"] == "test-session"
             assert message["params"]["pane_id"] == "p1"
             print(f"{agent}: installed hook reports the conversation to Herdr")
+
+settings = json.loads((Path.home() / ".codex/hooks.json").read_text())
+assert not any("herdr-agent-state.sh" in hook.get("command", "")
+               for group in settings["hooks"]["SessionStart"] for hook in group["hooks"]), "Codex daemon hooks must not report inherited pane identity"
+print("codex: daemon identity hook absent; pane-local relay owns registration")

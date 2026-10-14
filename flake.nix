@@ -314,6 +314,7 @@
         apple-agent = ./home/apple-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         herdr = ./home/herdr.nix;
+        herdr-codex = ./home/herdr-codex.nix;
         herdr-takeover = ./home/herdr-takeover.nix;
         agent-config-links = ./home/agent-config-links.nix;
         # needs pi, pi-calm, pi-web-access and pi-fast-mode inputs
