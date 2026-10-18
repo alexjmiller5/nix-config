@@ -258,7 +258,7 @@ in
         "CodexBar"
         "Google Chrome"
         "Hammerspoon"
-        "Notion"
+        "Iris"
         "Notion Calendar"
         "Raycast"
         "Receptor"
