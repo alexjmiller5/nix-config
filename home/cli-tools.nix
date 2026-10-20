@@ -22,6 +22,7 @@
     tree
     yq-go
     whisper-cpp
+    (callPackage ../pkgs/pymobiledevice3.nix { })
     # Agent-provider quota windows (Claude, Codex, ...) - see the `quota` skill
     (callPackage ../pkgs/quota-axi.nix { })
   ];
