@@ -30,11 +30,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1791912330,
-        "narHash": "sha256-i6CTfzLJNjCyuMrl16xfEVxBySiA0sqdsZl/KLE5Cx8=",
+        "lastModified": 1792531329,
+        "narHash": "sha256-SEXp1CzJSSRLqR0aqNnhuIa0gwGq2CJeWKo0p/5FxfQ=",
         "owner": "alexjmiller5",
         "repo": "agent-dispatch",
-        "rev": "a1a48456cfd3537e668d63122be948e4fec3bc7e",
+        "rev": "5cd88bf31186c88458d4eea5f65a1ce0963e439c",
         "type": "github"
       },
       "original": {
