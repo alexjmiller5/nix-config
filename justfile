@@ -75,7 +75,10 @@ snapshot name host="macbook-air":
     #!/usr/bin/env bash
     set -euo pipefail
     mkdir -p "snapshots/{{host}}"
-    fresh="$(ssh "{{host}}-tailscale" capture-snapshot "{{name}}")"
+    case "${AGENT_MACHINE:-}:{{host}}" in
+      mini:mac-mini|macbook:macbook-air) fresh="$(capture-snapshot "{{name}}")" ;;
+      *) fresh="$(ssh "{{host}}-tailscale" capture-snapshot "{{name}}")" ;;
+    esac
     printf '%s\n' "$fresh" > "snapshots/{{host}}/{{name}}.txt"
     git diff --stat -- "snapshots/{{host}}/{{name}}.txt"
 

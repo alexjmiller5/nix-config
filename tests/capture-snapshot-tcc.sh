@@ -79,10 +79,18 @@ printf '%s snapshot\n' "$1"
 SH
 chmod +x "$tmp/bin/ssh"
 git init -q "$tmp"
-PATH="$tmp/bin:$PATH" just --justfile "$PWD/justfile" --working-directory "$tmp" snapshot tcc macbook-air >/dev/null
+PATH="$tmp/bin:$PATH" AGENT_MACHINE=mini just --justfile "$PWD/justfile" --working-directory "$tmp" snapshot tcc macbook-air >/dev/null
 grep -qx 'macbook-air-tailscale snapshot' "$tmp/snapshots/macbook-air/tcc.txt" || fail "snapshot used the wrong machine"
-if PATH="$tmp/bin:$PATH" SNAPSHOT_TEST_FAIL=1 just --justfile "$PWD/justfile" --working-directory "$tmp" snapshot tcc macbook-air >/dev/null 2>&1; then
+if PATH="$tmp/bin:$PATH" AGENT_MACHINE=mini SNAPSHOT_TEST_FAIL=1 just --justfile "$PWD/justfile" --working-directory "$tmp" snapshot tcc macbook-air >/dev/null 2>&1; then
   fail "failed remote capture reported as success"
 fi
 grep -qx 'macbook-air-tailscale snapshot' "$tmp/snapshots/macbook-air/tcc.txt" || fail "failed capture overwrote snapshot"
 echo "ok snapshot host routing"
+cat > "$tmp/bin/capture-snapshot" <<'SH'
+#!/usr/bin/env bash
+printf 'local snapshot\n'
+SH
+chmod +x "$tmp/bin/capture-snapshot"
+PATH="$tmp/bin:$PATH" AGENT_MACHINE=mini just --justfile "$PWD/justfile" --working-directory "$tmp" snapshot tcc mac-mini >/dev/null
+grep -qx 'local snapshot' "$tmp/snapshots/mac-mini/tcc.txt" || fail "local mini capture unnecessarily used SSH"
+echo "ok local snapshot routing"

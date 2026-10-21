@@ -26,7 +26,8 @@ just snapshot tcc mac-mini
 just manual
 ```
 
-The recipe queries the selected host over SSH and preserves its previous
+The recipe captures locally when `AGENT_MACHINE` identifies the selected host,
+otherwise over SSH, and preserves its previous
 snapshot if capture fails. Both stores require Full Disk Access in the
 capturing shell's context; a read failure exits 3 rather than reporting a
 partial snapshot as success.
