@@ -75,11 +75,8 @@ snapshot name host="macbook-air":
     #!/usr/bin/env bash
     set -euo pipefail
     mkdir -p "snapshots/{{host}}"
-    if [ "{{host}}" = macbook-air ]; then
-      capture-snapshot "{{name}}" > "snapshots/{{host}}/{{name}}.txt"
-    else
-      ssh "{{host}}-tailscale" capture-snapshot "{{name}}" > "snapshots/{{host}}/{{name}}.txt"
-    fi
+    fresh="$(ssh "{{host}}-tailscale" capture-snapshot "{{name}}")"
+    printf '%s\n' "$fresh" > "snapshots/{{host}}/{{name}}.txt"
     git diff --stat -- "snapshots/{{host}}/{{name}}.txt"
 
 # Bump all inputs

@@ -2,43 +2,55 @@
 # Print the live state of things nix cannot own, normalized for diffing, or
 # compare it with a committed snapshot. Read-only: it never changes the app.
 #
-#   capture-snapshot tcc                 grants in the system TCC db
+#   capture-snapshot tcc                 decisions in the system and user TCC dbs
 #   capture-snapshot chrome-ui           tab strip, toolbar pins, extension shortcuts
 #   capture-snapshot <name> --diff FILE  exit 0 = matches, 1 = differs (unified diff on stdout)
 #
 # Exit 3 = cannot capture in this context (e.g. no Full Disk Access); exit 2 = usage.
 set -euo pipefail
 
-# A row whose app is gone (bundle id Spotlight cannot find, client path that no
-# longer exists) grants nothing, and with SIP on the system db refuses even a
+# A row whose app is gone (bundle id with no installed path, or client path
+# that no longer exists) grants nothing, and with SIP on the system db refuses even a
 # sudo DELETE from a Full Disk Access shell, so it is not drift. Apple clients
 # are kept as listed.
-# ponytail: Spotlight does not index helper bundles nested inside an app; if a
-# live helper's grant ever drops out, resolve the client through LaunchServices.
 live_grants() {
-  local service client
-  while IFS='|' read -r service client; do
+  local service client details registered bundle path found
+  # Spotlight omits nested helpers; LaunchServices retains their bundle paths.
+  registered=$("${CAPTURE_SNAPSHOT_LSREGISTER:-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister}" -dump \
+    | awk '/^path:/{sub(/^path:[[:space:]]*/, ""); sub(/ \(0x[[:xdigit:]]+\)$/, ""); path=$0}
+      /^identifier:/{sub(/^identifier:[[:space:]]*/, ""); print $0 "|" path}') || return 3
+  while IFS='|' read -r service client details; do
     case "$client" in
       /*) [ -e "$client" ] || continue ;;
       com.apple.*) ;;
-      *) [ -n "$(mdfind "kMDItemCFBundleIdentifier == '$client'" 2>/dev/null | head -1)" ] || continue ;;
+      *)
+        if [ -z "$(mdfind "kMDItemCFBundleIdentifier == '$client'" 2>/dev/null | head -1)" ]; then
+          found=0
+          while IFS='|' read -r bundle path; do
+            if [ "$bundle" = "$client" ] && [ -e "$path" ]; then found=1; break; fi
+          done <<< "$registered"
+          [ "$found" -eq 1 ] || continue
+        fi
+        ;;
     esac
-    printf '%s|%s\n' "$service" "$client"
+    printf '%s|%s|%s\n' "$service" "$client" "$details"
   done
 }
 
 capture_tcc() {
-  local db="${CAPTURE_SNAPSHOT_TCC_DB:-/Library/Application Support/com.apple.TCC/TCC.db}"
-  # Version-keyed client paths (nix store hashes, Homebrew Cellar versions)
-  # re-key on every bump; normalize them so a bump is not drift.
-  /usr/bin/sqlite3 -readonly "$db" "SELECT service, client FROM access WHERE auth_value > 0 AND service IN
-    ('kTCCServiceAccessibility','kTCCServiceListenEvent','kTCCServiceScreenCapture',
-     'kTCCServiceSystemPolicyAllFiles','kTCCServiceCalendar','kTCCServiceAddressBook',
-     'kTCCServiceMicrophone');" 2>/dev/null \
-    | live_grants \
-    | sed -E 's#/nix/store/[a-z0-9]{32}-([^/]+)-[0-9][^/]*/#/nix/store/*-\1-*/#; s#/nix/store/[a-z0-9]{32}-#/nix/store/*-#; s#(/opt/homebrew/Cellar/[^/]+/)[^/]+/#\1*/#' \
-    | sort -u \
-    || { echo "capture-snapshot: cannot read $db (the shell needs Full Disk Access)" >&2; return 3; }
+  local db
+  # Both stores are required: Automation, camera, photos and folder decisions
+  # generally live in the user store. Keep target apps and nonstandard auth values.
+  for db in "${CAPTURE_SNAPSHOT_TCC_DB:-/Library/Application Support/com.apple.TCC/TCC.db}" \
+    "${CAPTURE_SNAPSHOT_TCC_USER_DB:-$HOME/Library/Application Support/com.apple.TCC/TCC.db}"; do
+    /usr/bin/sqlite3 -readonly "$db" "SELECT service, client,
+      'auth=' || auth_value || CASE WHEN indirect_object_identifier = 'UNUSED' THEN ''
+        ELSE '|target=' || indirect_object_identifier END
+      FROM access WHERE auth_value > 0;" 2>/dev/null \
+      || { echo "capture-snapshot: cannot read $db (the shell needs Full Disk Access)" >&2; return 3; }
+  done | live_grants \
+    | sed -E 's#/nix/store/[a-z0-9]{32}-([^/]+)-[0-9][^/]*/#/nix/store/*-\1-*/#; s#/nix/store/[a-z0-9]{32}-#/nix/store/*-#; s#(/opt/homebrew/Cellar/[^/]+/)[^/]+/#\1*/#; s#/Users/[^/|]+/#~/#g' \
+    | sort -u
 }
 
 capture_chrome_ui() {

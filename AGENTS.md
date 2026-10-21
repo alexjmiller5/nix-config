@@ -180,7 +180,7 @@ routing table and workflow; this file is the in-repo map.
   nix-darwin's own `nix.gc`/`nix.optimise` assert `nix.enable`, which is
   false here; logs to `/var/log/nix-gc.log`)
 * `snapshots/<host>/` - committed read-only captures of state nix cannot own
-  (TCC grants, Chrome UI prefs); `scripts/capture-snapshot` produces them,
+  (TCC decisions from both system and user databases, Chrome UI prefs); `scripts/capture-snapshot` produces them,
   `just snapshot <name> [host]` refreshes one, and the matching `snapshot`
   manual step's verify diffs live against committed
 * `pkgs/` — custom package derivations (`callPackage`d from home files)
