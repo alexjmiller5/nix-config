@@ -89,6 +89,10 @@ routing table and workflow; this file is the in-repo map.
   `people-sync-operator.nix` (shared operator injection manifest containing
   only the dedicated app credential references; the mini launcher owns no
   credential supplier and retains Chrome's native social sessions),
+  `rust.nix` (exported `homeModules.rust`; opt-in
+  `programs.rust-development.enable` installs rustc, Cargo, rustfmt, Clippy,
+  rust-analyzer, nextest and cargo-audit with Nix-owned standard-library
+  sources through `RUST_SRC_PATH`; enabled by dev-tools on both hosts),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session

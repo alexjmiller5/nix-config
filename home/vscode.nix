@@ -83,6 +83,9 @@ in
         pflannery.vscode-versionlens # showOnStartup configured in settings.json
         svelte.svelte-vscode
 
+        # --- Rust ---
+        rust-lang.rust-analyzer
+
         # --- Swift / iOS ---
         sweetpad.sweetpad
         swiftlang.swift-vscode

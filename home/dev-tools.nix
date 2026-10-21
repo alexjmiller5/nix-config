@@ -8,6 +8,9 @@
 # Exported via homeModules; consumers must pass `cherri` through
 # extraSpecialArgs (like vscode.nix's input).
 {
+  imports = [ ./rust.nix ];
+  programs.rust-development.enable = true;
+
   home.packages = [
     pkgs.bun
     # Apple build chain shared by both hosts: the mini is the agents' build
