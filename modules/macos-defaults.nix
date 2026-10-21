@@ -32,6 +32,11 @@
   };
 
   system.defaults = {
+    menuExtraClock = {
+      ShowDate = 1; # Always show the date.
+      ShowDayOfWeek = true;
+    };
+
     NSGlobalDomain = {
       "com.apple.trackpad.scaling" = 5.0;
       InitialKeyRepeat = 10;
