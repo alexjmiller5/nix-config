@@ -83,6 +83,9 @@ in
         pflannery.vscode-versionlens # showOnStartup configured in settings.json
         svelte.svelte-vscode
 
+        # --- Go ---
+        golang.go
+
         # --- Rust ---
         rust-lang.rust-analyzer
 

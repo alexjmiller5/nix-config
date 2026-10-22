@@ -7,6 +7,12 @@
 	"editor.formatOnType": true,
 	// Disable minimap
 	"editor.minimap.enabled": false,
+	// Nix owns Go tools and their updates.
+	"go.toolsManagement.autoUpdate": false,
+	"go.toolsManagement.checkForUpdates": "off",
+	"[go]": {
+		"editor.defaultFormatter": "golang.go"
+	},
 	// Default Formatters
 	"[python]": {
 		"editor.defaultFormatter": "charliermarsh.ruff",

@@ -8,8 +8,12 @@
 # Exported via homeModules; consumers must pass `cherri` through
 # extraSpecialArgs (like vscode.nix's input).
 {
-  imports = [ ./rust.nix ];
+  imports = [
+    ./rust.nix
+    ./go.nix
+  ];
   programs.rust-development.enable = true;
+  programs.go-development.enable = true;
 
   home.packages = [
     pkgs.bun

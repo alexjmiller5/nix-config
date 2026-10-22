@@ -314,6 +314,7 @@
         apple-agent = ./home/apple-agent.nix;
         cli-tools = ./home/cli-tools.nix;
         rust = ./home/rust.nix;
+        go = ./home/go.nix;
         herdr = ./home/herdr.nix;
         herdr-codex = ./home/herdr-codex.nix;
         herdr-takeover = ./home/herdr-takeover.nix;

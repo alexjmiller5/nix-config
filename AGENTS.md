@@ -89,6 +89,11 @@ routing table and workflow; this file is the in-repo map.
   `people-sync-operator.nix` (shared operator injection manifest containing
   only the dedicated app credential references; the mini launcher owns no
   credential supplier and retains Chrome's native social sessions),
+  `go.nix` (exported `homeModules.go`; opt-in
+  `programs.go-development.enable` installs Go, gopls, gotools, govulncheck
+  and Delve; `GOTOOLCHAIN=local` keeps SDK selection Nix-owned;
+  enabled by dev-tools on both hosts; native Delve launch/attach
+  authorization is the declared `go-debugger-authorization` manual step),
   `rust.nix` (exported `homeModules.rust`; opt-in
   `programs.rust-development.enable` installs rustc, Cargo, rustfmt, Clippy,
   rust-analyzer, nextest and cargo-audit with Nix-owned standard-library
