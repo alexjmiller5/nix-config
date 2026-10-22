@@ -5,8 +5,8 @@
 # the op-authed CLI wrappers (op-wrappers.nix) and cli-tools.
 #
 # HOST-LAYER SIBLING (home-manager can't declare casks): the host's
-# homebrew.casks needs `claude-code@latest` and `notion-cli` (ntn — not in
-# nixpkgs), and its allowUnfreePredicate must include "1password-cli".
+# homebrew.casks needs `claude-code@latest`, `codex` and `notion-cli` (ntn -
+# not in nixpkgs), and its allowUnfreePredicate must include "1password-cli".
 {
   config,
   lib,
@@ -31,6 +31,29 @@
     pkgs.skills # skills.sh agent-skills manager (was a laptop brew formula)
   ]
   ++ lib.optional config.aiAgent.withOp config.opConnect.cliPackage;
+
+  # Switches never upgrade casks; a stale codex cask breaks herdr-codex's
+  # `app-server daemon start` (pre-0.160 demanded the standalone installer).
+  config.launchd.agents.brew-upgrade-agents = {
+    enable = true;
+    config = {
+      Label = "com.alexmiller.brew-upgrade-agents";
+      ProgramArguments = [
+        "/opt/homebrew/bin/brew"
+        "upgrade"
+        "claude-code@latest"
+        "codex"
+      ];
+      StartCalendarInterval = [
+        {
+          Hour = 9;
+          Minute = 0;
+        }
+      ];
+      StandardOutPath = "${config.home.homeDirectory}/Library/Logs/brew-upgrade-agents.log";
+      StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/brew-upgrade-agents.log";
+    };
+  };
 
   # Claude Code never persists home-dir trust acceptance to disk (session-only
   # by design), so launching `claude` from ~ re-prompts on every start. Seed

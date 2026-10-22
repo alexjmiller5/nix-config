@@ -136,7 +136,8 @@ routing table and workflow; this file is the in-repo map.
   authoritative record, separate from Nix bootstrap; see both host manuals.
   Nix never populates or refreshes this file. Claude/Codex subscription login
   remains native app state, separate from operator tool credentials.
-  Host-layer sibling = `claude-code` + `notion-cli` casks),
+  Host-layer sibling = `claude-code` + `codex` + `notion-cli` casks; a daily
+  launchd `brew upgrade` keeps the two agent CLI casks current on both hosts),
   `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs,screensaver}.nix`
   (activation-script defaults by concern, each exported via `homeModules`;
   `screensaver.nix` keeps the idle screen saver, and so the idle lock, off

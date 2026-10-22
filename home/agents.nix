@@ -221,27 +221,6 @@ in
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/simulator-prune.log";
       };
     };
-
-    # Ported from the imperative com.alexmiller.brew-upgrade-claude-code plist.
-    brew-upgrade-claude-code = {
-      enable = true;
-      config = {
-        Label = "com.alexmiller.brew-upgrade-claude-code";
-        ProgramArguments = [
-          "/opt/homebrew/bin/brew"
-          "upgrade"
-          "claude-code@latest"
-        ];
-        StartCalendarInterval = [
-          {
-            Hour = 9;
-            Minute = 0;
-          }
-        ];
-        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/brew-upgrade-claude-code.log";
-        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/brew-upgrade-claude-code.log";
-      };
-    };
   }
   // lib.listToAttrs (
     map
