@@ -149,7 +149,6 @@ in
         ms-azuretools.vscode-containers # container tools, not Azure
         hashicorp.terraform # OCI VM fleet
         nefrob.vscode-just-syntax
-        james-yu.latex-workshop # resume is .tex
         ms-vscode.extension-test-runner
       ])
       ++ (with pkgs.vscode-extensions; [
