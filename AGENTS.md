@@ -152,6 +152,7 @@ routing table and workflow; this file is the in-repo map.
   `~/Library/Logs/scratch-sweeper.log`; script `scratch-sweeper.py`
   (`--dry-run`), test `tests/scratch-sweeper.py`),
   `macos/finder.nix` owns the shared Finder baseline and nested list defaults.
+  Tags are hidden in both native default list-column layouts.
   Both hosts enable the full Finder profile through `home/common.nix`.
   Window controls are implemented by Hammerspoon; the exported
   `macos-window-management` module declares native Control-arrow navigation

@@ -82,6 +82,25 @@ in
       run /usr/bin/osascript -l JavaScript <<'JXA'
       ObjC.import('Foundation');
       const prefs = $.NSUserDefaults.alloc.initWithSuiteName('com.apple.finder');
+      // Finder calls the Tags column 'label'. Seed missing layouts from its
+      // native baseline, preserving every other column's order and settings.
+      const standard = ObjC.deepUnwrap(prefs.objectForKey('StandardViewSettings')) || {};
+      const baseline = ObjC.deepUnwrap(prefs.objectForKey('FK_StandardViewSettings')) || {};
+      for (const key of ['ExtendedListViewSettingsV2', 'ListViewSettings']) {
+        const layout = standard[key] || {};
+        const columns = layout.columns || (baseline[key] || {}).columns;
+        if (Array.isArray(columns)) {
+          for (const column of columns) {
+            if (column.identifier === 'label') column.visible = false;
+          }
+        } else if (columns && columns.label) {
+          columns.label.visible = false;
+        }
+        if (columns) layout.columns = columns;
+        standard[key] = layout;
+      }
+      prefs.setObjectForKey($(standard), 'StandardViewSettings');
+      prefs.synchronize;
       const value = ObjC.deepUnwrap(prefs.objectForKey('ListViewSettings'));
       if (value && Object.keys(value).length === 1 && value.calculateAllSizes === true) {
         prefs.removeObjectForKey('ListViewSettings');

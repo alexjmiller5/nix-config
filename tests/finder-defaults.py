@@ -50,3 +50,42 @@ for value, expected in [
 broken = check({"calculateAllSizes": True}, None, cleanup.replace("prefs.synchronize;", "prefs.synchronize();"))
 assert broken.returncode != 0, "native bridge regression was not detected"
 print("finder-defaults: native cleanup, absence, data preservation, and bridge regression passed")
+
+# Exercise both native column representations, preserving other column settings.
+program = """
+ObjC.import('Foundation');
+const fixture = $.NSUserDefaults.alloc.initWithSuiteName('com.example.finder-columns-test');
+try {
+  const initial = {
+    ExtendedListViewSettingsV2: {columns: [
+      {identifier: 'name', visible: true, width: 321},
+      {identifier: 'label', visible: true, width: 100}]},
+    ListViewSettings: {columns: {name: {visible: true}, label: {visible: true}}}
+  };
+  fixture.setObjectForKey($(initial), 'FK_StandardViewSettings');
+  fixture.setObjectForKey($(initial), 'StandardViewSettings');
+  (() => { SCRIPT })();
+  const result = ObjC.deepUnwrap(fixture.objectForKey('StandardViewSettings'));
+  if (result.ExtendedListViewSettingsV2.columns[1].visible !== false ||
+      result.ListViewSettings.columns.label.visible !== false)
+    throw Error('Tags column is still visible');
+  if (result.ExtendedListViewSettingsV2.columns[0].width !== 321 ||
+      result.ListViewSettings.columns.name.visible !== true)
+    throw Error('unrelated column settings changed');
+  fixture.removeObjectForKey('StandardViewSettings');
+  (() => { SCRIPT })();
+  const seeded = ObjC.deepUnwrap(fixture.objectForKey('StandardViewSettings'));
+  if (seeded.ExtendedListViewSettingsV2.columns[1].visible !== false ||
+      seeded.ListViewSettings.columns.label.visible !== false)
+    throw Error('missing column layouts were not seeded');
+} finally {
+  fixture.removePersistentDomainForName('com.example.finder-columns-test');
+  fixture.synchronize;
+}
+"""
+for script, succeeds in [(cleanup, True), (cleanup.replace('visible = false', 'visible = true'), False)]:
+    result = subprocess.run(['/usr/bin/osascript', '-l', 'JavaScript'],
+        input=program.replace('SCRIPT', script.replace('com.apple.finder', 'com.example.finder-columns-test')),
+        text=True, capture_output=True)
+    assert (result.returncode == 0) == succeeds, result.stderr
+print('finder-defaults: Tags hidden in both column formats; other columns preserved')
