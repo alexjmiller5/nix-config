@@ -105,6 +105,10 @@ routing table and workflow; this file is the in-repo map.
   runtime from the TUI. Native key bindings live in
   `dotfiles/herdr-app/keys.json`; Cmd+Shift+W closes the window safely,
   Cmd+Alt+[/] selects agents, Cmd+[/] selects left/right panes.
+  Native Catppuccin Latte/Mocha themes follow system appearance; the
+  magenta accent is part of each palette. Declared `settings` merge during
+  activation without making native settings read-only. Herdr is pinned
+  immediately after VS Code in the laptop Dock.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
