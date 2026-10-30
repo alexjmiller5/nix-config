@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 path = Path(__file__).resolve().parents[1] / "scripts/herdr-codex.py"
 spec = importlib.util.spec_from_file_location("bridge", path)
@@ -53,6 +54,18 @@ class RegistrationTests(unittest.TestCase):
             self.assertFalse(bridge.interactive(args))
         for args in ([], ["resume", "id"], ["-m", "model", "resume", "id"], ["hello"]):
             self.assertTrue(bridge.interactive(args))
+
+    def test_native_core_owns_codex_and_ignores_inherited_tui_identity(self):
+        with patch.dict(bridge.os.environ, {"HC_TERMINAL_ID":"t8", "HERDR_ENV":"1", "HERDR_PANE_ID":"old", "HERDR_SOCKET_PATH":"/wrong"}), patch.object(bridge.sys,"argv",["bridge","--codex","/codex","--","resume","exact"]), patch.object(bridge.os,"execv",side_effect=RuntimeError("exec")) as execute:
+            with self.assertRaisesRegex(RuntimeError,"exec"):bridge.main()
+            self.assertEqual(execute.call_args.args,('/codex',['/codex','--no-daemon','resume','exact']))
+            self.assertEqual(bridge.os.environ['HERDR_NATIVE_DIRECT'],'1')
+            self.assertNotIn('HERDR_PANE_ID',bridge.os.environ)
+
+    def test_native_operational_commands_remain_unchanged(self):
+        with patch.dict(bridge.os.environ, {"HC_TERMINAL_ID":"t8"}), patch.object(bridge.sys,"argv",["bridge","--codex","/codex","--","queue","--thread","exact"]), patch.object(bridge.os,"execv",side_effect=RuntimeError("exec")) as execute:
+            with self.assertRaisesRegex(RuntimeError,"exec"):bridge.main()
+            self.assertEqual(execute.call_args.args,('/codex',['/codex','queue','--thread','exact']))
 
 
 if __name__ == "__main__":

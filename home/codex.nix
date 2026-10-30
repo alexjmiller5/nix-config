@@ -127,6 +127,15 @@ in
         hooks = [
           {
             type = "command";
+            command = "herdr-native hook --agent codex";
+            timeout = 10;
+          }
+        ];
+      }
+      {
+        hooks = [
+          {
+            type = "command";
             command = "${hooksDir}/moshi-hook.sh";
             async = true;
           }
@@ -169,6 +178,15 @@ in
         hooks = [
           {
             type = "command";
+            command = "herdr-native hook --agent codex";
+            timeout = 3;
+          }
+        ];
+      }
+      {
+        hooks = [
+          {
+            type = "command";
             command = "${hooksDir}/moshi-hook.sh";
           }
         ];
@@ -188,6 +206,15 @@ in
     ];
 
     hooks.UserPromptSubmit = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "herdr-native hook --agent codex";
+            timeout = 10;
+          }
+        ];
+      }
       {
         hooks = [
           {

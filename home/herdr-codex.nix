@@ -10,7 +10,7 @@ let
 in
 {
   options.programs.herdrCodex = {
-    enable = lib.mkEnableOption "pane-local Codex identity registration with the shared daemon";
+    enable = lib.mkEnableOption "pane-local Codex identity registration and native core process ownership";
     executable = lib.mkOption {
       type = lib.types.str;
       default = lib.getExe pkgs.codex;

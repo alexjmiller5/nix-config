@@ -144,6 +144,29 @@ def main():
     if args[:1] == ["--"]:
         args = args[1:]
     args = reconnect_args(args)
+    if os.environ.get("HC_TERMINAL_ID"):
+        os.environ.pop("HERDR_NATIVE_DIRECT", None)
+        # Native core owns this process tree; a shared daemon would outlive close.
+        for key in ("HERDR_ENV", "HERDR_PANE_ID", "HERDR_SOCKET_PATH"):
+            os.environ.pop(key, None)
+        if "--no-daemon" in args or interactive(args):
+            os.environ["HERDR_NATIVE_DIRECT"] = "1"
+        if "resume" in args:
+            index = args.index("resume") + 1
+            if index < len(args):
+                try:
+                    uuid.UUID(args[index])
+                except ValueError:
+                    pass
+                else:
+                    try:
+                        subprocess.run(["herdr-native", "register", "--agent", "codex", "--session", args[index],
+                                        "--terminal", os.environ["HC_TERMINAL_ID"], "--cwd", os.getcwd()],
+                                       check=True, capture_output=True, timeout=10)
+                    except (OSError, subprocess.SubprocessError):
+                        print("herdr-codex: early core registration unavailable", file=sys.stderr)
+        if interactive(args):
+            args = ["--no-daemon", *args]
     if not (os.environ.get("HERDR_ENV") == "1" and os.environ.get("HERDR_PANE_ID")
             and os.environ.get("HERDR_SOCKET_PATH") and os.isatty(0) and interactive(args)):
         os.execv(options.codex, [options.codex, *args])

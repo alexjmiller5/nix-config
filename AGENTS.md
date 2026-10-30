@@ -16,7 +16,7 @@ routing table and workflow; this file is the in-repo map.
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
   `git.nix`, `git-signing.nix`, `git-hooks.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
-  `herdr-codex.nix` (exported pane-local Codex registration relay over the shared daemon),
+  `herdr-codex.nix` (exported pane-local TUI Codex registration relay over the shared daemon; native core clients run without the daemon),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agent-env.nix` (shared credential initialization in `.zshenv` and
   `~/.config/agent-shell/env.sh`; Claude's native SessionStart environment
@@ -113,6 +113,18 @@ routing table and workflow; this file is the in-repo map.
   open tab across all machines/spaces, including shells, in display order.
   Hammerspoon binds Cmd+Shift+[/] to it only in the native app, independent
   of layout-specific agent ordering. Tests: `tests/herdr-navigate.py`.
+  `herdr-native` registers exact Claude/Codex/Pi conversation identities,
+  records Cmd+W closures, and resumes them through Cmd+Shift+T with tab names,
+  pane working directories and split topology. It refuses unknown identities
+  and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
+  Shells reopen as fresh shells. Native close buttons bypass the undo snapshot.
+  The laptop's event-driven `herdr-native-titles` launchd agent names tabs from
+  agent-written task labels, useful terminal titles, or prompt fallbacks,
+  preserving manual labels. Hammerspoon activation refreshes names on reopen.
+  Cmd+[/] cycles panes, including mod panes; Cmd+Shift+R reconnects the selected
+  remote core. Native identities are resolved before TUI fallback by the shared
+  lifecycle helper. Legacy adapters ignore core terminals; zsh clears inherited
+  TUI context. Pi emits native OSC 7501 state from the shared adapter.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
