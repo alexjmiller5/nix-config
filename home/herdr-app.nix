@@ -8,6 +8,12 @@ let
   cfg = config.programs.herdr-desktop;
   core = pkgs.callPackage ../pkgs/herdr-core.nix { };
   app = pkgs.callPackage ../pkgs/herdr-app.nix { };
+  navigate = pkgs.writeShellApplication {
+    name = "herdr-navigate";
+    text = ''
+      exec ${pkgs.python3}/bin/python3 ${../scripts/herdr-navigate.py} --herdr-app ${lib.getExe app} "$@"
+    '';
+  };
   settingsFile = pkgs.writeText "herdr-desktop-settings.json" (builtins.toJSON cfg.settings);
 in
 {
@@ -21,7 +27,13 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
-    home.packages = [ core ] ++ lib.optional cfg.app.enable app;
+    home.packages = [
+      core
+    ]
+    ++ lib.optionals cfg.app.enable [
+      app
+      navigate
+    ];
     # Keep native preferences writable: only declared keys are enforced on switch.
     home.activation.herdrDesktopSettings = lib.mkIf cfg.app.enable (
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''

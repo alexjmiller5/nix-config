@@ -109,6 +109,10 @@ routing table and workflow; this file is the in-repo map.
   magenta accent is part of each palette. Declared `settings` merge during
   activation without making native settings read-only. Herdr is pinned
   immediately after VS Code in the laptop Dock.
+  `herdr-navigate next/previous` uses the native command API to cycle every
+  open tab across all machines/spaces, including shells, in display order.
+  Hammerspoon binds Cmd+Shift+[/] to it only in the native app, independent
+  of layout-specific agent ordering. Tests: `tests/herdr-navigate.py`.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
