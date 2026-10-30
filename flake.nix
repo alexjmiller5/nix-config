@@ -316,6 +316,7 @@
         rust = ./home/rust.nix;
         go = ./home/go.nix;
         herdr = ./home/herdr.nix;
+        herdr-app = ./home/herdr-app.nix;
         herdr-codex = ./home/herdr-codex.nix;
         herdr-takeover = ./home/herdr-takeover.nix;
         agent-config-links = ./home/agent-config-links.nix;

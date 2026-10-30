@@ -7,7 +7,11 @@
   imports = [
     ../modules/manual-steps.nix
     ./herdr.nix
+    ./herdr-app.nix
   ];
+
+  # Both machines host persistent terminals; only the laptop needs the GUI.
+  programs.herdr-desktop.enable = true;
 
   home.packages = with pkgs; [
     uv

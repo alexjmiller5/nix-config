@@ -100,6 +100,13 @@ routing table and workflow; this file is the in-repo map.
   sources through `RUST_SRC_PATH`; enabled by dev-tools on both hosts),
   `dev-tools.nix` (portable dev toolbox + memo wrapper, shared by BOTH
   hosts — laptop-only tooling stays in `macbook-air.nix`),
+  `herdr-app.nix` (exported `programs.herdr-desktop`: pinned, signed native
+  app on the laptop and herdr-core on both Macs. The app uses a separate
+  runtime from the TUI. Native key bindings live in
+  `dotfiles/herdr-app/keys.json`; Cmd+Shift+W closes the window safely,
+  Cmd+Alt+[/] selects agents, Cmd+[/] selects left/right panes.
+  App/core versions are Nix-owned; do not apply in-app updates.
+  Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session
   restoration hooks shared by both hosts; Claude's installer runs during
   activation against its writable settings, while Codex hooks are HM-managed;
