@@ -16,6 +16,37 @@ SID = "00000000-0000-4000-8000-000000000001"
 
 
 class NativeTests(unittest.TestCase):
+    def test_live_summaries_are_expanded_before_identity_or_naming(self):
+        full = {
+            "address": "mini/t1",
+            "labels": {"session.agent": "codex", "session.id": SID},
+        }
+        with patch.object(
+            n,
+            "run",
+            side_effect=[
+                {"terminals": [{"address": "mini/t1", "agent": "codex"}]},
+                full,
+            ],
+        ) as call:
+            self.assertEqual(n.live_records(), [full])
+            self.assertEqual(call.call_args.args[0], [n.HC, "get", "mini/t1"])
+
+    def test_wrapped_core_events_refresh_titles(self):
+        self.assertTrue(
+            n.title_event(
+                {
+                    "jsonrpc": "2.0",
+                    "method": "event",
+                    "params": {"type": "labels", "terminal": "mini/t1"},
+                }
+            )
+        )
+        self.assertTrue(n.title_event({"terminals": []}))
+        self.assertFalse(
+            n.title_event({"method": "event", "params": {"type": "output"}})
+        )
+
     def test_exact_resume_commands(self):
         for agent, expected in [
             ("codex", ["codex", "resume", SID]),

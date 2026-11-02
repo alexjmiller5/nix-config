@@ -146,10 +146,27 @@ def clear(terminal, session):
         )
 
 
+def live_records():
+    # ls is a compact summary; session labels are available through get/events.
+    return [
+        record if "labels" in record else run([HC, "get", record["address"]])
+        for record in run([HC, "ls"])["terminals"]
+    ]
+
+
+def title_event(event):
+    return "terminals" in event or event.get("params", event).get("type") in (
+        "labels",
+        "label",
+        "title",
+        "doc",
+    )
+
+
 def locate(agent, session):
     matches = [
         record
-        for record in run([HC, "ls"])["terminals"]
+        for record in live_records()
         if record.get("labels", {}).get("session.agent") == agent
         and session
         in (record["labels"].get("session.id"), record["labels"].get("session.file"))
@@ -303,7 +320,7 @@ def ensure_closed(entry):
         if record["argv"]
     }
     if identities:
-        for record in run([HC, "ls"])["terminals"]:
+        for record in live_records():
             labels = record.get("labels", {})
             if (
                 labels.get("session.id") in identities
@@ -612,7 +629,7 @@ def titles(path):
         world = app("ls")
     except (ValueError, subprocess.SubprocessError):
         return  # Never open a window just to rename it.
-    records = {r["address"]: r for r in run([HC, "ls"])["terminals"]}
+    records = {r["address"]: r for r in live_records()}
     previous = dict(load(path))
     named, available = set(), set()
     for machine in {space.get("machine") for space in world["spaces"]}:
@@ -652,12 +669,7 @@ def watch():
         try:
             for line in process.stdout:
                 event = json.loads(line)
-                if "terminals" in event or event.get("type") in (
-                    "labels",
-                    "label",
-                    "title",
-                    "doc",
-                ):
+                if title_event(event):
                     with (STATE / "lock").open("a") as lock:
                         fcntl.flock(lock, fcntl.LOCK_EX)
                         titles(STATE / "titles.json")
