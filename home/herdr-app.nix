@@ -123,8 +123,9 @@ in
         Option+H opens the app. Cmd+Shift+[/] traverses all open sessions across
         machines/spaces. Cmd+W saves exact conversation identities and split
         topology, then ends the processes; Cmd+Shift+T resumes the saved tab.
-        Shell tabs reopen shells without replaying commands. Unsupported programs
-        and agents without an exact identity stay open. Automatic names preserve
+        Shell tabs reopen shells without replaying commands. Codex/Claude tabs
+        without a saved identity reopen in their resume picker. Unsupported
+        programs stay open. Automatic names preserve
         manual labels. Cmd+Shift+W closes the viewer while programs keep running.
         Clicked close buttons use the app's native close; use Cmd+W for saved undo.
       '';

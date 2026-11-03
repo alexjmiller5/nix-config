@@ -1,5 +1,6 @@
 """Native close/restore refuses unknown identities and preserves exact conversations."""
 
+import subprocess
 import importlib.util
 import tempfile
 import unittest
@@ -31,6 +32,27 @@ class NativeTests(unittest.TestCase):
         ) as call:
             self.assertEqual(n.live_records(), [full])
             self.assertEqual(call.call_args.args[0], [n.HC, "get", "mini/t1"])
+
+    def test_terminal_removed_during_listing_does_not_stop_title_updates(self):
+        missing = subprocess.CalledProcessError(
+            3, [], output='{"error":{"kind":"not_found"}}'
+        )
+        with patch.object(
+            n, "run", side_effect=[{"terminals": [{"address": "t1"}]}, missing]
+        ):
+            self.assertEqual(n.live_records(), [])
+        unreachable = subprocess.CalledProcessError(
+            1, [], output='{"error":{"kind":"unreachable"}}'
+        )
+        with (
+            patch.object(
+                n,
+                "run",
+                side_effect=[{"terminals": [{"address": "mini/t1"}]}, unreachable],
+            ),
+            self.assertRaises(subprocess.CalledProcessError),
+        ):
+            n.live_records()
 
     def test_wrapped_core_events_refresh_titles(self):
         self.assertTrue(
@@ -75,7 +97,6 @@ class NativeTests(unittest.TestCase):
 
     def test_unknown_or_invalid_agent_identity_prevents_close(self):
         for record in [
-            {"status": {"app": "codex"}, "labels": {}, "cwd": "/workspace"},
             {
                 "status": {"app": "codex"},
                 "labels": {"session.agent": "codex", "session.id": "latest"},
@@ -90,6 +111,24 @@ class NativeTests(unittest.TestCase):
         ]:
             with self.assertRaises(ValueError):
                 n.resume_record(record)
+
+    def test_unregistered_agent_close_uses_explicit_picker_not_a_guessed_session(self):
+        for agent, picker in [
+            ("codex", ["codex", "resume"]),
+            ("claude", ["claude", "--resume"]),
+        ]:
+            saved = n.resume_record(
+                {
+                    "status": {"app": agent, "state": "idle"},
+                    "labels": {},
+                    "cwd": "/workspace",
+                }
+            )
+            self.assertEqual(saved["argv"], picker)
+            n.validate_spec(saved)
+            with patch.object(n, "run") as call:
+                n.label_restored({"terminal": "mini/new"}, saved)
+                call.assert_not_called()
 
     def test_shells_are_reopened_without_replaying_commands(self):
         self.assertEqual(

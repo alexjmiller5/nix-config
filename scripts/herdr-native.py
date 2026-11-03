@@ -147,11 +147,27 @@ def clear(terminal, session):
 
 
 def live_records():
-    # ls is a compact summary; session labels are available through get/events.
-    return [
-        record if "labels" in record else run([HC, "get", record["address"]])
-        for record in run([HC, "ls"])["terminals"]
-    ]
+    # ls is a compact summary; a terminal can disappear before its get completes.
+    records = []
+    for summary in run([HC, "ls"])["terminals"]:
+        try:
+            record = (
+                summary if "labels" in summary else run([HC, "get", summary["address"]])
+            )
+        except subprocess.CalledProcessError as error:
+            try:
+                missing = (
+                    json.loads(error.stdout or "{}").get("error", {}).get("kind")
+                    == "not_found"
+                )
+            except ValueError:
+                missing = False
+            if missing:
+                continue
+            raise
+        if record.get("state", "live") == "live":
+            records.append(record)
+    return records
 
 
 def title_event(event):
@@ -221,6 +237,13 @@ def resume_record(record):
     if agent in ("codex", "claude", "claude-code"):
         agent = "claude" if agent == "claude-code" else agent
         session = labels.get("session.id", "")
+        if not session:
+            # A conversation may not exist until the first prompt. Never guess one.
+            return {
+                "cwd": cwd,
+                "argv": [agent, "resume" if agent == "codex" else "--resume"],
+                "working": status.get("state") == "working",
+            }
         try:
             uuid.UUID(session)
         except ValueError:
@@ -260,6 +283,8 @@ def validate_spec(spec):
     argv = spec["argv"]
     if not argv:
         return
+    if argv in (["codex", "resume"], ["claude", "--resume"]):
+        return
     if len(argv) != 3 or (argv[0], argv[1]) not in [
         ("codex", "resume"),
         ("claude", "--resume"),
@@ -274,7 +299,7 @@ def validate_spec(spec):
 
 
 def label_restored(result, spec):
-    if not spec.get("argv"):
+    if len(spec.get("argv", [])) != 3:
         return
     argv = spec["argv"]
     labels = {
@@ -317,7 +342,7 @@ def ensure_closed(entry):
     identities = {
         record["argv"][-1]
         for record in entry.get("records", {}).values()
-        if record["argv"]
+        if len(record["argv"]) == 3
     }
     if identities:
         for record in live_records():

@@ -116,8 +116,8 @@ routing table and workflow; this file is the in-repo map.
   of layout-specific agent ordering. Tests: `tests/herdr-navigate.py`.
   `herdr-native` registers exact Claude/Codex/Pi conversation identities,
   records Cmd+W closures, and resumes them through Cmd+Shift+T with tab names,
-  pane working directories and split topology. It refuses unknown identities
-  and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
+  pane working directories and split topology. Unregistered Codex/Claude tabs reopen through their resume picker.
+  It refuses malformed identities and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
   Shells reopen as fresh shells. Native close buttons bypass the undo snapshot.
   The laptop's event-driven `herdr-native-titles` launchd agent names tabs from
   agent-written task labels, useful terminal titles, or prompt fallbacks,
