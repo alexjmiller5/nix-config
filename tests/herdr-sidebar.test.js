@@ -2,32 +2,40 @@ import { expect, mock, test } from "bun:test";
 mock.module("gpui-kit", () => ({ View: class {}, div() {} }));
 mock.module("gpui-base", () => ({ v_flex() {} }));
 const commands = [];
-mock.module("herdr", () => ({ agents() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
-const { groupAgents, selectMachine } = await import("../dotfiles/herdr-app/agent-sidebar/main.js");
+mock.module("herdr", () => ({ agents() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
+const { groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/agent-sidebar/main.js");
 
-test("sessions group by their actual machine without dropping or reordering sessions", () => {
-  const agents = [
-    { address: "mini/t1", space: "remote", tab_name: "First" },
-    { address: "t2", space: "local", tab_name: "Local" },
-    { address: "mini/t3", space: "remote", tab_name: "Second" },
+test("all spaces and shell panes remain visible under their actual machine", () => {
+  const spaces = [
+    {id:"r1",machine:"mini",name:"API",tabs:[{id:"tab1",name:"Server"}]},
+    {id:"r2",machine:"mini",name:"Web",tabs:[{id:"tab2",name:"Build"}]},
+    {id:"l",machine:null,name:"Home",tabs:[]},
   ];
-  const groups = groupAgents(agents, [{ id: "remote", machine: "mini" }, { id: "local", machine: null }]);
-  expect(groups.map(g => [g.machine, g.agents.map(a => a.tab_name)])).toEqual([
-    ["local", ["Local"]], ["mini", ["First", "Second"]],
+  const panes = [
+    {pane:"p1",terminal:"mini/t1",tab:"tab1",title:"zsh"},
+    {pane:"p2",terminal:"mini/t2",tab:"tab2",title:"Agent"},
+    {pane:"p3",terminal:null,tab:"tab1",title:"Files"},
+  ];
+  const groups = groupSidebar(spaces,panes,[{address:"mini/t2",tab_name:"Fix Login"}]);
+  expect(groups.map(g=>[g.machine,g.spaces.map(s=>s.name)])).toEqual([
+    ["local",["Home"]],["mini",["API","Web"]]
   ]);
-  expect(agents.map(a => a.address)).toEqual(["mini/t1", "t2", "mini/t3"]);
+  expect(groups[1].spaces.map(s=>s.rows.map(r=>[r.terminal,r.name]))).toEqual([
+    [["mini/t1","Server"]],[["mini/t2","Fix Login"]]
+  ]);
+  expect(panes).toHaveLength(3);
 });
 
-test("an agent outside the visible spaces still groups by its core address", () => {
-  expect(groupAgents([{ address: "other/t1" }], []).map(g => g.machine)).toEqual(["local", "other"]);
-  expect(groupAgents([{ address: "t1" }], [])[0].machine).toBe("local");
-  expect(groupAgents([], [])).toEqual([{ machine: "local", agents: [] }]);
+test("split shells each appear and local machine remains with no spaces", () => {
+  expect(groupSidebar([],[],[])).toEqual([{machine:"local",spaces:[]}]);
+  const groups=groupSidebar([{id:"s",machine:null,tabs:[{id:"t",name:"Shell"}]}],[
+    {pane:"p1",terminal:"t1",tab:"t"},{pane:"p2",terminal:"t2",tab:"t"}
+  ],[]);
+  expect(groups[0].spaces[0].rows.map(r=>r.terminal)).toEqual(["t1","t2"]);
 });
 
-test("laptop stays available without agent sessions and selects its existing shell space", () => {
-  const spaces = [{id:"remote",machine:"mini"},{id:"laptop",machine:null}];
-  expect(groupAgents([{address:"mini/t1",space:"remote"}],spaces)[0]).toEqual({machine:"local",agents:[]});
-  selectMachine("local",spaces);
+test("machine navigation selects an existing space or starts local shell", () => {
+  selectMachine("local",[{id:"laptop",machine:null}]);
   expect(commands.at(-1)).toEqual(["space.select",{id:"laptop"}]);
   selectMachine("local",[]);
   expect(commands.at(-1)).toEqual(["space.new",{folder:"/local-home"}]);
