@@ -36,7 +36,7 @@
       },
       "window_drag": true,
       "content": {
-        "mod": "terminals-bar"
+        "mod": "compact-terminals-bar"
       }
     },
     {

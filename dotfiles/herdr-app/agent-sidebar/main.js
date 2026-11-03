@@ -1,10 +1,10 @@
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
-import { agents, spaces, run, theme, setAgentOrder } from "herdr";
+import { agents, spaces, run, theme, home, setAgentOrder } from "herdr";
 
 export function groupAgents(sessions, allSpaces) {
   const machines = new Map(allSpaces.map(space => [space.id, space.machine]));
-  const groups = new Map();
+  const groups = new Map([["This Mac", []]]);
   for (const agent of sessions) {
     const machine = machines.get(agent.space)
       ?? (agent.address.includes("/") ? agent.address.split("/")[0] : "This Mac");
@@ -14,16 +14,25 @@ export function groupAgents(sessions, allSpaces) {
   return [...groups].map(([machine, agents]) => ({ machine, agents }));
 }
 
+export function selectMachine(machine, allSpaces) {
+  const space = allSpaces.find(space => (space.machine ?? "This Mac") === machine);
+  if (space) run("space.select", { id: space.id });
+  else if (machine === "This Mac") run("space.new", { folder: home() });
+}
+
 export default class AgentSidebar extends View {
   render() {
     const t = theme();
-    const groups = groupAgents(agents(), spaces());
+    const allSpaces = spaces();
+    const groups = groupAgents(agents(), allSpaces);
     setAgentOrder(groups.flatMap(group => group.agents.map(agent => agent.address)));
     return v_flex().id("agent-sidebar").size_full().min_h(0)
       .overflow_y_scrollbar().px(4).py(6).gap(12)
       .children(groups.map(group =>
         v_flex().gap(2)
-          .child(div().px(8).pb(3).text_size(11).text_color(t.dim).child(group.machine))
+          .child(div().px(8).pb(3).text_size(11).text_color(t.dim)
+            .cursor_pointer().hover(heading => heading.text_color(t.foreground))
+            .on_click(() => selectMachine(group.machine, allSpaces)).child(group.machine))
           .children(group.agents.map(agent =>
             div().id(`agent-${agent.address}`).px(8).py(5).rounded(5)
               .text_size(12).text_color(agent.focused ? t.foreground : t.muted)
@@ -32,9 +41,6 @@ export default class AgentSidebar extends View {
               .on_click(() => run("agent.focus", { terminal: agent.address }))
               .child(div().truncate().child(agent.tab_name || agent.title || "Untitled session"))
           ))
-      ))
-      .when(groups.length === 0, panel => panel.child(
-        div().px(8).text_size(12).text_color(t.dim).child("No agent sessions")
       ));
   }
 }
