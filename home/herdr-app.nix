@@ -42,19 +42,21 @@ let
       "t4-threads"
     ];
   };
-  exampleFiles = lib.foldl' (
-    files: name:
-    files
-    // {
-      "herdr-app/layouts/${name}.json".source = "${layoutExamples}/${name}/layouts/${name}.json";
-    }
-    // lib.listToAttrs (
-      map (mod: {
-        name = "herdr-app/mods/${mod}";
-        value.source = "${layoutExamples}/${name}/mods/${mod}";
-      }) exampleMods.${name}
-    )
-  ) { } cfg.exampleLayouts;
+  exampleFiles = lib.listToAttrs (
+    map (name: {
+      name = "herdr-app/layouts/${name}.json";
+      value.source = "${layoutExamples}/${name}/layouts/${name}.json";
+    }) cfg.exampleLayouts
+  );
+  layoutMods =
+    lib.foldl'
+      (
+        mods: name: mods // lib.genAttrs exampleMods.${name} (mod: "${layoutExamples}/${name}/mods/${mod}")
+      )
+      (lib.optionalAttrs cfg.agentSidebar.enable {
+        agent-sidebar = ../dotfiles/herdr-app/agent-sidebar;
+      })
+      cfg.exampleLayouts;
   settingsFile = pkgs.writeText "herdr-desktop-settings.json" (builtins.toJSON cfg.settings);
 in
 {
@@ -134,6 +136,23 @@ in
         unset HERDR_ENV HERDR_PANE_ID HERDR_SOCKET_PATH HERDR_TAB_ID
       fi
     '';
+    # Herdr's asset sandbox refuses symlinks that escape its config directory.
+    home.activation.herdrLayoutMods = lib.mkIf cfg.app.enable (
+      lib.hm.dag.entryAfter [ "linkGeneration" ] (
+        lib.concatStringsSep "\n" (
+          lib.mapAttrsToList (name: source: ''
+            target=${lib.escapeShellArg "${config.xdg.configHome}/herdr-app/mods/${name}"}
+            if [ -L "$target" ]; then
+              run unlink "$target"
+            fi
+            run mkdir -p "$target"
+            run ${pkgs.rsync}/bin/rsync -r --chmod=Du+w,Fu+w --delete \
+              --exclude=gpui-kit.d.ts --exclude=herdr.d.ts --exclude=jsconfig.json \
+              ${lib.escapeShellArg "${source}/"} "$target/"
+          '') layoutMods
+        )
+      )
+    );
     # Keep native preferences writable: only declared keys are enforced on switch.
     home.activation.herdrDesktopSettings = lib.mkIf cfg.app.enable (
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -152,7 +171,6 @@ in
       exampleFiles
       // lib.optionalAttrs cfg.agentSidebar.enable {
         "herdr-app/layouts/terminals-agents.json".source = ../dotfiles/herdr-app/terminals-agents.json;
-        "herdr-app/mods/agent-sidebar".source = ../dotfiles/herdr-app/agent-sidebar;
       }
       // {
         "herdr-app/themes/catppuccin-latte.json" = {
