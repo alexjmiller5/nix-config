@@ -23,6 +23,38 @@ let
       exec ${pkgs.python3}/bin/python3 ${../scripts/herdr-native.py} "$@"
     '';
   };
+  layoutExamples = pkgs.fetchFromGitHub {
+    owner = "herdrdev";
+    repo = "herdr-layout-examples";
+    rev = "0ec967640bf854ffb839e9af06c1e0c328bc9815";
+    sha256 = "0ckp5vkv8d0zliyhqxg51350ad2fj8q7yqg1mhcm889b8l33ic5y";
+  };
+  exampleMods = {
+    pasture = [ "pasture" ];
+    threads = [
+      "t4-composer"
+      "t4-details"
+      "t4-diff"
+      "t4-files"
+      "t4-head"
+      "t4-new"
+      "t4-panel-head"
+      "t4-threads"
+    ];
+  };
+  exampleFiles = lib.foldl' (
+    files: name:
+    files
+    // {
+      "herdr-app/layouts/${name}.json".source = "${layoutExamples}/${name}/layouts/${name}.json";
+    }
+    // lib.listToAttrs (
+      map (mod: {
+        name = "herdr-app/mods/${mod}";
+        value.source = "${layoutExamples}/${name}/mods/${mod}";
+      }) exampleMods.${name}
+    )
+  ) { } cfg.exampleLayouts;
   settingsFile = pkgs.writeText "herdr-desktop-settings.json" (builtins.toJSON cfg.settings);
 in
 {
@@ -30,6 +62,12 @@ in
   options.programs.herdr-desktop = {
     enable = lib.mkEnableOption "the Herdr desktop core";
     app.enable = lib.mkEnableOption "the native Herdr window";
+    agentSidebar.enable = lib.mkEnableOption "the Terminals layout with a minimal machine-grouped agent sidebar";
+    exampleLayouts = lib.mkOption {
+      type = lib.types.listOf (lib.types.enum (builtins.attrNames exampleMods));
+      default = [ ];
+      description = "Pinned official Herdr example layouts and their required mods.";
+    };
     settings = lib.mkOption {
       type = (pkgs.formats.json { }).type;
       default = { };
@@ -110,14 +148,19 @@ in
         fi
       ''
     );
-    xdg.configFile."herdr-app/themes/catppuccin-latte.json" = lib.mkIf cfg.app.enable {
-      source = ../dotfiles/herdr-app/catppuccin-latte.json;
-    };
-    xdg.configFile."herdr-app/themes/catppuccin-mocha.json" = lib.mkIf cfg.app.enable {
-      source = ../dotfiles/herdr-app/catppuccin-mocha.json;
-    };
-    xdg.configFile."herdr-app/keys.json" = lib.mkIf cfg.app.enable {
-      source = ../dotfiles/herdr-app/keys.json;
-    };
+    xdg.configFile = lib.mkIf cfg.app.enable (
+      exampleFiles
+      // {
+        "herdr-app/themes/catppuccin-latte.json" = {
+          source = ../dotfiles/herdr-app/catppuccin-latte.json;
+        };
+        "herdr-app/themes/catppuccin-mocha.json" = {
+          source = ../dotfiles/herdr-app/catppuccin-mocha.json;
+        };
+        "herdr-app/keys.json" = {
+          source = ../dotfiles/herdr-app/keys.json;
+        };
+      }
+    );
   };
 }

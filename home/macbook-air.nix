@@ -25,6 +25,11 @@ in
   # The personal browser lives on the laptop; the mini only runs agent Chrome.
   programs.bookmark-mirror.enable = true;
   programs.herdr-desktop.app.enable = true;
+  programs.herdr-desktop.agentSidebar.enable = true;
+  programs.herdr-desktop.exampleLayouts = [
+    "threads"
+    "pasture"
+  ];
   programs.herdr-desktop.settings.theme = {
     light = "catppuccin-latte";
     dark = "catppuccin-mocha";

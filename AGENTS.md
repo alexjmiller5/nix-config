@@ -16,6 +16,7 @@ routing table and workflow; this file is the in-repo map.
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
   `git.nix`, `git-signing.nix`, `git-hooks.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
+  `herdr-app.nix` (native app/core, shared keys/themes and opt-in pinned Threads/Pasture examples and a minimal machine-grouped Terminals agent sidebar for GUI clients),
   `herdr-codex.nix` (exported pane-local TUI Codex registration relay over the shared daemon; native core clients run without the daemon),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agent-env.nix` (shared credential initialization in `.zshenv` and
