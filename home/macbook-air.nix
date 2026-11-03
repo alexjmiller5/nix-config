@@ -26,6 +26,7 @@ in
   programs.bookmark-mirror.enable = true;
   programs.herdr-desktop.app.enable = true;
   programs.herdr-desktop.agentSidebar.enable = true;
+  programs.herdr-desktop.agentSidebar.localLabel = "laptop";
   programs.herdr-desktop.exampleLayouts = [
     "threads"
     "pasture"

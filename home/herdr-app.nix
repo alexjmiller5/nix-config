@@ -65,6 +65,11 @@ in
   options.programs.herdr-desktop = {
     enable = lib.mkEnableOption "the Herdr desktop core";
     app.enable = lib.mkEnableOption "the native Herdr window";
+    agentSidebar.localLabel = lib.mkOption {
+      type = lib.types.str;
+      default = "Local";
+      description = "Display name for the computer running the Herdr window.";
+    };
     agentSidebar.enable = lib.mkEnableOption "the Terminals layout with a minimal machine-grouped agent sidebar";
     exampleLayouts = lib.mkOption {
       type = lib.types.listOf (lib.types.enum (builtins.attrNames exampleMods));
@@ -172,7 +177,9 @@ in
     xdg.configFile = lib.mkIf cfg.app.enable (
       exampleFiles
       // lib.optionalAttrs cfg.agentSidebar.enable {
-        "herdr-app/layouts/terminals-agents.json".source = ../dotfiles/herdr-app/terminals-agents.json;
+        "herdr-app/layouts/terminals-agents.json".text =
+          builtins.replaceStrings [ ''"@localLabel@"'' ] [ (builtins.toJSON cfg.agentSidebar.localLabel) ]
+            (builtins.readFile ../dotfiles/herdr-app/terminals-agents.json);
       }
       // {
         "herdr-app/themes/catppuccin-latte.json" = {

@@ -51,7 +51,10 @@
             "px": 188
           },
           "content": {
-            "mod": "agent-sidebar"
+            "mod": "agent-sidebar",
+            "props": {
+              "localLabel": "@localLabel@"
+            }
           },
           "min": 140,
           "max": 300
