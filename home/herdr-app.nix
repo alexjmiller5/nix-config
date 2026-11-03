@@ -150,6 +150,10 @@ in
     );
     xdg.configFile = lib.mkIf cfg.app.enable (
       exampleFiles
+      // lib.optionalAttrs cfg.agentSidebar.enable {
+        "herdr-app/layouts/terminals-agents.json".source = ../dotfiles/herdr-app/terminals-agents.json;
+        "herdr-app/mods/agent-sidebar".source = ../dotfiles/herdr-app/agent-sidebar;
+      }
       // {
         "herdr-app/themes/catppuccin-latte.json" = {
           source = ../dotfiles/herdr-app/catppuccin-latte.json;
