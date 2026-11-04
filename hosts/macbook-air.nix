@@ -139,7 +139,7 @@
     { app = "/System/Applications/Mail.app"; }
     { app = "/Applications/Ghostty.app"; }
     { app = "/Applications/Visual Studio Code.app"; }
-    { app = "/Users/${username}/Applications/Home Manager Apps/Herdr.app"; }
+    { app = "${pkgs.callPackage ../pkgs/herdr-app.nix { }}/Applications/Herdr.app"; }
     { app = "/Applications/Google Chrome.app"; }
     { app = "/Applications/Notion Calendar.app"; }
     { app = "/Applications/Nix Apps/Iris.app"; }
