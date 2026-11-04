@@ -1,10 +1,13 @@
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
-import { agents, spaces, panes, run, theme, home, props, setAgentOrder } from "herdr";
+import { agents, spaces, panes, machines, run, theme, home, props, setAgentOrder } from "herdr";
 
-export function groupSidebar(allSpaces, allPanes, sessions) {
+export function groupSidebar(allSpaces, allPanes, sessions, allMachines = []) {
   const agentsByTerminal = new Map(sessions.map(agent => [agent.address, agent]));
   const groups = new Map([["local", []]]);
+  for (const machine of allMachines) {
+    if (machine.name && !machine.temporary) groups.set(machine.name, []);
+  }
   for (const space of allSpaces) {
     const machine = space.machine ?? "local";
     if (!groups.has(machine)) groups.set(machine, []);
@@ -23,6 +26,7 @@ export function selectMachine(machine, allSpaces) {
   const space = allSpaces.find(space => (space.machine ?? "local") === machine);
   if (space) run("space.select", { id: space.id });
   else if (machine === "local") run("space.new", { folder: home() });
+  else run("space.new", { machine, folder: "" });
 }
 
 export default class AgentSidebar extends View {
@@ -30,7 +34,7 @@ export default class AgentSidebar extends View {
     const t = theme();
     const allSpaces = spaces();
     const sessions = agents();
-    const groups = groupSidebar(allSpaces, panes(), sessions);
+    const groups = groupSidebar(allSpaces, panes(), sessions, machines());
     setAgentOrder(sessions.map(agent => agent.address));
     return v_flex().id("agent-sidebar").size_full().min_h(0)
       .overflow_y_scrollbar().px(4).py(6).gap(12)

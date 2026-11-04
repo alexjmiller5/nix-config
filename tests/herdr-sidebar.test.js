@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 mock.module("gpui-kit", () => ({ View: class {}, div() {} }));
 mock.module("gpui-base", () => ({ v_flex() {} }));
 const commands = [];
-mock.module("herdr", () => ({ agents() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
+mock.module("herdr", () => ({ agents() {}, machines() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
 const { groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/agent-sidebar/main.js");
 
 test("all spaces and shell panes remain visible under their actual machine", () => {
@@ -39,4 +39,10 @@ test("machine navigation selects an existing space or starts local shell", () =>
   expect(commands.at(-1)).toEqual(["space.select",{id:"laptop"}]);
   selectMachine("local",[]);
   expect(commands.at(-1)).toEqual(["space.new",{folder:"/local-home"}]);
+});
+
+test("connected machines remain visible without spaces and can open a space", () => {
+  expect(groupSidebar([],[],[],[{name:null},{name:"mini"}]).map(g=>g.machine)).toEqual(["local","mini"]);
+  selectMachine("mini",[]);
+  expect(commands.at(-1)).toEqual(["space.new",{machine:"mini",folder:""}]);
 });
