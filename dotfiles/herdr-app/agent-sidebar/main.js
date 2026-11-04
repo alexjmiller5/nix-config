@@ -1,6 +1,6 @@
 import { View, div } from "gpui-kit";
 import { v_flex } from "gpui-base";
-import { agents, spaces, panes, machines, run, theme, home, props, setAgentOrder } from "herdr";
+import { agents, spaces, panes, machines, hc, run, theme, home, props, setAgentOrder } from "herdr";
 
 export function groupSidebar(allSpaces, allPanes, sessions, allMachines = []) {
   const agentsByTerminal = new Map(sessions.map(agent => [agent.address, agent]));
@@ -30,11 +30,33 @@ export function selectMachine(machine, allSpaces) {
 }
 
 export default class AgentSidebar extends View {
+  init(_props, cx) {
+    this.connections = [];
+    this.refreshMachines(cx);
+    cx.timer.every(15000, cx => this.refreshMachines(cx));
+  }
+
+  refreshMachines(cx) {
+    if (this.refreshing) return;
+    this.refreshing = true;
+    cx.spawn(async cx => {
+      try {
+        const result = await hc(["machine", "ls", "--json"]);
+        if (result.code === 0) this.connections = JSON.parse(result.stdout).machines ?? [];
+      } finally {
+        this.refreshing = false;
+        cx.notify();
+      }
+    });
+  }
+
   render() {
     const t = theme();
     const allSpaces = spaces();
     const sessions = agents();
-    const groups = groupSidebar(allSpaces, panes(), sessions, machines());
+    const connections = this.connections ?? [];
+    const known = [...machines(), ...connections];
+    const groups = groupSidebar(allSpaces, panes(), sessions, known);
     setAgentOrder(sessions.map(agent => agent.address));
     return v_flex().id("agent-sidebar").size_full().min_h(0)
       .overflow_y_scrollbar().px(4).py(6).gap(12)
@@ -42,7 +64,7 @@ export default class AgentSidebar extends View {
         v_flex().gap(2)
           .child(div().px(8).pb(3).text_size(11).text_color(t.dim)
             .cursor_pointer().hover(heading => heading.text_color(t.foreground))
-            .on_click(() => selectMachine(group.machine, allSpaces)).child(group.machine === "local" ? (props()?.localLabel ?? "Local") : group.machine))
+            .on_click(() => selectMachine(group.machine, allSpaces)).child(group.machine === "local" ? (props()?.localLabel ?? "Local") : `${group.machine} · ${(connections.find(m => m.name === group.machine)?.state ?? "loading").replace(/_/g, " ")}`))
           .children(group.spaces.map(space =>
             v_flex().gap(1)
               .child(div().id(`space-${space.id}`).px(8).py(3)
