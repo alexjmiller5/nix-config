@@ -3,7 +3,7 @@ mock.module("gpui-kit", () => ({ View: class {}, div() {} }));
 mock.module("gpui-base", () => ({ v_flex() {} }));
 const commands = [];
 mock.module("herdr", () => ({ agents() {}, machines() {}, hc() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
-const { groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/agent-sidebar/main.js");
+const { groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/session-sidebar/main.js");
 
 test("all spaces and shell panes remain visible under their actual machine", () => {
   const spaces = [

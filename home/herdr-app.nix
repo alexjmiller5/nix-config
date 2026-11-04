@@ -54,7 +54,7 @@ let
         mods: name: mods // lib.genAttrs exampleMods.${name} (mod: "${layoutExamples}/${name}/mods/${mod}")
       )
       (lib.optionalAttrs cfg.agentSidebar.enable {
-        agent-sidebar = ../dotfiles/herdr-app/agent-sidebar;
+        session-sidebar = ../dotfiles/herdr-app/session-sidebar;
         compact-terminals-bar = ../dotfiles/herdr-app/compact-terminals-bar;
       })
       cfg.exampleLayouts;
