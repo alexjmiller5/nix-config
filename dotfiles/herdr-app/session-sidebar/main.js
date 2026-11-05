@@ -91,7 +91,10 @@ export default class AgentSidebar extends View {
                     this.suppressClick=false;
                     const selected=shared("compact.tabs.selection");
                     const chosen=selected?.space===space.id && selected.ids.includes(pane.tab);
-                    if (!chosen) setShared("compact.tabs.selection",null);
+                    if (!chosen) {
+                      setShared("compact.tabs.selection",null);
+                      run("pane.focus",{pane:pane.pane});
+                    }
                     this.drag={space:space.id,source:pane.tab,ids:chosen ? selected.ids : [pane.tab],name:pane.name,start:event.position};
                     cx.stop_propagation();
                   })
