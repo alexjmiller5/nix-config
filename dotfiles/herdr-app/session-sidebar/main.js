@@ -1,4 +1,4 @@
-import { View, div } from "gpui-kit";
+import { View, div, svg, image } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { agents, spaces, panes, machines, hc, run, theme, home, props, setAgentOrder } from "herdr";
 
@@ -73,12 +73,16 @@ export default class AgentSidebar extends View {
                 .on_click(() => run("space.select", { id: space.id }))
                 .child(div().truncate().child(space.name)))
               .children(space.rows.map(pane =>
-                div().id(`terminal-${pane.terminal}`).pl(16).pr(8).py(5).rounded(5)
+                div().id(`terminal-${pane.terminal}`).pl(16).pr(8).py(5).rounded(5).flex().items_center().gap(7)
                   .text_size(12).text_color(pane.focused ? t.foreground : t.muted)
                   .when(pane.focused, row => row.bg(t.hover))
                   .cursor_pointer().hover(row => row.bg(t.hover).text_color(t.foreground))
                   .on_click(() => run("pane.focus", { pane: pane.pane }))
-                  .child(div().truncate().child(pane.name))
+                  .when(Boolean(pane.program?.agent && pane.program?.icon), row =>
+                    row.child(pane.program.tint
+                      ? svg(pane.program.icon).size(14).flex_none().text_color(pane.program.color ?? t.muted)
+                      : image(pane.program.icon).w(14).h(14).flex_none()))
+                  .child(div().min_w(0).truncate().child(pane.name))
               ))
           ))
       ));

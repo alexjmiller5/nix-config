@@ -1,5 +1,5 @@
 import { expect, mock, test } from "bun:test";
-mock.module("gpui-kit", () => ({ View: class {}, div() {} }));
+mock.module("gpui-kit", () => ({ View: class {}, div() {}, svg() {}, image() {} }));
 mock.module("gpui-base", () => ({ v_flex() {} }));
 const commands = [];
 mock.module("herdr", () => ({ agents() {}, machines() {}, hc() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
