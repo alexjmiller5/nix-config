@@ -63,7 +63,7 @@ export default class AgentSidebar extends View {
   }
 
   dragRows(space) {
-    if(!this.drag?.lifted || this.drag.space!==space.id) return space.rows;
+    if(!this.drag?.lifted || this.drag.valid===false || this.drag.space!==space.id) return space.rows;
     const tabs=space.tabs.filter(t=>!this.drag.ids.includes(t.id));
     tabs.splice(this.drag.index,0,{gap:true});
     return tabs.flatMap(tab=>tab.gap ? [{gap:true}] : space.rows.filter(row=>row.tab===tab.id));
@@ -83,18 +83,20 @@ export default class AgentSidebar extends View {
         this.drag.pointer=event.local_position;
         this.drag.bounds=event.bounds;
         this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
-        if(this.drag.lifted) this.drag.index=insertionSlot(this.drag.sizes,this.drag.gap,1,this.drag.index,event.position.y-this.drag.origin);
+        this.drag.valid=event.position.y>=this.drag.origin && event.position.y<=this.drag.origin+this.drag.total;
+        if(this.drag.lifted && this.drag.valid) this.drag.index=insertionSlot(this.drag.sizes,this.drag.gap,1,this.drag.index,event.position.y-this.drag.origin);
         cx.notify();
       })
       .on_hover((hovered,cx)=>{if (!hovered && this.drag) {this.drag=null;cx.notify();}})
       .child(v_flex().id("agent-sidebar").size_full().min_h(0)
       .on_mouse_up("left",(_event,cx)=>{
-        if(this.drag?.lifted){
+        if(this.drag?.lifted && this.drag.valid!==false){
           setShared("compact.tabs.drop",this.drag);run("compact-terminals-bar.drop");this.suppressClick=true;
         }
         this.drag=null;cx.notify();
       })
       .on_mouse_down_out(()=>{this.drag=null;})
+      .on_scroll_wheel((_event,cx)=>{if(this.drag){this.drag=null;this.suppressClick=true;cx.notify();}})
       .overflow_y_scrollbar().px(4).py(6).gap(12)
       .children(groups.map(group =>
         v_flex().gap(2)
@@ -129,6 +131,7 @@ export default class AgentSidebar extends View {
                     const origin=event.bounds.y-space.rows.findIndex(row=>row.pane===pane.pane)*(rowHeight+1);
                     this.drag={space:space.id,source:pane.tab,ids:moving,name:pane.name,start:event.position,origin,
                       sizes:ids.filter(id=>!moving.includes(id)).map(height),
+                      total:ids.reduce((n,id)=>n+height(id),0)+ids.length-1,
                       gap:moving.reduce((n,id)=>n+height(id),0)+moving.length-1,
                       index:ids.slice(0,ids.findIndex(id=>moving.includes(id))).filter(id=>!moving.includes(id)).length};
                     cx.stop_propagation();
@@ -159,7 +162,7 @@ export default class AgentSidebar extends View {
       .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
         div().id("sidebar-drag-preview").absolute().left(Math.max(8,Math.min(this.drag.pointer.x+10,this.drag.bounds.width-168))).top(Math.max(8,Math.min(this.drag.pointer.y+12,this.drag.bounds.height-42)))
           .transition("left",{duration:65,easing:"ease-out"}).transition("top",{duration:65,easing:"ease-out"})
-          .w(160).h(34).px(10).flex().items_center().rounded(9).border_1().border_color(t.ansi4)
+          .w(160).h(34).px(10).flex().items_center().rounded(9).border_1().border_color(this.drag.valid===false ? t.ansi1 : t.ansi4)
           .bg(t.hover).shadow_lg().opacity(0.95).text_size(12).text_color(t.foreground)
           .child(div().truncate().child(this.drag.ids.length>1 ? `${this.drag.name} + ${this.drag.ids.length-1}` : this.drag.name))
       ));

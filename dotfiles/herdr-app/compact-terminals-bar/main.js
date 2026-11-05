@@ -298,15 +298,17 @@ export default class TerminalsBar extends View {
         this.drag.pointer=event.local_position;
         this.drag.bounds=event.bounds;
         this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
-        if(this.drag.lifted) this.drag.index=insertionSlot(this.drag.sizes,this.drag.gap,3,this.drag.index,event.position.x-this.drag.origin);
+        this.drag.valid=event.position.x>=this.drag.origin;
+        if(this.drag.lifted && this.drag.valid) this.drag.index=insertionSlot(this.drag.sizes,this.drag.gap,3,this.drag.index,event.position.x-this.drag.origin);
         cx.notify();
       })
       .on_hover((hovered,cx)=>{if (!hovered && this.drag) {this.drag=null;cx.notify();}})
       .on_mouse_up("left",(_event,cx)=>{
-        if(this.drag?.lifted){this.dropTabs(this.drag);this.suppressClick=true;}
+        if(this.drag?.lifted){if(this.drag.valid!==false)this.dropTabs(this.drag);this.suppressClick=true;}
         this.drag=null;cx.notify();
       })
       .on_mouse_down_out(()=>{this.drag=null;})
+      .on_scroll_wheel((_event,cx)=>{if(this.drag){this.drag=null;this.suppressClick=true;cx.notify();}})
       .size_full()
       .gap(8)
       .items_center()
@@ -335,6 +337,7 @@ export default class TerminalsBar extends View {
         h_flex()
           .id("compact-tabs")
           .overflow_x_scrollbar()
+          .on_scroll_wheel((_event,cx)=>{if(this.drag){this.drag=null;this.suppressClick=true;cx.notify();}})
           .flex_shrink(1)
           .min_w(0)
           .h(36)
@@ -342,7 +345,7 @@ export default class TerminalsBar extends View {
           .gap(3)
           .rounded(16)
           .bg(C.tray)
-          .children((this.drag?.lifted ? (()=>{
+          .children((this.drag?.lifted && this.drag.valid!==false ? (()=>{
             const remaining=space.tabs.filter(c=>!this.drag.ids.includes(c.id));
             remaining.splice(this.drag.index,0,{gap:true,width:this.drag.gap});
             return remaining;
@@ -362,7 +365,7 @@ export default class TerminalsBar extends View {
       .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
         div().id("tab-drag-preview").absolute().left(Math.max(8,Math.min(this.drag.pointer.x+10,this.drag.bounds.width-168))).top(0)
           .transition("left",{duration:65,easing:"ease-out"}).w(160).h(34).px(10)
-          .flex().items_center().rounded(10).border_1().border_color("#86b4cb")
+          .flex().items_center().rounded(10).border_1().border_color(this.drag.valid===false ? t.ansi1 : "#86b4cb")
           .bg(C.tab).shadow_lg().opacity(0.95).text_size(12).text_color(C.text)
           .child(div().truncate().child(this.drag.ids.length>1 ? `${this.drag.name} + ${this.drag.ids.length-1}` : this.drag.name))
       ))
