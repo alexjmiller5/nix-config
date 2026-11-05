@@ -1,6 +1,6 @@
 import { View, div, svg, image } from "gpui-kit";
 import { v_flex } from "gpui-base";
-import { agents, spaces, panes, machines, hc, run, shared, setShared, theme, home, props, setAgentOrder } from "herdr";
+import { agents, spaces, panes, machines, hc, run, openOverlay, shared, setShared, theme, home, props, setAgentOrder } from "herdr";
 
 export function groupSidebar(allSpaces, allPanes, sessions, allMachines = []) {
   const agentsByTerminal = new Map(sessions.map(agent => [agent.address, agent]));
@@ -97,6 +97,11 @@ export default class AgentSidebar extends View {
                     }
                     this.drag={space:space.id,source:pane.tab,ids:chosen ? selected.ids : [pane.tab],name:pane.name,start:event.position};
                     cx.stop_propagation();
+                  })
+                  .on_mouse_down("right", (_event,cx)=>{
+                    cx.stop_propagation();
+                    this.drag=null;
+                    openOverlay({mod:"menu",kind:"popup",width:200,props:{tab:"tab",target:{id:pane.tab,space:space.id}}});
                   })
                   .on_hover((hovered,cx)=>{
                     if (hovered && this.drag?.space===space.id) {this.drag.target=pane.tab;cx.notify();}

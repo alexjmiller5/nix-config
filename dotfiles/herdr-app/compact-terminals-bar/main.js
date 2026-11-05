@@ -50,9 +50,8 @@ function lead(all, id) {
 }
 
 // The program's tile from the app's table: its color, its glyph (or logo) on it.
-function tile(t, p, status) {
+function tile(p) {
   const g = p?.program;
-  const dot = status ? (status === "working" ? t.ansi3 : status === "blocked" ? t.ansi1 : t.ansi2) : null;
   return div()
     .relative()
     .flex_none()
@@ -67,9 +66,6 @@ function tile(t, p, status) {
     .justify_center()
     .when(Boolean(g?.icon), (el) =>
       el.child(g.tint ? svg(g.icon).size(15).text_color(g.color ?? C.text) : image(g.icon).w(15).h(15)),
-    )
-    .when(Boolean(dot), (el) =>
-      el.child(div().absolute().top(-4).right(-4).w(9).h(9).rounded_full().border_1().border_color(dot).bg(status === "idle" ? C.tray : dot)),
     );
 }
 
@@ -264,7 +260,12 @@ export default class TerminalsBar extends View {
         .on_mouse_down("right", () =>
           openOverlay({ mod: "menu", kind: "popup", width: 200, props: { tab: "tab", target: { id: c.id, space: space.id } } }),
         )
-        .child(tile(t, p, c.status))
+        .child(tile(p))
+        .when(Boolean(c.status), el=>{
+          const color=c.status === "working" ? t.ansi3 : c.status === "blocked" ? t.ansi1 : t.ansi2;
+          return el.child(div().size(7).flex_none().rounded_full().border_1().border_color(color)
+            .when(c.status !== "idle", dot=>dot.bg(color)));
+        })
         .child(
           h_flex()
             .min_w(0)
