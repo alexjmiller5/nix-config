@@ -630,12 +630,16 @@ def reopen(path):
     focused = (entry.get("focused") or "").split("/", 1)[-1]
     if focused in mapped:
         app("pane.focus", pane=mapped[focused])
-    app("tab.move", id=created, index=entry["index"])
+    restored_space = next(s for s in world["spaces"] if any(t["id"] == created for t in s["tabs"]))
+    app("tab.move", id=created, index=min(entry["index"], len(restored_space["tabs"])))
     if entry.get("auto_title"):
         previous = dict(load(STATE / "titles.json"))
         previous[created] = entry["name"]
         save(STATE / "titles.json", list(previous.items()))
     history.pop()
+    for previous in history:
+        if previous["space"] == entry["space"] and previous.get("machine_id") == entry.get("machine_id"):
+            previous["space"] = restored_space["id"]
     save(path, history)
 
 

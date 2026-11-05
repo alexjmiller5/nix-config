@@ -1,6 +1,7 @@
 """Native close/restore refuses unknown identities and preserves exact conversations."""
 
 import subprocess
+import json
 import importlib.util
 import tempfile
 import unittest
@@ -371,8 +372,14 @@ class NativeTests(unittest.TestCase):
             path = Path(d) / "archive.json"
             n.close_tab(path)
             self.assertEqual(len(n.load(path)), 1)
+            entry = n.load(path)[0]
+            previous = json.loads(json.dumps(entry))
+            previous["original_tab"] = "mini/previous-tab"
+            n.save(path, [previous, entry])
             n.reopen(path)
-            self.assertEqual(n.load(path), [])
+            remaining = n.load(path)
+            self.assertEqual(len(remaining), 1)
+            self.assertEqual(remaining[0]["space"], "mini/new-space")
         new = next(args for command, args in calls if command == "space.new")
         self.assertEqual(new["argv"], ["codex", "resume", SID])
         self.assertEqual(new["machine"], "mini")
