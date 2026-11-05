@@ -1340,11 +1340,11 @@
         "uv2nix": "uv2nix_6"
       },
       "locked": {
-        "lastModified": 1793901896,
-        "narHash": "sha256-1E+mbCQDsHacVUoN8V93jLSljGUutUoRq4UINs/dNag=",
+        "lastModified": 1793905724,
+        "narHash": "sha256-ciQuFLaVo8x7M/SAUHcCzg1yiZhrpHKk8rETDO2VzdA=",
         "owner": "alexjmiller5",
         "repo": "verdict",
-        "rev": "16326cb0f98493dc59a6772a0fdf703c8073adc8",
+        "rev": "5aa96a3144e822a67254341dfb90edc5583faeb0",
         "type": "github"
       },
       "original": {
