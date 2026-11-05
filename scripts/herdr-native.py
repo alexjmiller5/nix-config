@@ -645,14 +645,16 @@ def reopen(path):
 
 def preferred_title(record):
     labels = record.get("labels", {})
-    fallback = labels.get("session.title", "")
+    fallback = short_title(labels.get("session.title", ""))
+    if fallback and len(fallback.split()) == 1:
+        fallback += " Session"
     argv = record.get("argv") or []
     if not labels.get("session.agent") and argv and Path(argv[0]).name in ("zsh", "bash", "fish"):
         return " ".join(record.get("title", "").split())[:120]
     if labels.get("session.explicit-title"):
         return short_title(fallback)
     native = short_title(record.get("title", "").split("|", 1)[0])
-    if labels.get("session.agent") and native.lower() not in (
+    if labels.get("session.agent") and len(native.split()) == 2 and native.lower() not in (
         "",
         "codex",
         "claude",
@@ -665,7 +667,7 @@ def preferred_title(record):
         "openai codex",
     ):
         return native
-    return short_title(fallback)
+    return fallback or ("New Session" if labels.get("session.agent") else "")
 
 
 def titles(path):

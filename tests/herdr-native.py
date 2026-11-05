@@ -34,6 +34,8 @@ class NativeTests(unittest.TestCase):
 
     def test_agent_titles_are_two_words_but_shell_commands_stay_intact(self):
         self.assertEqual(n.short_title("Fix Broken Checkout Flow"),"Fix Broken")
+        self.assertEqual(n.preferred_title({"labels":{"session.agent":"codex"},"title":"loginname"}),"New Session")
+        self.assertEqual(n.preferred_title({"labels":{"session.agent":"codex","session.explicit-title":"1","session.title":"Checkout"}}),"Checkout Session")
         self.assertEqual(n.preferred_title({"labels":{"session.agent":"codex","session.explicit-title":"1","session.title":"Fix Broken Checkout"}}),"Fix Broken")
 
     def test_shell_hook_keeps_command_at_prompt_and_strips_control_characters(self):
