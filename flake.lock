@@ -1115,11 +1115,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792552839,
-        "narHash": "sha256-zsUp7bBT8+CgKHglt7Pk0t6hneJsMgOTnP4vkNMIi8E=",
+        "lastModified": 1793725658,
+        "narHash": "sha256-M/H29s+nqQVESd4OnG7OVbSkDsnyP1nQ/Z7WfRoZQz8=",
         "owner": "alexjmiller5",
         "repo": "soma",
-        "rev": "457c0440db054bbcc6e28a482c5a04ff6269d586",
+        "rev": "19d7eae2836ce771431a9eb9d5ee539dd7ea82e5",
         "type": "github"
       },
       "original": {
