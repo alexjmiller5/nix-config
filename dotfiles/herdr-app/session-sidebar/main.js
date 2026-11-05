@@ -2,6 +2,14 @@ import { View, div, svg, image } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { agents, spaces, panes, machines, hc, run, openOverlay, shared, setShared, theme, home, props, setAgentOrder } from "herdr";
 
+export function previewPosition(pointer, bounds) {
+  const marginY=Math.min(8,Math.max(0,(bounds.height-34)/2));
+  return {
+    x:Math.max(8,Math.min(pointer.x-80,bounds.width-168)),
+    y:Math.max(marginY,Math.min(pointer.y-17,bounds.height-34-marginY)),
+  };
+}
+
 export function insertionSlot(sizes, gap, spacing, current, pointer) {
   let at=0, next=current;
   sizes.forEach((size,i)=>{
@@ -160,8 +168,8 @@ export default class AgentSidebar extends View {
           ))
       )))
       .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
-        div().id("sidebar-drag-preview").absolute().left(Math.max(8,Math.min(this.drag.pointer.x+10,this.drag.bounds.width-168))).top(Math.max(8,Math.min(this.drag.pointer.y+12,this.drag.bounds.height-42)))
-          .transition("left",{duration:65,easing:"ease-out"}).transition("top",{duration:65,easing:"ease-out"})
+        div().id("sidebar-drag-preview").absolute().left(previewPosition(this.drag.pointer,this.drag.bounds).x).top(previewPosition(this.drag.pointer,this.drag.bounds).y)
+          
           .w(160).h(34).px(10).flex().items_center().rounded(9).border_1().border_color(this.drag.valid===false ? t.ansi1 : t.ansi4)
           .bg(t.hover).shadow_lg().opacity(0.95).text_size(12).text_color(t.foreground)
           .child(div().truncate().child(this.drag.ids.length>1 ? `${this.drag.name} + ${this.drag.ids.length-1}` : this.drag.name))

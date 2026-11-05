@@ -31,6 +31,14 @@ export function dropTabOrder(ids, selected, target) {
   return rest;
 }
 
+export function previewPosition(pointer, bounds) {
+  const marginY=Math.min(8,Math.max(0,(bounds.height-34)/2));
+  return {
+    x:Math.max(8,Math.min(pointer.x-80,bounds.width-168)),
+    y:Math.max(marginY,Math.min(pointer.y-17,bounds.height-34-marginY)),
+  };
+}
+
 export function insertionSlot(sizes, gap, spacing, current, pointer) {
   let at=0, next=current;
   sizes.forEach((size,i)=>{
@@ -364,8 +372,8 @@ export default class TerminalsBar extends View {
       .child(iconButton("tm-keys", "command", () => run("app.palette")))
       .child(iconButton("tm-new", "plus", () => run("tab.new", { space: space.id })))
       .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
-        div().id("tab-drag-preview").absolute().left(Math.max(8,Math.min(this.drag.pointer.x+10,this.drag.bounds.width-168))).top(0)
-          .transition("left",{duration:65,easing:"ease-out"}).w(160).h(34).px(10)
+        div().id("tab-drag-preview").absolute().left(previewPosition(this.drag.pointer,this.drag.bounds).x).top(previewPosition(this.drag.pointer,this.drag.bounds).y)
+          .w(160).h(34).px(10)
           .flex().items_center().rounded(10).border_1().border_color(this.drag.valid===false ? t.ansi1 : "#86b4cb")
           .bg(C.tab).shadow_lg().opacity(0.95).text_size(12).text_color(C.text)
           .child(div().truncate().child(this.drag.ids.length>1 ? `${this.drag.name} + ${this.drag.ids.length-1}` : this.drag.name))

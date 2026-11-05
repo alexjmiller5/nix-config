@@ -3,7 +3,7 @@ mock.module("gpui-kit", () => ({ View: class {}, div() {}, svg() {}, image() {} 
 mock.module("gpui-base", () => ({ v_flex() {}, h_flex() {} }));
 const commands = [];
 mock.module("herdr", () => ({ agents() {}, machines() {}, hc() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {}, nextCommand() {}, exec() {}, notify() {}, openOverlay() {}, window() {}, shared() {}, setShared() {} }));
-const { groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/session-sidebar/main.js");
+const { previewPosition, insertionSlot, groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/session-sidebar/main.js");
 
 test("all spaces and shell panes remain visible under their actual machine", () => {
   const spaces = [
@@ -45,4 +45,16 @@ test("connected machines remain visible without spaces and can open a space", ()
   expect(groupSidebar([],[],[],[{name:null},{name:"mini",state:"disconnected"}]).map(g=>g.machine)).toEqual(["local","mini"]);
   selectMachine("mini",[]);
   expect(commands.at(-1)).toEqual(["space.new",{machine:"mini",folder:""}]);
+});
+
+test("drag preview is centered on the pointer and stays inside its panel",()=>{
+ expect(previewPosition({x:200,y:100},{width:500,height:300})).toEqual({x:120,y:83});
+ expect(previewPosition({x:2,y:2},{width:500,height:300})).toEqual({x:8,y:8});
+ expect(previewPosition({x:499,y:299},{width:500,height:300})).toEqual({x:332,y:258});
+});
+test("hovering each half inserts before or after the row, including skipping rows",()=>{
+ expect(insertionSlot([30,30,30],30,0,3,41)).toBe(1);
+ expect(insertionSlot([30,30,30],30,0,3,49)).toBe(2);
+ expect(insertionSlot([30,30,30],30,0,0,71)).toBe(1);
+ expect(insertionSlot([30,30,30],30,0,0,79)).toBe(2);
 });
