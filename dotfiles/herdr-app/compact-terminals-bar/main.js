@@ -215,6 +215,7 @@ export default class TerminalsBar extends View {
     if (!space) return div();
     const ids = space.tabs.map(t => t.id);
     if (this.spaceId !== space.id) {
+      this.drag = null;
       this.spaceId = space.id;
       this.selected = [];
       this.anchor = space.tabs.find(t => t.active)?.id;
