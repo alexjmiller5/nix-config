@@ -1,7 +1,7 @@
 import { expect, mock, test } from "bun:test";
 mock.module("gpui-kit",()=>({View:class {},div(){},svg(){},image(){}}));
 mock.module("gpui-base",()=>({h_flex(){},v_flex(){}}));
-mock.module("herdr",()=>({spaces(){},panes(){},run(){},theme(){},openOverlay(){},window(){},nextCommand(){},exec(){},notify(){},shared(){},setShared(){},agents(){},machines(){},hc(){},home(){},props(){},setAgentOrder(){}}));
+mock.module("herdr",()=>({spaces(){},panes(){},run(){},theme(){},openOverlay(){},window(){},nextCommand(){},exec(){},notify(){},hc(){},shared(){},setShared(){},agents(){},machines(){},hc(){},home(){},props(){},setAgentOrder(){}}));
 const { clickSelection, moveTabOrder, dropTabOrder }=await import("../dotfiles/herdr-app/compact-terminals-bar/main.js");
 test("shift click selects the anchored range in either direction; plain click clears the group",()=>{
  const ids=["a","b","c","d"];

@@ -13,3 +13,5 @@
 - [ ] Commit, push, close associated tasks and deliver verification.
 
 User-approved additions: drag single tabs and selected groups in either bar within a space; two-word agent titles; native agent icons and traffic-light status dots in both bars; omit unnamed home-space headings; extend Hammerspoon copy confirmation to native Herdr.
+
+Review corrections: reset drag click suppression per press, clear old selection when dragging an unselected tab, aggregate top-tab status across panes, and run group close in a core-owned worker so it can exceed the UI command timeout. Native eased floating previews follow the drag in both bars.

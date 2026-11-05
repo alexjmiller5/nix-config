@@ -58,7 +58,15 @@ export default class AgentSidebar extends View {
     const known = [...machines(), ...connections];
     const groups = groupSidebar(allSpaces, panes(), sessions, known);
     setAgentOrder(sessions.map(agent => agent.address));
-    return v_flex().id("agent-sidebar").size_full().min_h(0)
+    return v_flex().relative().size_full().min_h(0)
+      .on_mouse_move((event,cx)=>{
+        if (!this.drag) return;
+        this.drag.pointer=event.local_position;
+        this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
+        cx.notify();
+      })
+      .on_hover((hovered,cx)=>{if (!hovered && this.drag) {this.drag=null;cx.notify();}})
+      .child(v_flex().id("agent-sidebar").size_full().min_h(0)
       .on_mouse_up("left",(_event,cx)=>{this.drag=null;cx.notify();})
       .on_mouse_down_out(()=>{this.drag=null;})
       .overflow_y_scrollbar().px(4).py(6).gap(12)
@@ -79,15 +87,19 @@ export default class AgentSidebar extends View {
                   .text_size(12).text_color(pane.focused ? t.foreground : t.muted)
                   .when(pane.focused, row => row.bg(t.hover))
                   .cursor_pointer().hover(row => row.bg(t.hover).text_color(t.foreground))
-                  .on_mouse_down("left", (_event,cx)=>{
+                  .on_mouse_down("left", (event,cx)=>{
+                    this.suppressClick=false;
                     const selected=shared("compact.tabs.selection");
-                    this.drag={space:space.id,source:pane.tab,ids:selected?.space===space.id && selected.ids.includes(pane.tab) ? selected.ids : [pane.tab]};
+                    const chosen=selected?.space===space.id && selected.ids.includes(pane.tab);
+                    if (!chosen) setShared("compact.tabs.selection",null);
+                    this.drag={space:space.id,source:pane.tab,ids:chosen ? selected.ids : [pane.tab],name:pane.name,start:event.position};
                     cx.stop_propagation();
                   })
                   .on_hover((hovered,cx)=>{
                     if (hovered && this.drag?.space===space.id) {this.drag.target=pane.tab;cx.notify();}
                   })
                   .when(this.drag?.target===pane.tab && !this.drag.ids.includes(pane.tab),row=>row.border_1().border_color(t.ansi4))
+                  .when(this.drag?.lifted && this.drag.ids.includes(pane.tab),row=>row.opacity(0.35))
                   .on_mouse_up("left", (_event,cx)=>{
                     if (this.drag?.space===space.id && !this.drag.ids.includes(pane.tab)) {
                       setShared("compact.tabs.drop",{...this.drag,target:pane.tab});
@@ -113,6 +125,13 @@ export default class AgentSidebar extends View {
                   .child(div().min_w(0).truncate().child(pane.name))
               ))
           ))
+      )))
+      .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
+        div().id("sidebar-drag-preview").absolute().left(this.drag.pointer.x+10).top(this.drag.pointer.y+12)
+          .transition("left",{duration:65,easing:"ease-out"}).transition("top",{duration:65,easing:"ease-out"})
+          .w(160).h(34).px(10).flex().items_center().rounded(9).border_1().border_color(t.ansi4)
+          .bg(t.hover).shadow_lg().opacity(0.95).text_size(12).text_color(t.foreground)
+          .child(div().truncate().child(this.drag.ids.length>1 ? `${this.drag.name} + ${this.drag.ids.length-1}` : this.drag.name))
       ));
   }
 }

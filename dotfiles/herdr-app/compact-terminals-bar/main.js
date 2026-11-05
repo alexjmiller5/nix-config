@@ -2,7 +2,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
-import { spaces, panes, run, theme, openOverlay, nextCommand, exec, notify, shared, setShared, window as win } from "herdr";
+import { spaces, panes, run, theme, openOverlay, nextCommand, hc, notify, shared, setShared, window as win } from "herdr";
 
 export function clickSelection(ids, anchor, clicked, shift) {
   if (!shift) return { anchor: clicked, selected: [] };
@@ -50,9 +50,9 @@ function lead(all, id) {
 }
 
 // The program's tile from the app's table: its color, its glyph (or logo) on it.
-function tile(t, p) {
+function tile(t, p, status) {
   const g = p?.program;
-  const dot = p?.status ? (p.status === "working" ? t.ansi3 : p.status === "blocked" ? t.ansi1 : t.ansi2) : null;
+  const dot = status ? (status === "working" ? t.ansi3 : status === "blocked" ? t.ansi1 : t.ansi2) : null;
   return div()
     .relative()
     .flex_none()
@@ -69,7 +69,7 @@ function tile(t, p) {
       el.child(g.tint ? svg(g.icon).size(15).text_color(g.color ?? C.text) : image(g.icon).w(15).h(15)),
     )
     .when(Boolean(dot), (el) =>
-      el.child(div().absolute().top(-4).right(-4).w(9).h(9).rounded_full().border_1().border_color(dot).bg(p.status === "idle" ? C.tray : dot)),
+      el.child(div().absolute().top(-4).right(-4).w(9).h(9).rounded_full().border_1().border_color(dot).bg(status === "idle" ? C.tray : dot)),
     );
 }
 
@@ -140,8 +140,23 @@ export default class TerminalsBar extends View {
     this.busy = true;
     cx.spawn(async cx => {
       try {
-        const result = await exec("herdr-native", ["close-group", "--tabs", ...ids]);
-        if (result.code !== 0) throw new Error(result.stderr || "Could not close selected tabs");
+        const launch = await hc(["run", "--bg", "--no-parent", "--no-notify", "--", "herdr-native", "close-group", "--tabs", ...ids]);
+        if (launch.code !== 0) throw new Error(launch.stderr || "Could not start group close");
+        const job = JSON.parse(launch.stdout).address;
+        let record;
+        do {
+          await hc(["wait", job, "--timeout", "15"]);
+          const result = await hc(["get", job]);
+          if (result.code !== 0) throw new Error(result.stderr || "Group close status unavailable");
+          record = JSON.parse(result.stdout);
+        } while (record.state === "live");
+        let error;
+        if (record.exit_code !== 0) {
+          const output = await hc(["read", "--json", job]);
+          error = (output.code === 0 ? JSON.parse(output.stdout).text : "") || "Could not close selected tabs";
+        }
+        await hc(["rm", job]);
+        if (error) throw new Error(error);
         this.selected = [];
         setShared("compact.tabs.selection", null);
       } catch (error) {
@@ -222,14 +237,21 @@ export default class TerminalsBar extends View {
           run("tab.select", { id: c.id });
           cx.notify();
         })
-        .on_mouse_down("left", (_event, cx) => {
+        .on_mouse_down("left", (event, cx) => {
           cx.stop_propagation();
-          this.drag = {space:space.id,ids:this.selected.includes(c.id) ? [...this.selected] : [c.id],source:c.id};
+          this.suppressClick = false;
+          const chosen = this.selected.includes(c.id);
+          if (!chosen && !event.modifiers.shift) {
+            this.selected=[];
+            setShared("compact.tabs.selection",null);
+          }
+          this.drag = {space:space.id,ids:chosen ? [...this.selected] : [c.id],source:c.id,name:c.name,start:event.position};
         })
         .on_hover((hovered,cx) => {
           if (hovered && this.drag) { this.drag.target=c.id; cx.notify(); }
         })
         .when(this.drag?.target === c.id && !this.drag.ids.includes(c.id), el=>el.border_color("#86b4cb"))
+        .when(this.drag?.lifted && this.drag.ids.includes(c.id), el=>el.opacity(0.35))
         .on_mouse_up("left", (_event,cx) => {
           if (this.drag && !this.drag.ids.includes(c.id)) {
             this.dropTabs({...this.drag,target:c.id});
@@ -240,7 +262,7 @@ export default class TerminalsBar extends View {
         .on_mouse_down("right", () =>
           openOverlay({ mod: "menu", kind: "popup", width: 200, props: { tab: "tab", target: { id: c.id, space: space.id } } }),
         )
-        .child(tile(t, p))
+        .child(tile(t, p, c.status))
         .child(
           h_flex()
             .min_w(0)
@@ -250,7 +272,14 @@ export default class TerminalsBar extends View {
         );
     };
 
-    return h_flex()
+    return h_flex().relative()
+      .on_mouse_move((event,cx)=>{
+        if (!this.drag) return;
+        this.drag.pointer=event.local_position;
+        this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
+        cx.notify();
+      })
+      .on_hover((hovered,cx)=>{if (!hovered && this.drag) {this.drag=null;cx.notify();}})
       .on_mouse_up("left",(_event,cx)=>{this.drag=null;cx.notify();})
       .on_mouse_down_out(()=>{this.drag=null;})
       .size_full()
@@ -292,7 +321,7 @@ export default class TerminalsBar extends View {
       )
       .when(this.selected.length > 1, el => el.child(
         h_flex().flex_none().gap(3).items_center()
-          .child(div().text_size(11).text_color(C.dim).child(`${this.selected.length} selected`))
+          .child(div().text_size(11).text_color(C.dim).child(this.busy ? "Closing tabs" : `${this.selected.length} selected`))
           .child(own(div()).id("group-left").px(6).py(4).cursor_pointer().on_click(()=>this.moveSelected(-1))
             .child(svg("mods/workspace-chrome/chevron-left.svg").size(16).text_color(C.text)))
           .child(own(div()).id("group-right").px(6).py(4).cursor_pointer().on_click(()=>this.moveSelected(1))
@@ -301,6 +330,13 @@ export default class TerminalsBar extends View {
       .child(div().flex_1())
       .child(iconButton("tm-keys", "command", () => run("app.palette")))
       .child(iconButton("tm-new", "plus", () => run("tab.new", { space: space.id })))
+      .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
+        div().id("tab-drag-preview").absolute().left(this.drag.pointer.x+10).top(0)
+          .transition("left",{duration:65,easing:"ease-out"}).w(160).h(34).px(10)
+          .flex().items_center().rounded(10).border_1().border_color("#86b4cb")
+          .bg(C.tab).shadow_lg().opacity(0.95).text_size(12).text_color(C.text)
+          .child(div().truncate().child(this.drag.ids.length>1 ? `${this.drag.name} + ${this.drag.ids.length-1}` : this.drag.name))
+      ))
       .when(Boolean(w.buttons), (el) =>
         el.child(
           h_flex()
