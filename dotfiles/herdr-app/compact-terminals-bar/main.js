@@ -31,6 +31,25 @@ export function dropTabOrder(ids, selected, target) {
   return rest;
 }
 
+export function insertionSlot(sizes, gap, spacing, current, pointer) {
+  let at=0, next=current;
+  sizes.forEach((size,i)=>{
+    if (i===current) at+=gap+spacing;
+    const center=at+size/2;
+    if (i<current && pointer<center && next===current) next=i;
+    if (i>=current && pointer>center) next=i+1;
+    at+=size+spacing;
+  });
+  return next;
+}
+
+export function insertTabOrder(ids, selected, index) {
+  const moving=ids.filter(id=>selected.includes(id));
+  const rest=ids.filter(id=>!moving.includes(id));
+  rest.splice(Math.max(0,Math.min(index,rest.length)),0,...moving);
+  return rest;
+}
+
 const C = {
   tray: "#1d1f22",
   // The shown tab stands out; a hovered one only hints, so the two never look alike.
@@ -111,6 +130,7 @@ function iconButton(id, icon, onClick) {
 export default class TerminalsBar extends View {
   init(_props, cx) {
     this.selected = [];
+    this.widths = {};
     setShared("compact.tabs.selection", null);
     cx.spawn(async cx => {
       for (;;) {
@@ -176,7 +196,7 @@ export default class TerminalsBar extends View {
     const space = spaces().find(s => s.id === drop.space);
     if (!space) return;
     const ids = space.tabs.map(t => t.id);
-    this.applyOrder(ids, dropTabOrder(ids, drop.ids, drop.target));
+    this.applyOrder(ids, drop.index === undefined ? dropTabOrder(ids,drop.ids,drop.target) : insertTabOrder(ids,drop.ids,drop.index));
   }
 
   moveSelected(direction) {
@@ -207,9 +227,12 @@ export default class TerminalsBar extends View {
     const w = win() ?? {};
 
     const tab = (c) => {
+      if (c.gap) return div().id("top-insertion-slot").w(c.width).h_full().flex_none().rounded(10)
+        .border_1().border_color("#86b4cb").bg("#86b4cb16");
       const p = lead(all, c.id);
       return own(h_flex())
         .id(`tm-${c.id}`)
+        .on_size_change((size,cx)=>{if(this.widths[c.id]!==size.width){this.widths[c.id]=size.width;cx.notify();}})
         .flex_none()
         .min_w(0)
         .h_full()
@@ -243,19 +266,13 @@ export default class TerminalsBar extends View {
             setShared("compact.tabs.selection",null);
             run("tab.select",{id:c.id});
           }
-          this.drag = {space:space.id,ids:chosen ? [...this.selected] : [c.id],source:c.id,name:c.name,start:event.position};
-        })
-        .on_hover((hovered,cx) => {
-          if (hovered && this.drag) { this.drag.target=c.id; cx.notify(); }
-        })
-        .when(this.drag?.target === c.id && !this.drag.ids.includes(c.id), el=>el.border_color("#86b4cb"))
-        .when(this.drag?.lifted && this.drag.ids.includes(c.id), el=>el.opacity(0.35))
-        .on_mouse_up("left", (_event,cx) => {
-          if (this.drag && !this.drag.ids.includes(c.id)) {
-            this.dropTabs({...this.drag,target:c.id});
-            this.suppressClick=true;
-          }
-          this.drag=null; cx.notify();
+          const moving=chosen ? [...this.selected] : [c.id];
+          const width=id=>this.widths[id] ?? (id===c.id ? event.bounds.width : 100);
+          const origin=event.bounds.x-ids.slice(0,ids.indexOf(c.id)).reduce((n,id)=>n+width(id)+3,0);
+          this.drag = {space:space.id,ids:moving,source:c.id,name:c.name,start:event.position,origin,
+            sizes:ids.filter(id=>!moving.includes(id)).map(width),
+            gap:moving.reduce((n,id)=>n+width(id),0)+3*(moving.length-1),
+            index:ids.slice(0,ids.findIndex(id=>moving.includes(id))).filter(id=>!moving.includes(id)).length};
         })
         .on_mouse_down("right", () =>
           openOverlay({ mod: "menu", kind: "popup", width: 200, props: { tab: "tab", target: { id: c.id, space: space.id } } }),
@@ -281,10 +298,14 @@ export default class TerminalsBar extends View {
         this.drag.pointer=event.local_position;
         this.drag.bounds=event.bounds;
         this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
+        if(this.drag.lifted) this.drag.index=insertionSlot(this.drag.sizes,this.drag.gap,3,this.drag.index,event.position.x-this.drag.origin);
         cx.notify();
       })
       .on_hover((hovered,cx)=>{if (!hovered && this.drag) {this.drag=null;cx.notify();}})
-      .on_mouse_up("left",(_event,cx)=>{this.drag=null;cx.notify();})
+      .on_mouse_up("left",(_event,cx)=>{
+        if(this.drag?.lifted){this.dropTabs(this.drag);this.suppressClick=true;}
+        this.drag=null;cx.notify();
+      })
       .on_mouse_down_out(()=>{this.drag=null;})
       .size_full()
       .gap(8)
@@ -321,7 +342,11 @@ export default class TerminalsBar extends View {
           .gap(3)
           .rounded(16)
           .bg(C.tray)
-          .children(space.tabs.map(tab)),
+          .children((this.drag?.lifted ? (()=>{
+            const remaining=space.tabs.filter(c=>!this.drag.ids.includes(c.id));
+            remaining.splice(this.drag.index,0,{gap:true,width:this.drag.gap});
+            return remaining;
+          })() : space.tabs).map(tab)),
       )
       .when(this.selected.length > 1, el => el.child(
         h_flex().flex_none().gap(3).items_center()

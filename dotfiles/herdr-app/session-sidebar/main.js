@@ -2,6 +2,18 @@ import { View, div, svg, image } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { agents, spaces, panes, machines, hc, run, openOverlay, shared, setShared, theme, home, props, setAgentOrder } from "herdr";
 
+export function insertionSlot(sizes, gap, spacing, current, pointer) {
+  let at=0, next=current;
+  sizes.forEach((size,i)=>{
+    if (i===current) at+=gap+spacing;
+    const center=at+size/2;
+    if (i<current && pointer<center && next===current) next=i;
+    if (i>=current && pointer>center) next=i+1;
+    at+=size+spacing;
+  });
+  return next;
+}
+
 export function groupSidebar(allSpaces, allPanes, sessions, allMachines = []) {
   const agentsByTerminal = new Map(sessions.map(agent => [agent.address, agent]));
   const groups = new Map([["local", []]]);
@@ -50,6 +62,13 @@ export default class AgentSidebar extends View {
     });
   }
 
+  dragRows(space) {
+    if(!this.drag?.lifted || this.drag.space!==space.id) return space.rows;
+    const tabs=space.tabs.filter(t=>!this.drag.ids.includes(t.id));
+    tabs.splice(this.drag.index,0,{gap:true});
+    return tabs.flatMap(tab=>tab.gap ? [{gap:true}] : space.rows.filter(row=>row.tab===tab.id));
+  }
+
   render() {
     const t = theme();
     const allSpaces = spaces();
@@ -64,11 +83,17 @@ export default class AgentSidebar extends View {
         this.drag.pointer=event.local_position;
         this.drag.bounds=event.bounds;
         this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
+        if(this.drag.lifted) this.drag.index=insertionSlot(this.drag.sizes,this.drag.gap,1,this.drag.index,event.position.y-this.drag.origin);
         cx.notify();
       })
       .on_hover((hovered,cx)=>{if (!hovered && this.drag) {this.drag=null;cx.notify();}})
       .child(v_flex().id("agent-sidebar").size_full().min_h(0)
-      .on_mouse_up("left",(_event,cx)=>{this.drag=null;cx.notify();})
+      .on_mouse_up("left",(_event,cx)=>{
+        if(this.drag?.lifted){
+          setShared("compact.tabs.drop",this.drag);run("compact-terminals-bar.drop");this.suppressClick=true;
+        }
+        this.drag=null;cx.notify();
+      })
       .on_mouse_down_out(()=>{this.drag=null;})
       .overflow_y_scrollbar().px(4).py(6).gap(12)
       .children(groups.map(group =>
@@ -83,8 +108,10 @@ export default class AgentSidebar extends View {
                 .cursor_pointer().hover(row => row.text_color(t.foreground))
                 .on_click(() => run("space.select", { id: space.id }))
                 .child(div().truncate().child(space.name))))
-              .children(space.rows.map(pane =>
-                div().id(`terminal-${pane.terminal}`).pl(16).pr(8).py(5).rounded(5).flex().items_center().gap(7)
+              .children(this.dragRows(space).map(pane =>
+                pane.gap ? div().id(`sidebar-insertion-slot-${space.id}`).h(this.drag.gap).w_full().flex_none()
+                  .rounded(5).border_1().border_color(t.ansi4).bg(t.hover)
+                : div().id(`terminal-${pane.terminal}`).pl(16).pr(8).py(5).rounded(5).flex().items_center().gap(7)
                   .text_size(12).text_color(pane.focused ? t.foreground : t.muted)
                   .when(pane.focused, row => row.bg(t.hover))
                   .cursor_pointer().hover(row => row.bg(t.hover).text_color(t.foreground))
@@ -96,26 +123,20 @@ export default class AgentSidebar extends View {
                       setShared("compact.tabs.selection",null);
                       run("pane.focus",{pane:pane.pane});
                     }
-                    this.drag={space:space.id,source:pane.tab,ids:chosen ? selected.ids : [pane.tab],name:pane.name,start:event.position};
+                    const ids=space.tabs.map(t=>t.id), moving=chosen ? ids.filter(id=>selected.ids.includes(id)) : [pane.tab];
+                    const rowHeight=event.bounds.height;
+                    const height=id=>{const count=space.rows.filter(row=>row.tab===id).length;return Math.max(0,count*(rowHeight+1)-1);};
+                    const origin=event.bounds.y-space.rows.findIndex(row=>row.pane===pane.pane)*(rowHeight+1);
+                    this.drag={space:space.id,source:pane.tab,ids:moving,name:pane.name,start:event.position,origin,
+                      sizes:ids.filter(id=>!moving.includes(id)).map(height),
+                      gap:moving.reduce((n,id)=>n+height(id),0)+moving.length-1,
+                      index:ids.slice(0,ids.findIndex(id=>moving.includes(id))).filter(id=>!moving.includes(id)).length};
                     cx.stop_propagation();
                   })
                   .on_mouse_down("right", (_event,cx)=>{
                     cx.stop_propagation();
                     this.drag=null;
                     openOverlay({mod:"menu",kind:"popup",width:200,props:{tab:"tab",target:{id:pane.tab,space:space.id}}});
-                  })
-                  .on_hover((hovered,cx)=>{
-                    if (hovered && this.drag?.space===space.id) {this.drag.target=pane.tab;cx.notify();}
-                  })
-                  .when(this.drag?.target===pane.tab && !this.drag.ids.includes(pane.tab),row=>row.border_1().border_color(t.ansi4))
-                  .when(this.drag?.lifted && this.drag.ids.includes(pane.tab),row=>row.opacity(0.35))
-                  .on_mouse_up("left", (_event,cx)=>{
-                    if (this.drag?.space===space.id && !this.drag.ids.includes(pane.tab)) {
-                      setShared("compact.tabs.drop",{...this.drag,target:pane.tab});
-                      run("compact-terminals-bar.drop");
-                      this.suppressClick=true;
-                    }
-                    this.drag=null;cx.notify();
                   })
                   .on_click(()=>{
                     if (this.suppressClick) {this.suppressClick=false;return;}

@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 mock.module("gpui-kit",()=>({View:class {},div(){},svg(){},image(){}}));
 mock.module("gpui-base",()=>({h_flex(){},v_flex(){}}));
 mock.module("herdr",()=>({spaces(){},panes(){},run(){},theme(){},openOverlay(){},window(){},nextCommand(){},exec(){},notify(){},hc(){},shared(){},setShared(){},agents(){},machines(){},hc(){},home(){},props(){},setAgentOrder(){}}));
-const { clickSelection, moveTabOrder, dropTabOrder }=await import("../dotfiles/herdr-app/compact-terminals-bar/main.js");
+const { clickSelection, moveTabOrder, dropTabOrder, insertionSlot, insertTabOrder }=await import("../dotfiles/herdr-app/compact-terminals-bar/main.js");
 test("shift click selects the anchored range in either direction; plain click clears the group",()=>{
  const ids=["a","b","c","d"];
  expect(clickSelection(ids,"b","d",true)).toEqual({anchor:"b",selected:["b","c","d"]});
@@ -26,4 +26,12 @@ test("dropping a selected group keeps its order on either side of the target",()
  expect(dropTabOrder(ids,["c","d"],"a")).toEqual(["c","d","a","b","e"]);
  expect(dropTabOrder(ids,["b","c"],"c")).toEqual(ids);
  expect(dropTabOrder(ids,["gone"],"a")).toEqual(ids);
+});
+
+test("the insertion slot stays put while hovering its gap, then crosses a neighbor midpoint",()=>{
+ expect(insertionSlot([100,100,100],100,0,1,150)).toBe(1);
+ expect(insertionSlot([100,100,100],100,0,1,260)).toBe(2);
+ expect(insertionSlot([100,100,100],100,0,2,260)).toBe(2);
+ expect(insertionSlot([100,100,100],100,0,1,40)).toBe(0);
+ expect(insertTabOrder(["a","b","c","d"],["b","c"],2)).toEqual(["a","d","b","c"]);
 });
