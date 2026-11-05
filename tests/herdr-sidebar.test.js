@@ -53,8 +53,14 @@ test("drag preview is centered on the pointer and stays inside its panel",()=>{
  expect(previewPosition({x:499,y:299},{width:500,height:300})).toEqual({x:332,y:258});
 });
 test("hovering each half inserts before or after the row, including skipping rows",()=>{
- expect(insertionSlot([30,30,30],30,0,3,41)).toBe(1);
- expect(insertionSlot([30,30,30],30,0,3,49)).toBe(2);
- expect(insertionSlot([30,30,30],30,0,0,71)).toBe(1);
- expect(insertionSlot([30,30,30],30,0,0,79)).toBe(2);
+ expect(insertionSlot([30,30,30],30,0,3,31)).toBe(1);
+ expect(insertionSlot([30,30,30],30,0,3,59)).toBe(2);
+ expect(insertionSlot([30,30,30],30,0,0,61)).toBe(1);
+ expect(insertionSlot([30,30,30],30,0,0,89)).toBe(2);
+});
+
+test("dragged tabs nudge neighbors before the pointer reaches their midpoint",()=>{
+ expect(insertionSlot([30,30],30,0,0,36)).toBe(1);
+ expect(insertionSlot([30,30],30,0,2,54)).toBe(1);
+ expect(insertionSlot([30,30],30,0,1,36)).toBe(1);
 });

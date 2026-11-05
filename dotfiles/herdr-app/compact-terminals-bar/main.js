@@ -40,12 +40,13 @@ export function previewPosition(pointer, bounds) {
 }
 
 export function insertionSlot(sizes, gap, spacing, current, pointer) {
+  const reach=Math.min(12,gap/3);
   let at=0, next=current;
   sizes.forEach((size,i)=>{
     if (i===current) at+=gap+spacing;
     const center=at+size/2;
-    if (i<current && pointer<center && next===current) next=i;
-    if (i>=current && pointer>center) next=i+1;
+    if (i<current && pointer<center+reach && next===current) next=i;
+    if (i>=current && pointer>center-reach) next=i+1;
     at+=size+spacing;
   });
   return next;
