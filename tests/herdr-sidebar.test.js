@@ -1,8 +1,8 @@
 import { expect, mock, test } from "bun:test";
 mock.module("gpui-kit", () => ({ View: class {}, div() {}, svg() {}, image() {} }));
-mock.module("gpui-base", () => ({ v_flex() {} }));
+mock.module("gpui-base", () => ({ v_flex() {}, h_flex() {} }));
 const commands = [];
-mock.module("herdr", () => ({ agents() {}, machines() {}, hc() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {} }));
+mock.module("herdr", () => ({ agents() {}, machines() {}, hc() {}, panes() {}, spaces() {}, run: (command,args) => commands.push([command,args]), theme() {}, home: () => "/local-home", props: () => ({}), setAgentOrder() {}, nextCommand() {}, exec() {}, notify() {}, openOverlay() {}, window() {}, shared() {}, setShared() {} }));
 const { groupSidebar, selectMachine } = await import("../dotfiles/herdr-app/session-sidebar/main.js");
 
 test("all spaces and shell panes remain visible under their actual machine", () => {

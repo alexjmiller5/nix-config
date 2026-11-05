@@ -87,7 +87,7 @@ def short_title(text):
         "want",
     }
     words = [word for word in words if word.lower() not in skip]
-    return " ".join(words[:3]).title()[:24].rstrip()
+    return " ".join(words[:2]).title()[:24].rstrip()
 
 
 def replace_title(current, previous, desired, named=True):
@@ -486,6 +486,18 @@ def check_snapshot(entry):
         saved["working"] = current.get("working", False)
 
 
+def close_group(path, tab_ids):
+    if not tab_ids or len(set(tab_ids)) != len(tab_ids):
+        raise ValueError("Select distinct open tabs")
+    spaces = app("ls")["spaces"]
+    if not any(set(tab_ids) <= {t["id"] for t in s["tabs"]} for s in spaces):
+        raise ValueError("Selected tabs must still be open in the same space")
+    for tab_id in tab_ids:
+        capture(tab_id)  # Refuse unsupported jobs before ending any selected tab.
+    for tab_id in tab_ids:
+        close_tab(path, tab_id)
+
+
 def close_tab(path, tab_id=None):
     entry = capture(tab_id)
     history = load(path)
@@ -634,7 +646,7 @@ def preferred_title(record):
     if not labels.get("session.agent") and argv and Path(argv[0]).name in ("zsh", "bash", "fish"):
         return " ".join(record.get("title", "").split())[:120]
     if labels.get("session.explicit-title"):
-        return fallback
+        return short_title(fallback)
     native = short_title(record.get("title", "").split("|", 1)[0])
     if labels.get("session.agent") and native.lower() not in (
         "",
@@ -649,7 +661,7 @@ def preferred_title(record):
         "openai codex",
     ):
         return native
-    return fallback
+    return short_title(fallback)
 
 
 def titles(path):
@@ -743,6 +755,7 @@ def main():
             "name",
             "hook",
             "close",
+            "close-group",
             "reopen",
             "titles",
             "watch",
@@ -754,6 +767,7 @@ def main():
     parser.add_argument(
         "--tab", help="Explicit tab to close; defaults to the selected tab"
     )
+    parser.add_argument("--tabs", nargs="+")
     parser.add_argument("--agent", choices=["codex", "claude", "pi"])
     parser.add_argument("--session")
     parser.add_argument("--terminal")
@@ -811,7 +825,12 @@ def main():
             with (STATE / "lock").open("a") as lock:
                 fcntl.flock(lock, fcntl.LOCK_EX)
                 if args.command == "close":
-                    close_tab(STATE / "archive.json", args.tab)
+                    if not args.tab and app("status").get("layout") == "terminals-agents":
+                        app("compact-terminals-bar.close")
+                    else:
+                        close_tab(STATE / "archive.json", args.tab)
+                elif args.command == "close-group":
+                    close_group(STATE / "archive.json", args.tabs)
                 elif args.command == "reopen":
                     reopen(STATE / "archive.json")
                 else:

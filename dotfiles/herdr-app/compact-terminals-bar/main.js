@@ -2,7 +2,34 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
-import { spaces, panes, run, theme, openOverlay, window as win } from "herdr";
+import { spaces, panes, run, theme, openOverlay, nextCommand, exec, notify, shared, setShared, window as win } from "herdr";
+
+export function clickSelection(ids, anchor, clicked, shift) {
+  if (!shift) return { anchor: clicked, selected: [] };
+  const start = ids.includes(anchor) ? anchor : clicked;
+  const a = ids.indexOf(start), b = ids.indexOf(clicked);
+  return { anchor: start, selected: ids.slice(Math.min(a,b), Math.max(a,b)+1) };
+}
+
+export function moveTabOrder(ids, selected, direction) {
+  const result = [...ids], chosen = new Set(selected);
+  const positions = direction < 0 ? ids.map((_,i)=>i) : ids.map((_,i)=>i).reverse();
+  for (const i of positions) {
+    const j = i + direction;
+    if (j >= 0 && j < result.length && chosen.has(result[i]) && !chosen.has(result[j]))
+      [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+export function dropTabOrder(ids, selected, target) {
+  const moving = ids.filter(id => selected.includes(id));
+  if (!moving.length || moving.includes(target) || !ids.includes(target)) return [...ids];
+  const rest = ids.filter(id => !moving.includes(id));
+  const index = rest.indexOf(target) + (ids.indexOf(moving[0]) < ids.indexOf(target) ? 1 : 0);
+  rest.splice(index, 0, ...moving);
+  return rest;
+}
 
 const C = {
   tray: "#1d1f22",
@@ -25,7 +52,7 @@ function lead(all, id) {
 // The program's tile from the app's table: its color, its glyph (or logo) on it.
 function tile(t, p) {
   const g = p?.program;
-  const dot = p?.status && p.status !== "idle" ? t[p.status] : null;
+  const dot = p?.status ? (p.status === "working" ? t.ansi3 : p.status === "blocked" ? t.ansi1 : t.ansi2) : null;
   return div()
     .relative()
     .flex_none()
@@ -42,7 +69,7 @@ function tile(t, p) {
       el.child(g.tint ? svg(g.icon).size(15).text_color(g.color ?? C.text) : image(g.icon).w(15).h(15)),
     )
     .when(Boolean(dot), (el) =>
-      el.child(div().absolute().top(-4).right(-4).w(11).h(11).rounded_full().border_2().border_color(C.tray).bg(dot)),
+      el.child(div().absolute().top(-4).right(-4).w(9).h(9).rounded_full().border_1().border_color(dot).bg(p.status === "idle" ? C.tray : dot)),
     );
 }
 
@@ -86,10 +113,85 @@ function iconButton(id, icon, onClick) {
 }
 
 export default class TerminalsBar extends View {
+  init(_props, cx) {
+    this.selected = [];
+    setShared("compact.tabs.selection", null);
+    cx.spawn(async cx => {
+      for (;;) {
+        const command = await nextCommand();
+        if (command === "close") this.closeSelected(cx);
+        if (command === "drop") {
+          const drop = shared("compact.tabs.drop");
+          setShared("compact.tabs.drop", null);
+          if (drop) this.dropTabs(drop);
+        }
+      }
+    });
+  }
+
+  closeSelected(cx) {
+    if (this.busy) return;
+    const space = spaces().find(s => s.active);
+    if (!space) return;
+    const selected = this.spaceId === space.id ? (this.selected ?? []) : [];
+    const ids = space.tabs.filter(t => selected.includes(t.id)).map(t => t.id);
+    if (!ids.length) ids.push(space.tabs.find(t => t.active)?.id);
+    if (!ids[0]) return;
+    this.busy = true;
+    cx.spawn(async cx => {
+      try {
+        const result = await exec("herdr-native", ["close-group", "--tabs", ...ids]);
+        if (result.code !== 0) throw new Error(result.stderr || "Could not close selected tabs");
+        this.selected = [];
+        setShared("compact.tabs.selection", null);
+      } catch (error) {
+        notify({title: "Tabs left open", body: String(error)});
+      } finally { this.busy = false; cx.notify(); }
+    });
+  }
+
+  applyOrder(ids, target) {
+    const current = [...ids];
+    target.forEach((id,i) => {
+      if (current[i] === id) return;
+      run("tab.move", {id,index:i+1});
+      current.splice(current.indexOf(id),1);
+      current.splice(i,0,id);
+    });
+  }
+
+  dropTabs(drop) {
+    if (this.busy) return;
+    const space = spaces().find(s => s.id === drop.space);
+    if (!space) return;
+    const ids = space.tabs.map(t => t.id);
+    this.applyOrder(ids, dropTabOrder(ids, drop.ids, drop.target));
+  }
+
+  moveSelected(direction) {
+    if (this.busy) return;
+    const space = spaces().find(s => s.active);
+    if (!space) return;
+    const ids = space.tabs.map(t => t.id);
+    const target = moveTabOrder(ids, this.selected ?? [], direction);
+    if (target.every((id,i)=>id === ids[i])) return;
+    this.applyOrder(ids, target);
+  }
+
   render() {
     const t = theme();
     const space = spaces().find((p) => p.active);
     if (!space) return div();
+    const ids = space.tabs.map(t => t.id);
+    if (this.spaceId !== space.id) {
+      this.spaceId = space.id;
+      this.selected = [];
+      this.anchor = space.tabs.find(t => t.active)?.id;
+      setShared("compact.tabs.selection", null);
+    }
+    const selection = shared("compact.tabs.selection");
+    this.selected = selection?.space === space.id ? selection.ids.filter(id => ids.includes(id)) : [];
+    if (selection?.space === space.id) this.anchor = selection.anchor;
     const all = panes();
     const w = win() ?? {};
 
@@ -109,8 +211,32 @@ export default class TerminalsBar extends View {
         .cursor_pointer()
         .text_size(13)
         .when(c.active, (el) => el.bg(C.tab).border_color(C.tabEdge))
-        .when(!c.active, (el) => el.border_color("#00000000").hover((s) => s.bg(C.hover)))
-        .on_click(() => run("tab.select", { id: c.id }))
+        .when(this.selected.includes(c.id), el => el.bg("#345565").border_color("#86b4cb"))
+        .when(!c.active && !this.selected.includes(c.id), (el) => el.border_color("#00000000").hover((s) => s.bg(C.hover)))
+        .on_click((event, cx) => {
+          if (this.suppressClick) { this.suppressClick = false; return; }
+          const selection = clickSelection(ids, this.anchor, c.id, event.modifiers.shift);
+          this.anchor = selection.anchor;
+          this.selected = selection.selected;
+          setShared("compact.tabs.selection", {space:space.id,ids:this.selected,anchor:this.anchor});
+          run("tab.select", { id: c.id });
+          cx.notify();
+        })
+        .on_mouse_down("left", (_event, cx) => {
+          cx.stop_propagation();
+          this.drag = {space:space.id,ids:this.selected.includes(c.id) ? [...this.selected] : [c.id],source:c.id};
+        })
+        .on_hover((hovered,cx) => {
+          if (hovered && this.drag) { this.drag.target=c.id; cx.notify(); }
+        })
+        .when(this.drag?.target === c.id && !this.drag.ids.includes(c.id), el=>el.border_color("#86b4cb"))
+        .on_mouse_up("left", (_event,cx) => {
+          if (this.drag && !this.drag.ids.includes(c.id)) {
+            this.dropTabs({...this.drag,target:c.id});
+            this.suppressClick=true;
+          }
+          this.drag=null; cx.notify();
+        })
         .on_mouse_down("right", () =>
           openOverlay({ mod: "menu", kind: "popup", width: 200, props: { tab: "tab", target: { id: c.id, space: space.id } } }),
         )
@@ -125,6 +251,8 @@ export default class TerminalsBar extends View {
     };
 
     return h_flex()
+      .on_mouse_up("left",(_event,cx)=>{this.drag=null;cx.notify();})
+      .on_mouse_down_out(()=>{this.drag=null;})
       .size_full()
       .gap(8)
       .items_center()
@@ -162,6 +290,14 @@ export default class TerminalsBar extends View {
           .bg(C.tray)
           .children(space.tabs.map(tab)),
       )
+      .when(this.selected.length > 1, el => el.child(
+        h_flex().flex_none().gap(3).items_center()
+          .child(div().text_size(11).text_color(C.dim).child(`${this.selected.length} selected`))
+          .child(own(div()).id("group-left").px(6).py(4).cursor_pointer().on_click(()=>this.moveSelected(-1))
+            .child(svg("mods/workspace-chrome/chevron-left.svg").size(16).text_color(C.text)))
+          .child(own(div()).id("group-right").px(6).py(4).cursor_pointer().on_click(()=>this.moveSelected(1))
+            .child(svg("mods/workspace-chrome/chevron-right.svg").size(16).text_color(C.text)))
+      ))
       .child(div().flex_1())
       .child(iconButton("tm-keys", "command", () => run("app.palette")))
       .child(iconButton("tm-new", "plus", () => run("tab.new", { space: space.id })))

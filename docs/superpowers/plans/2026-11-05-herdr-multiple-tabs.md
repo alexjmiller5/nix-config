@@ -6,8 +6,10 @@
 
 **Tech Stack:** Existing Herdr GPUI JavaScript mod and Python native helper.
 
-- [ ] Test range selection, stale IDs, boundary moves and relative order before implementing pure helpers in the existing mod.
-- [ ] Add selected styling and minimal left/right controls. Clear selection on plain click or space change.
-- [ ] Test and implement explicit group close validation and preflight, preserving the archive path and existing single-tab close.
+- [x] Test range selection, stale IDs, boundary moves and relative order before implementing pure helpers in the existing mod.
+- [x] Add selected styling and minimal left/right controls. Clear selection on plain click or space change.
+- [x] Test and implement explicit group close validation and preflight, preserving the archive path and existing single-tab close.
 - [ ] Wire live mod commands and error reporting. Verify native mods, rebuild laptop, run disposable shell selection/movement/close/restore fixtures, then clean up.
 - [ ] Commit, push, close associated tasks and deliver verification.
+
+User-approved additions: drag single tabs and selected groups in either bar within a space; two-word agent titles; native agent icons and traffic-light status dots in both bars; omit unnamed home-space headings; extend Hammerspoon copy confirmation to native Herdr.

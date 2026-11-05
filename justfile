@@ -51,7 +51,7 @@ check:
     bash tests/gog-access-token.sh
     bash tests/claude-memory.sh
     bash tests/wait-for-remote.sh
-    bun test ./tests/herdr-sidebar.test.js
+    bun test ./tests/herdr-sidebar.test.js ./tests/herdr-tabs.test.js
     python3 tests/herdr-native.py
     python3 tests/herdr-navigate.py
     python3 tests/herdr-takeover.py

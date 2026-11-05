@@ -16,7 +16,7 @@ routing table and workflow; this file is the in-repo map.
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
   `git.nix`, `git-signing.nix`, `git-hooks.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
-  `herdr-app.nix` (native app/core, shared keys/themes and opt-in pinned Threads/Pasture examples and a minimal Terminals sidebar grouped by machine and space, including ordinary terminal panes, persistent configured machines and native connection status, with always-available local navigation and title-sized tabs for GUI clients),
+  `herdr-app.nix` (native app/core, shared keys/themes and opt-in pinned Threads/Pasture examples and a minimal Terminals sidebar grouped by machine and space, including ordinary terminal panes, persistent configured machines, agent logos and native status dots, with always-available local navigation and title-sized tabs with range selection, group close, move controls and same-space drag reordering for GUI clients),
   `herdr-codex.nix` (exported pane-local TUI Codex registration relay over the shared daemon; native core clients run without the daemon),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agent-env.nix` (shared credential initialization in `.zshenv` and
@@ -119,7 +119,7 @@ routing table and workflow; this file is the in-repo map.
   pane working directories and split topology. Unregistered Codex/Claude tabs reopen through their resume picker.
   It refuses malformed identities and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
   Shells reopen as fresh shells. Native close buttons bypass the undo snapshot.
-  Native shell tabs retain the last command through a shared zsh title hook; manual tab names are preserved.
+  Native agent task titles use two words. Default home-space headings are hidden in the sidebar; named project spaces remain visible. Native shell tabs retain the last command through a shared zsh title hook; manual tab names are preserved.
   The laptop's event-driven `herdr-native-titles` launchd agent names tabs from
   agent-written task labels, useful terminal titles, or prompt fallbacks,
   preserving manual labels. Hammerspoon activation refreshes names on reopen.

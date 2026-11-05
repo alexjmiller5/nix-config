@@ -17,6 +17,24 @@ SID = "00000000-0000-4000-8000-000000000001"
 
 
 class NativeTests(unittest.TestCase):
+    def test_group_close_preflights_every_tab_before_closing_any(self):
+        with patch.object(n,"app",return_value={"spaces":[{"tabs":[{"id":"a"},{"id":"b"}]}]}), patch.object(n,"capture",side_effect=[{},ValueError("Unknown job")]), patch.object(n,"close_tab") as close:
+            with self.assertRaises(ValueError):n.close_group(Path("archive"),["a","b"])
+            close.assert_not_called()
+        with patch.object(n,"app",return_value={"spaces":[{"tabs":[{"id":"a"},{"id":"b"}]}]}), patch.object(n,"capture",return_value={}), patch.object(n,"close_tab") as close:
+            n.close_group(Path("archive"),["a","b"])
+            self.assertEqual([c.args[1] for c in close.call_args_list],["a","b"])
+
+    def test_group_close_rejects_stale_duplicate_or_cross_space_ids(self):
+        with patch.object(n,"app",return_value={"spaces":[{"tabs":[{"id":"a"}]},{"tabs":[{"id":"b"}]}]}), patch.object(n,"close_tab") as close:
+            for ids in ([],["a","a"],["gone"],["a","b"]):
+                with self.assertRaises(ValueError):n.close_group(Path("archive"),ids)
+            close.assert_not_called()
+
+    def test_agent_titles_are_two_words_but_shell_commands_stay_intact(self):
+        self.assertEqual(n.short_title("Fix Broken Checkout Flow"),"Fix Broken")
+        self.assertEqual(n.preferred_title({"labels":{"session.agent":"codex","session.explicit-title":"1","session.title":"Fix Broken Checkout"}}),"Fix Broken")
+
     def test_shell_hook_keeps_command_at_prompt_and_strips_control_characters(self):
         hook = Path(__file__).resolve().parents[1] / "home/zsh/herdr-title.zsh"
         result = subprocess.run(["zsh", "-f", "-c", 'source "$1"; _herdr_command_preexec $\'git status\\n--short\'; _herdr_command_title', "test", str(hook)], env={"HC_TERMINAL_ID":"fixture"}, capture_output=True, check=True)
@@ -150,7 +168,7 @@ class NativeTests(unittest.TestCase):
 
     def test_short_titles_and_manual_names(self):
         self.assertEqual(
-            n.short_title("please fix the checkout bug in payments"), "Fix Checkout Bug"
+            n.short_title("please fix the checkout bug in payments"), "Fix Checkout"
         )
         self.assertLessEqual(
             len(n.short_title("investigate extraordinarilylongproblem with queues")), 24
@@ -470,10 +488,10 @@ class NativeTests(unittest.TestCase):
         }
         self.assertEqual(n.preferred_title(record), "Repair Checkout")
         record["labels"]["session.explicit-title"] = "1"
-        self.assertEqual(n.preferred_title(record), "Please Fix Checkout")
+        self.assertEqual(n.preferred_title(record), "Fix Checkout")
         record["labels"].pop("session.explicit-title")
         record["title"] = "Codex"
-        self.assertEqual(n.preferred_title(record), "Please Fix Checkout")
+        self.assertEqual(n.preferred_title(record), "Fix Checkout")
 
     def test_legacy_adapters_do_not_report_a_core_terminal_as_a_tui_pane(self):
         with tempfile.TemporaryDirectory() as d:
