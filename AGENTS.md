@@ -119,6 +119,7 @@ routing table and workflow; this file is the in-repo map.
   pane working directories and split topology. Unregistered Codex/Claude tabs reopen through their resume picker.
   It refuses malformed identities and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
   Shells reopen as fresh shells. Native close buttons bypass the undo snapshot.
+  Native shell tabs retain the last command through a shared zsh title hook; manual tab names are preserved.
   The laptop's event-driven `herdr-native-titles` launchd agent names tabs from
   agent-written task labels, useful terminal titles, or prompt fallbacks,
   preserving manual labels. Hammerspoon activation refreshes names on reopen.

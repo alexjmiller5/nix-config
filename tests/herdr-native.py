@@ -17,6 +17,16 @@ SID = "00000000-0000-4000-8000-000000000001"
 
 
 class NativeTests(unittest.TestCase):
+    def test_shell_hook_keeps_command_at_prompt_and_strips_control_characters(self):
+        hook = Path(__file__).resolve().parents[1] / "home/zsh/herdr-title.zsh"
+        result = subprocess.run(["zsh", "-f", "-c", 'source "$1"; _herdr_command_preexec $\'git status\\n--short\'; _herdr_command_title', "test", str(hook)], env={"HC_TERMINAL_ID":"fixture"}, capture_output=True, check=True)
+        self.assertEqual(result.stdout, b"\x1b]2;git status --short\x07" * 2)
+
+    def test_shell_titles_preserve_the_last_command_and_agent_names(self):
+        self.assertEqual(n.preferred_title({"argv":["/bin/zsh"],"title":"git status --short"}), "git status --short")
+        self.assertEqual(n.preferred_title({"argv":["/bin/zsh"],"title":"  "}), "")
+        self.assertEqual(n.preferred_title({"argv":["codex"],"title":"git status"}), "")
+
     def test_live_summaries_are_expanded_before_identity_or_naming(self):
         full = {
             "address": "mini/t1",

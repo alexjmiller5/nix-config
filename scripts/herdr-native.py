@@ -630,6 +630,9 @@ def reopen(path):
 def preferred_title(record):
     labels = record.get("labels", {})
     fallback = labels.get("session.title", "")
+    argv = record.get("argv") or []
+    if not labels.get("session.agent") and argv and Path(argv[0]).name in ("zsh", "bash", "fish"):
+        return " ".join(record.get("title", "").split())[:120]
     if labels.get("session.explicit-title"):
         return fallback
     native = short_title(record.get("title", "").split("|", 1)[0])

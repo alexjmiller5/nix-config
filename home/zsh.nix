@@ -93,6 +93,7 @@
 
       # Shell functions (plain zsh, edited in the repo)
       source ${./zsh/functions.zsh}
+      source ${./zsh/herdr-title.zsh}
 
       # zsh autosuggestions — sourced explicitly (not via the HM option) so the
       # custom Tab widget below is guaranteed to register AFTER the plugin loads.
