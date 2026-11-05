@@ -38,6 +38,7 @@
     settings = {
       # Theme follows macOS appearance (ghostty +list-themes for the full set)
       theme = "light:Catppuccin Latte,dark:Catppuccin Mocha";
+      background = "000000";
 
       window-padding-x = 8;
       window-padding-y = 4;

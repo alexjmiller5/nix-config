@@ -62,6 +62,7 @@ export default class AgentSidebar extends View {
       .on_mouse_move((event,cx)=>{
         if (!this.drag) return;
         this.drag.pointer=event.local_position;
+        this.drag.bounds=event.bounds;
         this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
         cx.notify();
       })
@@ -135,7 +136,7 @@ export default class AgentSidebar extends View {
           ))
       )))
       .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
-        div().id("sidebar-drag-preview").absolute().left(this.drag.pointer.x+10).top(this.drag.pointer.y+12)
+        div().id("sidebar-drag-preview").absolute().left(Math.max(8,Math.min(this.drag.pointer.x+10,this.drag.bounds.width-168))).top(Math.max(8,Math.min(this.drag.pointer.y+12,this.drag.bounds.height-42)))
           .transition("left",{duration:65,easing:"ease-out"}).transition("top",{duration:65,easing:"ease-out"})
           .w(160).h(34).px(10).flex().items_center().rounded(9).border_1().border_color(t.ansi4)
           .bg(t.hover).shadow_lg().opacity(0.95).text_size(12).text_color(t.foreground)

@@ -279,6 +279,7 @@ export default class TerminalsBar extends View {
       .on_mouse_move((event,cx)=>{
         if (!this.drag) return;
         this.drag.pointer=event.local_position;
+        this.drag.bounds=event.bounds;
         this.drag.lifted ||= Math.hypot(event.position.x-this.drag.start.x,event.position.y-this.drag.start.y)>4;
         cx.notify();
       })
@@ -334,7 +335,7 @@ export default class TerminalsBar extends View {
       .child(iconButton("tm-keys", "command", () => run("app.palette")))
       .child(iconButton("tm-new", "plus", () => run("tab.new", { space: space.id })))
       .when(this.drag?.lifted && this.drag.pointer, el=>el.child(
-        div().id("tab-drag-preview").absolute().left(this.drag.pointer.x+10).top(0)
+        div().id("tab-drag-preview").absolute().left(Math.max(8,Math.min(this.drag.pointer.x+10,this.drag.bounds.width-168))).top(0)
           .transition("left",{duration:65,easing:"ease-out"}).w(160).h(34).px(10)
           .flex().items_center().rounded(10).border_1().border_color("#86b4cb")
           .bg(C.tab).shadow_lg().opacity(0.95).text_size(12).text_color(C.text)
