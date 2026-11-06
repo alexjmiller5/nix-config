@@ -167,8 +167,10 @@ routing table and workflow; this file is the in-repo map.
   remains native app state, separate from operator tool credentials.
   Host-layer sibling = `claude-code` + `codex` + `notion-cli` casks; a daily
   launchd upgrade keeps the two agent CLI casks current on both hosts and strips
-  their quarantine flags, including after partial upgrades. Darwin activation
-  refreshes cached Gatekeeper launch assessments after cask cleanup),
+  their quarantine flags, including after partial upgrades. Codex launches use
+  the complete signed upstream package from `pkgs/codex-native.nix` in the Nix
+  store; the cask remains available for existing sessions that use its paths.
+  Update the pinned native package when upgrading the installed Codex version),
   `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs,screensaver}.nix`
   (activation-script defaults by concern, each exported via `homeModules`;
   `screensaver.nix` keeps the idle screen saver, and so the idle lock, off

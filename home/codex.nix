@@ -2,6 +2,7 @@
   claude-plugin-ponytail,
   claude-plugin-superpowers,
   config,
+  pkgs,
   ...
 }:
 
@@ -23,18 +24,14 @@ in
   imports = [ ./herdr-codex.nix ];
   programs.herdrCodex = {
     enable = true;
-    executable = "/opt/homebrew/bin/codex";
+    executable = "${pkgs.callPackage ../pkgs/codex-native.nix { }}/bin/codex";
   };
 
   programs.codex = {
     enable = true;
 
-    # The MODULE only, not the binary: nixpkgs lags upstream badly (0.149.0 vs
-    # 0.153.4 at the time of writing, and hooks only ship enabled by default
-    # from 0.150.1). The cask tracks upstream, so codex comes from homebrew on
-    # both hosts and `package = null` keeps this module doing what it is
-    # actually here for - generating ~/.codex/hooks.json. Same reasoning as
-    # claude-code@latest.
+    # herdrCodex owns the wrapper and signed upstream Nix package. The cask
+    # remains available to existing sessions that still use its executable paths.
     package = null;
 
     # Shared servers come from mcp.nix's native plugin. Direct integration

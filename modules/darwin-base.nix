@@ -66,8 +66,8 @@
   # launch that already blocked BEFORE the strip stays blocked, and so does
   # every later exec of that path (syspolicyd keeps the verdict per path;
   # copying, replacing or touching the file does not clear it): restart it
-  # with `sudo launchctl kickstart -k system/com.apple.security.syspolicy`
-  # or reboot. Scoped to the Caskroom on purpose: anything else in
+  # from another installed distribution or reboot; SIP blocks restarting
+  # syspolicyd on current macOS. Scoped to the Caskroom on purpose: anything else in
   # /Applications keeps its
   # Gatekeeper prompt. Quarantine-flag check on the root keeps re-runs
   # cheap (no recursive walk unless there's something to strip).
@@ -81,8 +81,6 @@
         /usr/bin/xattr -dr com.apple.quarantine "$app" || true
       fi
     done
-    # Pending first launches can stay blocked after their quarantine flag is gone.
-    /bin/launchctl kickstart -k system/com.apple.security.syspolicy || true
   '';
 
   # Homebrew itself is installed/pinned by nix-homebrew (flake.nix). zap:
