@@ -14,6 +14,6 @@
 
 User-approved additions: drag single tabs and selected groups in either bar within a space; two-word agent titles; native agent icons and traffic-light status dots in both bars; omit unnamed home-space headings; extend Hammerspoon copy confirmation to native Herdr.
 
-Review corrections: reset drag click suppression per press, clear old selection when dragging an unselected tab, aggregate top-tab status across panes, and run group close in a core-owned worker so it can exceed the UI command timeout. Floating previews stay centered on the pointer in both bars, clamped to the visible panel edges. Row midpoints select before/after insertion.
+Review corrections: reset drag click suppression per press, clear old group selection when dragging an unselected tab while preserving the active session, aggregate top-tab status across panes, and run group close in a core-owned worker so it can exceed the UI command timeout. Floating previews stay centered on the pointer in both bars, clamped to the visible panel edges. Row midpoints select before/after insertion.
 
 Insertion feedback: while dragging, remove the dragged rows from normal flow and reserve a measured gap at the insertion slot. Neighbor midpoints move the slot without hover/reflow oscillation. Both bars commit the projected order on release.

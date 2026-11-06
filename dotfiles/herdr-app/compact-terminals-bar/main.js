@@ -274,7 +274,6 @@ export default class TerminalsBar extends View {
             this.selected=[];
             this.anchor=c.id;
             setShared("compact.tabs.selection",null);
-            run("tab.select",{id:c.id});
           }
           const moving=chosen ? [...this.selected] : [c.id];
           const width=id=>this.widths[id] ?? (id===c.id ? event.bounds.width : 100);

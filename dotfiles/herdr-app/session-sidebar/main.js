@@ -132,7 +132,6 @@ export default class AgentSidebar extends View {
                     const chosen=selected?.space===space.id && selected.ids.includes(pane.tab);
                     if (!chosen) {
                       setShared("compact.tabs.selection",null);
-                      run("pane.focus",{pane:pane.pane});
                     }
                     const ids=space.tabs.map(t=>t.id), moving=chosen ? ids.filter(id=>selected.ids.includes(id)) : [pane.tab];
                     const rowHeight=event.bounds.height;
