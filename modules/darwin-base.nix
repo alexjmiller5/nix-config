@@ -72,20 +72,17 @@
   # Gatekeeper prompt. Quarantine-flag check on the root keeps re-runs
   # cheap (no recursive walk unless there's something to strip).
   system.activationScripts.postActivation.text = ''
-    quarantine_changed=false
     for link in /opt/homebrew/Caskroom/*/*/*; do
       app=$(/usr/bin/readlink "$link" || echo "$link")
       if [ -e "$app" ] && /usr/bin/xattr -p com.apple.quarantine "$app" >/dev/null 2>&1; then
         echo "de-quarantining $app" >&2
         # A half-upgraded bundle (brew's *.upgrading leftovers) can hold dangling
         # symlinks; a failed strip must not abort the whole activation.
-        if /usr/bin/xattr -dr com.apple.quarantine "$app"; then quarantine_changed=true; fi
+        /usr/bin/xattr -dr com.apple.quarantine "$app" || true
       fi
     done
     # Pending first launches can stay blocked after their quarantine flag is gone.
-    if [ "$quarantine_changed" = true ]; then
-      /bin/launchctl kickstart -k system/com.apple.security.syspolicy || true
-    fi
+    /bin/launchctl kickstart -k system/com.apple.security.syspolicy || true
   '';
 
   # Homebrew itself is installed/pinned by nix-homebrew (flake.nix). zap:
