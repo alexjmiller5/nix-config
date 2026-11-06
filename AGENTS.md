@@ -166,7 +166,9 @@ routing table and workflow; this file is the in-repo map.
   Nix never populates or refreshes this file. Claude/Codex subscription login
   remains native app state, separate from operator tool credentials.
   Host-layer sibling = `claude-code` + `codex` + `notion-cli` casks; a daily
-  launchd `brew upgrade` keeps the two agent CLI casks current on both hosts),
+  launchd upgrade keeps the two agent CLI casks current on both hosts and strips
+  their quarantine flags, including after partial upgrades. Darwin activation
+  refreshes cached Gatekeeper launch assessments after cask cleanup),
   `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs,screensaver}.nix`
   (activation-script defaults by concern, each exported via `homeModules`;
   `screensaver.nix` keeps the idle screen saver, and so the idle lock, off
