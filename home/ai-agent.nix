@@ -39,10 +39,9 @@
     config = {
       Label = "com.alexmiller.brew-upgrade-agents";
       ProgramArguments = [
+        "${pkgs.bash}/bin/bash"
+        "${../scripts/upgrade-agent-casks.sh}"
         "/opt/homebrew/bin/brew"
-        "upgrade"
-        "claude-code@latest"
-        "codex"
       ];
       StartCalendarInterval = [
         {

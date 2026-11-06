@@ -37,6 +37,7 @@ check:
     python3 tests/manual-render.py
     /usr/bin/ruby tests/flighty-install.rb
     python3 tests/finder-defaults.py
+    bash tests/upgrade-agent-casks.sh
     bash tests/agent-detect.sh
     bash tests/capture-snapshot-tcc.sh
     bash tests/agent-machine.sh
