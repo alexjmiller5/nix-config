@@ -273,6 +273,7 @@
       # copies them into the repo, and the check below fails when a committed
       # body (everything after the header line) has drifted from its render.
       packages.${system} = {
+        codex-native = pkgs.callPackage ./pkgs/codex-native.nix { };
         manual-macbook-air = manualOf "macbook-air";
         manual-mac-mini = manualOf "mac-mini";
       };
