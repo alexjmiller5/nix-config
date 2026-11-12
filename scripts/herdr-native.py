@@ -709,11 +709,11 @@ def titles(path):
                 app("tab.rename", id=tab["id"], name=desired)
 
 
-def refresh_titles():
+def refresh_titles(wait=False):
     # Naming is best-effort background work; never queue it behind close/restore.
     with (STATE / "titles.lock").open("a") as lock:
         try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(lock, fcntl.LOCK_EX | (0 if wait else fcntl.LOCK_NB))
         except BlockingIOError:
             return
         titles(STATE / "titles.json")
@@ -725,7 +725,7 @@ def watch():
             for line in process.stdout:
                 event = json.loads(line)
                 if title_event(event):
-                    refresh_titles()
+                    refresh_titles(wait=True)
         finally:
             process.terminate()
             process.wait()

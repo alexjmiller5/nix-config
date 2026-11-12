@@ -37,6 +37,9 @@ class NativeTests(unittest.TestCase):
                 n.refresh_titles()
                 self.assertEqual(flock.call_args.args[1], n.fcntl.LOCK_EX | n.fcntl.LOCK_NB)
             titles.assert_called_once_with(Path(d)/"titles.json")
+            with patch.object(n.fcntl,"flock") as flock:
+                n.refresh_titles(wait=True)
+                self.assertEqual(flock.call_args.args[1],n.fcntl.LOCK_EX)
             titles.reset_mock()
             with patch.object(n.fcntl,"flock",side_effect=BlockingIOError):
                 n.refresh_titles()
