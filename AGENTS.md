@@ -115,7 +115,8 @@ routing table and workflow; this file is the in-repo map.
   Hammerspoon dispatches Cmd+Shift+[/] directly to the custom layout for
   in-process global traversal, with `herdr-navigate` as the fallback for other
   layouts. Native hotkeys launch installed executables without login shells.
-  Naming has an independent nonblocking lock, so it cannot delay close/restore.
+  Naming has an independent lock, so it cannot delay close/restore; redundant
+  activation refreshes skip a naming pass already in progress.
   Tests: `tests/herdr-navigate.py`, `tests/herdr-native.py`.
   `herdr-native` registers exact Claude/Codex/Pi conversation identities,
   records Cmd+W closures, and resumes them through Cmd+Shift+T with tab names,
