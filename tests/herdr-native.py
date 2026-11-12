@@ -1,6 +1,8 @@
 """Native close/restore refuses unknown identities and preserves exact conversations."""
 
 import subprocess
+import os
+import sys
 import json
 import importlib.util
 import tempfile
@@ -18,6 +20,39 @@ SID = "00000000-0000-4000-8000-000000000001"
 
 
 class NativeTests(unittest.TestCase):
+    def test_close_dispatch_does_not_wait_for_archive_lock(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            fake=root/"app"
+            fake.write_text("#!"+sys.executable+"\nimport json,sys\nprint(json.dumps({'layout':'terminals-agents'} if sys.argv[1]=='status' else {'ok':True}))\n")
+            fake.chmod(0o700)
+            with (root/"lock").open("a") as lock:
+                n.fcntl.flock(lock,n.fcntl.LOCK_EX)
+                result=subprocess.run([sys.executable,n.__file__,"close"],env={**os.environ,"HERDR_NATIVE_STATE_DIR":d,"HERDR_APP_BIN":str(fake)},capture_output=True,timeout=3)
+            self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_title_refresh_uses_an_independent_nonblocking_lock(self):
+        with tempfile.TemporaryDirectory() as d, patch.object(n,"STATE",Path(d)), patch.object(n,"titles") as titles:
+            with patch.object(n.fcntl,"flock") as flock:
+                n.refresh_titles()
+                self.assertEqual(flock.call_args.args[1], n.fcntl.LOCK_EX | n.fcntl.LOCK_NB)
+            titles.assert_called_once_with(Path(d)/"titles.json")
+            titles.reset_mock()
+            with patch.object(n.fcntl,"flock",side_effect=BlockingIOError):
+                n.refresh_titles()
+            titles.assert_not_called()
+            self.assertTrue((Path(d)/"titles.lock").exists())
+            self.assertFalse((Path(d)/"lock").exists())
+
+    def test_group_close_reuses_preflight_snapshots(self):
+        entries=[{"id":"one","original_tab":"a"},{"id":"two","original_tab":"b"}]
+        def app(command,**kwargs):
+            return {"spaces":[{"tabs":[{"id":"a"},{"id":"b"}]}]} if command=="ls" else {}
+        with patch.object(n,"app",side_effect=app), patch.object(n,"capture",side_effect=entries) as capture, patch.object(n,"load",return_value=[]), patch.object(n,"save"), patch.object(n,"check_snapshot") as check:
+            n.close_group(Path("archive"),["a","b"])
+            self.assertEqual(capture.call_count,2)
+            self.assertEqual(check.call_count,2)
+
     def test_group_close_preflights_every_tab_before_closing_any(self):
         with patch.object(n,"app",return_value={"spaces":[{"tabs":[{"id":"a"},{"id":"b"}]}]}), patch.object(n,"capture",side_effect=[{},ValueError("Unknown job")]), patch.object(n,"close_tab") as close:
             with self.assertRaises(ValueError):n.close_group(Path("archive"),["a","b"])

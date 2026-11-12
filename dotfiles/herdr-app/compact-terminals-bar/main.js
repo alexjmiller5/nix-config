@@ -4,6 +4,13 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, panes, run, theme, openOverlay, nextCommand, hc, notify, shared, setShared, window as win } from "herdr";
 
+export function sessionDestination(allSpaces, step) {
+  const tabs=allSpaces.flatMap(space=>space.tabs.filter(tab=>!tab.settled).map(tab=>({id:tab.id,current:space.active && tab.active})));
+  if (!tabs.length) return null;
+  const current=tabs.findIndex(tab=>tab.current);
+  return tabs[current<0 ? (step>0 ? 0 : tabs.length-1) : (current+step+tabs.length)%tabs.length].id;
+}
+
 export function clickSelection(ids, anchor, clicked, shift) {
   if (!shift) return { anchor: clicked, selected: [] };
   const start = ids.includes(anchor) ? anchor : clicked;
@@ -145,6 +152,10 @@ export default class TerminalsBar extends View {
       for (;;) {
         const command = await nextCommand();
         if (command === "close") this.closeSelected(cx);
+        if (command === "next" || command === "previous") {
+          const id=sessionDestination(spaces(),command === "next" ? 1 : -1);
+          if (id) run("tab.select",{id});
+        }
         if (command === "drop") {
           const drop = shared("compact.tabs.drop");
           setShared("compact.tabs.drop", null);

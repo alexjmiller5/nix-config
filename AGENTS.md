@@ -112,8 +112,11 @@ routing table and workflow; this file is the in-repo map.
   immediately after VS Code in the laptop Dock.
   `herdr-navigate next/previous` uses the native command API to cycle every
   open tab across all machines/spaces, including shells, in display order.
-  Hammerspoon binds Cmd+Shift+[/] to it only in the native app, independent
-  of layout-specific agent ordering. Tests: `tests/herdr-navigate.py`.
+  Hammerspoon dispatches Cmd+Shift+[/] directly to the custom layout for
+  in-process global traversal, with `herdr-navigate` as the fallback for other
+  layouts. Native hotkeys launch installed executables without login shells.
+  Naming has an independent nonblocking lock, so it cannot delay close/restore.
+  Tests: `tests/herdr-navigate.py`, `tests/herdr-native.py`.
   `herdr-native` registers exact Claude/Codex/Pi conversation identities,
   records Cmd+W closures, and resumes them through Cmd+Shift+T with tab names,
   pane working directories and split topology. Unregistered Codex/Claude tabs reopen through their resume picker.

@@ -2,7 +2,7 @@ import { expect, mock, test } from "bun:test";
 mock.module("gpui-kit",()=>({View:class {},div(){},svg(){},image(){}}));
 mock.module("gpui-base",()=>({h_flex(){},v_flex(){}}));
 mock.module("herdr",()=>({spaces(){},panes(){},run(){},theme(){},openOverlay(){},window(){},nextCommand(){},exec(){},notify(){},hc(){},shared(){},setShared(){},agents(){},machines(){},hc(){},home(){},props(){},setAgentOrder(){}}));
-const { previewPosition, clickSelection, moveTabOrder, dropTabOrder, insertionSlot, insertTabOrder }=await import("../dotfiles/herdr-app/compact-terminals-bar/main.js");
+const { sessionDestination, previewPosition, clickSelection, moveTabOrder, dropTabOrder, insertionSlot, insertTabOrder }=await import("../dotfiles/herdr-app/compact-terminals-bar/main.js");
 test("shift click selects the anchored range in either direction; plain click clears the group",()=>{
  const ids=["a","b","c","d"];
  expect(clickSelection(ids,"b","d",true)).toEqual({anchor:"b",selected:["b","c","d"]});
@@ -52,4 +52,13 @@ test("dragged tabs nudge neighbors before the pointer reaches their midpoint",()
  expect(insertionSlot([30,30],30,0,0,36)).toBe(1);
  expect(insertionSlot([30,30],30,0,2,54)).toBe(1);
  expect(insertionSlot([30,30],30,0,1,36)).toBe(1);
+});
+
+test("native navigation visits every machine and space and wraps without a subprocess snapshot",()=>{
+ const all=[{active:true,tabs:[{id:"a",active:true},{id:"b"},{id:"hidden",settled:true}]},{tabs:[{id:"mini/c",active:true}]}];
+ expect(sessionDestination(all,1)).toBe("b");
+ expect(sessionDestination(all,-1)).toBe("mini/c");
+ expect(sessionDestination([],1)).toBeNull();
+ all[0].active=false;all[1].active=true;
+ expect(sessionDestination(all,1)).toBe("a");
 });

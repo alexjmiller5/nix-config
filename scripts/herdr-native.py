@@ -492,14 +492,13 @@ def close_group(path, tab_ids):
     spaces = app("ls")["spaces"]
     if not any(set(tab_ids) <= {t["id"] for t in s["tabs"]} for s in spaces):
         raise ValueError("Selected tabs must still be open in the same space")
-    for tab_id in tab_ids:
-        capture(tab_id)  # Refuse unsupported jobs before ending any selected tab.
-    for tab_id in tab_ids:
-        close_tab(path, tab_id)
+    entries = [capture(tab_id) for tab_id in tab_ids]
+    for tab_id, entry in zip(tab_ids, entries):
+        close_tab(path, tab_id, entry=entry)
 
 
-def close_tab(path, tab_id=None):
-    entry = capture(tab_id)
+def close_tab(path, tab_id=None, entry=None):
+    entry = capture(tab_id) if entry is None else entry
     history = load(path)
     history = [
         item for item in history if item["original_tab"] != entry["original_tab"]
@@ -710,15 +709,23 @@ def titles(path):
                 app("tab.rename", id=tab["id"], name=desired)
 
 
+def refresh_titles():
+    # Naming is best-effort background work; never queue it behind close/restore.
+    with (STATE / "titles.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        titles(STATE / "titles.json")
+
+
 def watch():
     with subprocess.Popen([HC, "events"], stdout=subprocess.PIPE, text=True) as process:
         try:
             for line in process.stdout:
                 event = json.loads(line)
                 if title_event(event):
-                    with (STATE / "lock").open("a") as lock:
-                        fcntl.flock(lock, fcntl.LOCK_EX)
-                        titles(STATE / "titles.json")
+                    refresh_titles()
         finally:
             process.terminate()
             process.wait()
@@ -827,14 +834,15 @@ def main():
             cycle_pane(1 if args.command == "pane-next" else -1)
         elif args.command == "reconnect":
             reconnect()
+        elif args.command == "titles":
+            refresh_titles()
+        elif args.command == "close" and not args.tab and app("status").get("layout") == "terminals-agents":
+            app("compact-terminals-bar.close")
         else:
             with (STATE / "lock").open("a") as lock:
                 fcntl.flock(lock, fcntl.LOCK_EX)
                 if args.command == "close":
-                    if not args.tab and app("status").get("layout") == "terminals-agents":
-                        app("compact-terminals-bar.close")
-                    else:
-                        close_tab(STATE / "archive.json", args.tab)
+                    close_tab(STATE / "archive.json", args.tab)
                 elif args.command == "close-group":
                     close_group(STATE / "archive.json", args.tabs)
                 elif args.command == "reopen":
