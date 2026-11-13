@@ -8,6 +8,18 @@ let
   cfg = config.programs.herdr-desktop;
   core = pkgs.callPackage ../pkgs/herdr-core.nix { };
   app = pkgs.callPackage ../pkgs/herdr-app.nix { };
+  launcher = pkgs.writeShellApplication {
+    name = "hdr";
+    text = ''
+      export HERDR_CORE_BIN=${lib.getExe core}
+      export HERDR_PYTHON_BIN=${pkgs.python3}/bin/python3
+      ${lib.optionalString (
+        cfg.defaultSpace != null
+      ) "export HERDR_SPACE_ID=${lib.escapeShellArg cfg.defaultSpace}"}
+      ${lib.optionalString cfg.app.enable "export HERDR_APP_BUNDLE=${app}/Applications/Herdr.app"}
+      exec ${pkgs.bash}/bin/bash ${../scripts/herdr-launch.sh} "$@"
+    '';
+  };
   navigate = pkgs.writeShellApplication {
     name = "herdr-navigate";
     text = ''
@@ -65,6 +77,11 @@ in
   options.programs.herdr-desktop = {
     enable = lib.mkEnableOption "the Herdr desktop core";
     app.enable = lib.mkEnableOption "the native Herdr window";
+    defaultSpace = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Existing native desktop space ID for hdr new terminals.";
+    };
     agentSidebar.localLabel = lib.mkOption {
       type = lib.types.str;
       default = "Local";
@@ -85,6 +102,7 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [
       core
+      launcher
       native
     ]
     ++ lib.optionals cfg.app.enable [

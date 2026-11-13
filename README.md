@@ -12,9 +12,28 @@ Day-to-day: edit config, then `just switch-laptop` (on the laptop), `just deploy
 The flake also exports `homeModules.*` (zsh, git, alias categories) for
 consumption by other flakes — e.g. a work-machine config pinning this repo.
 
-## Herdr in Ghostty
+## Native Herdr and phone access
 
-Run `hdr` (the `herdr` shell function) from a project directory to open a dedicated Ghostty
+`hdr` opens the native desktop app on a local desktop-enabled host. On the
+mini, including a Moshi SSH/Mosh connection, it opens the attach-only picker
+for the same native core terminals shown in the desktop app. Type to search,
+press Enter to attach, and use Ctrl+Backslash to detach while the agent keeps
+running. `hdr attach <terminal-id>` connects directly.
+
+`hdr new` creates a persistent shell in the user's home folder, labels it for
+`programs.herdr-desktop.defaultSpace`, and attaches. The space must exist in
+the native app. `hdr new codex --no-daemon` starts Codex there directly.
+Other arguments pass to `herdr-core`, for example `hdr ls`. Core sessions and
+legacy TUI sessions are separate runtimes; no transcript sync is involved.
+
+Synapse's exact `$ agent` context sets `dispatch = Requested`. The mini's
+Agent Dispatch service uses the native core and the configured native space,
+so dispatched work appears in the desktop and phone picker. Runtime selection
+and space assignment are declared in `services.agent-dispatch`.
+
+## Legacy Herdr in Ghostty
+
+Run `hdr-tui` (the `herdr` shell function) from a project directory to open a dedicated Ghostty
 window; in an ssh or Moshi shell on the mini it attaches to Herdr in place. Hammerspoon (`herdrHotkeys.lua`) gives that window macOS-style shortcuts,
 typing Herdr's ctrl+b prefix for each one:
 

@@ -136,8 +136,13 @@
     hubUrl = "https://soma.nqipomyrjb.workers.dev";
     subscriptionId = "0b06361f-3efa-422c-ae97-1d671f700d3c";
     credentialCommand = [
-      "/usr/bin/security" "find-generic-password"
-      "-s" "media-center.youtube-offline" "-a" "hub" "-w"
+      "/usr/bin/security"
+      "find-generic-password"
+      "-s"
+      "media-center.youtube-offline"
+      "-a"
+      "hub"
+      "-w"
     ];
   };
   # Networth finance reviews started from the dashboard land here as Herdr
@@ -149,7 +154,7 @@
     url = "https://networth.nqipomyrjb.workers.dev";
     herdrWorkspace = "w1";
   };
-  # Tasks marked dispatch Requested (Synapse's `ag` keyword) open an agent in
+  # Tasks marked dispatch Requested (Synapse's `$ agent` context) open an agent in
   # a new Herdr tab here. Outbound long poll on the hub subscription over
   # tasks.dispatch; the job's own profile token (agent-dispatch-v1) is in the
   # login Keychain (manual step below). The prompt template is user state at
@@ -160,10 +165,16 @@
     hubUrl = "https://soma.nqipomyrjb.workers.dev";
     subscriptionId = "32f827d5-59d0-47c5-a613-e7df09daba01";
     credentialCommand = [
-      "/usr/bin/security" "find-generic-password"
-      "-s" "agent-dispatch" "-a" "hub" "-w"
+      "/usr/bin/security"
+      "find-generic-password"
+      "-s"
+      "agent-dispatch"
+      "-a"
+      "hub"
+      "-w"
     ];
-    herdrWorkspace = "w1";
+    runtime = "core";
+    herdrWorkspace = "sp127095d663503df24b4375896791bc98";
     # Claude while at least 5% of its quota is left, then Codex.
     minQuotaPercent = 5;
   };
@@ -203,9 +214,35 @@
     checksStream = "friend_city_checks";
     locationStream = "location";
     bindings = {
-      people = { table = "people"; fields = { id = "id"; name = "name"; deleted = "deleted_at"; hangoutCadence = "hangout_cadence"; }; };
-      locations = { table = "person_locations"; fields = { id = "id"; person = "person_id"; city = "city"; country = "country"; end = "end"; deleted = "deleted_at"; }; };
-      hangouts = { table = "hangouts"; fields = { id = "id"; date = "date"; people = "person_ids"; deleted = "deleted_at"; }; };
+      people = {
+        table = "people";
+        fields = {
+          id = "id";
+          name = "name";
+          deleted = "deleted_at";
+          hangoutCadence = "hangout_cadence";
+        };
+      };
+      locations = {
+        table = "person_locations";
+        fields = {
+          id = "id";
+          person = "person_id";
+          city = "city";
+          country = "country";
+          end = "end";
+          deleted = "deleted_at";
+        };
+      };
+      hangouts = {
+        table = "hangouts";
+        fields = {
+          id = "id";
+          date = "date";
+          people = "person_ids";
+          deleted = "deleted_at";
+        };
+      };
     };
     tailscaleHttpsPort = 8445;
   };

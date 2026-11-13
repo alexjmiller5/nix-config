@@ -51,6 +51,8 @@ in
   # resolves message and call participants with the laptop's address book too.
   programs.people-sync.addressBookHost = "macbook-air-tailscale";
 
+  programs.herdr-desktop.defaultSpace = "sp127095d663503df24b4375896791bc98";
+
   imports = [
     shared-album-reminders.homeModules.default
     ./common.nix
@@ -87,8 +89,13 @@ in
       retain_partial = true;
       browser_headless = false;
       credential_command = [
-        "/usr/bin/security" "find-generic-password"
-        "-s" "page-archiver.hub" "-a" "4947e554-dd02-4d66-9046-3cbc1a4b3a67" "-w"
+        "/usr/bin/security"
+        "find-generic-password"
+        "-s"
+        "page-archiver.hub"
+        "-a"
+        "4947e554-dd02-4d66-9046-3cbc1a4b3a67"
+        "-w"
       ];
     };
   };

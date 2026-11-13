@@ -131,6 +131,12 @@ routing table and workflow; this file is the in-repo map.
   remote core. Native identities are resolved before TUI fallback by the shared
   lifecycle helper. Legacy adapters ignore core terminals; zsh clears inherited
   TUI context. Pi emits native OSC 7501 state from the shared adapter.
+  `hdr` opens the native desktop locally on app-enabled hosts and the native
+  attach picker over SSH or on core-only hosts (including Moshi/Mosh).
+  `hdr new` creates a persistent shell in the configured native defaultSpace,
+  then attaches. Other arguments pass to herdr-core.
+  `hdr-tui` preserves the legacy herdr/Ghostty wrapper. The mini's Agent Dispatch
+  uses the native core with an explicit desktop space ID.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session

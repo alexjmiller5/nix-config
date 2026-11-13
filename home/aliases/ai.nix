@@ -5,10 +5,8 @@
 {
   programs.zsh.shellAliases = {
     cdx = "codex";
-    # The herdr function (home/zsh/functions.zsh) opens the Ghostty window and
-    # closes the tab where Ghostty exists, and attaches in place elsewhere (an
-    # ssh/Moshi shell on the mini), so hdr routes through it on every host.
-    hdr = "herdr";
+    # hdr is the native launcher installed by herdr-app.nix.
+    hdr-tui = "herdr";
     # Claude's default model lives in agent-config's claude/settings.json.
     cc = "claude";
     claude-max = "claude --effort max";
