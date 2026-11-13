@@ -20,6 +20,40 @@ SID = "00000000-0000-4000-8000-000000000001"
 
 
 class NativeTests(unittest.TestCase):
+    def test_connection_guard_refuses_known_offline_without_remote_probe(self):
+        world={"spaces":[{"id":"remote","active":True,"machine":"box","tabs":[{"id":"t","active":True}]}]}
+        with patch.object(n,"run",side_effect=[world,{"machines":[{"name":"box","state":"disconnected"}]}]), patch.object(n,"rpc") as rpc:
+            with self.assertRaisesRegex(ValueError,"box.*disconnected"):
+                n.check_connection("close")
+            rpc.assert_not_called()
+
+    def test_connection_guard_probes_stale_connected_state_with_deadline(self):
+        world={"spaces":[{"id":"remote","active":True,"machine":"box","tabs":[{"id":"t","active":True}]}]}
+        with patch.object(n,"run",side_effect=[world,{"machines":[{"name":"box","state":"connected"}]}]), patch.object(n,"rpc",side_effect=subprocess.TimeoutExpired("probe",0.8)) as rpc:
+            with self.assertRaisesRegex(ValueError,"box.*not responding"):
+                n.check_connection("new")
+            self.assertEqual(rpc.call_args.kwargs["timeout"],0.8)
+
+    def test_connection_guard_leaves_local_actions_independent(self):
+        with patch.object(n,"run",return_value={"spaces":[{"id":"local","active":True,"machine":None} ]}) as run, patch.object(n,"rpc") as rpc:
+            n.check_connection("new")
+            self.assertEqual(run.call_count,1)
+            rpc.assert_not_called()
+
+    def test_connection_guard_uses_restore_machine_identity(self):
+        saved={"id":"undo","machine":"old-name","machine_id":"saved"}
+        with patch.object(n,"load",return_value=[saved]), patch.object(n,"run",return_value={"machines":[{"id":"saved","name":"renamed","state":"needs_login"}]}), patch.object(n,"rpc") as rpc:
+            with self.assertRaisesRegex(ValueError,"renamed.*needs login"):
+                n.check_connection("reopen")
+            rpc.assert_not_called()
+
+    def test_connection_guard_does_not_act_after_focus_changes(self):
+        world={"spaces":[{"id":"remote","active":True,"machine":"box","tabs":[{"id":"t","active":True}]}]}
+        changed={"spaces":[{"id":"local","active":True,"machine":None}]}
+        with patch.object(n,"run",side_effect=[world,{"machines":[{"name":"box","state":"connected"}]},changed]), patch.object(n,"rpc",return_value={}):
+            with self.assertRaisesRegex(ValueError,"selection changed"):
+                n.check_connection("close")
+
     def test_close_dispatch_does_not_wait_for_archive_lock(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)

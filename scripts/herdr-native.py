@@ -22,9 +22,9 @@ APP = os.environ.get("HERDR_APP_BIN", "herdr-app")
 HC = os.environ.get("HERDR_CORE_BIN", "hc")
 
 
-def run(argv, **kwargs):
+def run(argv, timeout=15, **kwargs):
     result = subprocess.run(
-        argv, capture_output=True, text=True, timeout=15, check=True, **kwargs
+        argv, capture_output=True, text=True, timeout=timeout, check=True, **kwargs
     )
     return json.loads(result.stdout) if result.stdout.strip() else {}
 
@@ -38,13 +38,14 @@ def app(command, **args):
     return result
 
 
-def rpc(method, **params):
+def rpc(method, timeout=None, **params):
     result = run(
         [HC, "connect"],
         input=json.dumps(
             {"jsonrpc": "2.0", "id": 1, "method": method, "params": params}
         )
         + "\n",
+        **({"timeout": timeout} if timeout is not None else {}),
     )
     if "error" in result:
         raise ValueError(result["error"].get("message", "Core request failed"))
@@ -396,6 +397,49 @@ def reconnect():
     result = rpc("machine.connect", machine=space["machine"])
     if result.get("state") != "connected":
         raise ValueError("Remote machine needs attention; check hc machine ls")
+
+
+def check_connection(action):
+    def selection():
+        world = run([APP, "ls"], timeout=0.35)
+        space = next((s for s in world["spaces"] if s.get("active")), {})
+        tab = next((t for t in space.get("tabs", []) if t.get("active")), {})
+        return space.get("machine"), (space.get("id"), tab.get("id"))
+
+    try:
+        if action == "reopen":
+            history = load(STATE / "archive.json")
+            if not history or not history[-1].get("machine"):
+                return
+            entry = history[-1]
+            machines = run([HC, "machine", "ls"], timeout=0.35)["machines"]
+            remote = next((m for m in machines if m["id"] == entry.get("machine_id")), None)
+            if remote is None:
+                raise ValueError("Saved machine is unavailable. Action cancelled; history retained.")
+            machine = remote["name"]
+        else:
+            machine, original = selection()
+            if not machine:
+                return
+            machines = run([HC, "machine", "ls"], timeout=0.35)["machines"]
+            remote = next((m for m in machines if m["name"] == machine), None)
+        state = remote.get("state", "unavailable") if remote else "unavailable"
+        if state != "connected":
+            raise ValueError(f"{machine} is {state.replace('_', ' ')}. Action cancelled. Cmd+Shift+R reconnects.")
+        try:
+            # Read through the existing core link, without creating or ending anything.
+            rpc("doc.get", name="herdr-app", on=machine, timeout=0.8)
+        except (OSError, ValueError, subprocess.SubprocessError):
+            raise ValueError(f"{machine} is not responding. Action cancelled. Cmd+Shift+R reconnects.") from None
+        if action == "reopen":
+            current = load(STATE / "archive.json")
+            unchanged = bool(current) and current[-1].get("id") == entry.get("id")
+        else:
+            unchanged = selection()[1] == original
+        if not unchanged:
+            raise ValueError("Herdr selection changed during the check. Action cancelled; press the shortcut again.")
+    except (OSError, subprocess.SubprocessError):
+        raise ValueError("Herdr is busy or unavailable. Action cancelled.") from None
 
 
 def capture(tab_id=None):
@@ -761,6 +805,7 @@ def main():
     parser.add_argument(
         "command",
         choices=[
+            "check-connection",
             "guard-legacy",
             "register",
             "clear",
@@ -787,6 +832,7 @@ def main():
     parser.add_argument("--cwd")
     parser.add_argument("--title")
     parser.add_argument("--session-file")
+    parser.add_argument("--action", choices=["new", "close", "reopen", "pane-next", "pane-previous", "split-right", "split-down"], default="close")
     args = parser.parse_args()
     if args.command in ("register", "hook", "locate", "name") and not args.agent:
         parser.error("--agent is required")
@@ -796,7 +842,9 @@ def main():
         parser.error("--terminal is required")
     try:
         STATE.mkdir(parents=True, exist_ok=True)
-        if args.command == "guard-legacy":
+        if args.command == "check-connection":
+            check_connection(args.action)
+        elif args.command == "guard-legacy":
             guard_legacy(Path.home())
         elif args.command == "register":
             register(
