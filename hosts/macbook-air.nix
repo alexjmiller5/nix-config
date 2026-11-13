@@ -623,6 +623,7 @@
         | `desk` | `~/Desktop` |
         | `docs` | `~/Documents` |
         | `down` | `~/Downloads` |
+        | `resume` | `~/Desktop/career/resume/alexander-miller-resume.pdf` (open with Preview) |
         | `sg` | `https://google.com/search?q={Query}` (Search Google) |
         | `tasks` | Notion Tasks DB (notion:// deep link) |
 
