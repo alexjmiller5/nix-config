@@ -605,11 +605,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1791874848,
-        "narHash": "sha256-iChleSkBLgYVGOM1jU5KHZWmWQZiWKr37uPj6ZJGhXg=",
+        "lastModified": 1793666069,
+        "narHash": "sha256-C5gmhveKnfPIBrrt89K8ZzHwIDDxF6h8RNZDXhHkjXs=",
         "owner": "alexjmiller5",
         "repo": "people-sync",
-        "rev": "54b398d4b233480e86427a01dc921b412ba2eff2",
+        "rev": "82dc9d21be556e325fffe23c3ccd2d53c7409bf1",
         "type": "github"
       },
       "original": {
