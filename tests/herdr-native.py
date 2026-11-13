@@ -20,6 +20,25 @@ SID = "00000000-0000-4000-8000-000000000001"
 
 
 class NativeTests(unittest.TestCase):
+    def test_connected_guard_is_read_only_and_revalidates_selection(self):
+        world={"spaces":[{"id":"remote","active":True,"machine":"box","tabs":[{"id":"t","active":True}]}]}
+        with patch.object(n,"run",side_effect=[world,{"machines":[{"name":"box","state":"connected"}]},world]) as run, patch.object(n,"rpc",return_value={}) as rpc:
+            n.check_connection("new")
+            self.assertEqual([call.args[0] for call in run.call_args_list],[[n.APP,"ls"],[n.HC,"machine","ls"],[n.APP,"ls"]])
+            rpc.assert_called_once_with("doc.get",name="herdr-hotkey-check",on="box",timeout=0.8)
+
+    def test_stale_link_probe_has_real_bounded_process_timeout(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            fake=root/"app"; core=root/"core"
+            world={"spaces":[{"id":"s","active":True,"machine":"box","tabs":[]}]}
+            fake.write_text("#!"+sys.executable+"\nimport json\nprint("+repr(json.dumps(world))+")\n")
+            core.write_text("#!"+sys.executable+"\nimport sys,time\nif sys.argv[1]=='connect': time.sleep(4)\nelse: print('"+json.dumps({"machines":[{"name":"box","state":"connected"}]})+"')\n")
+            fake.chmod(0o700);core.chmod(0o700)
+            result=subprocess.run([sys.executable,n.__file__,"check-connection","--action","new"],env={**os.environ,"HERDR_NATIVE_STATE_DIR":d,"HERDR_APP_BIN":str(fake),"HERDR_CORE_BIN":str(core)},capture_output=True,text=True,timeout=2)
+            self.assertEqual(result.returncode,1)
+            self.assertIn("box is not responding",result.stderr)
+
     def test_connection_guard_refuses_known_offline_without_remote_probe(self):
         world={"spaces":[{"id":"remote","active":True,"machine":"box","tabs":[{"id":"t","active":True}]}]}
         with patch.object(n,"run",side_effect=[world,{"machines":[{"name":"box","state":"disconnected"}]}]), patch.object(n,"rpc") as rpc:

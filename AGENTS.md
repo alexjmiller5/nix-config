@@ -115,6 +115,9 @@ routing table and workflow; this file is the in-repo map.
   Hammerspoon dispatches Cmd+Shift+[/] directly to the custom layout for
   in-process global traversal, with `herdr-navigate` as the fallback for other
   layouts. Native hotkeys launch installed executables without login shells.
+  Remote create/close/restore/split/pane shortcuts use a bounded read-only
+  connection preflight; failed checks cancel rather than queue the action.
+  Local navigation and reconnect remain available offline.
   Naming has an independent lock, so it cannot delay close/restore; redundant
   activation refreshes skip a naming pass already in progress.
   Tests: `tests/herdr-navigate.py`, `tests/herdr-native.py`.

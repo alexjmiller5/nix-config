@@ -427,8 +427,8 @@ def check_connection(action):
         if state != "connected":
             raise ValueError(f"{machine} is {state.replace('_', ' ')}. Action cancelled. Cmd+Shift+R reconnects.")
         try:
-            # Read through the existing core link, without creating or ending anything.
-            rpc("doc.get", name="herdr-app", on=machine, timeout=0.8)
+            # An absent-document read probes the link without fetching session data.
+            rpc("doc.get", name="herdr-hotkey-check", on=machine, timeout=0.8)
         except (OSError, ValueError, subprocess.SubprocessError):
             raise ValueError(f"{machine} is not responding. Action cancelled. Cmd+Shift+R reconnects.") from None
         if action == "reopen":
