@@ -15,10 +15,11 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 ## Native Herdr and phone access
 
 `hdr` opens the native desktop app on a local desktop-enabled host. On the
-mini, including a Moshi SSH/Mosh connection, it opens the attach-only picker
-for the same native core terminals shown in the desktop app. Type to search,
-press Enter to attach, and use Ctrl+Backslash to detach while the agent keeps
-running. `hdr attach <terminal-id>` connects directly.
+mini, including a Moshi SSH/Mosh connection, it opens a persistent menu: `s`
+selects an existing native session, `n` creates a new one, and `q` quits. The
+session picker supports typing to search and Enter to attach. Ctrl+Backslash
+detaches back to the menu while the agent keeps running.
+`hdr attach <terminal-id>` connects directly.
 
 `hdr new` creates a persistent shell in the user's home folder, labels it for
 `programs.herdr-desktop.defaultSpace`, and attaches. The space must exist in

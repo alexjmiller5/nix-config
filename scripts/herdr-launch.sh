@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 core=${HERDR_CORE_BIN:-herdr-core}
-# The phone picker only attaches; creating a desktop-visible terminal is explicit.
+# New terminals share the native desktop space and persist after detaching.
 if [[ ${1:-} == new ]]; then
   shift
   if [[ -z ${HERDR_SPACE_ID:-} ]]; then
@@ -25,6 +25,20 @@ if [[ $# -eq 0 ]]; then
   if [[ -n ${HERDR_APP_BUNDLE:-} && -z ${SSH_CONNECTION:-} && -z ${SSH_TTY:-} ]]; then
     exec open -a "$HERDR_APP_BUNDLE"
   fi
-  exec "$core" attach
+  if [[ ! -t 0 ]]; then
+    exec "$core" attach
+  fi
+  while true; do
+    printf '\nHerdr sessions\n  s  Select session\n  n  New session\n  q  Quit\nCtrl+Backslash returns here without stopping the session.\n'
+    if ! read -r -p 'Choose [s/n/q]: ' choice; then
+      exit 0
+    fi
+    case "$choice" in
+      s|S|'') "$core" attach || true ;;
+      n|N) "$BASH" "$0" new || true ;;
+      q|Q) exit 0 ;;
+      *) printf 'Choose s, n, or q.\n' ;;
+    esac
+  done
 fi
 exec "$core" "$@"

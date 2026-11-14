@@ -32,6 +32,46 @@ class LaunchTests(unittest.TestCase):
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(result.stdout.splitlines(), expected)
 
+    def test_mobile_menu_switches_creates_and_returns_after_detach(self):
+        import json
+        import pty
+        import select
+        import time
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            log = root / "calls"
+            core = root / "core"
+            core.write_text("#!/usr/bin/python3\nimport json,os,sys\nwith open(os.environ['CALLS'], 'a') as f: f.write(json.dumps(sys.argv[1:]) + '\\n')\nif sys.argv[1] == 'connect': print(json.dumps({'result':{'value':{'spaces':[{'id':'space-id'}]}}}))\nif sys.argv[1] == 'run': print(json.dumps({'address':'t9'}))\n")
+            core.chmod(0o755)
+            master, slave = pty.openpty()
+            env = dict(os.environ, HERDR_CORE_BIN=str(core), HERDR_SPACE_ID="space-id", CALLS=str(log), SSH_TTY="/dev/test")
+            proc = subprocess.Popen(["/bin/bash", str(SCRIPT)], env=env, stdin=slave, stdout=slave, stderr=slave)
+            os.close(slave)
+            output = b""
+            try:
+                os.write(master, b"s\nn\nq\n")
+                deadline = time.monotonic() + 5
+                while time.monotonic() < deadline:
+                    if select.select([master], [], [], 0.1)[0]:
+                        try:
+                            output += os.read(master, 65536)
+                        except OSError:
+                            break
+                    if proc.poll() is not None:
+                        break
+                self.assertIsNotNone(proc.poll(), output.decode())
+                self.assertEqual(proc.returncode, 0, output.decode())
+                calls = [json.loads(line) for line in log.read_text().splitlines()]
+                self.assertEqual(calls[0], ["attach"])
+                self.assertIn(["attach", "t9"], calls)
+                self.assertEqual(sum(call[0] == "run" for call in calls), 1)
+                self.assertGreaterEqual(output.count(b"New session"), 3)
+            finally:
+                if proc.poll() is None:
+                    proc.kill()
+                proc.wait()
+                os.close(master)
+
     def test_new_requires_explicit_space(self):
         result = subprocess.run(["/bin/bash", str(SCRIPT), "new"], env={"PATH": "/usr/bin:/bin"}, capture_output=True, text=True)
         self.assertEqual(result.returncode, 2)

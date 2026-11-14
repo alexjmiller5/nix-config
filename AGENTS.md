@@ -135,7 +135,9 @@ routing table and workflow; this file is the in-repo map.
   lifecycle helper. Legacy adapters ignore core terminals; zsh clears inherited
   TUI context. Pi emits native OSC 7501 state from the shared adapter.
   `hdr` opens the native desktop locally on app-enabled hosts and the native
-  attach picker over SSH or on core-only hosts (including Moshi/Mosh).
+  session menu over SSH or on core-only hosts (including Moshi/Mosh):
+  s opens the searchable attach picker, n creates a session, q quits;
+  Ctrl+Backslash detaches back to the menu without ending the session.
   `hdr new` creates a persistent shell in the configured native defaultSpace,
   then attaches. Other arguments pass to herdr-core.
   `hdr-tui` preserves the legacy herdr/Ghostty wrapper. The mini's Agent Dispatch
