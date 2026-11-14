@@ -20,19 +20,21 @@ switch:
 
 # Apply the laptop's config ON the laptop. Works before nix-darwin is installed:
 # builds the system first, then uses the build's own darwin-rebuild to activate.
-switch-laptop:
+[positional-arguments]
+switch-laptop *nix_flags:
     #!/usr/bin/env bash
     set -euo pipefail
     just manual
-    nix build .#darwinConfigurations.macbook-air.system
+    nix build .#darwinConfigurations.macbook-air.system "$@"
     # /run/current-system path matches the NOPASSWD sudoers rule (darwin-base.nix);
     # the ./result fallback is bootstrap-only (first activation, password prompt).
     dr=/run/current-system/sw/bin/darwin-rebuild
     [ -x "$dr" ] || dr=./result/sw/bin/darwin-rebuild
-    sudo "$dr" switch --flake .#macbook-air
+    sudo "$dr" switch --flake .#macbook-air "$@"
 
 # Validate the flake
 check:
+    python3 tests/switch-laptop.py
     nix flake check
     python3 tests/manual-render.py
     /usr/bin/ruby tests/flighty-install.rb

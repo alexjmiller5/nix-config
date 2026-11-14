@@ -9,6 +9,10 @@ Declarative macOS machine configs via [nix-darwin](https://github.com/nix-darwin
 
 Day-to-day: edit config, then `just switch-laptop` (on the laptop), `just deploy` (mini, from the laptop), or `just switch` (on the mini). `just check` validates the flake.
 
+On the laptop, `just -- switch-laptop --max-jobs 1 --cores 1` passes the
+resource limits to both the proof build and the root rebuild. Standard Nix
+flags are optional; `just switch-laptop` keeps its usual behavior.
+
 The flake also exports `homeModules.*` (zsh, git, alias categories) for
 consumption by other flakes — e.g. a work-machine config pinning this repo.
 

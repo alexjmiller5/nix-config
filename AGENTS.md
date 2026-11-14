@@ -330,3 +330,5 @@ machine: each applies its host locally when run there and over ssh (`just
 deploy <host> <attr>`) from the other one. Both are passwordless via the
 NOPASSWD sudoers rule in `modules/darwin-base.nix`, so agents run them
 directly after a green proof-build.
+Laptop-local `just -- switch-laptop --max-jobs 1 --cores 1` forwards optional
+standard Nix flags to both the user proof build and the root rebuild.
