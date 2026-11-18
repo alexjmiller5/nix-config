@@ -106,6 +106,7 @@ routing table and workflow; this file is the in-repo map.
   runtime from the TUI. Native key bindings live in
   `dotfiles/herdr-app/keys.json`; Cmd+Shift+W closes the window safely,
   Cmd+Alt+[/] selects agents, Cmd+[/] selects left/right panes.
+  Cmd+P and Cmd+K both open the agent/session picker.
   Native Catppuccin Latte/Mocha themes follow system appearance; the
   magenta accent is part of each palette. Declared `settings` merge during
   activation without making native settings read-only. Herdr is pinned
