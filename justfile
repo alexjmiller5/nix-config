@@ -56,6 +56,7 @@ check:
     bash tests/wait-for-remote.sh
     bun test ./tests/herdr-sidebar.test.js ./tests/herdr-tabs.test.js
     bun tests/herdr-drag-focus.js
+    bun tests/herdr-close-worker.js
     python3 tests/herdr-launch.py
     python3 tests/herdr-native.py
     python3 tests/herdr-navigate.py

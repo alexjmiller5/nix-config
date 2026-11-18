@@ -196,7 +196,7 @@ in
       exampleFiles
       // lib.optionalAttrs cfg.agentSidebar.enable {
         "herdr-app/layouts/terminals-agents.json".text =
-          builtins.replaceStrings [ ''"@localLabel@"'' ] [ (builtins.toJSON cfg.agentSidebar.localLabel) ]
+          builtins.replaceStrings [ ''"@localLabel@"'' ''"@nativeHelper@"'' ] [ (builtins.toJSON cfg.agentSidebar.localLabel) (builtins.toJSON (lib.getExe native)) ]
             (builtins.readFile ../dotfiles/herdr-app/terminals-agents.json);
       }
       // {

@@ -2,7 +2,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
-import { spaces, panes, run, theme, openOverlay, nextCommand, hc, notify, shared, setShared, window as win } from "herdr";
+import { spaces, panes, run, theme, openOverlay, nextCommand, hc, notify, shared, setShared, props, home, window as win } from "herdr";
 
 export function sessionDestination(allSpaces, step) {
   const tabs=allSpaces.flatMap(space=>space.tabs.filter(tab=>!tab.settled).map(tab=>({id:tab.id,current:space.active && tab.active})));
@@ -173,10 +173,15 @@ export default class TerminalsBar extends View {
     const ids = space.tabs.filter(t => selected.includes(t.id)).map(t => t.id);
     if (!ids.length) ids.push(space.tabs.find(t => t.active)?.id);
     if (!ids[0]) return;
+    const helper = props()?.nativeHelper;
+    if (!helper || !helper.startsWith("/")) {
+      notify({title:"Tabs left open",body:"The installed close helper is unavailable. Reload the desktop configuration."});
+      return;
+    }
     this.busy = true;
     cx.spawn(async cx => {
       try {
-        const launch = await hc(["run", "--bg", "--no-parent", "--no-notify", "--", "herdr-native", "close-group", "--tabs", ...ids]);
+        const launch = await hc(["run", "--bg", "--no-parent", "--no-notify", "--cwd", home(), "--", helper, "close-group", "--tabs", ...ids]);
         if (launch.code !== 0) throw new Error(launch.stderr || "Could not start group close");
         const job = JSON.parse(launch.stdout).address;
         let record;
