@@ -62,6 +62,17 @@ class RegistrationTests(unittest.TestCase):
             self.assertEqual(bridge.os.environ['HERDR_NATIVE_DIRECT'],'1')
             self.assertNotIn('HERDR_PANE_ID',bridge.os.environ)
 
+    def test_native_interactive_restores_colors_without_affecting_tools(self):
+        for args, native, expected in (([], True, None), (["queue", "--thread", "exact"], True, "1"), ([], False, "1")):
+            environment = {"NO_COLOR": "1", "COLORTERM": "truecolor"}
+            if native:
+                environment["HC_TERMINAL_ID"] = "t8"
+            with patch.dict(bridge.os.environ, environment, clear=True), patch.object(bridge.sys, "argv", ["bridge", "--codex", "/codex", "--", *args]), patch.object(bridge.os, "execv", side_effect=RuntimeError("exec")):
+                with self.assertRaisesRegex(RuntimeError, "exec"):
+                    bridge.main()
+                self.assertEqual(bridge.os.environ.get("NO_COLOR"), expected)
+                self.assertEqual(bridge.os.environ["COLORTERM"], "truecolor")
+
     def test_native_operational_commands_remain_unchanged(self):
         with patch.dict(bridge.os.environ, {"HC_TERMINAL_ID":"t8"}), patch.object(bridge.sys,"argv",["bridge","--codex","/codex","--","queue","--thread","exact"]), patch.object(bridge.os,"execv",side_effect=RuntimeError("exec")) as execute:
             with self.assertRaisesRegex(RuntimeError,"exec"):bridge.main()

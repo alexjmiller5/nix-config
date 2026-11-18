@@ -166,6 +166,9 @@ def main():
                     except (OSError, subprocess.SubprocessError):
                         print("herdr-codex: early core registration unavailable", file=sys.stderr)
         if interactive(args):
+            # Tool-launched native sessions can inherit NO_COLOR from the caller.
+            # Keep the interactive composer shading and agent accents enabled.
+            os.environ.pop("NO_COLOR", None)
             args = ["--no-daemon", *args]
     if not (os.environ.get("HERDR_ENV") == "1" and os.environ.get("HERDR_PANE_ID")
             and os.environ.get("HERDR_SOCKET_PATH") and os.isatty(0) and interactive(args)):
