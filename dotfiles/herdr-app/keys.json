@@ -58,7 +58,8 @@
     "ctrl-8": "space.select:8",
     "ctrl-9": "space.select:9",
     "cmd-shift-n": "space.new",
-    "cmd-\\": "layout.toggle:sidebar"
+    "cmd-\\": "layout.toggle:sidebar",
+    "cmd-k": "mod.open:picker"
   },
   "terminal": {
     "cmd-c": "terminal.copy",
@@ -70,7 +71,6 @@
     "cmd-left": "send:\u001b[H",
     "cmd-right": "send:\u001b[F",
     "cmd-backspace": "send:\u0015",
-    "cmd-k": "send:\f",
     "cmd-up": "send:\u001b[1;5H",
     "cmd-down": "send:\u001b[1;5F"
   }
