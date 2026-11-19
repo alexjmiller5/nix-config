@@ -61,6 +61,7 @@ class RegistrationTests(unittest.TestCase):
             self.assertEqual(execute.call_args.args,('/codex',['/codex','--no-daemon','resume','exact']))
             self.assertEqual(bridge.os.environ['HERDR_NATIVE_DIRECT'],'1')
             self.assertNotIn('HERDR_PANE_ID',bridge.os.environ)
+            self.assertEqual(bridge.os.environ.get('HERDR_ENV'), '1')
 
     def test_native_interactive_restores_colors_without_affecting_tools(self):
         for args, native, expected in (([], True, None), (["queue", "--thread", "exact"], True, "1"), ([], False, "1")):

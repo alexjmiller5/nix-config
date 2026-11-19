@@ -17,7 +17,7 @@ routing table and workflow; this file is the in-repo map.
   `git.nix`, `git-signing.nix`, `git-hooks.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),
   `herdr-app.nix` (native app/core, shared keys/themes and opt-in pinned Threads/Pasture examples and a minimal Terminals sidebar grouped by machine and space, including ordinary terminal panes, persistent configured machines, agent logos and native status dots, with always-available local navigation and title-sized tabs with range selection, group close, move controls and same-space drag reordering for GUI clients),
-  `herdr-codex.nix` (exported pane-local TUI Codex registration relay over the shared daemon; native core clients run without the daemon and interactive launches discard inherited NO_COLOR so input shading remains visible),
+  `herdr-codex.nix` (exported pane-local TUI Codex registration relay over the shared daemon; native core clients run without the daemon and interactive launches discard inherited NO_COLOR so input shading remains visible; their Herdr marker forwards copies to attached viewers while stale TUI pane/socket identity is cleared),
   `zsh.nix` (full shell + starship), `aliases/{dev,ai,infra}`,
   `agent-env.nix` (shared credential initialization in `.zshenv` and
   `~/.config/agent-shell/env.sh`; Claude's native SessionStart environment

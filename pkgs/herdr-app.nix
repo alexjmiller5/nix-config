@@ -5,10 +5,10 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "herdr-app";
-  version = "0.1.10";
+  version = "0.1.16";
   src = fetchurl {
-    url = "https://releases.herdr.dev/app/0.1.10/herdr-app-macos-aarch64.tar.gz";
-    sha256 = "f6ff58010a88d70dcbd06e9593f57ca70ada3e7e8377f8a371702c027a8f3d76";
+    url = "https://releases.herdr.dev/app/0.1.16/herdr-app-macos-aarch64.tar.gz";
+    sha256 = "99000875ead9333a33f5cb60274ccd9cf9d3e47360f03613a467295105c71c04";
   };
   sourceRoot = ".";
   # Preserve the upstream Developer ID signature, including Mach-O contents.
