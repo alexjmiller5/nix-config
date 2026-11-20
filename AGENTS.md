@@ -239,7 +239,9 @@ routing table and workflow; this file is the in-repo map.
   (TCC decisions from both system and user databases, Chrome UI prefs); `scripts/capture-snapshot` produces them,
   `just snapshot <name> [host]` refreshes one, and the matching `snapshot`
   manual step's verify diffs live against committed
-* `pkgs/` — custom package derivations (`callPackage`d from home files)
+* `pkgs/` - custom package derivations (`callPackage`d from home files).
+  `imsg.nix` pins the official macOS release with its signed executable,
+  bridge helper and adjacent Swift resources, installed on both Macs by cli-tools.
 * `dotfiles/` - file payloads (nvim, vscode, ssh pubs, duti list)
   Hyper uses the exported `homeModules.macos-hyper-key` module: hidutil maps
   Caps Lock to F19 at activation, at login and, because macOS silently drops

@@ -29,6 +29,7 @@
     (callPackage ../pkgs/pymobiledevice3.nix { })
     # Agent-provider quota windows (Claude, Codex, ...) - see the `quota` skill
     (callPackage ../pkgs/quota-axi.nix { })
+    (callPackage ../pkgs/imsg.nix { })
   ];
 
   # Editor everywhere: nvim, with a real `vim` shim and $EDITOR set

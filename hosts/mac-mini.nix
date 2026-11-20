@@ -69,8 +69,6 @@
     }
   ];
   homebrew.brews = [
-    # iMessage CLI for operator use. Not in nixpkgs.
-    "steipete/tap/imsg"
     # Native UI batch automation for headless operators; no laptop UI control.
     "steipete/tap/peekaboo"
     # Moshi (phone terminal) agent daemon: surfaces Claude Code sessions on

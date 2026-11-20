@@ -184,9 +184,6 @@
     brews = [
       # Not in nixpkgs (checked 2026-09-01); skills + nightlight migrated out.
       "chrome-cli"
-      # iMessage CLI for agents (read chat.db, send via Messages.app) — not in
-      # nixpkgs. Needs TCC grants (tcc-grants snapshot step below).
-      "steipete/tap/imsg"
     ];
     casks = [
       "1password"
