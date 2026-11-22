@@ -18,12 +18,19 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 
 ## Native Herdr and phone access
 
-`hdr` opens the native desktop app on a local desktop-enabled host. On the
-mini, including a Moshi SSH/Mosh connection, it opens a persistent menu: `s`
-selects an existing native session, `n` creates a new one, and `q` quits. The
-session picker supports typing to search and Enter to attach. Ctrl+Backslash
-detaches back to the menu while the agent keeps running.
-`hdr attach <terminal-id>` connects directly.
+`hdr` opens the native desktop app on a local desktop-enabled host. In an
+interactive SSH shell (including Moshi), it opens `hct`, a Core-native
+terminal client with tabs, a space menu, search and touch controls. It uses
+the desktop app's running terminals and shared space/tab document.
+
+In Moshi, connect to the mini using plain SSH and type `hdr`. Tap the
+space dropdown or a tab, or press Ctrl+B then W for the searchable switcher.
+Ctrl+B then N/P switches tabs without detaching. Ctrl+B then [ enters
+scrollback; Ctrl+B then Q detaches while the agents keep running. Actual
+swipe delivery depends on the phone terminal's mouse/gesture settings.
+
+`hdr menu` opens the fallback s/n/q session menu; `hdr attach <terminal-id>`
+connects directly. `hdr-tui` still opens the original, separate Herdr TUI.
 
 `hdr new` creates a persistent shell in the user's home folder, labels it for
 `programs.herdr-desktop.defaultSpace`, and attaches. The space must exist in
@@ -40,7 +47,7 @@ Moshi can also open native Herdr Core spaces directly from its session picker.
 The mini runs the declared `moshi-hook` service (0.4.45 or newer required);
 reconnect the phone after upgrading. Check discovery with
 `moshi-hook mux ls --json`. Use SSH for Core scrollback; Mosh does not
-support it. The `hdr` menu remains available as a fallback.
+support it. The `hdr menu` command remains available as a fallback.
 
 ## Legacy Herdr in Ghostty
 

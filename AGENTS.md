@@ -135,14 +135,19 @@ routing table and workflow; this file is the in-repo map.
   remote core. Native identities are resolved before TUI fallback by the shared
   lifecycle helper. Legacy adapters ignore core terminals; zsh clears inherited
   TUI context. Pi emits native OSC 7501 state from the shared adapter.
-  `hdr` opens the native desktop locally on app-enabled hosts and the native
-  session menu over SSH or on core-only hosts (including Moshi/Mosh):
-  s opens the searchable attach picker, n creates a session, q quits;
-  Ctrl+Backslash detaches back to the menu without ending the session.
-  `hdr new` creates a persistent shell in the configured native defaultSpace,
-  then attaches. Other arguments pass to herdr-core.
-  `hdr-tui` preserves the legacy herdr/Ghostty wrapper. The mini's Agent Dispatch
-  uses the native core with an explicit desktop space ID.
+  `hdr` opens the native desktop locally on app-enabled hosts and the
+  Core-native hct interface in interactive SSH/core-only shells. Its package
+  comes from the herdr-tui flake input (following the parent nixpkgs), so
+  automatic input updates cover it. The exported `tuiPackage` option is nullable;
+  external consumers can provide another Core-native client or keep the menu.
+  hct shares the desktop space/tab document, with tabs, a space dropdown and
+  fuzzy switcher; Ctrl+B N/P changes tabs, W searches, [ scrolls, Q detaches.
+  `hdr menu` preserves the searchable attach/create fallback. `hdr new`
+  creates a persistent shell in the configured defaultSpace and attaches.
+  Other arguments pass to herdr-core; `hdr-tui` remains the separate legacy
+  runtime. The mini's Agent Dispatch uses Core and an explicit desktop space.
+  `uv run scripts/herdr-tui-smoke.py --hct <installed hct>` exercises an
+  isolated fixture Core, attached switching, detachment and shared tab IDs.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session

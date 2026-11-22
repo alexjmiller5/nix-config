@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    herdr-tui = {
+      url = "github:xxb/herdr-tui";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -225,6 +229,7 @@
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "backup";
               home-manager.sharedModules = [
+                { programs.herdr-desktop.tuiPackage = inputs.herdr-tui.packages.${system}.default; }
                 inputs.bookmark-mirror.homeModules.default
                 inputs.soma.homeModules.default
                 inputs.people-sync.homeModules.default
@@ -273,6 +278,7 @@
       # copies them into the repo, and the check below fails when a committed
       # body (everything after the header line) has drifted from its render.
       packages.${system} = {
+        herdr-tui = inputs.herdr-tui.packages.${system}.default;
         codex-native = pkgs.callPackage ./pkgs/codex-native.nix { };
         manual-macbook-air = manualOf "macbook-air";
         manual-mac-mini = manualOf "mac-mini";

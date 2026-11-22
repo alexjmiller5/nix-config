@@ -45,7 +45,7 @@ class LaunchTests(unittest.TestCase):
             core.chmod(0o755)
             master, slave = pty.openpty()
             env = dict(os.environ, HERDR_CORE_BIN=str(core), HERDR_SPACE_ID="space-id", CALLS=str(log), SSH_TTY="/dev/test")
-            proc = subprocess.Popen(["/bin/bash", str(SCRIPT)], env=env, stdin=slave, stdout=slave, stderr=slave)
+            proc = subprocess.Popen(["/bin/bash", str(SCRIPT), "menu"], env=env, stdin=slave, stdout=slave, stderr=slave)
             os.close(slave)
             output = b""
             try:
@@ -66,6 +66,38 @@ class LaunchTests(unittest.TestCase):
                 self.assertIn(["attach", "t9"], calls)
                 self.assertEqual(sum(call[0] == "run" for call in calls), 1)
                 self.assertGreaterEqual(output.count(b"New session"), 3)
+            finally:
+                if proc.poll() is None:
+                    proc.kill()
+                proc.wait()
+                os.close(master)
+
+    def test_phone_opens_native_core_tui(self):
+        import pty
+        import select
+        import time
+        with tempfile.TemporaryDirectory() as scratch:
+            tui = Path(scratch) / "hct"
+            tui.write_text('#!/bin/sh\nprintf "CORE-TUI %s\\n" "$*"\n')
+            tui.chmod(0o755)
+            master, slave = pty.openpty()
+            env = dict(os.environ, HERDR_TUI_BIN=str(tui), SSH_TTY="/dev/test")
+            proc = subprocess.Popen(["/bin/bash", str(SCRIPT)], env=env, stdin=slave, stdout=slave, stderr=slave)
+            os.close(slave)
+            output = b""
+            try:
+                deadline = time.monotonic() + 3
+                while time.monotonic() < deadline:
+                    if select.select([master], [], [], 0.1)[0]:
+                        try:
+                            output += os.read(master, 65536)
+                        except OSError:
+                            break
+                    if proc.poll() is not None:
+                        break
+                self.assertEqual(proc.poll(), 0, output.decode())
+                self.assertIn(b"CORE-TUI --touch", output)
+                self.assertNotIn(b"Choose [s/n/q]", output)
             finally:
                 if proc.poll() is None:
                     proc.kill()
