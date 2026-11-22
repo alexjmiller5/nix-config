@@ -103,28 +103,6 @@ let
     '';
   };
 
-  # Weekly update pass (Mon 09:30; launchd catches up after wake if asleep):
-  # bump flake inputs, prove the system still builds (revert the lock if not),
-  # upgrade brew formulae, then notify — switching stays a human decision.
-  # Stays writeShellScript ON PURPOSE: it runs `set -uo pipefail` WITHOUT -e
-  # so a failed step still reaches the notification at the end
-  # (writeShellApplication would force -e and exit silently instead).
-  weeklyUpdates = pkgs.writeShellScript "weekly-updates" ''
-    set -uo pipefail
-    # /nix/var/nix/profiles/default/bin: nix lives ONLY here with nix.enable=false (Determinate)
-    export PATH="/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/opt/homebrew/bin:/usr/bin:/bin"
-    cd "$HOME/.config/nix-config"
-    nix flake update
-    if nix build .#darwinConfigurations.macbook-air.system; then
-      status="flake inputs updated + system builds — review lock diff, then just switch-laptop"
-    else
-      git checkout -- flake.lock
-      status="flake update FAILED to build — lock reverted, investigate"
-    fi
-    brew upgrade --formula || true
-    /usr/bin/osascript -e "display notification \"$status\" with title \"nix weekly updates\""
-  '';
-
   # Monthly: delete iOS simulator runtimes unused for 30+ days (each is
   # 5-8 GB; Xcode re-downloads on demand so over-deleting costs a download,
   # not breakage) and clear simulator devices orphaned by removed runtimes.
@@ -185,23 +163,6 @@ in
         ];
         StandardOutPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/agent-config-sync.log";
-      };
-    };
-
-    weekly-updates = {
-      enable = true;
-      config = {
-        Label = "com.alexmiller.weekly-updates";
-        ProgramArguments = [ "${weeklyUpdates}" ];
-        StartCalendarInterval = [
-          {
-            Weekday = 1;
-            Hour = 9;
-            Minute = 30;
-          }
-        ];
-        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/weekly-updates.log";
-        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/weekly-updates.log";
       };
     };
 

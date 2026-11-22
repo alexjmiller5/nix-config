@@ -308,6 +308,7 @@
         op-connect = ./home/op-connect.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;
         ai-agent = ./home/ai-agent.nix;
+        automatic-updates = ./home/automatic-updates.nix;
         claude-rc = ./home/claude-rc.nix;
         agent-env = ./home/agent-env.nix;
         agent-machine = ./home/agent-machine.nix;

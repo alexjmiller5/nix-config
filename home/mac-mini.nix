@@ -53,6 +53,8 @@ in
 
   programs.herdr-desktop.defaultSpace = "sp127095d663503df24b4375896791bc98";
 
+  services.automatic-updates.host = "mac-mini";
+
   imports = [
     shared-album-reminders.homeModules.default
     ./common.nix

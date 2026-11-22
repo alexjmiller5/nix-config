@@ -78,7 +78,7 @@
     # agent-config's settings.json (nix-managed, read-only here).
     {
       name = "rjyo/moshi/moshi-hook";
-      start_service = true;
+      restart_service = "changed";
     }
   ];
 

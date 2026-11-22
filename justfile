@@ -34,6 +34,8 @@ switch-laptop *nix_flags:
 
 # Validate the flake
 check:
+    python3 tests/package-updates.py
+    python3 tests/system-updates.py
     python3 tests/switch-laptop.py
     nix flake check
     python3 tests/manual-render.py

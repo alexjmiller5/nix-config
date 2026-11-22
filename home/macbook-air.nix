@@ -36,6 +36,8 @@ in
     dark = "catppuccin-mocha";
   };
 
+  services.automatic-updates.host = "macbook-air";
+
   imports = [
     ./common.nix
     ./agent-machine.nix

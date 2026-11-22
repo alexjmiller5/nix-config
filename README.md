@@ -36,6 +36,12 @@ Agent Dispatch service uses the native core and the configured native space,
 so dispatched work appears in the desktop and phone picker. Runtime selection
 and space assignment are declared in `services.agent-dispatch`.
 
+Moshi can also open native Herdr Core spaces directly from its session picker.
+The mini runs the declared `moshi-hook` service (0.4.45 or newer required);
+reconnect the phone after upgrading. Check discovery with
+`moshi-hook mux ls --json`. Use SSH for Core scrollback; Mosh does not
+support it. The `hdr` menu remains available as a fallback.
+
 ## Legacy Herdr in Ghostty
 
 Run `hdr-tui` (the `herdr` shell function) from a project directory to open a dedicated Ghostty
@@ -136,3 +142,16 @@ returns to the normal tier. No terminal-title extension is installed.
 Provider sign-in is native user state; see the generated machine manual.
 App-bundled Codex/Claude tools and plugins are specific to those hosts;
 portable skills and their installed CLI/browser tools remain available.
+
+## Automatic updates
+
+Both Macs upgrade Homebrew formulae and casks daily at 10:15, restarting
+only running services whose package version changed. Nix updates check at
+10:30 daily and run when the last success is at least a week old. They use
+an isolated clone, build the target system, commit and push the lockfile,
+then activate. Failed builds or pushes stop activation; failures retry the
+next day. Work in progress in the normal checkout is preserved.
+
+Inspect `~/Library/Logs/package-updates.log` and `system-updates.log`, or
+`launchctl print gui/$(id -u)/local.system-updates`. Package versions pinned
+inside custom `.nix` derivations still require explicit version changes.

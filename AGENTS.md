@@ -266,6 +266,16 @@ routing table and workflow; this file is the in-repo map.
   `secrets/secrets.nix` header); no master key exists.
   Screentime ingest enrolls through its own browser approval and Keychain;
   its watcher and backup hook use the same native app credential.
+* `home/automatic-updates.nix` exports `services.automatic-updates` on both hosts.
+  Homebrew formulae and casks update daily at 10:15; only changed running
+  services restart. At 10:30, Nix inputs update and activate when the last
+  successful update is at least seven days old; failures retry the next day.
+  A temporary clone builds the host before committing/pushing its lockfile
+  and switching with passwordless sudo. Failed builds or pushes never switch.
+  Working checkouts are preserved; only clean ones fast-forward afterward.
+  Logs: `package-updates.log` and `system-updates.log` in `~/Library/Logs`.
+  Custom package version pins are not advanced by flake input updates.
+
 * Moshi on the Mini uses its declared Homebrew formula/service and native
   pairing store. Nix does not restore or rewrite Moshi credentials. Existing
   machines retain their pairing; replacement machines pair through Moshi.
