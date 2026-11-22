@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix='hb-',dir='/tmp') as tmp:
             HC_BRIDGE_STATE_DIR=tmp+'/mapping',HC_BIN_PATH=shutil.which('herdr-core'),HERDR_BIN_PATH=shutil.which('herdr'),
             HC_REAL_SHELL='/bin/sh',HC_SYNC_MS='500',TERM='xterm-256color')
  config=root/'cfg/herdr/config.toml';config.parent.mkdir(parents=True)
- config.write_text('onboarding = false\n[terminal]\ndefault_shell = '+json.dumps(str(plugin/'bin/hc-shell'))+'\n')
+ config.write_text('onboarding = false\n[terminal]\ndefault_shell = '+json.dumps(str(plugin/'bin/hc-shell'))+'\n[session]\nresume_agents_on_restore = false\n')
  env['HERDR_CONFIG_PATH']=str(config)
  def run(*argv,**kw):
   r=subprocess.run(argv,env=env,text=True,capture_output=True,timeout=30,**kw)

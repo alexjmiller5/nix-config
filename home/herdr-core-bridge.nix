@@ -5,6 +5,7 @@ let
   core = pkgs.callPackage ../pkgs/herdr-core.nix { };
   settings = pkgs.formats.toml { };
   bridgeConfig = config.programs.herdr.settings // {
+    session = (config.programs.herdr.settings.session or { }) // { resume_agents_on_restore = false; };
     terminal = (config.programs.herdr.settings.terminal or { }) // {
       default_shell = "${plugin}/bin/hc-shell";
     };
@@ -31,6 +32,19 @@ in {
   };
   config = lib.mkIf cfg.enable {
     home.packages = [ launcher pkgs.nodejs ];
+    launchd.agents.herdr-core-bridge = {
+      enable = true;
+      config = {
+        Label = "local.herdr-core-bridge";
+        ProgramArguments = [ "${launcher}/bin/herdr-core-tui" "server" ];
+        RunAtLoad = true;
+        KeepAlive = true;
+        ThrottleInterval = 10;
+        WorkingDirectory = config.home.homeDirectory;
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/herdr-core-bridge.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/herdr-core-bridge.log";
+      };
+    };
     xdg.configFile."herdr/core-bridge.toml".source = settings.generate "core-bridge.toml" bridgeConfig;
     programs.herdr-desktop.tuiPackage = launcher;
     home.activation.herdrCoreBridge = lib.hm.dag.entryAfter [ "linkGeneration" ] ''

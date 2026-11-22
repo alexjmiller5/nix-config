@@ -36,7 +36,9 @@ not synchronized. Two active viewers can resize the same terminal.
 `hdr menu` preserves the direct-Core fallback; `hdr attach <terminal-id>`
 attaches directly. `hdr-tui` opens the separate original default session.
 The bridge's mapping and logs live under the standard XDG state directory
-in `herdr-core-bridge/core`. Core remains authoritative for process lifetime.
+in `herdr-core-bridge/core`. A Nix-managed launchd job owns the bridge
+server and synchronizer. TUI agent restoration is disabled: Core remains
+authoritative for process lifetime.
 
 `hdr new` creates a persistent shell in the user's home folder, labels it for
 `programs.herdr-desktop.defaultSpace`, and attaches. The space must exist in
