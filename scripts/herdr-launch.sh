@@ -34,7 +34,7 @@ if [[ $# -eq 0 ]]; then
     exec "$core" attach
   fi
   if [[ $menu == false && -n ${HERDR_TUI_BIN:-} ]]; then
-    exec "$HERDR_TUI_BIN" --touch
+    exec "$HERDR_TUI_BIN" --no-touch
   fi
   while true; do
     printf '\nHerdr sessions\n  s  Select session\n  n  New session\n  q  Quit\nCtrl+Backslash returns here without stopping the session.\n'

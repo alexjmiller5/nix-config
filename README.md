@@ -20,13 +20,14 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 
 `hdr` opens the native desktop app on a local desktop-enabled host. In an
 interactive SSH shell (including Moshi), it opens `hct`, a Core-native
-terminal client with tabs, a space menu, search and touch controls. It uses
+terminal client with clickable tabs, a space menu and search. It uses
 the desktop app's running terminals and shared space/tab document.
 
 In Moshi, connect to the mini using plain SSH and type `hdr`. Tap the
 space dropdown or a tab, or press Ctrl+B then W for the searchable switcher.
 Ctrl+B then N/P switches tabs without detaching. Ctrl+B then [ enters
-scrollback; Ctrl+B then Q detaches while the agents keep running. Actual
+scrollback; Ctrl+B then Q detaches while the agents keep running. Floating control pads are off by default to keep output readable;
+`hct --touch` enables them if wanted. Actual
 swipe delivery depends on the phone terminal's mouse/gesture settings.
 
 `hdr menu` opens the fallback s/n/q session menu; `hdr attach <terminal-id>`

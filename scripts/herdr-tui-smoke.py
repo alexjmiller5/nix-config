@@ -41,7 +41,7 @@ with tempfile.TemporaryDirectory(prefix='hct-', dir='/tmp') as tmp:
     try:
         terminals=[]
         for label in ['Fixture Alpha', 'Fixture Beta']:
-            result = json.loads(core('run','--bg','--no-parent','--no-notify','--cwd',tmp,'--','/usr/bin/python3','-u','-c',f'print({label!r}); input()'))
+            result = json.loads(core('run','--bg','--no-parent','--no-notify','--cwd',tmp,'--','/usr/bin/python3','-u','-c',f'[print("History %03d" % n) for n in range(100)]; print({label!r}); input()'))
             terminals.append(result['address'])
         tabs=[dict(id=f'tab-{i}',name=label,root=dict(id=f'root-{i}',type='row',children=[dict(id=f'pane-{i}',type='block',content=dict(terminal=terminal))])) for i,(label,terminal) in enumerate(zip(['Alpha','Beta'],terminals))]
         doc=dict(spaces=[dict(id='fixture-space',name='Fixture',folder=tmp,tabs=tabs)])
@@ -51,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix='hct-', dir='/tmp') as tmp:
         def setup():
             os.setsid()
             fcntl.ioctl(0,termios.TIOCSCTTY,0)
-        proc=subprocess.Popen([args.hct] if args.launcher else [args.hct,'--touch'],env=env,stdin=slave,stdout=slave,stderr=slave,preexec_fn=setup)
+        proc=subprocess.Popen([args.hct] if args.launcher else [args.hct,'--no-touch'],env=env,stdin=slave,stdout=slave,stderr=slave,preexec_fn=setup)
         os.close(slave)
         screen=pyte.Screen(60,24)
         stream=pyte.ByteStream(screen)
@@ -73,6 +73,11 @@ with tempfile.TemporaryDirectory(prefix='hct-', dir='/tmp') as tmp:
             raise AssertionError(f'Missing {text!r}; exit={proc.poll()}\n'+'\n'.join(screen.display))
         wait_for('Fixture Alpha')
         print('Initial existing Core terminal renders: PASS')
+        os.write(master,b'\x02[')
+        wait_for('BOT (+')
+        print('Scrollback mode opens: PASS')
+        os.write(master,b'\x1b')
+        wait_for('BOT (+', absent=True)
         os.write(master,b'\x1b[<0;10;1M\x1b[<0;10;1m')
         wait_for('New Space')
         print('Touch space menu opens: PASS')
