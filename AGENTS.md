@@ -135,19 +135,20 @@ routing table and workflow; this file is the in-repo map.
   remote core. Native identities are resolved before TUI fallback by the shared
   lifecycle helper. Legacy adapters ignore core terminals; zsh clears inherited
   TUI context. Pi emits native OSC 7501 state from the shared adapter.
-  `hdr` opens the native desktop locally on app-enabled hosts and the
-  Core-native hct interface in interactive SSH/core-only shells. Its package
-  comes from the herdr-tui flake input (following the parent nixpkgs), so
-  automatic input updates cover it. The exported `tuiPackage` option is nullable;
-  external consumers can provide another Core-native client or keep the menu.
-  hct shares the desktop space/tab document, with tabs, a space dropdown and
-  fuzzy switcher; Ctrl+B N/P changes tabs, W searches, [ scrolls, Q detaches.
-  `hdr menu` preserves the searchable attach/create fallback. `hdr new`
-  creates a persistent shell in the configured defaultSpace and attaches.
-  Other arguments pass to herdr-core; `hdr-tui` remains the separate legacy
-  runtime. The mini's Agent Dispatch uses Core and an explicit desktop space.
-  `uv run scripts/herdr-tui-smoke.py --hct <installed hct>` exercises an
-  isolated fixture Core, attached switching, detachment and shared tab IDs.
+  `hdr` opens the native desktop locally and the original TUI's named
+  `core` session over SSH. The exported `herdr-core-bridge` module packages
+  hc-attach with a headless Core-document adapter, Core-authoritative names,
+  version-checked adoption writes, a scoped watcher, and a shell hook for Core-owned new
+  panes. It mirrors local spaces/tabs/terminals without moving existing agents.
+  Its separate config uses the shared TUI settings; original default-session
+  shells stay independent. Closing a view preserves the Core process pending
+  the plugin's explicit keep/reopen/end choice. Focus/zoom/split geometry and
+  terminal moves between tabs are not mirrored. Mapping/logs are XDG state
+  under herdr-core-bridge/core. `hdr menu` and direct attach remain available.
+  `hdr-tui` targets the original default TUI session. The nullable `tuiPackage`
+  option accepts a terminal frontend; this flake supplies herdr-core-tui.
+  `python3 scripts/herdr-core-bridge-smoke.py --plugin <package>` verifies
+  shared input, ordinary new-tab adoption and safe close in isolated runtimes.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session

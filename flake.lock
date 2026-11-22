@@ -304,26 +304,6 @@
         "type": "github"
       }
     },
-    "herdr-tui": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1795232983,
-        "narHash": "sha256-N0yKaNmwDA9M88YDhTCkcsG/p76V0Ls8bOfm8sKljb0=",
-        "owner": "xxb",
-        "repo": "herdr-tui",
-        "rev": "4fbd62098e217d09d7366513593b34dd1f09beed",
-        "type": "github"
-      },
-      "original": {
-        "owner": "xxb",
-        "repo": "herdr-tui",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1044,7 +1024,6 @@
         "cochlea": "cochlea",
         "findmy-cli": "findmy-cli",
         "flighty-sync": "flighty-sync",
-        "herdr-tui": "herdr-tui",
         "home-manager": "home-manager",
         "iris": "iris",
         "mcp-nixos": "mcp-nixos",

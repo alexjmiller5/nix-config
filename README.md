@@ -18,20 +18,25 @@ consumption by other flakes — e.g. a work-machine config pinning this repo.
 
 ## Native Herdr and phone access
 
-`hdr` opens the native desktop app on a local desktop-enabled host. In an
-interactive SSH shell (including Moshi), it opens `hct`, a Core-native
-terminal client with clickable tabs, a space menu and search. It uses
-the desktop app's running terminals and shared space/tab document.
+`hdr` opens the native desktop app locally. In an interactive SSH shell,
+it opens the original Herdr TUI in the named `core` session. The hc-attach
+plugin mirrors local Core spaces, tabs and terminals into that session;
+programs remain owned by Core and are usable from the desktop and phone.
 
-In Moshi, connect to the mini using plain SSH and type `hdr`. Tap the
-space dropdown or a tab, or press Ctrl+B then W for the searchable switcher.
-Ctrl+B then N/P switches tabs without detaching. Ctrl+B then [ enters
-scrollback; Ctrl+B then Q detaches while the agents keep running. Floating control pads are off by default to keep output readable;
-`hct --touch` enables them if wanted. Actual
-swipe delivery depends on the phone terminal's mouse/gesture settings.
+In Moshi, open plain SSH to the mini and type `hdr`. Use the original TUI's
+workspace menu, tab bar and prefix keys to switch while attached. New TUI
+panes start Core-owned shells and join the shared desktop layout. Core names
+flow to the TUI; TUI automatic titles never rename the desktop tabs. Closing a mirrored
+view leaves the Core terminal running; the plugin then offers keep,
+reopen or end choices. Existing TUI-only programs are not moved.
 
-`hdr menu` opens the fallback s/n/q session menu; `hdr attach <terminal-id>`
-connects directly. `hdr-tui` still opens the original, separate Herdr TUI.
+The bridge reads Core's document directly and works without an open desktop
+window. Focus, zoom, precise split geometry and moved-tab membership are
+not synchronized. Two active viewers can resize the same terminal.
+`hdr menu` preserves the direct-Core fallback; `hdr attach <terminal-id>`
+attaches directly. `hdr-tui` opens the separate original default session.
+The bridge's mapping and logs live under the standard XDG state directory
+in `herdr-core-bridge/core`. Core remains authoritative for process lifetime.
 
 `hdr new` creates a persistent shell in the user's home folder, labels it for
 `programs.herdr-desktop.defaultSpace`, and attaches. The space must exist in
@@ -47,8 +52,8 @@ and space assignment are declared in `services.agent-dispatch`.
 Moshi can also open native Herdr Core spaces directly from its session picker.
 The mini runs the declared `moshi-hook` service (0.4.45 or newer required);
 reconnect the phone after upgrading. Check discovery with
-`moshi-hook mux ls --json`. Use SSH for Core scrollback; Mosh does not
-support it. The `hdr menu` command remains available as a fallback.
+`moshi-hook mux ls --json`. Direct Core attachment has no Mosh scrollback; the original TUI
+maintains its own scrollback. The `hdr menu` command remains available as a fallback.
 
 ## Legacy Herdr in Ghostty
 

@@ -96,7 +96,7 @@ class LaunchTests(unittest.TestCase):
                     if proc.poll() is not None:
                         break
                 self.assertEqual(proc.poll(), 0, output.decode())
-                self.assertIn(b"CORE-TUI --no-touch", output)
+                self.assertEqual(output.strip(), b"CORE-TUI")
                 self.assertNotIn(b"Choose [s/n/q]", output)
             finally:
                 if proc.poll() is None:
