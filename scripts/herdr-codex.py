@@ -145,11 +145,12 @@ def main():
         args = args[1:]
     args = reconnect_args(args)
     if os.environ.get("HC_TERMINAL_ID"):
+        native_tui = interactive([arg for arg in args if arg != "--no-daemon"])
         os.environ.pop("HERDR_NATIVE_DIRECT", None)
         # Native core owns this process tree; a shared daemon would outlive close.
         for key in ("HERDR_ENV", "HERDR_PANE_ID", "HERDR_SOCKET_PATH"):
             os.environ.pop(key, None)
-        if "--no-daemon" in args or interactive(args):
+        if native_tui:
             os.environ["HERDR_NATIVE_DIRECT"] = "1"
         if "resume" in args:
             index = args.index("resume") + 1
@@ -165,13 +166,14 @@ def main():
                                        check=True, capture_output=True, timeout=10)
                     except (OSError, subprocess.SubprocessError):
                         print("herdr-codex: early core registration unavailable", file=sys.stderr)
-        if interactive(args):
+        if native_tui:
             # Tool-launched native sessions can inherit NO_COLOR from the caller.
             # Keep the interactive composer shading and agent accents enabled.
             os.environ.pop("NO_COLOR", None)
             # Codex uses this marker to forward copies to attached viewers.
             os.environ["HERDR_ENV"] = "1"
-            args = ["--no-daemon", *args]
+            if "--no-daemon" not in args:
+                args = ["--no-daemon", *args]
     if not (os.environ.get("HERDR_ENV") == "1" and os.environ.get("HERDR_PANE_ID")
             and os.environ.get("HERDR_SOCKET_PATH") and os.isatty(0) and interactive(args)):
         os.execv(options.codex, [options.codex, *args])
