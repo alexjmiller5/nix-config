@@ -6,7 +6,6 @@
   programs.zsh.shellAliases = {
     cdx = "codex";
     # hdr is the native launcher installed by herdr-app.nix.
-    hdr-tui = "herdr";
     # Claude's default model lives in agent-config's claude/settings.json.
     cc = "claude";
     claude-max = "claude --effort max";

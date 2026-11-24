@@ -26,7 +26,6 @@
     ./people-sync-operator.nix
     ./scratch-sweeper.nix
     ./automatic-updates.nix
-    ./herdr-core-bridge.nix
   ];
 
   # Both Macs use the full Finder profile, including desktop preferences.
@@ -36,7 +35,6 @@
 
   services.scratch-sweeper.enable = true;
   services.automatic-updates.enable = true;
-  programs.herdr-core-bridge.enable = true;
 
   opAuth.vaultId = "4eeyrkqibibn7k4j6rz2fbzvxm";
 

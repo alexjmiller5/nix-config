@@ -21,32 +21,10 @@ if not any(space.get("id") == sys.argv[1] for space in spaces):
     "${HERDR_PYTHON_BIN:-python3}" -c 'import json,sys; print(json.load(sys.stdin)["address"])')
   exec "$core" attach "$terminal"
 fi
-menu=false
-if [[ ${1:-} == menu ]]; then
-  menu=true
-  shift
-fi
 if [[ $# -eq 0 ]]; then
   if [[ -n ${HERDR_APP_BUNDLE:-} && -z ${SSH_CONNECTION:-} && -z ${SSH_TTY:-} ]]; then
     exec open -a "$HERDR_APP_BUNDLE"
   fi
-  if [[ ! -t 0 ]]; then
-    exec "$core" attach
-  fi
-  if [[ $menu == false && -n ${HERDR_TUI_BIN:-} ]]; then
-    exec "$HERDR_TUI_BIN"
-  fi
-  while true; do
-    printf '\nHerdr sessions\n  s  Select session\n  n  New session\n  q  Quit\nCtrl+Backslash returns here without stopping the session.\n'
-    if ! read -r -p 'Choose [s/n/q]: ' choice; then
-      exit 0
-    fi
-    case "$choice" in
-      s|S|'') "$core" attach || true ;;
-      n|N) "$BASH" "$0" new || true ;;
-      q|Q) exit 0 ;;
-      *) printf 'Choose s, n, or q.\n' ;;
-    esac
-  done
+  exec "$core" attach
 fi
 exec "$core" "$@"

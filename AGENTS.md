@@ -135,22 +135,8 @@ routing table and workflow; this file is the in-repo map.
   remote core. Native identities are resolved before TUI fallback by the shared
   lifecycle helper. Legacy adapters ignore core terminals; zsh clears inherited
   TUI context. Pi emits native OSC 7501 state from the shared adapter.
-  `hdr` opens the native desktop locally and the original TUI's named
-  `core` session over SSH. The exported `herdr-core-bridge` module packages
-  hc-attach with a headless Core-document adapter, Core-authoritative names,
-  version-checked adoption writes, a scoped watcher, and a shell hook for Core-owned new
-  panes. It mirrors local spaces/tabs/terminals without moving existing agents.
-  Its launchd job local.herdr-core-bridge owns the TUI server and watcher.
-  TUI agent restoration is disabled because Core owns those processes.
-  Its separate config uses the shared TUI settings; original default-session
-  shells stay independent. Closing a view preserves the Core process pending
-  the plugin's explicit keep/reopen/end choice. Focus/zoom/split geometry and
-  terminal moves between tabs are not mirrored. Mapping/logs are XDG state
-  under herdr-core-bridge/core. `hdr menu` and direct attach remain available.
-  `hdr-tui` targets the original default TUI session. The nullable `tuiPackage`
-  option accepts a terminal frontend; this flake supplies herdr-core-tui.
-  `python3 scripts/herdr-core-bridge-smoke.py --plugin <package>` verifies
-  shared input, ordinary new-tab adoption and safe close in isolated runtimes.
+  `hdr` opens the native desktop locally and attaches directly to Core over SSH.
+  The native iOS app connects directly to Core and shares its sessions with the desktop.
   `programs.herdr-desktop.spaces` ensures named Core spaces at activation while preserving their tabs. The mini routes capture dispatch into Captures; ordinary terminals use Default.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),

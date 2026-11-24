@@ -11,7 +11,6 @@ let
   launcher = pkgs.writeShellApplication {
     name = "hdr";
     text = ''
-      ${lib.optionalString (cfg.tuiPackage != null) "export HERDR_TUI_BIN=${lib.getExe cfg.tuiPackage}"}
       export HERDR_CORE_BIN=${lib.getExe core}
       export HERDR_PYTHON_BIN=${pkgs.python3}/bin/python3
       ${lib.optionalString (
@@ -78,11 +77,6 @@ in
   imports = [ ../modules/manual-steps.nix ];
   options.programs.herdr-desktop = {
     enable = lib.mkEnableOption "the Herdr desktop core";
-    tuiPackage = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
-      default = null;
-      description = "Optional Core-native terminal client for interactive hdr sessions.";
-    };
     app.enable = lib.mkEnableOption "the native Herdr window";
     defaultSpace = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
@@ -117,7 +111,6 @@ in
       launcher
       native
     ]
-    ++ lib.optional (cfg.tuiPackage != null) cfg.tuiPackage
     ++ lib.optionals cfg.app.enable [
       app
       navigate
@@ -138,6 +131,16 @@ in
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/herdr-native-titles.log";
       };
     };
+    # Remove persisted mirrored-view registrations when upgrading existing installs.
+    home.activation.herdrNativeClients = lib.mkIf (config.programs.herdr.enable or false) (
+      lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
+        run env HERDR_LEGACY_BIN=${lib.getExe config.programs.herdr.package} \
+          ${pkgs.bash}/bin/bash ${../scripts/herdr-retire-bridge.sh} \
+          ${lib.escapeShellArg config.xdg.stateHome}/herdr-core-bridge/core \
+          ${lib.escapeShellArg config.xdg.configHome}/herdr/core-bridge.toml \
+          ${lib.escapeShellArg config.home.homeDirectory}/Library/LaunchAgents/local.herdr-core-bridge.plist
+      ''
+    );
     home.activation.herdrNativeSpaces = lib.mkIf (cfg.spaces != { }) (
       lib.hm.dag.entryAfter [ "linkGeneration" ] ''
         run ${lib.getExe native} spaces --spaces-file ${spacesFile}

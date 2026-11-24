@@ -61,6 +61,7 @@ check:
     bun tests/herdr-drag-focus.js
     bun tests/herdr-close-worker.js
     python3 tests/herdr-launch.py
+    python3 tests/herdr-retire-bridge.py
     python3 tests/herdr-native.py
     python3 tests/herdr-navigate.py
     python3 tests/herdr-takeover.py
