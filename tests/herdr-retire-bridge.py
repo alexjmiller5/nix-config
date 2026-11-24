@@ -22,7 +22,7 @@ class RetirementTests(unittest.TestCase):
                     (state / 'sync.pid').write_text(str(watcher.pid))
                 for name, body in {
                     'launchctl': 'echo "launchctl $*" >> "$CALLS"; if [ "$1" = print ]; then [ "$SERVICE_PRESENT" = 1 ]; fi',
-                    'herdr': 'echo "herdr $*" >> "$CALLS"; if [ "$1" = plugin ] && [ "$2" = list ]; then echo "- barnuri.hc-attach (hc attach) enabled"; fi',
+                    'herdr': 'echo "herdr $*" >> "$CALLS"; case "$*" in *"plugin list") echo "- barnuri.hc-attach (hc attach) enabled";; "plugin unlink"*) exit 1;; esac',
                     'ps': 'printf "%s\\n" "$PROCESS_COMMAND"',
                 }.items():
                     f = root / name
@@ -34,7 +34,7 @@ class RetirementTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 calls = log.read_text() if log.exists() else ''
                 if artifacts:
-                    self.assertIn('herdr plugin unlink barnuri.hc-attach', calls)
+                    self.assertIn('herdr --session core plugin unlink barnuri.hc-attach', calls)
                     self.assertIn('herdr --session core server stop', calls)
                     self.assertNotIn('herdr-core server', calls)
                     self.assertIn('launchctl bootout gui/', calls)

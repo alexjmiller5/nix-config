@@ -11,8 +11,8 @@ if [[ ! -e $plist && ! -e $config && ! -f $pid_file ]] && ! launchctl print "$se
   exit 0
 fi
 # Remove focus/startup hooks before stopping the detached watcher.
-if [[ $("$legacy" plugin list) == *"barnuri.hc-attach "* ]]; then
-  "$legacy" plugin unlink barnuri.hc-attach
+if [[ $("$legacy" --session core plugin list) == *"barnuri.hc-attach "* ]]; then
+  "$legacy" --session core plugin unlink barnuri.hc-attach
 fi
 if [[ -f $pid_file ]]; then
   watcher=$(cat "$pid_file")
