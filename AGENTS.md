@@ -221,6 +221,10 @@ routing table and workflow; this file is the in-repo map.
   selections and iCloud enrollment remain native user state. Activation does
   not restart Finder or change per-folder `.DS_Store` settings,
   `ssh.nix` (programs.ssh + private Include),
+  `user-clipboard.nix` (exported `programs.user-clipboard`: `user-copy` reads stdin
+  and writes to the configured local or SSH clipboard; both hosts enable it,
+  with the mini targeting the laptop and the laptop using its own clipboard;
+  SSH failures propagate without local fallback; test: `tests/user-copy.py`),
   `scripts.nix` (standalone commands as writeShellApplication — shell-state
   functions and command shadows stay in `zsh/functions.zsh`),
   per-host `macbook-air.nix` / `mac-mini.nix`. The mini alone imports

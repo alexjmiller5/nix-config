@@ -310,6 +310,7 @@
         git-hooks = ./home/git-hooks.nix;
         zsh = ./home/zsh.nix;
         scripts = ./home/scripts.nix;
+        user-clipboard = ./home/user-clipboard.nix;
         op-auth = ./home/op-auth.nix;
         op-connect = ./home/op-connect.nix;
         agent-ssh-agent = ./home/agent-ssh-agent.nix;

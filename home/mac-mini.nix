@@ -144,6 +144,8 @@ in
 
   # The agent Chrome (hosts/mac-mini.nix services.agent-chrome) is local here:
   # chrome-control drives 127.0.0.1:9222 directly, no ssh forward.
+  programs.user-clipboard.targetHost = lib.mkDefault "macbook-air-tailscale";
+
   home.sessionVariables.CHROME_CONTROL_HOST = "local";
   # Same reach as AGENT_MACHINE: Herdr panes here are non-login shells.
   programs.zsh.envExtra = lib.mkAfter "export CHROME_CONTROL_HOST=local\n";

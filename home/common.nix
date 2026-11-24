@@ -14,6 +14,7 @@
     ./git-signing.nix
     ./git-hooks.nix
     ./scripts.nix
+    ./user-clipboard.nix
     ./cli-tools.nix
     ./mcp.nix
     ./op-wrappers.nix
@@ -30,6 +31,8 @@
 
   # Both Macs use the full Finder profile, including desktop preferences.
   macos.finder.desktop.enable = true;
+
+  programs.user-clipboard.enable = true;
 
   services.scratch-sweeper.enable = true;
   services.automatic-updates.enable = true;
