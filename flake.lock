@@ -1047,6 +1047,7 @@
         "shared-album-reminders": "shared-album-reminders",
         "soma": "soma",
         "sticker-sync": "sticker-sync",
+        "synapse": "synapse",
         "verdict": "verdict"
       }
     },
@@ -1146,6 +1147,26 @@
       "original": {
         "owner": "alexjmiller5",
         "repo": "sticker-sync",
+        "type": "github"
+      }
+    },
+    "synapse": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795543768,
+        "narHash": "sha256-Bs+aN8yNYQVXtNSQQ55NBZE0PsisQCbR0u9hiQZQsVM=",
+        "owner": "alexjmiller5",
+        "repo": "synapse",
+        "rev": "11e741b93b60a230e7af39a0c8be05531cbf6e5a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "alexjmiller5",
+        "repo": "synapse",
         "type": "github"
       }
     },

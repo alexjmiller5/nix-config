@@ -120,6 +120,11 @@
       url = "github:alexjmiller5/agent-dispatch";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Native Apple Notes capture client; the mini alone scans the iCloud inbox.
+    synapse = {
+      url = "github:alexjmiller5/synapse";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Shared album reminder module, imported only by the mini profile.
     shared-album-reminders = {
       url = "github:alexjmiller5/shared-album-reminders";
@@ -202,6 +207,7 @@
             inputs.media-center-youtube-offline.darwinModules.default
             inputs.networth-host.darwinModules.default
             inputs.agent-dispatch.darwinModules.default
+            inputs.synapse.darwinModules.notes-intake
             inputs.flighty-sync.darwinModules.default
             inputs.callhistory-backup.darwinModules.default
             inputs.verdict.darwinModules.default

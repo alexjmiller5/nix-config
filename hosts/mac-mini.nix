@@ -176,6 +176,13 @@
     # Claude while at least 5% of its quota is left, then Codex.
     minQuotaPercent = 5;
   };
+  # One collector for the shared iCloud Notes inbox; keep the laptop disabled
+  # to avoid separate journals dispatching duplicate captures. Inbox/exclusions
+  # and native enrollment are user state configured through notes-intake.
+  services.synapse-notes-intake = {
+    enable = true;
+    user = username;
+  };
   # Verdict review pages: agents publish, Alex answers in the browser. Bound
   # to the tailnet interface only, so no auth code; agents on both Macs reach
   # it through VERDICT_URL (programs.verdict in home/common.nix).

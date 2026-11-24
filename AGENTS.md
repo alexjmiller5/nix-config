@@ -315,6 +315,13 @@ not enable it.
 
 ## Conventions
 
+Synapse's exported `darwinModules.notes-intake` owns the mini-only
+`services.synapse-notes-intake` job (`org.synapse.notes-intake`, every five
+minutes). The installed `notes-intake` CLI owns inbox/exclusion preferences,
+private revision journal and native Keychain enrollment; Nix carries only
+enable/user settings. The laptop is disabled to prevent duplicate iCloud
+capture journals.
+
 * **Two-machine parity rule**: every change to a host file or per-host home
   profile must explicitly consider the OTHER machine — does this belong on
   both (→ a shared module: `dev-tools`, `cli-tools`, `ai-agent`, ...), or on
