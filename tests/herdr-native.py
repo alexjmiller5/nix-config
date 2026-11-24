@@ -85,7 +85,7 @@ class NativeTests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
 
     def test_title_refresh_uses_an_independent_nonblocking_lock(self):
-        with tempfile.TemporaryDirectory() as d, patch.object(n,"STATE",Path(d)), patch.object(n,"titles") as titles:
+        with tempfile.TemporaryDirectory() as d, patch.object(n,"STATE",Path(d)), patch.object(n,"titles") as titles, patch.object(n,"core_titles"):
             with patch.object(n.fcntl,"flock") as flock:
                 n.refresh_titles()
                 self.assertEqual(flock.call_args.args[1], n.fcntl.LOCK_EX | n.fcntl.LOCK_NB)
@@ -177,6 +177,7 @@ class NativeTests(unittest.TestCase):
             n.live_records()
 
     def test_wrapped_core_events_refresh_titles(self):
+        self.assertTrue(n.title_event({"method": "event", "params": {"type": "created"}}))
         self.assertTrue(
             n.title_event(
                 {
@@ -507,6 +508,77 @@ class NativeTests(unittest.TestCase):
                 n.reopen(path)
             self.assertTrue(n.load(path)[0]["restoring"])
             self.assertEqual(n.load(path)[0]["id"], "receipt")
+
+    def test_headless_dispatch_gets_one_named_tab_in_its_destination(self):
+        document = {"version": 3, "value": {"spaces": [{"id": "captures", "tabs": []}]}}
+        record = {"address": "t1", "labels": {"dispatch.task": "opaque", "herdr.space": "captures", "session.title": "Repair Checkout"}}
+        with tempfile.TemporaryDirectory() as d, patch.object(n, "rpc", return_value=document), patch.object(n, "live_records", return_value=[record]), patch.object(n, "run", return_value={}) as run:
+            path = Path(d) / "titles.json"
+            n.core_titles(path)
+            tabs = document["value"]["spaces"][0]["tabs"]
+            self.assertEqual(len(tabs), 1)
+            self.assertEqual(tabs[0]["name"], "Repair Checkout")
+            self.assertEqual(tabs[0]["root"]["children"][0]["content"]["terminal"], "t1")
+            run.assert_called_with([n.HC, "label", "t1", "herdr.tab=" + tabs[0]["id"]])
+            n.core_titles(path)
+            self.assertEqual(len(tabs), 1)
+
+    def test_core_refresh_reuses_desktop_automatic_title_ownership(self):
+        with tempfile.TemporaryDirectory() as d, patch.object(n, "STATE", Path(d)), patch.object(n, "core_titles") as core, patch.object(n, "titles"):
+            n.refresh_titles()
+            core.assert_called_once_with(Path(d) / "titles.json")
+
+    def test_declared_spaces_preserve_tabs_and_are_idempotent(self):
+        document = {"version": 4, "value": {"spaces": [
+            {"id": "default", "name": "", "tabs": [{"id": "existing"}]},
+            {"id": "other", "name": "Personal", "tabs": []},
+        ]}}
+        with patch.object(n, "rpc", return_value=document) as rpc:
+            n.configure_spaces({"default": "Default", "captures": "Captures"})
+            spaces = document["value"]["spaces"]
+            self.assertEqual([s["name"] for s in spaces], ["Default", "Personal", "Captures"])
+            self.assertEqual(spaces[0]["tabs"], [{"id": "existing"}])
+            self.assertEqual(spaces[2]["tabs"], [])
+            self.assertEqual(rpc.call_args.kwargs["version"], 4)
+            rpc.reset_mock()
+            n.configure_spaces({"default": "Default", "captures": "Captures"})
+            self.assertEqual(rpc.call_count, 1)
+
+    def test_headless_naming_does_not_require_an_app_executable(self):
+        with patch.object(n, "app", side_effect=FileNotFoundError("no viewer")):
+            n.titles(Path("unused"))
+
+    def test_registration_keeps_launch_title_but_clears_previous_conversation(self):
+        for previous, expected in [
+            ({"session.title": "Repair Checkout", "dispatch.task": "opaque-task"}, "Repair Checkout"),
+            ({"session.id": "old", "session.title": "Old Work"}, ""),
+        ]:
+            with patch.object(n, "run", return_value={"labels": previous}) as run:
+                n.register("codex", SID, terminal="t1")
+                labels = dict(arg.split("=", 1) for arg in run.call_args.args[0][3:])
+                self.assertEqual(labels["session.title"], expected)
+
+    def test_headless_titles_follow_agent_labels_and_preserve_manual_names(self):
+        document = {"version": 7, "value": {"spaces": [{"tabs": [
+            {"id": "automatic", "name": "", "root": {"content": {"terminal": "t1"}}},
+            {"id": "manual", "name": "My Custom Name", "root": {"content": {"terminal": "t2"}}},
+        ]}]}}
+        records = [{"address": terminal, "labels": {"session.agent": "codex",
+                   "session.explicit-title": "1", "session.title": "Repair Checkout"}}
+                   for terminal in ("t1", "t2")]
+        with tempfile.TemporaryDirectory() as d, patch.object(n, "rpc", return_value=document) as rpc, patch.object(n, "live_records", return_value=records):
+            path = Path(d) / "titles.json"
+            n.core_titles(path)
+            self.assertEqual(document["value"]["spaces"][0]["tabs"][0]["name"], "Repair Checkout")
+            self.assertEqual(document["value"]["spaces"][0]["tabs"][1]["name"], "My Custom Name")
+            self.assertEqual(rpc.call_args.kwargs["version"], 7)
+            rpc.reset_mock()
+            n.core_titles(path)
+            self.assertEqual(rpc.call_count, 1)
+            records[0]["labels"]["session.title"] = "Review Payment"
+            n.core_titles(path)
+            self.assertEqual(document["value"]["spaces"][0]["tabs"][0]["name"], "Review Payment")
+            self.assertEqual(document["value"]["spaces"][0]["tabs"][1]["name"], "My Custom Name")
 
     def test_exact_native_locator_never_uses_inherited_pane_identity(self):
         records = {

@@ -52,6 +52,11 @@ in
   programs.people-sync.addressBookHost = "macbook-air-tailscale";
 
   programs.herdr-desktop.defaultSpace = "sp127095d663503df24b4375896791bc98";
+  # Capture dispatch runs on the mini; the laptop displays these remote spaces.
+  programs.herdr-desktop.spaces = {
+    sp127095d663503df24b4375896791bc98 = "Default";
+    spb7e239b82e2e43fdbefae0439f269435 = "Captures";
+  };
 
   services.automatic-updates.host = "mac-mini";
 

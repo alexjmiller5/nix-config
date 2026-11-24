@@ -128,7 +128,7 @@ routing table and workflow; this file is the in-repo map.
   It refuses malformed identities and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
   Shells reopen as fresh shells. Native close buttons bypass the undo snapshot.
   Native agent task titles use two words. Default home-space headings are hidden in the sidebar; named project spaces remain visible. Native shell tabs retain the last command through a shared zsh title hook; manual tab names are preserved.
-  The laptop's event-driven `herdr-native-titles` launchd agent names tabs from
+  Both Macs run the event-driven `herdr-native-titles` launchd agent. It persists local task names through version-checked Core document writes even without a desktop viewer, adopts live dispatched terminals into their labeled spaces once, then refreshes visible app tabs from
   agent-written task labels, useful terminal titles, or prompt fallbacks,
   preserving manual labels. Hammerspoon activation refreshes names on reopen.
   Cmd+[/] cycles panes, including mod panes; Cmd+Shift+R reconnects the selected
@@ -151,6 +151,7 @@ routing table and workflow; this file is the in-repo map.
   option accepts a terminal frontend; this flake supplies herdr-core-tui.
   `python3 scripts/herdr-core-bridge-smoke.py --plugin <package>` verifies
   shared input, ordinary new-tab adoption and safe close in isolated runtimes.
+  `programs.herdr-desktop.spaces` ensures named Core spaces at activation while preserving their tabs. The mini routes capture dispatch into Captures; ordinary terminals use Default.
   App/core versions are Nix-owned; do not apply in-app updates.
   Option+H launches the app through Hammerspoon; Option+T keeps Ghostty),
   `herdr.nix` (native `programs.herdr` settings and Claude/Codex session

@@ -109,7 +109,12 @@ def register(agent, session, terminal=None, cwd=None, title=None, session_file=N
     labels = {"session.agent": agent, "session.id": session}
     if previous.get("session.id") != session:
         labels.update(
-            {"session.title": "", "session.explicit-title": "", "session.file": ""}
+            {
+                "session.title": previous.get("session.title", "")
+                if not previous.get("session.id") else "",
+                "session.explicit-title": "",
+                "session.file": "",
+            }
         )
     if cwd:
         labels["session.cwd"] = cwd
@@ -173,6 +178,7 @@ def live_records():
 
 def title_event(event):
     return "terminals" in event or event.get("params", event).get("type") in (
+        "created",
         "labels",
         "label",
         "title",
@@ -713,10 +719,85 @@ def preferred_title(record):
     return fallback or ("New Session" if labels.get("session.agent") else "")
 
 
+def configure_spaces(declared):
+    document = rpc("doc.get", name="herdr-app")
+    value = document.get("value") or {"spaces": []}
+    spaces = value.setdefault("spaces", [])
+    changed = False
+    for identity, name in declared.items():
+        space = next((space for space in spaces if space["id"] == identity), None)
+        if space is None:
+            spaces.append({"id": identity, "name": name, "folder": str(Path.home()), "tabs": []})
+            changed = True
+        elif space.get("name") != name:
+            space["name"] = name
+            changed = True
+    if changed:
+        rpc("doc.set", name="herdr-app", version=document["version"], value=value)
+
+
+def core_titles(path):
+    """Persist local task names even when no desktop viewer is running."""
+    document = rpc("doc.get", name="herdr-app")
+    value = document.get("value") or {}
+    records = {record["address"]: record for record in live_records()}
+    previous = dict(load(path))
+    changed = False
+
+    def terminals(node):
+        terminal = node.get("content", {}).get("terminal")
+        if terminal:
+            yield terminal
+        for child in node.get("children", []):
+            yield from terminals(child)
+
+    spaces = value.get("spaces", [])
+    represented = {terminal for space in spaces for tab in space.get("tabs", [])
+                   for terminal in terminals(tab.get("root", {}))}
+    for terminal, record in records.items():
+        labels = record.get("labels", {})
+        destination = next((space for space in spaces
+                            if space.get("id") == labels.get("herdr.space")), None)
+        if terminal in represented or not labels.get("dispatch.task") or destination is None:
+            continue
+        identity = "tb" + uuid.uuid4().hex
+        destination.setdefault("tabs", []).append({
+            "id": identity, "name": "", "root": {
+                "id": identity, "type": "row", "children": [{
+                    "id": "p" + uuid.uuid4().hex, "type": "block",
+                    "content": {"terminal": terminal},
+                }],
+            },
+        })
+        changed = True
+
+    for space in spaces:
+        for tab in space.get("tabs", []):
+            names = (preferred_title(records.get(terminal, {}))
+                     for terminal in terminals(tab.get("root", {})))
+            desired = next((name for name in names if name), "")
+            if replace_title(
+                tab.get("name", ""), previous.get(tab["id"]), desired,
+                named=bool(tab.get("name")),
+            ):
+                tab["name"] = desired
+                previous[tab["id"]] = desired
+                changed = True
+    if changed:
+        rpc("doc.set", name="herdr-app", version=document["version"], value=value)
+        save(path, list(previous.items()))
+    for space in spaces:
+        for tab in space.get("tabs", []):
+            for terminal in terminals(tab.get("root", {})):
+                labels = records.get(terminal, {}).get("labels", {})
+                if labels.get("dispatch.task") and labels.get("herdr.tab") != tab["id"]:
+                    run([HC, "label", terminal, "herdr.tab=" + tab["id"]])
+
+
 def titles(path):
     try:
         world = app("ls")
-    except (ValueError, subprocess.SubprocessError):
+    except (OSError, ValueError, subprocess.SubprocessError):
         return  # Never open a window just to rename it.
     records = {r["address"]: r for r in live_records()}
     previous = dict(load(path))
@@ -760,6 +841,7 @@ def refresh_titles(wait=False):
             fcntl.flock(lock, fcntl.LOCK_EX | (0 if wait else fcntl.LOCK_NB))
         except BlockingIOError:
             return
+        core_titles(STATE / "titles.json")
         titles(STATE / "titles.json")
 
 
@@ -816,6 +898,7 @@ def main():
             "close-group",
             "reopen",
             "titles",
+            "spaces",
             "watch",
             "pane-next",
             "pane-previous",
@@ -831,6 +914,7 @@ def main():
     parser.add_argument("--terminal")
     parser.add_argument("--cwd")
     parser.add_argument("--title")
+    parser.add_argument("--spaces-file", type=Path)
     parser.add_argument("--session-file")
     parser.add_argument("--action", choices=["new", "close", "reopen", "pane-next", "pane-previous", "split-right", "split-down"], default="close")
     args = parser.parse_args()
@@ -876,6 +960,10 @@ def main():
             clear(args.terminal, args.session)
         elif args.command == "hook":
             hook(args.agent)
+        elif args.command == "spaces":
+            if not args.spaces_file:
+                parser.error("--spaces-file is required")
+            configure_spaces(json.loads(args.spaces_file.read_text()))
         elif args.command == "watch":
             watch()
         elif args.command in ("pane-next", "pane-previous"):

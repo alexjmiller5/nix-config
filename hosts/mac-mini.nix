@@ -172,7 +172,7 @@
       "-w"
     ];
     runtime = "core";
-    herdrWorkspace = "sp127095d663503df24b4375896791bc98";
+    herdrWorkspace = "spb7e239b82e2e43fdbefae0439f269435";
     # Claude while at least 5% of its quota is left, then Codex.
     minQuotaPercent = 5;
   };

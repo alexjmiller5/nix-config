@@ -71,6 +71,7 @@ let
         compact-terminals-bar = ../dotfiles/herdr-app/compact-terminals-bar;
       })
       cfg.exampleLayouts;
+  spacesFile = pkgs.writeText "herdr-spaces.json" (builtins.toJSON cfg.spaces);
   settingsFile = pkgs.writeText "herdr-desktop-settings.json" (builtins.toJSON cfg.settings);
 in
 {
@@ -87,6 +88,11 @@ in
       type = lib.types.nullOr lib.types.str;
       default = null;
       description = "Existing native desktop space ID for hdr new terminals.";
+    };
+    spaces = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      description = "Native space IDs and display names ensured at activation; existing tabs are preserved.";
     };
     agentSidebar.localLabel = lib.mkOption {
       type = lib.types.str;
@@ -116,7 +122,7 @@ in
       app
       navigate
     ];
-    launchd.agents.herdr-native-titles = lib.mkIf cfg.app.enable {
+    launchd.agents.herdr-native-titles = {
       enable = true;
       config = {
         Label = "org.nix-community.herdr-native-titles";
@@ -132,6 +138,11 @@ in
         StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/herdr-native-titles.log";
       };
     };
+    home.activation.herdrNativeSpaces = lib.mkIf (cfg.spaces != { }) (
+      lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        run ${lib.getExe native} spaces --spaces-file ${spacesFile}
+      ''
+    );
     home.activation.herdrNativeLegacyGuards =
       lib.hm.dag.entryAfter
         [
@@ -203,7 +214,9 @@ in
       exampleFiles
       // lib.optionalAttrs cfg.agentSidebar.enable {
         "herdr-app/layouts/terminals-agents.json".text =
-          builtins.replaceStrings [ ''"@localLabel@"'' ''"@nativeHelper@"'' ] [ (builtins.toJSON cfg.agentSidebar.localLabel) (builtins.toJSON (lib.getExe native)) ]
+          builtins.replaceStrings
+            [ ''"@localLabel@"'' ''"@nativeHelper@"'' ]
+            [ (builtins.toJSON cfg.agentSidebar.localLabel) (builtins.toJSON (lib.getExe native)) ]
             (builtins.readFile ../dotfiles/herdr-app/terminals-agents.json);
       }
       // {
