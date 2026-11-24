@@ -163,7 +163,7 @@ def live_records():
         except subprocess.CalledProcessError as error:
             try:
                 missing = (
-                    json.loads(error.stdout or "{}").get("error", {}).get("kind")
+                    json.loads(error.stdout or error.stderr or "{}").get("error", {}).get("kind")
                     == "not_found"
                 )
             except ValueError:

@@ -163,6 +163,11 @@ class NativeTests(unittest.TestCase):
             n, "run", side_effect=[{"terminals": [{"address": "t1"}]}, missing]
         ):
             self.assertEqual(n.live_records(), [])
+        missing_stderr = subprocess.CalledProcessError(
+            3, [], output="", stderr='{"error":{"kind":"not_found"}}'
+        )
+        with patch.object(n, "run", side_effect=[{"terminals": [{"address": "t1"}]}, missing_stderr]):
+            self.assertEqual(n.live_records(), [])
         unreachable = subprocess.CalledProcessError(
             1, [], output='{"error":{"kind":"unreachable"}}'
         )
