@@ -1157,11 +1157,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795543982,
-        "narHash": "sha256-Bz7IG/ZUa06crEzDJTpTVnu10WZdcHSNcFgxG1wnZGc=",
+        "lastModified": 1795544208,
+        "narHash": "sha256-8ZWRP/OerAj9THwUwneLF1CBSdVXqAxChHaLeXzC5+U=",
         "owner": "alexjmiller5",
         "repo": "synapse",
-        "rev": "64d03d3e2be2589055d3e5243e2a91000873e7c1",
+        "rev": "904985c5128db2d825dac428cfe793efe8f1ba3b",
         "type": "github"
       },
       "original": {
