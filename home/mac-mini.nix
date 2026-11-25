@@ -64,9 +64,9 @@ in
       enable = false;
       flags = 312483854;
     };
-    "com.apple.iChat" = {
+    "com.apple.MobileSMS" = {
       enable = false;
-      flags = 41943054;
+      flags = 9523691530;
     };
     "com.apple.mobilephone" = {
       enable = false;
