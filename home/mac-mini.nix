@@ -58,6 +58,22 @@ in
     spb7e239b82e2e43fdbefae0439f269435 = "Captures";
   };
 
+  # Quiet headless host; the laptop keeps its own notification preferences.
+  macos.notificationPrefs.apps = {
+    "com.apple.FaceTime" = {
+      enable = false;
+      flags = 312483854;
+    };
+    "com.apple.iChat" = {
+      enable = false;
+      flags = 41943054;
+    };
+    "com.apple.mobilephone" = {
+      enable = false;
+      flags = 278929422;
+    };
+  };
+
   services.automatic-updates.host = "mac-mini";
 
   imports = [
@@ -77,6 +93,7 @@ in
     ./spotify-player.nix
     # Headless: no idle screen saver, so the desktop agents drive never locks.
     ./macos/screensaver.nix
+    ./macos/notification-prefs.nix
     ./heartbeat.nix
   ];
 

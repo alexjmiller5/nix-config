@@ -187,6 +187,7 @@ routing table and workflow; this file is the in-repo map.
   Update the pinned native package when upgrading the installed Codex version),
   `macos/{finder,menu-bar,duti,nightlight,spotlight-raycast,chrome-extension-storage,chrome-remote-debugging,notification-prefs,screensaver}.nix`
   (activation-script defaults by concern, each exported via `homeModules`;
+  the mini disables Messages, FaceTime and Phone notifications;
   `screensaver.nix` keeps the idle screen saver, and so the idle lock, off
   and is imported only on the headless mini),
   `heartbeat.nix` (`services.heartbeat`: a launchd ping to a dead-man's-switch
