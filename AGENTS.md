@@ -13,6 +13,8 @@ routing table and workflow; this file is the in-repo map.
 * `hosts/*.nix` — system layer DIFFS from `modules/darwin-base.nix`: brew
   taps/brews/casks/masApps (zap cleanup: the lists ARE the machine), power,
   per-host defaults
+* `home/people-sync-operator.nix` renders the operator credential seam from stable field IDs;
+  each host sets `peopleSyncOperator.commTokenReference` to its independent exact-stream credential.
 * `home/` — home-manager modules by concern: `common` (base identity; pulls
   `git.nix`, `git-signing.nix`, `git-hooks.nix`, `scripts.nix`, `cli-tools.nix`, `op-wrappers.nix`,
   `agent-config-links.nix`, `machine-vault-git.nix`, `mcp.nix`),

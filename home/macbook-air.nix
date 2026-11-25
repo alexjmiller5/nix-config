@@ -22,6 +22,9 @@ let
   mkLink = path: config.lib.file.mkOutOfStoreSymlink path;
 in
 {
+  peopleSyncOperator.commTokenReference =
+    "op://ug25zl4cfxnyk7rnwkyhea752i/5xs6y3x5sxkhmvbjlredlpk7oi/SOMA_COMM_HUB_TOKEN_MACBOOK_AIR";
+
   # The personal browser lives on the laptop; the mini only runs agent Chrome.
   programs.bookmark-mirror.enable = true;
   programs.herdr-desktop.app.enable = true;

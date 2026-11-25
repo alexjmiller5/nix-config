@@ -45,6 +45,9 @@ let
   '';
 in
 {
+  peopleSyncOperator.commTokenReference =
+    "op://ug25zl4cfxnyk7rnwkyhea752i/5xs6y3x5sxkhmvbjlredlpk7oi/SOMA_COMM_HUB_TOKEN_MAC_MINI";
+
   # People Sync attaches to this machine's own shared agent Chrome.
   programs.people-sync.endpoint = "127.0.0.1:${toString osConfig.services.agent-chrome.port}";
   # The mini's own Contacts hold only a handful of entries; `people-sync comm`

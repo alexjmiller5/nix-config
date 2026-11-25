@@ -39,6 +39,7 @@ check:
     python3 tests/system-updates.py
     python3 tests/switch-laptop.py
     nix flake check
+    python3 tests/people-sync-operator.py
     python3 tests/manual-render.py
     /usr/bin/ruby tests/flighty-install.rb
     python3 tests/finder-defaults.py
