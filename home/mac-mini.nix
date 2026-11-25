@@ -261,6 +261,21 @@ in
 
   # Human steps nix cannot do (rendered into MANUAL-<host>.md; verified by manual-check).
   manual.steps = {
+    call-relay-off = {
+      title = "Disable iPhone call relay";
+      owner = "macos-notifications";
+      desktop = true;
+      body = ''
+        In Phone > Settings > Calls, turn off Calls from iPhone.
+        Quit and reopen Phone, then verify that the switch remains off.
+        This is native device calling state: Notification Center permissions
+        do not disable call relay. A com.apple.TTY preference write alone does
+        not change the Phone switch. Keep the Mac signed in for other services.
+        Verify with an incoming cellular call while the iPhone is nearby on
+        the same network: the iPhone should ring and this Mac should stay silent.
+      '';
+      redo = "on replacement machines or after re-enabling Calls from iPhone";
+    };
     shared-album-reminders-access = {
       title = "Shared Album Reminders Photos access and enrollment";
       owner = "shared-album-reminders";
