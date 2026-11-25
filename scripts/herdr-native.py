@@ -536,6 +536,53 @@ def check_snapshot(entry):
         saved["working"] = current.get("working", False)
 
 
+def close_session(agent, session, dry_run=False):
+    """Close only this conversation through Core, including on headless hosts."""
+    native = {"codex": os.environ.get("CODEX_THREAD_ID"),
+              "claude": os.environ.get("AGENT_OP_SESSION", "").removeprefix("claude-"),
+              "pi": os.environ.get("PI_SESSION_FILE")}.get(agent)
+    if not native or native != session:
+        raise ValueError("Self-close requires this agent's exact native identity")
+    owned = locate(agent, session)
+    terminal = owned["terminal_id"]
+    if "/" in terminal:
+        raise ValueError("Self-close must run on the conversation's own Core host")
+    document = rpc("doc.get", name="herdr-app")
+    value = document.get("value") or {}
+    tabs = [(space, tab) for space in value.get("spaces", [])
+            for tab in space.get("tabs", []) if tab["id"] == owned["tab_id"]]
+    if len(tabs) != 1:
+        raise ValueError("No unique native tab; leaving the session open")
+    space, tab = tabs[0]
+    panes = leaves(tab["root"])
+    if len(panes) != 1:
+        raise ValueError("Shared tab: refusing to close other panes")
+    if panes[0].get("content") != {"terminal": terminal}:
+        raise ValueError("Native tab ownership changed; leaving the session open")
+    spec = resume_record(run([HC, "get", terminal]))
+    if spec["argv"] != [agent, "--session" if agent == "pi" else
+                        "resume" if agent == "codex" else "--resume", session]:
+        raise ValueError("Native conversation identity changed; leaving the session open")
+    if dry_run:
+        print(json.dumps({**owned, "action": "would_close"}), flush=True)
+        return
+    path = STATE / "archive.json"
+    history = [item for item in load(path) if item["original_tab"] != tab["id"]]
+    history.append({"id": uuid.uuid4().hex, "original_tab": tab["id"],
+                    "space": space["id"], "space_name": space["name"],
+                    "space_folder": space.get("folder"), "machine": None,
+                    "machine_id": None, "name": tab.get("name", ""),
+                    "tree": tab["root"], "records": {terminal: spec},
+                    "index": space["tabs"].index(tab) + 1})
+    save(path, history)
+    # Prevent the dispatch naming service from adopting this terminal again.
+    run([HC, "label", terminal, "dispatch.task="])
+    space["tabs"].remove(tab)
+    rpc("doc.set", name="herdr-app", version=document["version"], value=value)
+    print(json.dumps({**owned, "action": "closing"}), flush=True)
+    run([HC, "kill", terminal])
+
+
 def close_group(path, tab_ids):
     if not tab_ids or len(set(tab_ids)) != len(tab_ids):
         raise ValueError("Select distinct open tabs")
@@ -895,6 +942,7 @@ def main():
             "name",
             "hook",
             "close",
+            "close-session",
             "close-group",
             "reopen",
             "titles",
@@ -916,11 +964,12 @@ def main():
     parser.add_argument("--title")
     parser.add_argument("--spaces-file", type=Path)
     parser.add_argument("--session-file")
+    parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--action", choices=["new", "close", "reopen", "pane-next", "pane-previous", "split-right", "split-down"], default="close")
     args = parser.parse_args()
-    if args.command in ("register", "hook", "locate", "name") and not args.agent:
+    if args.command in ("register", "hook", "locate", "name", "close-session") and not args.agent:
         parser.error("--agent is required")
-    if args.command in ("register", "clear", "locate", "name") and not args.session:
+    if args.command in ("register", "clear", "locate", "name", "close-session") and not args.session:
         parser.error("--session is required")
     if args.command == "clear" and not args.terminal:
         parser.error("--terminal is required")
@@ -979,6 +1028,8 @@ def main():
                 fcntl.flock(lock, fcntl.LOCK_EX)
                 if args.command == "close":
                     close_tab(STATE / "archive.json", args.tab)
+                elif args.command == "close-session":
+                    close_session(args.agent, args.session, args.dry_run)
                 elif args.command == "close-group":
                     close_group(STATE / "archive.json", args.tabs)
                 elif args.command == "reopen":

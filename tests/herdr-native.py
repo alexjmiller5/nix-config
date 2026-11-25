@@ -19,6 +19,103 @@ spec.loader.exec_module(n)
 SID = "00000000-0000-4000-8000-000000000001"
 
 
+class SelfCloseTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.directory = Path(self.temp.name)
+        self.record = {"address": "t1", "cwd": "/workspace", "state": "live",
+                       "labels": {"session.agent": "codex", "session.id": SID,
+                                  "herdr.tab": "own", "dispatch.task": "task-id"}}
+        self.tab = {"id": "own", "name": "Fix Close", "root": {
+            "id": "root", "type": "row", "children": [
+                {"id": "pane", "content": {"terminal": "t1"}}]}}
+        self.document = {"version": 7, "value": {"spaces": [
+            {"id": "space", "name": "Work", "folder": "/workspace",
+             "tabs": [self.tab, {"id": "other", "root": {}}]}]}}
+        self.killed = []
+        self.written = None
+        self.conflict = False
+        self.addCleanup(patch.stopall)
+        patch.object(n, "STATE", self.directory).start()
+        patch.dict(os.environ, CODEX_THREAD_ID=SID).start()
+        patch.object(n, "live_records", return_value=[self.record]).start()
+        patch.object(n, "rpc", side_effect=self.rpc).start()
+        patch.object(n, "run", side_effect=self.run_core).start()
+        patch.object(n, "app", side_effect=AssertionError("No desktop CLI on this host")).start()
+
+    def rpc(self, method, **params):
+        if method == "doc.get":
+            self.assertEqual(params, {"name": "herdr-app"})
+            return json.loads(json.dumps(self.document))
+        self.assertEqual(method, "doc.set")
+        self.assertEqual(params["version"], 7)
+        self.assertEqual(params["name"], "herdr-app")
+        self.assertTrue((self.directory / "archive.json").exists())
+        if self.conflict:
+            raise ValueError("conflict")
+        self.written = params["value"]
+        return {"version": 8}
+
+    def run_core(self, argv, **kwargs):
+        if argv == [n.HC, "get", "t1"]:
+            return self.record
+        if argv == [n.HC, "label", "t1", "dispatch.task="]:
+            return {}
+        self.assertEqual(argv, [n.HC, "kill", "t1"])
+        self.assertEqual([t["id"] for t in self.written["spaces"][0]["tabs"]], ["other"])
+        self.killed.append("t1")
+        return {}
+
+    def test_core_self_close_archives_exact_resume_and_removes_only_own_tab(self):
+        n.close_session("codex", SID)
+        self.assertEqual(self.killed, ["t1"])
+        saved = n.load(self.directory / "archive.json")[-1]
+        self.assertEqual(saved["records"]["t1"]["argv"], ["codex", "resume", SID])
+        self.assertEqual(saved["original_tab"], "own")
+        self.assertEqual(saved["tree"], self.tab["root"])
+
+    def test_dry_run_has_no_mutations(self):
+        n.close_session("codex", SID, dry_run=True)
+        self.assertEqual(self.killed, [])
+        self.assertIsNone(self.written)
+        self.assertFalse((self.directory / "archive.json").exists())
+
+    def test_shared_or_stale_tab_never_closes_any_terminal(self):
+        for content in ({"terminal": "t2"}, {"mod": "editor"}):
+            self.tab["root"]["children"].append({"id": "second", "content": content})
+            with self.assertRaisesRegex(ValueError, "Shared tab"):
+                n.close_session("codex", SID)
+            self.tab["root"]["children"].pop()
+        self.tab["root"]["children"][0]["content"]["terminal"] = "t2"
+        with self.assertRaises(ValueError):
+            n.close_session("codex", SID)
+        self.assertEqual(self.killed, [])
+        self.assertIsNone(self.written)
+
+    def test_native_identity_and_document_conflicts_fail_closed(self):
+        with patch.dict(os.environ, CODEX_THREAD_ID="different"):
+            with self.assertRaisesRegex(ValueError, "identity"):
+                n.close_session("codex", SID)
+        self.conflict = True
+        with self.assertRaisesRegex(ValueError, "conflict"):
+            n.close_session("codex", SID)
+        self.assertEqual(self.killed, [])
+        self.assertIsNone(self.written)
+
+    def test_changed_or_duplicate_conversation_never_closes(self):
+        changed = {**self.record, "labels": {"session.agent": "codex",
+                   "session.id": "00000000-0000-4000-8000-000000000002"}}
+        with patch.object(n, "run", return_value=changed):
+            with self.assertRaisesRegex(ValueError, "identity changed"):
+                n.close_session("codex", SID)
+        with patch.object(n, "live_records", return_value=[self.record, self.record]):
+            with self.assertRaisesRegex(ValueError, "Multiple"):
+                n.close_session("codex", SID)
+        self.assertEqual(self.killed, [])
+        self.assertIsNone(self.written)
+
+
 class NativeTests(unittest.TestCase):
     def test_connected_guard_is_read_only_and_revalidates_selection(self):
         world={"spaces":[{"id":"remote","active":True,"machine":"box","tabs":[{"id":"t","active":True}]}]}

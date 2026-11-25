@@ -122,8 +122,11 @@ routing table and workflow; this file is the in-repo map.
   Naming has an independent lock, so it cannot delay close/restore; redundant
   activation refreshes skip a naming pass already in progress.
   Tests: `tests/herdr-navigate.py`, `tests/herdr-native.py`.
-  `herdr-native` registers exact Claude/Codex/Pi conversation identities,
-  records Cmd+W closures, and resumes them through Cmd+Shift+T with tab names,
+  `herdr-native` registers exact Claude/Codex/Pi conversation identities.
+  `close-session --agent <kind> --session <identity> [--dry-run]` safely
+  closes only the caller's single-pane tab through Core on headless hosts,
+  saving its resume snapshot and rejecting document-version conflicts.
+  It records Cmd+W closures and resumes them through Cmd+Shift+T with tab names,
   pane working directories and split topology. Unregistered Codex/Claude tabs reopen through their resume picker.
   It refuses malformed identities and duplicate/uncertain restores; it never replays arbitrary foreground jobs.
   Shells reopen as fresh shells. Native close buttons bypass the undo snapshot.
