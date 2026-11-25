@@ -16,4 +16,4 @@ for host, field in [('mac-mini', 'SOMA_COMM_HUB_TOKEN_MAC_MINI'), ('macbook-air'
         'NOTION_API_TOKEN': prefix + 'NOTION_API_TOKEN',
         'SOMA_COMM_HUB_TOKEN': prefix + field,
     }, f'{host}: rendered operator refs do not match its independent enrolled credential'
-print('PASS both rendered People Sync caller refs; base credential refs preserved by stable field ID')
+print('PASS both rendered People Sync caller refs and expected base field references; secret equality is verified separately')
